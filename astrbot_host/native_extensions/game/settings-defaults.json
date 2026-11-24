@@ -1,0 +1,40 @@
+{
+  "server": {
+    "enabled": true,
+    "host": "127.0.0.1",
+    "access_host": "",
+    "port": 6331,
+    "public_base_url": "",
+    "external_base_url": "",
+    "auto_quick_tunnel": true,
+    "cloudflared_path": "",
+    "allow_cloudflared_download": true,
+    "cloudflared_download_proxy": ""
+  },
+  "native_v2": {
+    "tictactoe_enabled": true,
+    "gomoku_enabled": true,
+    "pig_dice_enabled": true,
+    "pig_dice_target_score": 50,
+    "blackjack_enabled": true,
+    "xiangqi_enabled": true,
+    "turtle_soup_enabled": true,
+    "turtle_soup_content_level": "normal",
+    "turtle_soup_max_hints": 3,
+    "draw_guess_enabled": true,
+    "draw_guess_max_guesses": 5,
+    "draw_guess_duration_seconds": 120
+  },
+  "xiangqi": {
+    "engine_path": "",
+    "allow_engine_download": true,
+    "download_proxy": ""
+  },
+  "context": {
+    "enable_private_qq_game_context": true,
+    "recent_game_result_ttl_minutes": 30
+  },
+  "logging": {
+    "level": "inherit"
+  }
+}
