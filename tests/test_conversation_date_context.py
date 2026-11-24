@@ -6,10 +6,10 @@ import sys
 import unittest
 from unittest.mock import patch
 
-from companion_v2.conversation.date_context import (period_label, project_interaction_gap, project_local_date,
+from digital_life_core.conversation.date_context import (period_label, project_interaction_gap, project_local_date,
                                                     project_personal_dates)
-from companion_v2.conversation import date_context
-from companion_v2.agenda.annual_calendar import SCHEMA, parse_annual_calendar
+from digital_life_core.conversation import date_context
+from digital_life_core.agenda.annual_calendar import SCHEMA, parse_annual_calendar
 
 
 class LocalDateContextTests(unittest.TestCase):
@@ -36,7 +36,7 @@ class LocalDateContextTests(unittest.TestCase):
     def test_holiday_provider_and_weekend_fallback_are_explicit(self):
         provider = SimpleNamespace(is_holiday=lambda day: day.isoformat() == "2026-10-01",
             get_holiday_detail=lambda _day: (True, "国庆节"), is_workday=lambda _day: True)
-        with patch("companion_v2.conversation.date_context._chinese_calendar", provider):
+        with patch("digital_life_core.conversation.date_context._chinese_calendar", provider):
             holiday = project_local_date(datetime(2026, 10, 1, 4, tzinfo=timezone.utc), "UTC")
             workday = project_local_date(datetime(2026, 10, 2, 4, tzinfo=timezone.utc), "UTC")
         self.assertEqual(holiday["holiday"], {"status": "available", "kind": "holiday",
@@ -51,7 +51,7 @@ class LocalDateContextTests(unittest.TestCase):
             raise NotImplementedError("holiday data is unavailable for this year")
 
         provider = SimpleNamespace(is_holiday=out_of_range, is_workday=lambda _day: False)
-        with patch("companion_v2.conversation.date_context._chinese_calendar", provider):
+        with patch("digital_life_core.conversation.date_context._chinese_calendar", provider):
             result = project_local_date(datetime(2027, 1, 1, 4, tzinfo=timezone.utc), "UTC")
         self.assertEqual(result["holiday"], {"status": "available", "kind": "workday",
                          "label": "工作日", "source": "weekday_fallback"})
@@ -61,7 +61,7 @@ class LocalDateContextTests(unittest.TestCase):
             get_holiday_detail=lambda _day: (False, ""), is_workday=lambda _day: False)
         calendar = parse_annual_calendar({"schema": SCHEMA, "year": 2026,
             "makeup_workdays": [{"date": "2026-09-25", "name": "调休上班"}]})
-        with patch("companion_v2.conversation.date_context._chinese_calendar", provider):
+        with patch("digital_life_core.conversation.date_context._chinese_calendar", provider):
             result = project_local_date(datetime(2026, 9, 25, 4, tzinfo=timezone.utc), "UTC", (calendar,),
                                         almanac_enabled=True)
         self.assertEqual(result["holiday"], {"status": "available", "kind": "makeup_workday",
@@ -118,7 +118,7 @@ class LocalDateContextTests(unittest.TestCase):
                 raise PermissionError("holiday package is unreadable")
             return original_import(name, *args, **kwargs)
 
-        spec = spec_from_file_location("companion_v2.conversation.date_context_import_fixture", date_context.__file__)
+        spec = spec_from_file_location("digital_life_core.conversation.date_context_import_fixture", date_context.__file__)
         isolated = module_from_spec(spec)
         with patch("builtins.__import__", side_effect=unavailable):
             spec.loader.exec_module(isolated)
@@ -133,7 +133,7 @@ class LocalDateContextTests(unittest.TestCase):
             raise OSError("optional holiday data could not be read")
 
         provider = SimpleNamespace(is_holiday=unreadable)
-        with patch("companion_v2.conversation.date_context._chinese_calendar", provider):
+        with patch("digital_life_core.conversation.date_context._chinese_calendar", provider):
             result = project_local_date(datetime(2026, 10, 3, 4, tzinfo=timezone.utc), "UTC")
         self.assertEqual(result["holiday"]["source"], "weekday_fallback")
         self.assertEqual(result["holiday"]["label"], "周末")
@@ -252,7 +252,7 @@ class LocalDateContextTests(unittest.TestCase):
 
     def test_lunar_personal_birthday_and_ambiguous_text(self):
         at = datetime(2026, 10, 23, 8, 0, tzinfo=timezone.utc)
-        with patch("companion_v2.conversation.date_context.lunar_date_parts",
+        with patch("digital_life_core.conversation.date_context.lunar_date_parts",
                    side_effect=lambda day: (2026, 9, 15, False) if day.isoformat() == "2026-10-24" else None):
             result = project_personal_dates(at, "Asia/Shanghai", user_birthday="农历九月十五")
         self.assertEqual(result["entries"], [{"subject": "user", "label": "对方生日",

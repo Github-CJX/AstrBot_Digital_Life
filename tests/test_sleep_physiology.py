@@ -4,9 +4,9 @@ from datetime import datetime, timedelta, timezone
 from types import SimpleNamespace
 import unittest
 
-from companion_v2.role_work.life.physiology import (nap_ready, night_sleep_ready,
+from digital_life_core.role_work.life.physiology import (nap_ready, night_sleep_ready,
     oversleep_extension, sleep_profile, sleep_quality_range)
-from companion_v2.role_work.models import RoleActivityState as State, RoleSleepReceipt
+from digital_life_core.role_work.models import RoleActivityState as State, RoleSleepReceipt
 NOW = datetime(2026, 10, 14, 12, tzinfo=timezone.utc)
 
 

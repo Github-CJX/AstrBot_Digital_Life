@@ -17,7 +17,7 @@ import threading
 import time
 import unittest
 
-from companion_v2.execution.models import TaskError
+from digital_life_core.execution.models import TaskError
 from tests.test_host_application import HostFixture
 
 

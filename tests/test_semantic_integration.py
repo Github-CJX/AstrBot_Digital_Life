@@ -14,14 +14,14 @@ import unittest
 
 from PIL import Image
 
-from astrbot_host.media import inspect_image
-from companion_v2.conversation.media.animation import CapturedAnimation, PromptAnimation
-from companion_v2.conversation.media.models import CapturedImage, ImageDescriptor
-from companion_v2.conversation.media.reply import ImageReplyDraft
-from companion_v2.execution.models import TaskError
-from companion_v2.model_gateway.embedding import EmbeddingGateway, unit
-from companion_v2.proactive.external_materials import NewsItem, ParseBatch
-from companion_v2.storage.semantic import SemanticStore
+from digital_life_host.media import inspect_image
+from digital_life_core.conversation.media.animation import CapturedAnimation, PromptAnimation
+from digital_life_core.conversation.media.models import CapturedImage, ImageDescriptor
+from digital_life_core.conversation.media.reply import ImageReplyDraft
+from digital_life_core.execution.models import TaskError
+from digital_life_core.model_gateway.embedding import EmbeddingGateway, unit
+from digital_life_core.proactive.external_materials import NewsItem, ParseBatch
+from digital_life_core.storage.semantic import SemanticStore
 from tests.test_host_application import HostFixture
 from tests.test_role_tool_loop import requested, answered, call
 
@@ -448,7 +448,7 @@ class SemanticConversationTests(HostFixture, unittest.IsolatedAsyncioTestCase):
         self.assertEqual((await self.done(app, first))["state"], "complete")
         context = self.context(app, first)
         row = app.runtime.read_one("SELECT event_json FROM conversation_inputs WHERE batch_id = ?", (first,))
-        from companion_v2.memory.codec import source as source_from_json
+        from digital_life_core.memory.codec import source as source_from_json
         source = source_from_json(json.loads(row["event_json"])["source"])
         evidence = app.memory.writer.access.capture(context, source)
         saved = app.memory.experiences.save(context, view_id="river-walk", expected_revision=0,
@@ -828,7 +828,7 @@ class SemanticConversationTests(HostFixture, unittest.IsolatedAsyncioTestCase):
         with self.semantic.store.db() as db:
             db.execute("INSERT INTO reaction_deliveries VALUES (?,?,?,?,?,NULL,NULL)",
                        (owner, actor, "expired-delivery", item["id"], delivered_at))
-        from companion_v2.expression.reaction_preferences import REACTION_FEEDBACK_WINDOW_SECONDS
+        from digital_life_core.expression.reaction_preferences import REACTION_FEEDBACK_WINDOW_SECONDS
         self.semantic.reaction_preferences._observe(owner, actor, "expired-feedback",
             "刚才那张表情包不合适", delivered_at + REACTION_FEEDBACK_WINDOW_SECONDS + 1)
         self.assertEqual(self.semantic.reaction_preferences.scores(context), {})

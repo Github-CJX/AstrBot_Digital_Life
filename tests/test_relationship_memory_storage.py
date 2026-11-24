@@ -6,10 +6,10 @@ import sqlite3
 import unittest
 from unittest.mock import patch
 
-from companion_v2.execution.models import digest, encode, stamp
-from companion_v2.role_work.models import RoleActivity, RoleActivityState
-from companion_v2.storage.runtime import StorageOpenError, StorageRuntime
-from companion_v2.storage.schema import (
+from digital_life_core.execution.models import digest, encode, stamp
+from digital_life_core.role_work.models import RoleActivity, RoleActivityState
+from digital_life_core.storage.runtime import StorageOpenError, StorageRuntime
+from digital_life_core.storage.schema import (
     MIGRATION_V16_TO_V17_ID,
     MIGRATION_V17_TO_V18_FINGERPRINT,
     MIGRATION_V17_TO_V18_ID,
@@ -86,7 +86,7 @@ class RelationshipMemoryStorageTests(unittest.TestCase):
         self.assert_preserved(self.open_runtime())
 
     def test_failed_v18_upgrade_rolls_back_all_new_tables_and_can_retry(self):
-        with patch("companion_v2.storage.runtime.V18_MIGRATION_STATEMENTS",
+        with patch("digital_life_core.storage.runtime.V18_MIGRATION_STATEMENTS",
                    V18_MIGRATION_STATEMENTS + ("INVALID UPGRADE",)):
             with self.assertRaises(StorageOpenError):
                 StorageRuntime.open(data_root=self.root, installation_id=INSTALLATION)

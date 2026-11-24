@@ -14,16 +14,16 @@ from tests.test_astrbot_staging_host import WebContext, host_config
 from tests.native_adapter_support import FakeEvent, FakeProvider, FakeReverseApi, completion
 from tests.staging_bootstrap_support import wait_for_batch
 from tests.test_management_access import NOW
-from astrbot_host.binding_store import PendingBinding, write_binding
-from astrbot_host.controller import AstrBotStagingController
-from astrbot_host.multi_controller import AstrBotMultiController
-from astrbot_host.setup_api import (PROACTIVE_TEST_FAILURE_LABELS, PROACTIVE_TEST_STAGE_BY_CODE,
+from digital_life_host.binding_store import PendingBinding, write_binding
+from digital_life_host.controller import AstrBotStagingController
+from digital_life_host.multi_controller import AstrBotMultiController
+from digital_life_host.setup_api import (PROACTIVE_TEST_FAILURE_LABELS, PROACTIVE_TEST_STAGE_BY_CODE,
                                     PROACTIVE_TEST_SUGGESTIONS, SetupWebAPI, _settle_failed_stages)
-from companion_v2.adapters.astrbot.staging import NativeAdapterTypes
-from companion_v2.execution.models import TaskError
-from companion_v2.proactive.diagnostic_models import DiagnosticSourceError
-from companion_v2.foundation.outcome import Outcome
-from companion_v2.foundation.refs import ScopeKind
+from digital_life_core.adapters.astrbot.staging import NativeAdapterTypes
+from digital_life_core.execution.models import TaskError
+from digital_life_core.proactive.diagnostic_models import DiagnosticSourceError
+from digital_life_core.foundation.outcome import Outcome
+from digital_life_core.foundation.refs import ScopeKind
 
 
 class AstrBotSetupFlowTests(unittest.IsolatedAsyncioTestCase):
@@ -57,7 +57,7 @@ class AstrBotSetupFlowTests(unittest.IsolatedAsyncioTestCase):
         payload = (b"" if name in {"model_tasks", "profile"} else
                    json.dumps(body if body is not None else {}, ensure_ascii=False).encode("utf-8"))
         request = NS(username=username, query={}, body=AsyncMock(return_value=payload))
-        with patch("astrbot_host.setup_api.request", request):
+        with patch("digital_life_host.setup_api.request", request):
             return await getattr(self.api, name)()
 
     async def test_profile_save_accepts_the_full_field_set(self):
@@ -82,7 +82,7 @@ class AstrBotSetupFlowTests(unittest.IsolatedAsyncioTestCase):
 
     async def test_setup_api_has_no_runtime_mode_endpoint_or_status_field(self):
         routes = {route for route, *_ in self.api.routes()}
-        self.assertNotIn("/astrbot_plugin_private_companion/setup/mode", routes)
+        self.assertNotIn("/astrbot_plugin_digital_life/setup/mode", routes)
         status = await self.call("status")
         self.assertEqual(status["status"], "ok", status)
         self.assertNotIn("mode", status["data"])
@@ -208,9 +208,9 @@ class AstrBotSetupFlowTests(unittest.IsolatedAsyncioTestCase):
 
         payload = json.dumps({"purpose": "environment", "confirm_delivery": True}).encode("utf-8")
         request = NS(username="administrator", query={}, body=AsyncMock(return_value=payload))
-        with patch("astrbot_host.setup_api.request", request), \
-             patch("astrbot_host.setup_api.ContactManagement", ContactManager), \
-             patch("astrbot_host.setup_api.dashboard_operator", return_value=object()):
+        with patch("digital_life_host.setup_api.request", request), \
+             patch("digital_life_host.setup_api.ContactManagement", ContactManager), \
+             patch("digital_life_host.setup_api.dashboard_operator", return_value=object()):
             response = await api.proactive_diagnostic()
 
         result = response["data"]
@@ -232,9 +232,9 @@ class AstrBotSetupFlowTests(unittest.IsolatedAsyncioTestCase):
         self.assertFalse(result["replay_allowed"])
 
         app.proactive.contact.return_value = Outcome.failed("model_budget_exhausted", "local model budget exhausted")
-        with patch("astrbot_host.setup_api.request", request), \
-             patch("astrbot_host.setup_api.ContactManagement", ContactManager), \
-             patch("astrbot_host.setup_api.dashboard_operator", return_value=object()):
+        with patch("digital_life_host.setup_api.request", request), \
+             patch("digital_life_host.setup_api.ContactManagement", ContactManager), \
+             patch("digital_life_host.setup_api.dashboard_operator", return_value=object()):
             budget_response = await api.proactive_diagnostic()
         budget_failure = budget_response["data"]
         self.assertEqual((budget_failure["state"], budget_failure["code"], budget_failure["stage"]),
@@ -249,9 +249,9 @@ class AstrBotSetupFlowTests(unittest.IsolatedAsyncioTestCase):
             "receipt_ref": None, "skip_reason": "model_decision", "model_skip_reason": "no_natural_opening",
             "dedup_reason": None, "presentation_reason": None, "decision_confidence": 0.91,
             "silence_threshold": 0.65})
-        with patch("astrbot_host.setup_api.request", request), \
-             patch("astrbot_host.setup_api.ContactManagement", ContactManager), \
-             patch("astrbot_host.setup_api.dashboard_operator", return_value=object()):
+        with patch("digital_life_host.setup_api.request", request), \
+             patch("digital_life_host.setup_api.ContactManagement", ContactManager), \
+             patch("digital_life_host.setup_api.dashboard_operator", return_value=object()):
             skipped_response = await api.proactive_diagnostic()
         skipped = skipped_response["data"]
         self.assertEqual((skipped["state"], skipped["skip_reason"], skipped["model_skip_reason"]),
@@ -270,9 +270,9 @@ class AstrBotSetupFlowTests(unittest.IsolatedAsyncioTestCase):
                 "image_attachment": {"state": "passed", "attached": True}}})
         request.body.return_value = json.dumps({"purpose": "chat", "confirm_delivery": True,
             "diagnostic_image": True}).encode("utf-8")
-        with patch("astrbot_host.setup_api.request", request), \
-             patch("astrbot_host.setup_api.ContactManagement", ContactManager), \
-             patch("astrbot_host.setup_api.dashboard_operator", return_value=object()):
+        with patch("digital_life_host.setup_api.request", request), \
+             patch("digital_life_host.setup_api.ContactManagement", ContactManager), \
+             patch("digital_life_host.setup_api.dashboard_operator", return_value=object()):
             image_response = await api.proactive_diagnostic()
         image_result = image_response["data"]
         self.assertEqual((image_result["state"], image_result["delivery_state"]), ("passed", "delivered"))
@@ -323,9 +323,9 @@ class AstrBotSetupFlowTests(unittest.IsolatedAsyncioTestCase):
         payload = json.dumps({"purpose": "environment", "confirm_delivery": True,
                               "synthetic_event": False, "variant": "mobile_location"}).encode("utf-8")
         request = NS(username="administrator", query={}, body=AsyncMock(return_value=payload))
-        with patch("astrbot_host.setup_api.request", request), \
-             patch("astrbot_host.setup_api.ContactManagement", ContactManager), \
-             patch("astrbot_host.setup_api.dashboard_operator", return_value=object()):
+        with patch("digital_life_host.setup_api.request", request), \
+             patch("digital_life_host.setup_api.ContactManagement", ContactManager), \
+             patch("digital_life_host.setup_api.dashboard_operator", return_value=object()):
             response = await api.proactive_diagnostic()
 
         result = response["data"]
@@ -378,9 +378,9 @@ class AstrBotSetupFlowTests(unittest.IsolatedAsyncioTestCase):
         payload = json.dumps({"purpose": "news", "confirm_delivery": True,
                               "synthetic_event": True}).encode("utf-8")
         request = NS(username="administrator", query={}, body=AsyncMock(return_value=payload))
-        with patch("astrbot_host.setup_api.request", request), \
-             patch("astrbot_host.setup_api.ContactManagement", ContactManager), \
-             patch("astrbot_host.setup_api.dashboard_operator", return_value=object()):
+        with patch("digital_life_host.setup_api.request", request), \
+             patch("digital_life_host.setup_api.ContactManagement", ContactManager), \
+             patch("digital_life_host.setup_api.dashboard_operator", return_value=object()):
             response = await api.proactive_diagnostic()
 
         result = response["data"]
@@ -400,9 +400,9 @@ class AstrBotSetupFlowTests(unittest.IsolatedAsyncioTestCase):
         self.assertNotIn("diagnostic_allow_linked_accounts", kwargs, "old callers default to a pinned diagnostic")
         request.body.return_value = json.dumps({"purpose": "news", "confirm_delivery": True,
             "synthetic_event": True, "allow_linked_accounts": True}).encode("utf-8")
-        with patch("astrbot_host.setup_api.request", request), \
-             patch("astrbot_host.setup_api.ContactManagement", ContactManager), \
-             patch("astrbot_host.setup_api.dashboard_operator", return_value=object()):
+        with patch("digital_life_host.setup_api.request", request), \
+             patch("digital_life_host.setup_api.ContactManagement", ContactManager), \
+             patch("digital_life_host.setup_api.dashboard_operator", return_value=object()):
             forwarded = await api.proactive_diagnostic()
         self.assertEqual(forwarded["data"]["state"], "passed", forwarded)
         self.assertTrue(app.proactive.contact.await_args.kwargs["diagnostic_allow_linked_accounts"])
@@ -412,9 +412,9 @@ class AstrBotSetupFlowTests(unittest.IsolatedAsyncioTestCase):
             "judge": None, "judge_allowed": None, "judge_reason": None, "receipt_ref": None,
             "route_rejections": [{"member": {"platform": "napcat", "account_id": "bot-a", "native_account_id": "peer-a"},
                                   "code": "account_link_transport_unavailable"}]})
-        with patch("astrbot_host.setup_api.request", request), \
-             patch("astrbot_host.setup_api.ContactManagement", ContactManager), \
-             patch("astrbot_host.setup_api.dashboard_operator", return_value=object()):
+        with patch("digital_life_host.setup_api.request", request), \
+             patch("digital_life_host.setup_api.ContactManagement", ContactManager), \
+             patch("digital_life_host.setup_api.dashboard_operator", return_value=object()):
             rejected = (await api.proactive_diagnostic())["data"]
         self.assertEqual(rejected["code"], "account_link_all_unavailable")
         self.assertIn("napcat · bot-a · peer-a", rejected["error"])
@@ -426,7 +426,7 @@ class AstrBotSetupFlowTests(unittest.IsolatedAsyncioTestCase):
         before = app.proactive.contact.await_count
         request.body.return_value = json.dumps({"purpose": "news", "confirm_delivery": True,
             "synthetic_event": True, "allow_linked_accounts": "true"}).encode("utf-8")
-        with patch("astrbot_host.setup_api.request", request):
+        with patch("digital_life_host.setup_api.request", request):
             invalid = await api.proactive_diagnostic()
         self.assertEqual(invalid["data"]["code"], "proactive_test_confirmation_required")
         self.assertEqual(app.proactive.contact.await_count, before)
@@ -470,9 +470,9 @@ class AstrBotSetupFlowTests(unittest.IsolatedAsyncioTestCase):
 
         payload = json.dumps({"purpose": "environment", "confirm_delivery": True}).encode("utf-8")
         request = NS(username="administrator", query={}, body=AsyncMock(return_value=payload))
-        with patch("astrbot_host.setup_api.request", request), \
-             patch("astrbot_host.setup_api.ContactManagement", ContactManager), \
-             patch("astrbot_host.setup_api.dashboard_operator", return_value=object()):
+        with patch("digital_life_host.setup_api.request", request), \
+             patch("digital_life_host.setup_api.ContactManagement", ContactManager), \
+             patch("digital_life_host.setup_api.dashboard_operator", return_value=object()):
             response = await api.proactive_diagnostic()
 
         result = response["data"]
@@ -531,9 +531,9 @@ class AstrBotSetupFlowTests(unittest.IsolatedAsyncioTestCase):
                 preferences.update(enabled=master, **{"care.enabled": purpose_enabled})
                 app.proactive.contact.reset_mock()
                 app.contact_schedule.diagnostic_candidate.reset_mock()
-                with patch("astrbot_host.setup_api.request", request), \
-                     patch("astrbot_host.setup_api.ContactManagement", ContactManager), \
-                     patch("astrbot_host.setup_api.dashboard_operator", return_value=object()):
+                with patch("digital_life_host.setup_api.request", request), \
+                     patch("digital_life_host.setup_api.ContactManagement", ContactManager), \
+                     patch("digital_life_host.setup_api.dashboard_operator", return_value=object()):
                     response = await api.proactive_diagnostic()
                 result = response["data"]
                 if permitted:
@@ -572,9 +572,9 @@ class AstrBotSetupFlowTests(unittest.IsolatedAsyncioTestCase):
 
         payload = json.dumps({"purpose": "news", "confirm_delivery": True}).encode("utf-8")
         request = NS(username="administrator", query={}, body=AsyncMock(return_value=payload))
-        with patch("astrbot_host.setup_api.request", request), \
-             patch("astrbot_host.setup_api.ContactManagement", ContactManager), \
-             patch("astrbot_host.setup_api.dashboard_operator", return_value=object()):
+        with patch("digital_life_host.setup_api.request", request), \
+             patch("digital_life_host.setup_api.ContactManagement", ContactManager), \
+             patch("digital_life_host.setup_api.dashboard_operator", return_value=object()):
             response = await api.proactive_diagnostic()
 
         result = response["data"]
@@ -593,9 +593,9 @@ class AstrBotSetupFlowTests(unittest.IsolatedAsyncioTestCase):
             "model_timeout", "视觉模型结果未知", stage="screen_interpretation", state="unknown",
             task_id="vision-task", stages=[{"stage": "screen_capture", "state": "passed"}])
         request.body.return_value = json.dumps({"purpose": "screen", "confirm_delivery": True}).encode("utf-8")
-        with patch("astrbot_host.setup_api.request", request), \
-             patch("astrbot_host.setup_api.ContactManagement", ContactManager), \
-             patch("astrbot_host.setup_api.dashboard_operator", return_value=object()):
+        with patch("digital_life_host.setup_api.request", request), \
+             patch("digital_life_host.setup_api.ContactManagement", ContactManager), \
+             patch("digital_life_host.setup_api.dashboard_operator", return_value=object()):
             unknown = (await api.proactive_diagnostic())["data"]
         self.assertEqual((unknown["state"], unknown["stage"], unknown["task_id"]),
                          ("unknown", "screen_interpretation", "vision-task"))
@@ -851,7 +851,7 @@ class AstrBotSetupFlowTests(unittest.IsolatedAsyncioTestCase):
         await self.bind_core_window()
         started = await self.controller.start()
         self.assertIsNone(started.failure, started.failure)
-        from astrbot_host.binding_store import clear_binding
+        from digital_life_host.binding_store import clear_binding
         self.assertTrue(clear_binding(self.controller.binding_root))
 
         target = self.controller.settings.targets[0]
@@ -859,8 +859,8 @@ class AstrBotSetupFlowTests(unittest.IsolatedAsyncioTestCase):
         # binding file still lets the unique configured target be recovered.
         self.assertEqual(await self.controller.proactive_diagnostic_target(), target)
 
-        from companion_v2.identity_policy.models import AuthorizationTier
-        from companion_v2.identity_policy.object_access import ObjectAccessPolicy
+        from digital_life_core.identity_policy.models import AuthorizationTier
+        from digital_life_core.identity_policy.object_access import ObjectAccessPolicy
         policy = ObjectAccessPolicy(self.controller.runtime)
         binding = self.controller.binding_state()
         self.assertTrue(binding["bound"], binding)
@@ -876,7 +876,7 @@ class AstrBotSetupFlowTests(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(role_view.role_id, context.role_binding.role.subject_id)
 
         from dataclasses import replace
-        from astrbot_host.multi_settings import PrivateTarget
+        from digital_life_host.multi_settings import PrivateTarget
         second_target = PrivateTarget("second-core-target", target.platform_id, target.account_id,
                                       target.bot_id, "201")
         self.controller.settings = replace(self.controller.settings, targets=(target, second_target))
@@ -908,9 +908,9 @@ class AstrBotSetupFlowTests(unittest.IsolatedAsyncioTestCase):
         self.assertFalse(document["data"]["selection_required"])
 
         from dataclasses import replace
-        from astrbot_host.multi_settings import PrivateTarget
-        from companion_v2.identity_policy.models import AuthorizationTier
-        from companion_v2.identity_policy.object_access import ObjectAccessPolicy
+        from digital_life_host.multi_settings import PrivateTarget
+        from digital_life_core.identity_policy.models import AuthorizationTier
+        from digital_life_core.identity_policy.object_access import ObjectAccessPolicy
         second = PrivateTarget("second-core", first.platform_id, first.account_id, first.bot_id, "201")
         outsider = PrivateTarget("not-core", first.platform_id, first.account_id, first.bot_id, "202")
         self.controller.settings = replace(self.controller.settings, targets=(first, second, outsider))
@@ -975,8 +975,8 @@ class AstrBotSetupFlowTests(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(calls[1][0], "send_private_msg")
         self.assertIn(generated_text, json.dumps(calls[1][1], ensure_ascii=False))
         self.assertEqual(len(self.native.provider.client.state.calls), 2)
-        from astrbot_host.management_identity import dashboard_operator
-        from companion_v2.proactive.management import ContactManagement
+        from digital_life_host.management_identity import dashboard_operator
+        from digital_life_core.proactive.management import ContactManagement
         session = self.controller.session or self.controller.last_session
         settings = ContactManagement(session.application, session.profile.target).status(
             dashboard_operator(self.controller.runtime, "administrator", at=NOW)).unwrap()["settings"]
@@ -984,14 +984,14 @@ class AstrBotSetupFlowTests(unittest.IsolatedAsyncioTestCase):
         self.assertFalse(settings["automatic_enabled"])
 
     async def test_proactive_poll_does_not_load_host_catalog_or_upgrade_plan(self):
-        from astrbot_host.setup_state import SETUP_STEPS
+        from digital_life_host.setup_state import SETUP_STEPS
         for step in SETUP_STEPS:
             self.api.progress.complete(step)
         self.api.progress.begin_proactive_test(attempt_id="poll-only", started_at=NOW.isoformat())
         self.api._test_task = asyncio.get_running_loop().create_future()
         try:
             with patch.object(self.controller, "status", side_effect=AssertionError("host discovery")), \
-                    patch("astrbot_host.upgrade_setup.UpgradeSetup.plan", new=AsyncMock(
+                    patch("digital_life_host.upgrade_setup.UpgradeSetup.plan", new=AsyncMock(
                         side_effect=AssertionError("migration discovery"))):
                 result = await self.call("proactive_test_status")
             self.assertEqual(result["status"], "ok", result)
@@ -1003,7 +1003,7 @@ class AstrBotSetupFlowTests(unittest.IsolatedAsyncioTestCase):
             self.api._test_task.cancel()
 
     async def test_proactive_test_stops_when_generation_has_already_failed(self):
-        from astrbot_host.setup_state import SETUP_STEPS
+        from digital_life_host.setup_state import SETUP_STEPS
         for step in SETUP_STEPS:
             self.api.progress.complete(step)
         manager = NS(status=Mock(return_value=Outcome.success({"settings": {"enabled": True}})))
@@ -1024,10 +1024,10 @@ class AstrBotSetupFlowTests(unittest.IsolatedAsyncioTestCase):
                         observe=Mock(return_value=Outcome.success({"generation": generation,
                             "delivery": None, "judge": None, "skipped": False}))))
                 with patch.object(self.api, "_test_context", new=AsyncMock(return_value=(NS(application=app), object(), ""))), \
-                        patch("astrbot_host.setup_api.dashboard_operator", return_value=object()), \
-                        patch("astrbot_host.setup_api.ContactManagement", return_value=manager), \
+                        patch("digital_life_host.setup_api.dashboard_operator", return_value=object()), \
+                        patch("digital_life_host.setup_api.ContactManagement", return_value=manager), \
                         patch.object(self.api, "_restore_test_contact_permission_with_context"), \
-                        patch("astrbot_host.setup_api.asyncio.sleep", new=AsyncMock(
+                        patch("digital_life_host.setup_api.asyncio.sleep", new=AsyncMock(
                             side_effect=AssertionError("a terminal generation must not keep polling"))):
                     await self.api._execute_proactive_test("administrator", generation)
                 receipt = self.api.progress.read()["proactive_test"]
@@ -1119,14 +1119,14 @@ class AstrBotSetupFlowTests(unittest.IsolatedAsyncioTestCase):
 
         started = await self.controller.start()
         self.assertIsNone(started.failure, started.failure)
-        from astrbot_host.management_identity import dashboard_operator
-        from companion_v2.proactive.management import ContactManagement
+        from digital_life_host.management_identity import dashboard_operator
+        from digital_life_core.proactive.management import ContactManagement
 
         session = self.controller.session or self.controller.last_session
         context = session.profile.target
         operator = dashboard_operator(self.controller.runtime, "administrator", at=NOW)
         manager = ContactManagement(session.application, context)
-        from companion_v2.configuration.management import ProactiveContactManagement
+        from digital_life_core.configuration.management import ProactiveContactManagement
         public = ProactiveContactManagement(session.application, context)
         public.configure(operator, {"operation_key": "master-off-before-setup-test",
             "edit_token": public.status(operator).unwrap()["edit_token"], "changes": {"enabled": False}}).unwrap()
@@ -1151,7 +1151,7 @@ class AstrBotSetupFlowTests(unittest.IsolatedAsyncioTestCase):
             dashboard_operator(self.controller.runtime, "administrator", at=NOW)).unwrap()["settings"]
         self.assertFalse(restored["enabled"])
         self.assertFalse(restored["automatic_enabled"])
-        from companion_v2.proactive.configuration import GROUP, target_for
+        from digital_life_core.proactive.configuration import GROUP, target_for
         recovered_identity = recovered_session.application.tasks.identity
         self.assertTrue(any(grant.capability == GROUP and grant.grant_id.startswith("proactive-managed:")
             and grant.state.value == "active" for grant in recovered_identity.snapshot().grants))

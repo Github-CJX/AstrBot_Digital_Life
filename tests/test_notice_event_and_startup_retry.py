@@ -14,12 +14,12 @@ from types import ModuleType, SimpleNamespace as NS
 import unittest
 from unittest.mock import AsyncMock, Mock, patch
 
-from astrbot_host.bootstrap_provider import resolve_bootstrap_provider
-from astrbot_host.multi_settings import MultiHostSettings
-from astrbot_host.recalls import is_notice_event
-from astrbot_host.settings import HostControlError
-from companion_v2.foundation.outcome import Outcome
-from companion_v2.storage.runtime import StorageRuntime
+from digital_life_host.bootstrap_provider import resolve_bootstrap_provider
+from digital_life_host.multi_settings import MultiHostSettings
+from digital_life_host.recalls import is_notice_event
+from digital_life_host.settings import HostControlError
+from digital_life_core.foundation.outcome import Outcome
+from digital_life_core.storage.runtime import StorageRuntime
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -116,8 +116,8 @@ class NoticeEventFilterTests(unittest.TestCase):
                 self.assertFalse(is_notice_event(event))
 
     def test_polluted_real_message_is_not_treated_as_poke_or_recall_notice(self):
-        from astrbot_host.pokes import is_poke_notice
-        from astrbot_host.recalls import capture_recall
+        from digital_life_host.pokes import is_poke_notice
+        from digital_life_host.recalls import capture_recall
 
         pure_poke = NS(
             message_str="",
@@ -219,7 +219,7 @@ def _build_main_import_stubs():
     astrbot_core_provider_entities = ModuleType("astrbot.core.provider.entities")
     astrbot_core_provider_entities.LLMResponse = object
 
-    pkg_name = "_companion_v2_issue_811_test_pkg"
+    pkg_name = "_digital_life_core_issue_811_test_pkg"
     package = ModuleType(pkg_name)
     package.__path__ = [str(ROOT)]
 
@@ -238,42 +238,42 @@ def _build_main_import_stubs():
         pkg_name: package,
     }
     dummy_modules = (
-        "astrbot_host.automatic_backup",
-        "astrbot_host.calendar_command",
-        "astrbot_host.conversation_reset",
-        "astrbot_host.core_reply",
-        "astrbot_host.core_reply_closing",
-        "astrbot_host.core_reply_decision",
-        "astrbot_host.core_reply_native_send",
-        "astrbot_host.core_reply_perception",
-        "astrbot_host.core_reply_preparation",
-        "astrbot_host.core_reply_segmentation",
-        "astrbot_host.core_reply_telemetry",
-        "astrbot_host.core_reply_tool_dispatch",
-        "astrbot_host.core_reply_tool_guard",
-        "astrbot_host.core_reply_tools",
-        "astrbot_host.core_reply_tracking",
-        "astrbot_host.core_reply_turn_gate",
-        "astrbot_host.event_routing",
-        "astrbot_host.functional_commands",
-        "astrbot_host.group_command",
-        "astrbot_host.group_debounce",
-        "astrbot_host.import_lifecycle",
-        "astrbot_host.integration_registry",
-        "astrbot_host.log_buffer",
-        "astrbot_host.multi_controller",
-        "astrbot_host.native",
-        "astrbot_host.native_extensions",
-        "astrbot_host.native_extensions.host_events",
-        "astrbot_host.phone_command",
-        "astrbot_host.private_debounce",
-        "astrbot_host.private_reply_followup",
-        "astrbot_host.qzone_life_publish",
-        "astrbot_host.reset_command",
-        "astrbot_host.shared_host_migration",
-        "astrbot_host.storage_location",
-        "astrbot_host.stranger_notice",
-        "astrbot_host.upgrade_source",
+        "digital_life_host.automatic_backup",
+        "digital_life_host.calendar_command",
+        "digital_life_host.conversation_reset",
+        "digital_life_host.core_reply",
+        "digital_life_host.core_reply_closing",
+        "digital_life_host.core_reply_decision",
+        "digital_life_host.core_reply_native_send",
+        "digital_life_host.core_reply_perception",
+        "digital_life_host.core_reply_preparation",
+        "digital_life_host.core_reply_segmentation",
+        "digital_life_host.core_reply_telemetry",
+        "digital_life_host.core_reply_tool_dispatch",
+        "digital_life_host.core_reply_tool_guard",
+        "digital_life_host.core_reply_tools",
+        "digital_life_host.core_reply_tracking",
+        "digital_life_host.core_reply_turn_gate",
+        "digital_life_host.event_routing",
+        "digital_life_host.functional_commands",
+        "digital_life_host.group_command",
+        "digital_life_host.group_debounce",
+        "digital_life_host.import_lifecycle",
+        "digital_life_host.integration_registry",
+        "digital_life_host.log_buffer",
+        "digital_life_host.multi_controller",
+        "digital_life_host.native",
+        "digital_life_host.native_extensions",
+        "digital_life_host.native_extensions.host_events",
+        "digital_life_host.phone_command",
+        "digital_life_host.private_debounce",
+        "digital_life_host.private_reply_followup",
+        "digital_life_host.qzone_life_publish",
+        "digital_life_host.reset_command",
+        "digital_life_host.shared_host_migration",
+        "digital_life_host.storage_location",
+        "digital_life_host.stranger_notice",
+        "digital_life_host.upgrade_source",
     )
 
     class _WildcardModule(ModuleType):
@@ -309,8 +309,8 @@ def _build_main_import_stubs():
         full = pkg_name + "." + rel
         stubs[full] = _WildcardModule(full)
     # Use the real recalls module under the test package so main.py tests the real filter.
-    import astrbot_host.recalls as real_recalls
-    stubs[pkg_name + ".astrbot_host.recalls"] = real_recalls
+    import digital_life_host.recalls as real_recalls
+    stubs[pkg_name + ".digital_life_host.recalls"] = real_recalls
     return pkg_name, plugin_logger, stubs
 
 

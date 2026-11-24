@@ -9,14 +9,14 @@ from types import SimpleNamespace
 import unittest
 from unittest.mock import patch
 
-from companion_v2.conversation.content.access import ContentAccess, document
-from companion_v2.conversation.content.sources import ContentSources
-from companion_v2.execution.models import TaskContext, TaskError, digest, require
-from companion_v2.foundation.refs import AudienceRef, SourceRef, VersionRef
-from companion_v2.sources.dependencies import key, link, validation_batch
-from companion_v2.sources.governance import bind
-from companion_v2.sources.models import SourceRecord
-from companion_v2.sources.repositories import SourceRepository
+from digital_life_core.conversation.content.access import ContentAccess, document
+from digital_life_core.conversation.content.sources import ContentSources
+from digital_life_core.execution.models import TaskContext, TaskError, digest, require
+from digital_life_core.foundation.refs import AudienceRef, SourceRef, VersionRef
+from digital_life_core.sources.dependencies import key, link, validation_batch
+from digital_life_core.sources.governance import bind
+from digital_life_core.sources.models import SourceRecord
+from digital_life_core.sources.repositories import SourceRepository
 from tests.test_management_access import ManagementFixture, NOW, SCOPE
 
 

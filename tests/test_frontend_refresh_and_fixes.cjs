@@ -8,7 +8,7 @@ const vm = require("node:vm");
 
 const ROOT = path.resolve(__dirname, "..");
 const COTTAGE = path.join(ROOT, "pages", "陪伴小屋");
-const PREFIX = "/astrbot_plugin_private_companion/";
+const PREFIX = "/astrbot_plugin_digital_life/";
 const read = (...parts) => fs.readFileSync(path.join(ROOT, ...parts), "utf8");
 const flush = () => new Promise(resolve => setTimeout(resolve, 0));
 
@@ -164,7 +164,7 @@ test("每日复盘刷新：更新 policy 与 status、完整成功权威替换�
     actions: ["withdraw"], view_token: `tok-${id}`, evidence: [],
   });
   const bridge = {
-    ready: async () => ({pluginName: "astrbot_plugin_private_companion"}),
+    ready: async () => ({pluginName: "astrbot_plugin_digital_life"}),
     apiGet: async (route, params) => {
       if (params?.state === "decided") return {status: "ok", data: {items: [], expired_in_page: 0}};
       if (route.includes("targets/a/")) {
@@ -230,7 +230,7 @@ test("成长链路：growth_view_stale/growth_progress_decided 自动刷新、�
     {key: "b", label: "来源乙", growthApi: `${PREFIX}targets/b/roles/rb/growth`},
   ];
   const bridge = {
-    ready: async () => ({pluginName: "astrbot_plugin_private_companion"}),
+    ready: async () => ({pluginName: "astrbot_plugin_digital_life"}),
     apiGet: async route => {
       if (route.endsWith("/progress")) {
         reviewCalls += 1;

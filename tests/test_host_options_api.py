@@ -27,10 +27,10 @@ def _cleanup_astrbot_test_root():
 
 atexit.register(_cleanup_astrbot_test_root)
 
-from astrbot_host.service_balance import configured_balance_port
-from astrbot_host.host_options_api import HostOptionsWebAPI, PREFIX as HOST_OPTIONS_PREFIX
-from companion_v2.conversation.forwards.models import ForwardIntakePolicy
-from companion_v2.conversation.pokes import PokePolicy
+from digital_life_host.service_balance import configured_balance_port
+from digital_life_host.host_options_api import HostOptionsWebAPI, PREFIX as HOST_OPTIONS_PREFIX
+from digital_life_core.conversation.forwards.models import ForwardIntakePolicy
+from digital_life_core.conversation.pokes import PokePolicy
 
 
 class HostOptionsSchemaTests(unittest.TestCase):
@@ -100,8 +100,8 @@ class HostOptionsWebAPITests(unittest.IsolatedAsyncioTestCase):
     async def call(self, name, body=None, *, username="administrator", query=None):
         payload = json.dumps(body or {}, ensure_ascii=False).encode("utf-8")
         request = NS(username=username, query=query or {}, body=AsyncMock(return_value=payload))
-        with patch("astrbot_host.host_options_api.request", request), \
-             patch("astrbot_host.host_options_api.require_management_operator", return_value=object()):
+        with patch("digital_life_host.host_options_api.request", request), \
+             patch("digital_life_host.host_options_api.require_management_operator", return_value=object()):
             return await getattr(self.api, name)()
 
     async def snapshot(self):
@@ -137,14 +137,14 @@ class HostOptionsWebAPITests(unittest.IsolatedAsyncioTestCase):
         from tests.test_service_balance_provider import context
         from tests.test_service_balance_script import SCRIPT
         from datetime import datetime, timezone
-        from companion_v2.proactive.balance_events import BalanceObservation
+        from digital_life_core.proactive.balance_events import BalanceObservation
         self.controller.context = context()
         seen = []
         async def fetch(port):
             seen.append((port.base_url, port.api_key, port.proxy_url))
             return BalanceObservation(Decimal("12.3"), None, datetime.now(timezone.utc))
         current = await self.snapshot()
-        with patch("astrbot_host.service_balance_script.ScriptServiceBalancePort.fetch", fetch):
+        with patch("digital_life_host.service_balance_script.ScriptServiceBalancePort.fetch", fetch):
             response = await self.call("balance_test", {"edit_token":current["edit_tokens"]["balance"],
                 "changes":{"advanced_enabled":True, "advanced_from_astrbot":True,
                            "advanced_provider_id":"source-b", "advanced_script":SCRIPT}})
@@ -221,7 +221,7 @@ class HostOptionsWebAPITests(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(self.refreshed, 0)
 
     async def test_balance_source_saves_secret_without_returning_it_and_updates_live_contact(self):
-        from astrbot_host.service_balance import configured_balance_port
+        from digital_life_host.service_balance import configured_balance_port
 
         from unittest.mock import Mock
         invalidations = Mock()
@@ -299,7 +299,7 @@ class HostOptionsWebAPITests(unittest.IsolatedAsyncioTestCase):
             return port if config.get("service_balance", {}).get("url") == "https://newapi.example.com" else None
 
         with patch.dict("os.environ", {}, clear=True), \
-             patch("astrbot_host.host_options_api.configured_balance_port", side_effect=select_port):
+             patch("digital_life_host.host_options_api.configured_balance_port", side_effect=select_port):
             response = await self.call("balance_test", {
                 "edit_token": current["edit_tokens"]["balance"],
                 "changes": {"url": "https://newapi.example.com", "api_key": "fixture-secret-token",
@@ -349,8 +349,8 @@ class HostOptionsWebAPITests(unittest.IsolatedAsyncioTestCase):
 
     async def test_advanced_draft_test_uses_shared_validation_without_saving(self):
         from tests.test_service_balance_script import SCRIPT
-        from astrbot_host.service_balance_script import ScriptServiceBalancePort
-        from companion_v2.proactive.balance_events import BalanceObservation
+        from digital_life_host.service_balance_script import ScriptServiceBalancePort
+        from digital_life_core.proactive.balance_events import BalanceObservation
         from datetime import datetime, timezone
         current = await self.snapshot()
         observation = BalanceObservation(Decimal("12.3"), Decimal("16.8"), datetime.now(timezone.utc),
@@ -387,7 +387,7 @@ class HostOptionsWebAPITests(unittest.IsolatedAsyncioTestCase):
 
     async def test_advanced_invalid_account_has_no_amount_and_does_not_fall_back(self):
         from tests.test_service_balance_script import SCRIPT
-        from astrbot_host.service_balance_script import BalanceQueryError, ScriptServiceBalancePort
+        from digital_life_host.service_balance_script import BalanceQueryError, ScriptServiceBalancePort
         current = await self.snapshot()
         changes = {"advanced_enabled": True, "advanced_script": SCRIPT}
         with patch.object(ScriptServiceBalancePort, "fetch", AsyncMock(side_effect=

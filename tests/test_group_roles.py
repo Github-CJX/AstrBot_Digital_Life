@@ -5,9 +5,9 @@ from dataclasses import replace
 from datetime import timedelta
 from types import SimpleNamespace as NS
 
-from astrbot_host.group_standing import group_sender_standing
-from companion_v2.conversation.group_roles import GroupRoleStore
-from companion_v2.foundation.refs import ScopeKind
+from digital_life_host.group_standing import group_sender_standing
+from digital_life_core.conversation.group_roles import GroupRoleStore
+from digital_life_core.foundation.refs import ScopeKind
 from tests.g6_support import G6Fixture, NOW
 
 
@@ -71,7 +71,7 @@ class GroupStandingPromptTests(G6Fixture):
         self.remember("owner", account="10001")
         self.remember("owner", account="10002", minutes=1)
         document = self.store.read(
-            __import__("companion_v2.memory.group.access", fromlist=["owner_key"]).owner_key(self.group))
+            __import__("digital_life_core.memory.group.access", fromlist=["owner_key"]).owner_key(self.group))
         self.assertEqual(document["owner_id"], "10002")
         self.assertEqual([account for account, record in document["members"].items()
                           if record["role"] == "owner"], ["10002"])
@@ -80,13 +80,13 @@ class GroupStandingPromptTests(G6Fixture):
         for index in range(80):
             self.remember("member", account=str(20000 + index), minutes=index)
         document = self.store.read(
-            __import__("companion_v2.memory.group.access", fromlist=["owner_key"]).owner_key(self.group))
+            __import__("digital_life_core.memory.group.access", fromlist=["owner_key"]).owner_key(self.group))
         self.assertLessEqual(len(document["members"]), 64)
 
     def test_speaker_contribution_carries_the_standing(self):
         import json
 
-        from companion_v2.conversation.group_context import GroupConversationContext
+        from digital_life_core.conversation.group_context import GroupConversationContext
 
         self.remember("owner")
         context = GroupConversationContext(NS(runtime=self.runtime, tasks=None))
@@ -101,7 +101,7 @@ class GroupStandingPromptTests(G6Fixture):
     def test_speaker_contribution_stays_minimal_without_standing(self):
         import json
 
-        from companion_v2.conversation.group_context import GroupConversationContext
+        from digital_life_core.conversation.group_context import GroupConversationContext
 
         context = GroupConversationContext(NS(runtime=self.runtime, tasks=None))
         payload = json.loads(context.speaker(self.group, []).payload)

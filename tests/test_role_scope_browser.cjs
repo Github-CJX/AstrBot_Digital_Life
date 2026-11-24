@@ -46,7 +46,7 @@ test("完整小屋按当前 Bot 与角色切换工作区", {skip:chromium ? fals
   page.on("console",message => { if (message.text().includes("工作区挂载失败")) errors.push(message.text()); });
   await page.addInitScript(() => {
     const request = (method,endpoint,params) => fetch("/rpc",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({method,endpoint,params})}).then(response=>response.json());
-    window.AstrBotPluginPage = {ready:async()=>({pluginName:"astrbot_plugin_private_companion",pageName:"陪伴小屋"}),
+    window.AstrBotPluginPage = {ready:async()=>({pluginName:"astrbot_plugin_digital_life",pageName:"陪伴小屋"}),
       apiGet:(endpoint,params)=>request("GET",endpoint,params),apiPost:(endpoint,params)=>request("POST",endpoint,params),onContext:()=>()=>{}};
   });
   const url = `http://127.0.0.1:${server.address().port}/`;

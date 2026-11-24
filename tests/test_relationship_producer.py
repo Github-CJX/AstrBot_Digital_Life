@@ -6,13 +6,13 @@ import json
 import unittest
 from unittest.mock import patch
 
-from companion_v2.conversation.relationship_context import RelationshipContext
-from companion_v2.conversation.tool_loop import LocalRoleTools, ToolSource
-from companion_v2.execution.models import TaskError
-from companion_v2.identity_policy.models import AuthorizationTier
-from companion_v2.relationships.management import RelationshipMemoryManagement
-from companion_v2.relationships.models import RelationshipMemoryState as State
-from companion_v2.relationships.service import RelationshipMemoryService
+from digital_life_core.conversation.relationship_context import RelationshipContext
+from digital_life_core.conversation.tool_loop import LocalRoleTools, ToolSource
+from digital_life_core.execution.models import TaskError
+from digital_life_core.identity_policy.models import AuthorizationTier
+from digital_life_core.relationships.management import RelationshipMemoryManagement
+from digital_life_core.relationships.models import RelationshipMemoryState as State
+from digital_life_core.relationships.service import RelationshipMemoryService
 from tests.test_host_application import HostFixture
 from tests.test_management_access import NOW, SCOPE
 from tests.test_role_tool_loop import ToolLoopFixture, answered, call, requested

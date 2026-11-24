@@ -5,20 +5,20 @@ from datetime import timedelta
 import json
 import unittest
 
-from companion_v2.conversation.foreground import ClaimKind, DraftClaim, ModelDraft
-from companion_v2.conversation.life_context import ConversationLifeContext, LIFE_INSTRUCTION, MAX_ACTIVITIES, MAX_PAYLOAD_CHARS
-from companion_v2.conversation.messages import ConversationMessages
-from companion_v2.execution.models import Lane, TaskError, digest
-from companion_v2.foundation.refs import AudienceRef, RoleOwnerRef, SubjectKind, SubjectRef
-from companion_v2.identity_policy.models import AuthorizationTier
-from companion_v2.model_gateway.models import Amount, ProviderResponse
-from companion_v2.role_work.journal import RoleJournalService
-from companion_v2.role_work.journal.models import DreamRecall, JournalContext, JournalDerivatives, JournalDraft, JournalKey, JournalKind
-from companion_v2.role_work.ledger import PersistentRoleLifeLedger
-from companion_v2.role_work.life.context import RoleLifeContextReader
-from companion_v2.role_work.models import RoleActivity, RoleActivityState as State, RoleReadingReceipt
-from companion_v2.role_work.work_models import RoleWorkSpec
-from companion_v2.sources.models import SourceRecord
+from digital_life_core.conversation.foreground import ClaimKind, DraftClaim, ModelDraft
+from digital_life_core.conversation.life_context import ConversationLifeContext, LIFE_INSTRUCTION, MAX_ACTIVITIES, MAX_PAYLOAD_CHARS
+from digital_life_core.conversation.messages import ConversationMessages
+from digital_life_core.execution.models import Lane, TaskError, digest
+from digital_life_core.foundation.refs import AudienceRef, RoleOwnerRef, SubjectKind, SubjectRef
+from digital_life_core.identity_policy.models import AuthorizationTier
+from digital_life_core.model_gateway.models import Amount, ProviderResponse
+from digital_life_core.role_work.journal import RoleJournalService
+from digital_life_core.role_work.journal.models import DreamRecall, JournalContext, JournalDerivatives, JournalDraft, JournalKey, JournalKind
+from digital_life_core.role_work.ledger import PersistentRoleLifeLedger
+from digital_life_core.role_work.life.context import RoleLifeContextReader
+from digital_life_core.role_work.models import RoleActivity, RoleActivityState as State, RoleReadingReceipt
+from digital_life_core.role_work.work_models import RoleWorkSpec
+from digital_life_core.sources.models import SourceRecord
 from tests.test_conversation_messages import MessageFixture
 from tests.test_management_access import INSTALLATION, NOW, SCOPE
 

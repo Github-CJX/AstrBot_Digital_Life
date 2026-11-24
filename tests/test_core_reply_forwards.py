@@ -9,8 +9,8 @@ from types import SimpleNamespace as NS
 import unittest
 from unittest.mock import AsyncMock, Mock
 
-from astrbot_host.core_reply_closing import _has_heavy_content
-from astrbot_host.core_reply_forwards import (
+from digital_life_host.core_reply_closing import _has_heavy_content
+from digital_life_host.core_reply_forwards import (
     COMPANION_FORWARD_INJECTED_EXTRA,
     COMPANION_FORWARD_OWNED_EXTRA,
     FORWARD_DISABLED_SUMMARY,
@@ -34,10 +34,10 @@ from astrbot_host.core_reply_forwards import (
     prepare_forward_only_request,
     private_debounce_input,
 )
-from astrbot_host.private_debounce import PrivateDebounce
-from companion_v2.conversation.forwards.models import ForwardIntakePolicy
-from companion_v2.conversation.private_debounce import Policy
-from companion_v2.foundation.outcome import Outcome
+from digital_life_host.private_debounce import PrivateDebounce
+from digital_life_core.conversation.forwards.models import ForwardIntakePolicy
+from digital_life_core.conversation.private_debounce import Policy
+from digital_life_core.foundation.outcome import Outcome
 from tests.group_host_support import GroupFixture
 from tests.test_main_no_reply import ENTRY
 
@@ -772,7 +772,7 @@ class CoreReplyForwardPersistenceAndGroupTests(GroupFixture, unittest.IsolatedAs
         self.assertIsNotNone(turn_rows[0]["input_observation_id"])
 
     def _disable_forward_adaptation(self, context, *, key):
-        from companion_v2.conversation.reply_settings import GROUP, target_for
+        from digital_life_core.conversation.reply_settings import GROUP, target_for
 
         cfg = self.app.configuration
         target = target_for(context)

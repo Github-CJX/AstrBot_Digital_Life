@@ -21,17 +21,17 @@ class InstalledLayaSmoke(CoreReplyDecisionTests):
     async def test_installed_weights(self):
         self.predict_patch.stop()
         if self.model_path:
-            from companion_v2.decision.store import LayaSettingsStore
+            from digital_life_core.decision.store import LayaSettingsStore
             store = LayaSettingsStore(self.root / "decision-config")
             store.update(store.raw()["revision"], {"local_model_path": self.model_path})
         if self.action_only:
             self.fields = {name: name == "action" for name in self.fields}
-        from astrbot_host.laya_client import _load_local_model
+        from digital_life_host.laya_client import _load_local_model
         started = perf_counter()
         device = await asyncio.to_thread(_load_local_model, self.model_path)
         initialization_ms = round((perf_counter() - started) * 1000)
         print(json.dumps({"initialized": True, "device": device, "initialization_ms": initialization_ms}), flush=True)
-        from astrbot_host import laya_client
+        from digital_life_host import laya_client
         predict = laya_client._local_predict
         raw_usage = {}
 
@@ -41,7 +41,7 @@ class InstalledLayaSmoke(CoreReplyDecisionTests):
             raw_usage.update(result.get("usage", {}))
             return result
 
-        observation = patch("astrbot_host.laya_client._local_predict", side_effect=observe_predict)
+        observation = patch("digital_life_host.laya_client._local_predict", side_effect=observe_predict)
         observation.start()
         self.addCleanup(observation.stop)
         results = []

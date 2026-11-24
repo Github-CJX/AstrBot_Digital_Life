@@ -16,18 +16,18 @@ from tests.astrbot_data_root import assert_sdk_database_isolated
 from astrbot.api.web import PluginRequest, bind_request_context
 from starlette.requests import Request
 
-from astrbot_host.legacy_api import LegacyMigrationWebAPI
-from astrbot_host.multi_controller import AstrBotMultiController
+from digital_life_host.legacy_api import LegacyMigrationWebAPI
+from digital_life_host.multi_controller import AstrBotMultiController
 from astrbot.core import db_helper
-from companion_v2.adapters.astrbot.staging import NativeAdapterTypes
-from companion_v2.execution.models import TaskContext
-from companion_v2.foundation.clock import DeterministicClock
-from companion_v2.foundation.refs import AudienceRef, ScopeKind
-from companion_v2.legacy.archive import build_v1_archive_plan, verify_v1_archive
-from companion_v2.legacy.data_migration import build_data_plan
-from companion_v2.legacy.migration import LegacyMigration
-from companion_v2.role_work.journal import JournalKey, JournalKind
-from companion_v2.foundation.refs import RoleOwnerRef
+from digital_life_core.adapters.astrbot.staging import NativeAdapterTypes
+from digital_life_core.execution.models import TaskContext
+from digital_life_core.foundation.clock import DeterministicClock
+from digital_life_core.foundation.refs import AudienceRef, ScopeKind
+from digital_life_core.legacy.archive import build_v1_archive_plan, verify_v1_archive
+from digital_life_core.legacy.data_migration import build_data_plan
+from digital_life_core.legacy.migration import LegacyMigration
+from digital_life_core.role_work.journal import JournalKey, JournalKind
+from digital_life_core.foundation.refs import RoleOwnerRef
 from tests.multi_host_support import MultiNativeContext, multi_config
 from tests.native_adapter_support import FakeEvent, FakeProvider, FakeReverseApi
 from tests.test_management_access import NOW
@@ -59,8 +59,8 @@ def _role_context(base_context, role_id, *, runtime=None, at=None):
     role = replace(base_context.role_binding.role, subject_id=role_id)
     if runtime is None:
         raise ValueError("mapped_role_requires_persistent_binding")
-    from companion_v2.identity_policy.personas import ConversationRoute, PersonaDirectory
-    from companion_v2.identity_policy.repository import PersistentIdentityDirectory
+    from digital_life_core.identity_policy.personas import ConversationRoute, PersonaDirectory
+    from digital_life_core.identity_policy.repository import PersistentIdentityDirectory
     scope = replace(base_context.scope, conversation_id="migration-acceptance:" + role_id)
     PersonaDirectory(runtime).register_route(ConversationRoute(scope, user=base_context.actor.subject),
                                              observed_at=at)
@@ -110,7 +110,7 @@ def _verify_references(application, context, source_plan, root):
     expected = {item.sha256: item for item in source_plan.reference_images}
     expected.update({item.image.sha256: item.image for item in source_plan.wardrobe_items
                      if item.image is not None})
-    from companion_v2.legacy.data_migration import load_reference_image
+    from digital_life_core.legacy.data_migration import load_reference_image
     for sha, item in expected.items():
         asset = by_hash.get(sha)
         if asset is None or service.assets.get_payload(owner, asset.asset_id) != load_reference_image(root, item):

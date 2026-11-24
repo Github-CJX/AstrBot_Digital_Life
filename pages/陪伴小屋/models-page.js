@@ -1,7 +1,7 @@
 /* Model configuration: task routing, voice, image generation and optional Laya decisions. */
 "use strict";
 window.CompanionModelsPage = (() => {
-  const PREFIX = "/astrbot_plugin_private_companion/";
+  const PREFIX = "/astrbot_plugin_digital_life/";
   const MODEL_TABS = new Set(["fn", "voice", "image", "search", "laya", "pricing"]);
   const routing = ["provider", "fallback", "max_output_tokens"];
   const MAX_MODEL_OUTPUT_TOKENS = 65536;

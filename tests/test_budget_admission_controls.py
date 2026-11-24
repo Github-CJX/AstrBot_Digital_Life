@@ -3,14 +3,14 @@
 from dataclasses import replace
 import unittest
 
-from astrbot_host.settings import HostSettings
-from companion_v2.configuration.models import ConfigLayer, ConfigTarget
-from companion_v2.configuration.owners import SparseConfigurationOwner
-from companion_v2.conversation.foreground import ModelDraft
-from companion_v2.execution.models import TaskError, TaskResult
-from companion_v2.model_gateway.budget import BudgetLedger, BudgetSoftPolicy, GROUP, SOFT_FIELDS
-from companion_v2.model_gateway.models import Amount, BudgetPolicy, ProviderResponse
-from companion_v2.model_gateway.service import LocalModelGateway
+from digital_life_host.settings import HostSettings
+from digital_life_core.configuration.models import ConfigLayer, ConfigTarget
+from digital_life_core.configuration.owners import SparseConfigurationOwner
+from digital_life_core.conversation.foreground import ModelDraft
+from digital_life_core.execution.models import TaskError, TaskResult
+from digital_life_core.model_gateway.budget import BudgetLedger, BudgetSoftPolicy, GROUP, SOFT_FIELDS
+from digital_life_core.model_gateway.models import Amount, BudgetPolicy, ProviderResponse
+from digital_life_core.model_gateway.service import LocalModelGateway
 from tests.test_model_gateway import ModelFixture
 
 

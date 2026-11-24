@@ -6,7 +6,7 @@
  * 只放了一张 boundaryCard 解释「为什么没有入口」。那是「能接却没接」，
  * 属于要接上的那一类，不是要删的那一类。
  *
- * 后端状态机（`companion_v2/storage/backup.py`）：
+ * 后端状态机（`digital_life_core/storage/backup.py`）：
  *
  *   listing            列出已完成快照，按 created_at 倒序
  *   create(note)       写一份快照；sidecar 最后写，它的存在标记快照完成
@@ -42,10 +42,10 @@
  *      二次确认的「放弃这个还原请求」出口（不会删任何快照或用户数据）。
  *
  * 信封与其它页一致：{status, message, data}，机器码在 message 与 data.code 上，
- * 两者都要看（见 [[project_companion_v2_page_error_codes]]）。
+ * 两者都要看（见 [[project_digital_life_core_page_error_codes]]）。
  */
 window.CompanionBackupPage = (() => {
-  const HOST = "astrbot_plugin_private_companion";
+  const HOST = "astrbot_plugin_digital_life";
   const PREFIX = "/" + HOST + "/";
   const ROUTE = "backup";
 

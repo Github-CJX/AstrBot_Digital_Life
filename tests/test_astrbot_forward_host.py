@@ -12,13 +12,13 @@ from unittest.mock import patch
 from tests import test_astrbot_staging_host as sdk_environment
 from aiocqhttp.api_impl import ResultStore, WebSocketReverseApi
 from astrbot.core.message.components import Forward, Image, Plain, Reply
-from astrbot_host.controller import AstrBotStagingController
-from astrbot_host.forwards import load_native_forwards
-from astrbot_host.media import load_native_image
-from astrbot_host.native import installed_native_types
-from companion_v2.adapters.astrbot.forwards import NativeForwardLocator, read_private_forwards
-from companion_v2.adapters.astrbot.quotes import NativeQuoteLocator, read_private_quote
-from companion_v2.adapters.astrbot.staging import NativeAdapterTypes
+from digital_life_host.controller import AstrBotStagingController
+from digital_life_host.forwards import load_native_forwards
+from digital_life_host.media import load_native_image
+from digital_life_host.native import installed_native_types
+from digital_life_core.adapters.astrbot.forwards import NativeForwardLocator, read_private_forwards
+from digital_life_core.adapters.astrbot.quotes import NativeQuoteLocator, read_private_quote
+from digital_life_core.adapters.astrbot.staging import NativeAdapterTypes
 from tests.forward_support import outer_raw
 from tests.native_adapter_support import FakeEvent, FakeProvider, FakeReverseApi
 from tests.staging_bootstrap_support import wait_for_batch
@@ -94,7 +94,7 @@ class AstrBotForwardHostTests(unittest.IsolatedAsyncioTestCase):
             finally:
                 cancelled.set()
         session.bridge.forward_loader = held
-        with patch("companion_v2.adapters.astrbot.native.MEDIA_PREPARE_TIMEOUT", 0.1):
+        with patch("digital_life_core.adapters.astrbot.native.MEDIA_PREPARE_TIMEOUT", 0.1):
             result = await asyncio.wait_for(self.controller.receive_claimed(self.event()), 2)
         self.assertEqual(result.failure.code, "host_media_timeout")
         self.assertTrue(entered.is_set())

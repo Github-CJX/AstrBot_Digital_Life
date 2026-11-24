@@ -13,23 +13,23 @@ import httpx
 
 try:
     # google-genai 由宿主提供，requirements.txt 不声明它：契约环境里可能没有。
-    from astrbot_host.video.gemini_provider import GeminiNativeVideoProvider
+    from digital_life_host.video.gemini_provider import GeminiNativeVideoProvider
     from google.genai import errors as genai_errors
 except ModuleNotFoundError:  # 只在没装宿主 SDK 的环境里发生，视频与真实 SDK 异常契约随之跳过。
     GeminiNativeVideoProvider = None
     genai_errors = None
-from companion_v2.adapters.astrbot.memory_output import capture, explicit_refusal
-from companion_v2.adapters.astrbot.provider import (AstrBotTextProvider, UsageTariff, _gemini_messages,
+from digital_life_core.adapters.astrbot.memory_output import capture, explicit_refusal
+from digital_life_core.adapters.astrbot.provider import (AstrBotTextProvider, UsageTariff, _gemini_messages,
                                                     provider_fingerprint)
-from companion_v2.adapters.astrbot.provider_catalog import TextProviderSettings
-from companion_v2.adapters.astrbot.provider_transport import (extract_error_status_code,
+from digital_life_core.adapters.astrbot.provider_catalog import TextProviderSettings
+from digital_life_core.adapters.astrbot.provider_transport import (extract_error_status_code,
                                                               rejected_before_generation)
-from companion_v2.adapters.astrbot.response_diagnostics import native_finish_reason, observe_completion
-from companion_v2.execution.models import ProviderBinding, TaskError
-from companion_v2.model_gateway.budget import BudgetLedger
-from companion_v2.model_gateway.failures import ModelFailure
-from companion_v2.model_gateway.models import Amount, BudgetPolicy, ModelEnvelope
-from companion_v2.model_gateway.service import LocalModelGateway
+from digital_life_core.adapters.astrbot.response_diagnostics import native_finish_reason, observe_completion
+from digital_life_core.execution.models import ProviderBinding, TaskError
+from digital_life_core.model_gateway.budget import BudgetLedger
+from digital_life_core.model_gateway.failures import ModelFailure
+from digital_life_core.model_gateway.models import Amount, BudgetPolicy, ModelEnvelope
+from digital_life_core.model_gateway.service import LocalModelGateway
 from tests.test_model_gateway import ModelFixture
 
 
@@ -614,7 +614,7 @@ class GeminiErrorStatusTests(ModelFixture, unittest.IsolatedAsyncioTestCase):
                 provider, _native = self._failing_provider(lambda c=code: SimulatedClientError(c, secret))
                 envelope = ModelEnvelope(self.request(), "task prompt", 256, "configuration",
                                          before_dispatch=lambda: None)
-                with self.assertLogs("companion_v2.adapters.astrbot.provider", level="WARNING") as captured:
+                with self.assertLogs("digital_life_core.adapters.astrbot.provider", level="WARNING") as captured:
                     response = await provider.generate(envelope)
                 self.assertEqual(response.status, "not_started")
                 self.assertEqual(response.usage, Amount(0, 0))
@@ -636,7 +636,7 @@ class GeminiErrorStatusTests(ModelFixture, unittest.IsolatedAsyncioTestCase):
                 provider, _native = self._failing_provider(factory)
                 envelope = ModelEnvelope(self.request(), "task prompt", 256, "configuration",
                                          before_dispatch=lambda: None)
-                with self.assertLogs("companion_v2.adapters.astrbot.provider", level="WARNING") as captured:
+                with self.assertLogs("digital_life_core.adapters.astrbot.provider", level="WARNING") as captured:
                     response = await provider.generate(envelope)
                 self.assertEqual(response.status, "unknown")
                 self.assertEqual(response.failure, ModelFailure.TRANSPORT)
@@ -653,7 +653,7 @@ class GeminiErrorStatusTests(ModelFixture, unittest.IsolatedAsyncioTestCase):
 
         envelope = ModelEnvelope(self.request(), "task prompt", 256, "configuration",
                                  before_dispatch=revoked)
-        with self.assertLogs("companion_v2.adapters.astrbot.provider", level="WARNING") as captured:
+        with self.assertLogs("digital_life_core.adapters.astrbot.provider", level="WARNING") as captured:
             response = await provider.generate(envelope)
         self.assertEqual(response.status, "not_started")
         self.assertEqual(response.failure, ModelFailure.PREPARATION)
@@ -690,7 +690,7 @@ class GeminiErrorStatusTests(ModelFixture, unittest.IsolatedAsyncioTestCase):
             lambda: SimulatedServerError(503, "unavailable", status="UNAVAILABLE"), provider_id="primary")
         self.gateway_with(provider_503.local_provider(), self.provider("fallback"))
         self._enable_large_budget()
-        with self.assertLogs("companion_v2.adapters.astrbot.provider", level="WARNING") as captured:
+        with self.assertLogs("digital_life_core.adapters.astrbot.provider", level="WARNING") as captured:
             with self.assertRaises(TaskError) as raised:
                 await self.gateway.generate(self.model_run("task-503"), self.request())
         self.assertEqual(raised.exception.code, "model_usage_unknown")
@@ -713,7 +713,7 @@ class GeminiErrorStatusTests(ModelFixture, unittest.IsolatedAsyncioTestCase):
                 provider, _ = self._failing_provider(lambda e=err: e, provider_id="primary")
                 envelope = ModelEnvelope(self.request(), "task prompt", 256, "configuration",
                                          before_dispatch=lambda: None)
-                with self.assertLogs("companion_v2.adapters.astrbot.provider", level="WARNING") as captured:
+                with self.assertLogs("digital_life_core.adapters.astrbot.provider", level="WARNING") as captured:
                     response = await provider.generate(envelope)
                 self.assertEqual(response.status, "not_started")
                 self.assertEqual(response.usage, Amount(0, 0))
@@ -754,7 +754,7 @@ class GeminiErrorStatusTests(ModelFixture, unittest.IsolatedAsyncioTestCase):
         primary_503, _ = self._failing_provider(lambda: err_503, provider_id="primary")
         self.gateway_with(primary_503.local_provider(), self.provider("fallback"))
         self._enable_large_budget()
-        with self.assertLogs("companion_v2.adapters.astrbot.provider", level="WARNING") as captured:
+        with self.assertLogs("digital_life_core.adapters.astrbot.provider", level="WARNING") as captured:
             with self.assertRaises(TaskError) as raised:
                 await self.gateway.generate(self.model_run("real-genai-503"), self.request())
         self.assertEqual(raised.exception.code, "model_usage_unknown")
@@ -779,7 +779,7 @@ class GeminiErrorStatusTests(ModelFixture, unittest.IsolatedAsyncioTestCase):
         primary, _ = self._failing_provider(make_chained, provider_id="primary")
         self.gateway_with(primary.local_provider(), self.provider("fallback"))
         self._enable_large_budget()
-        with self.assertLogs("companion_v2.adapters.astrbot.provider", level="WARNING") as captured:
+        with self.assertLogs("digital_life_core.adapters.astrbot.provider", level="WARNING") as captured:
             with self.assertRaises(TaskError) as raised:
                 await self.gateway.generate(self.model_run("sim-503-cause-400"), self.request())
         self.assertEqual(raised.exception.code, "model_usage_unknown")
@@ -810,7 +810,7 @@ class GeminiErrorStatusTests(ModelFixture, unittest.IsolatedAsyncioTestCase):
         primary, _ = self._failing_provider(make_chained, provider_id="primary")
         self.gateway_with(primary.local_provider(), self.provider("fallback"))
         self._enable_large_budget()
-        with self.assertLogs("companion_v2.adapters.astrbot.provider", level="WARNING") as captured:
+        with self.assertLogs("digital_life_core.adapters.astrbot.provider", level="WARNING") as captured:
             with self.assertRaises(TaskError) as raised:
                 await self.gateway.generate(self.model_run("real-genai-503-cause-400"), self.request())
         self.assertEqual(raised.exception.code, "model_usage_unknown")

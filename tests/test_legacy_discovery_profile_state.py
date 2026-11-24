@@ -19,7 +19,7 @@ import sqlite3
 import tempfile
 import unittest
 
-from companion_v2.legacy.migration import LegacyMigration, MigrationState
+from digital_life_core.legacy.migration import LegacyMigration, MigrationState
 
 PROFILE_SOURCES = ("private.core_profiles",
                    "private.authoritative_memory",
@@ -129,7 +129,7 @@ class UnreadableProfileTests(ProfileDiscoveryTestCase):
 
     def test_a_store_above_the_read_limit_is_reported_unreadable(self) -> None:
         # 64 MiB 上限本身不在本改动范围；锁定的是「解析器读不出来 ⇒ 发现阶段也报读不到」。
-        from companion_v2.legacy import profile_source
+        from digital_life_core.legacy import profile_source
 
         self.write_json("companions.json", {"groups": {"json-group": {}}})
         original = profile_source.MAX_PROFILE_JSON_BYTES
@@ -228,7 +228,7 @@ class RepeatedDiscoveryTests(ProfileDiscoveryTestCase):
 
     def test_one_discovery_pass_reads_the_store_once(self) -> None:
         # 三个来源问的是同一个问题：一次发现只读一遍快照，而不是三遍。
-        from companion_v2.legacy import profile_source
+        from digital_life_core.legacy import profile_source
 
         self.write_json("companions.json", {"groups": {"json-group": {}}})
         reads = []

@@ -29,10 +29,10 @@ class NativeAcceptanceBoundaryTests(unittest.TestCase):
     def test_direct_dynamic_nested_and_from_import_are_denied(self):
         with self.guard() as guard:
             for action in (
-                lambda: builtins.__import__("astrbot_plugin_private_companion.main"),
+                lambda: builtins.__import__("astrbot_plugin_digital_life.main"),
                 lambda: importlib.import_module("astrbot_plugin_" + "private_companion"),
-                lambda: importlib.util.find_spec("data.plugins.astrbot_plugin_private_companion.main"),
-                lambda: builtins.__import__("data.plugins", fromlist=("astrbot_plugin_private_companion",)),
+                lambda: importlib.util.find_spec("data.plugins.astrbot_plugin_digital_life.main"),
+                lambda: builtins.__import__("data.plugins", fromlist=("astrbot_plugin_digital_life",)),
             ):
                 with self.subTest(action=action):
                     with self.assertRaises(NativeAcceptanceViolation):
@@ -40,20 +40,20 @@ class NativeAcceptanceBoundaryTests(unittest.TestCase):
             self.assertEqual(len(guard.violations), 4)
 
     def test_cached_legacy_and_shadow_registration_cannot_pass(self):
-        sys.modules["astrbot_plugin_private_companion"] = NS()
+        sys.modules["astrbot_plugin_digital_life"] = NS()
         try:
             with self.assertRaises(NativeAcceptanceViolation):
                 with self.guard():
                     pass
         finally:
-            sys.modules.pop("astrbot_plugin_private_companion", None)
+            sys.modules.pop("astrbot_plugin_digital_life", None)
         with self.guard() as guard:
             with self.assertRaises(NativeAcceptanceViolation):
-                guard.catalog([NS(name="innocent", root_dir_name="astrbot_plugin_private_companion")])
+                guard.catalog([NS(name="innocent", root_dir_name="astrbot_plugin_digital_life")])
 
     def test_cached_alias_from_legacy_origin_is_rejected(self):
         alias = ModuleType("native_acceptance_alias")
-        alias.__file__ = str(self.root / "astrbot_plugin_private_companion" / "core.py")
+        alias.__file__ = str(self.root / "astrbot_plugin_digital_life" / "core.py")
         sys.modules[alias.__name__] = alias
         try:
             with self.assertRaisesRegex(NativeAcceptanceViolation, "forbidden_module_origin"):
@@ -63,15 +63,15 @@ class NativeAcceptanceBoundaryTests(unittest.TestCase):
             sys.modules.pop(alias.__name__, None)
 
     def test_name_alias_discovery_is_denied_and_v2_name_is_distinct(self):
-        current = NS(name="astrbot_plugin_private_companion", root_dir_name="astrbot_plugin_private_companion")
+        current = NS(name="astrbot_plugin_digital_life", root_dir_name="astrbot_plugin_digital_life")
         with self.guard() as guard:
             self.assertIs(guard.discover(current.name, [current]), current)
-            for name in ("astrbot_plugin_private_companion", "PrivateCompanion"):
+            for name in ("astrbot_plugin_digital_life", "PrivateCompanion"):
                 with self.assertRaises(NativeAcceptanceViolation):
                     guard.discover(name)
 
     def test_legacy_file_open_and_sqlite_uri_are_denied_before_read(self):
-        legacy = self.root / "astrbot_plugin_private_companion"
+        legacy = self.root / "astrbot_plugin_digital_life"
         legacy.mkdir()
         path = legacy / "synthetic.txt"
         path.write_text("synthetic secret", encoding="utf-8")
@@ -96,7 +96,7 @@ class NativeAcceptanceBoundaryTests(unittest.TestCase):
     def test_swallowed_dependency_exception_still_fails_final_audit(self):
         with self.guard() as guard:
             try:
-                importlib.import_module("astrbot_plugin_private_companion")
+                importlib.import_module("astrbot_plugin_digital_life")
             except Exception:
                 pass
             with self.assertRaises(NativeAcceptanceViolation):
@@ -118,7 +118,7 @@ class NativeAcceptanceBoundaryTests(unittest.TestCase):
                 with self.assertRaises(NativeAcceptanceViolation):
                     sys.audit("ctypes.dlopen", "provider.dll")
                 with self.assertRaises(NativeAcceptanceViolation):
-                    importlib.import_module("astrbot_plugin_private_companion")
+                    importlib.import_module("astrbot_plugin_digital_life")
             with self.assertRaises(NativeAcceptanceViolation):
                 sys.audit("ctypes.dlopen", "kernel32")
             self.assertEqual(guard.trusted_native_loads, ["kernel32"])
@@ -142,29 +142,29 @@ class NativeAcceptanceBoundaryTests(unittest.TestCase):
             self.assertEqual(guard.violations, [{"code": "installed_data_or_plugin_access"}])
 
     def test_source_scan_detects_executable_legacy_dependency_not_metadata(self):
-        self.assertEqual(scan_dependencies('META={"plugin_id":"astrbot_plugin_private_companion"}\n'), [])
-        source = """from data.plugins import astrbot_plugin_private_companion
+        self.assertEqual(scan_dependencies('META={"plugin_id":"astrbot_plugin_digital_life"}\n'), [])
+        source = """from data.plugins import astrbot_plugin_digital_life
 importlib.import_module('astrbot_plugin_' + 'private_companion')
 context.get_registered_star('PrivateCompanion')
-open('data/astrbot_plugin_private_companion/user.json')
+open('data/astrbot_plugin_digital_life/user.json')
 """
         self.assertEqual([v["code"] for v in scan_dependencies(source)],
                          ["legacy_import", "legacy_import", "legacy_discovery", "legacy_data"])
 
     def test_snapshot_never_copies_data_or_live_legacy_siblings(self):
         scanner = self.root / "scanner"
-        source = scanner / "astrbot_plugin_private_companion"
+        source = scanner / "astrbot_plugin_digital_life"
         source.mkdir(parents=True)
         for name, text in {"main.py":"pass\n", "metadata.yaml":"name: fixture\n", "_conf_schema.json":"{}\n", "requirements.txt":"\n"}.items():
             (source / name).write_text(text, encoding="utf-8")
-        (source / "companion_v2" / "data").mkdir(parents=True)
-        (source / "companion_v2" / "data" / "user.py").write_text("should never be copied", encoding="utf-8")
-        (scanner / "astrbot_plugin_private_companion").mkdir()
-        target = self.root / "scratch" / "astrbot_plugin_private_companion"
+        (source / "digital_life_core" / "data").mkdir(parents=True)
+        (source / "digital_life_core" / "data" / "user.py").write_text("should never be copied", encoding="utf-8")
+        (scanner / "astrbot_plugin_digital_life").mkdir()
+        target = self.root / "scratch" / "astrbot_plugin_digital_life"
         inventory = snapshot(source, target)
         self.assertEqual(len(inventory["files"]), 4)
-        self.assertFalse((target / "companion_v2" / "data").exists())
-        self.assertFalse((target.parent / "astrbot_plugin_private_companion").exists())
+        self.assertFalse((target / "digital_life_core" / "data").exists())
+        self.assertFalse((target.parent / "astrbot_plugin_digital_life").exists())
         with self.assertRaises(ValueError):
             outside_scan(scanner / "test-clone", source)
 

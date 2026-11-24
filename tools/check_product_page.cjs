@@ -8,7 +8,7 @@ async function run({browser, outputDir, bridgePath, replyOnly=false, identityOnl
   const root=path.resolve(__dirname,'../pages/陪伴小屋');
   await fs.mkdir(outputDir,{recursive:true});
   const sdk=await fs.readFile(bridgePath,'utf8');
-  const HOST='astrbot_plugin_private_companion';
+  const HOST='astrbot_plugin_digital_life';
   const qa={calls:[],posts:[],mode:'direct',catalogMode:wildcardOnly?'wildcard':'multi',initialized:true,deny:false,late:null,growthState:'proposed',semanticRevision:1,semanticReactions:true};
   const internalIdentity={installation_id:'synthetic-installation-internal',operator_id:'dashboard:qa-internal'};
   const replyDefaults={enabled:false,llm_controlled:true,rules_enabled:false,rule_mode:'sentences',threshold:120,min_segment_chars:12,max_segments:4,prompt:'',streaming:false,part_gap_ms:0,image_position:'after_text',
@@ -78,13 +78,13 @@ async function run({browser, outputDir, bridgePath, replyOnly=false, identityOnl
     if(endpoint==='integration/manifest')return ok({product:{version:'2.1.0'},host:{enabled:true},
       core:[{id:'life',label:'生活、日记与成长',description:'已实现的本体生活模块'}],
       extensions:[
-        {capability_id:'content',extension_id:'content',owner:'companion_v2',label:'创作与 QQ 空间',description:'生成与编辑',version:'2.1.0',enabled:true,runtime_ready:true,assembled:true,installed_revision:1,installed_package_version:'2.1.0',status_connected:true,integration_state:'connected',reason:'V2 原生模块已启用'},
-        {capability_id:'image',extension_id:'image',owner:'companion_v2',label:'生图与相册',description:'生成与编辑',version:'2.1.0',enabled:false,runtime_ready:false,assembled:true,installed_revision:2,installed_package_version:'2.1.0',status_connected:true,integration_state:'disabled',reason:'模块已暂停'},
-        {capability_id:'screen',extension_id:'companion.screen.native',owner:'companion_v2',label:'屏幕陪伴',version:'2.1.0',enabled:true,runtime_ready:true,assembled:true,installed_revision:1,installed_package_version:'2.1.0',status_connected:true,integration_state:'connected',reason:'V2 原生模块已启用'},
-        {capability_id:'reality',extension_id:'reality',owner:'companion_v2',label:'现实触及',version:'2.1.0',enabled:true,runtime_ready:true,assembled:true,installed_revision:1,installed_package_version:'2.1.0',status_connected:true,integration_state:'connected',reason:'V2 原生模块已启用'},
-        {capability_id:'together',extension_id:'together',owner:'companion_v2',label:'共处与实时活动',version:'2.1.0',enabled:true,runtime_ready:true,assembled:true,installed_revision:1,installed_package_version:'2.1.0',status_connected:true,integration_state:'connected',reason:'V2 原生模块已启用'},
-        {capability_id:'game',extension_id:'game',owner:'companion_v2',label:'共同游玩',version:'2.1.0',enabled:true,runtime_ready:true,assembled:true,installed_revision:1,installed_package_version:'2.1.0',status_connected:true,integration_state:'connected',reason:'V2 原生模块已启用'},
-        {capability_id:'live',extension_id:'live',owner:'companion_v2',label:'直播与表演',version:'2.1.0',enabled:true,runtime_ready:true,assembled:true,installed_revision:1,installed_package_version:'2.1.0',status_connected:true,integration_state:'connected',reason:'V2 原生模块已启用'}],
+        {capability_id:'content',extension_id:'content',owner:'digital_life_core',label:'创作与 QQ 空间',description:'生成与编辑',version:'2.1.0',enabled:true,runtime_ready:true,assembled:true,installed_revision:1,installed_package_version:'2.1.0',status_connected:true,integration_state:'connected',reason:'V2 原生模块已启用'},
+        {capability_id:'image',extension_id:'image',owner:'digital_life_core',label:'生图与相册',description:'生成与编辑',version:'2.1.0',enabled:false,runtime_ready:false,assembled:true,installed_revision:2,installed_package_version:'2.1.0',status_connected:true,integration_state:'disabled',reason:'模块已暂停'},
+        {capability_id:'screen',extension_id:'companion.screen.native',owner:'digital_life_core',label:'屏幕陪伴',version:'2.1.0',enabled:true,runtime_ready:true,assembled:true,installed_revision:1,installed_package_version:'2.1.0',status_connected:true,integration_state:'connected',reason:'V2 原生模块已启用'},
+        {capability_id:'reality',extension_id:'reality',owner:'digital_life_core',label:'现实触及',version:'2.1.0',enabled:true,runtime_ready:true,assembled:true,installed_revision:1,installed_package_version:'2.1.0',status_connected:true,integration_state:'connected',reason:'V2 原生模块已启用'},
+        {capability_id:'together',extension_id:'together',owner:'digital_life_core',label:'共处与实时活动',version:'2.1.0',enabled:true,runtime_ready:true,assembled:true,installed_revision:1,installed_package_version:'2.1.0',status_connected:true,integration_state:'connected',reason:'V2 原生模块已启用'},
+        {capability_id:'game',extension_id:'game',owner:'digital_life_core',label:'共同游玩',version:'2.1.0',enabled:true,runtime_ready:true,assembled:true,installed_revision:1,installed_package_version:'2.1.0',status_connected:true,integration_state:'connected',reason:'V2 原生模块已启用'},
+        {capability_id:'live',extension_id:'live',owner:'digital_life_core',label:'直播与表演',version:'2.1.0',enabled:true,runtime_ready:true,assembled:true,installed_revision:1,installed_package_version:'2.1.0',status_connected:true,integration_state:'connected',reason:'V2 原生模块已启用'}],
       providers:[], summary:{connected_count:6,extension_ready_count:6,unassembled_extension_count:0,installed_count:0,missing_count:0}});
     if(endpoint==='staging/status')return {status:'error',message:'未找到该路由',data:{}};
     if(endpoint==='host/performance')return ok({enabled:false,mode:'standard'});

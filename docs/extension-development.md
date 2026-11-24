@@ -13,7 +13,7 @@
 在第三方插件完成初始化后，从 AstrBot 已加载插件中按插件目录名精确查找陪伴插件，并读取其 `extension_api`。避免用显示名或子串匹配，也不要缓存跨重载实例：宿主重载后应重新发现 API 并重新注册。
 
 ```python
-COMPANION_PLUGIN_ID = "astrbot_plugin_private_companion"
+COMPANION_PLUGIN_ID = "astrbot_plugin_digital_life"
 MEMORY_API_VERSION = "companion.external-memory.v1"
 
 async def initialize(self):

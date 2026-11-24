@@ -4,9 +4,9 @@ import json
 import unittest
 from unittest import mock
 
-from astrbot_host.native_extensions.image_native import output_routing
-from astrbot_host.native_extensions.image_native.output_routing import OnlineImageBackend
-from astrbot_host.native_extensions.image_native.types import ImageInvocation, NativeImageError
+from digital_life_host.native_extensions.image_native import output_routing
+from digital_life_host.native_extensions.image_native.output_routing import OnlineImageBackend
+from digital_life_host.native_extensions.image_native.types import ImageInvocation, NativeImageError
 
 PNG = b"\x89PNG\r\n\x1a\n-modelscope-image"
 

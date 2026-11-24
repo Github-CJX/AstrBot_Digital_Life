@@ -6,9 +6,9 @@ from types import SimpleNamespace
 import unittest
 from unittest.mock import AsyncMock, Mock, patch
 
-from companion_v2.execution.models import TaskError
-from companion_v2.role_work.journal.self_review_evidence import ReviewEvidence, SelfReviewEvidenceCatalog
-from companion_v2.role_work.journal.self_review_service import SelfReviewService
+from digital_life_core.execution.models import TaskError
+from digital_life_core.role_work.journal.self_review_evidence import ReviewEvidence, SelfReviewEvidenceCatalog
+from digital_life_core.role_work.journal.self_review_service import SelfReviewService
 
 
 class SelfReviewEvidenceDisplayTests(unittest.TestCase):

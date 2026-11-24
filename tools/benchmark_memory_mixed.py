@@ -10,8 +10,8 @@ import time
 import unittest
 from unittest.mock import patch
 
-from companion_v2.memory.query import MemoryQuery
-from companion_v2.memory.search import SearchIndex
+from digital_life_core.memory.query import MemoryQuery
+from digital_life_core.memory.search import SearchIndex
 from tests.memory_support import MemoryFixture
 
 
@@ -36,7 +36,7 @@ def benchmark(count, baseline_path=None):
                   "seed_seconds": time.perf_counter() - created, "queries": {}}
         classes = {"optimized": MemoryQuery}
         if baseline_path:
-            spec = importlib.util.spec_from_file_location("companion_v2.memory.benchmark_baseline_query", baseline_path)
+            spec = importlib.util.spec_from_file_location("digital_life_core.memory.benchmark_baseline_query", baseline_path)
             module = importlib.util.module_from_spec(spec)
             spec.loader.exec_module(module)
             classes["baseline"] = module.MemoryQuery

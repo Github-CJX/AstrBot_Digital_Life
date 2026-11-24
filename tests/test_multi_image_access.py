@@ -5,14 +5,14 @@ from types import SimpleNamespace as NS
 import unittest
 from unittest.mock import patch
 
-from astrbot_host.core_reply import prepare_core_reply_event
-from astrbot_host.core_reply_tools import close_core_reply_tools, inject_core_reply_tools, native_tool_name
-from astrbot_host.native_extensions.image_native.adapter import NativeImageProvider
-from astrbot_host.native_extensions.image_native.owner import NativeImageOwner
-from astrbot_host.native_extensions.image_native.types import BackendResult
-from companion_v2.capabilities import CapabilityAuthorizationState, CapabilityRepository
-from companion_v2.execution.models import TaskContext
-from companion_v2.product import PRODUCT_VERSION
+from digital_life_host.core_reply import prepare_core_reply_event
+from digital_life_host.core_reply_tools import close_core_reply_tools, inject_core_reply_tools, native_tool_name
+from digital_life_host.native_extensions.image_native.adapter import NativeImageProvider
+from digital_life_host.native_extensions.image_native.owner import NativeImageOwner
+from digital_life_host.native_extensions.image_native.types import BackendResult
+from digital_life_core.capabilities import CapabilityAuthorizationState, CapabilityRepository
+from digital_life_core.execution.models import TaskContext
+from digital_life_core.product import PRODUCT_VERSION
 from tests.multi_host_support import MultiFixture, multi_config
 from tests.native_image_support import ImageBackend
 from tests.native_internal_support import internal_lease
@@ -25,7 +25,7 @@ class MultiImageAccessTests(MultiFixture, unittest.IsolatedAsyncioTestCase):
         self.owner = NativeImageOwner(self.root / "native-image", self.backend)
         self.addAsyncCleanup(self.owner.close)
         provider = NativeImageProvider(self.owner, package_version=PRODUCT_VERSION, artifact_hash="image-fixture")
-        self.factory = patch("astrbot_host.multi_controller.create_bundled_extensions",
+        self.factory = patch("digital_life_host.multi_controller.create_bundled_extensions",
                              return_value=((internal_lease(provider),), ()))
         self.factory.start()
         self.addCleanup(self.factory.stop)
@@ -76,7 +76,7 @@ class MultiImageAccessTests(MultiFixture, unittest.IsolatedAsyncioTestCase):
         app = await self.image_host()
         event = self.event(identifier="image-ready-after-admission", text="来张自拍看看")
         session = self.controller.session
-        with patch("astrbot_host.image_access.ensure_image_access"):
+        with patch("digital_life_host.image_access.ensure_image_access"):
             plan = (await session.prepare_core_reply_context(
                 event, self.controller.settings.target("first"))).unwrap()
         self.assertFalse(any(tool.action.startswith("image.")
@@ -100,7 +100,7 @@ class MultiImageAccessTests(MultiFixture, unittest.IsolatedAsyncioTestCase):
         from astrbot.core.agent.message import Message, ToolCall
 
         with patch.object(app.tools.semantic, "catalog_for", side_effect=TypeError("optional catalogue mismatch")), \
-                self.assertLogs("astrbot_host.core_reply_tools", level="WARNING") as logs:
+                self.assertLogs("digital_life_host.core_reply_tools", level="WARNING") as logs:
             _, event, request = await self.prepare(identifier="selfie-with-semantic-unavailable")
             self.assert_images(request)
             call = ToolCall(id="selfie-with-semantic-unavailable", function=ToolCall.FunctionBody(
@@ -114,12 +114,12 @@ class MultiImageAccessTests(MultiFixture, unittest.IsolatedAsyncioTestCase):
         self.assertEqual(len(self.backend.calls), 1)
 
     async def test_request_repair_preserves_core_only_and_explicit_standard_access(self):
-        from companion_v2.configuration.models import ConfigLayer, ConfigTarget
-        from companion_v2.conversation.media.output_settings import (
+        from digital_life_core.configuration.models import ConfigLayer, ConfigTarget
+        from digital_life_core.conversation.media.output_settings import (
             GROUP, ImageOutputConfigurationOwner, configuration_fields,
         )
-        from companion_v2.identity_policy.models import AuthorizationTier
-        from companion_v2.identity_policy.object_access import ObjectAccessPolicy
+        from digital_life_core.identity_policy.models import AuthorizationTier
+        from digital_life_core.identity_policy.object_access import ObjectAccessPolicy
 
         app = await self.image_host()
         context, _, _ = await self.prepare()
@@ -178,7 +178,7 @@ class MultiImageAccessTests(MultiFixture, unittest.IsolatedAsyncioTestCase):
         self.addAsyncCleanup(next_owner.close)
         next_provider = NativeImageProvider(next_owner, package_version=PRODUCT_VERSION,
                                            artifact_hash="image-fixture")
-        with patch("astrbot_host.multi_controller.create_bundled_extensions",
+        with patch("digital_life_host.multi_controller.create_bundled_extensions",
                    return_value=((internal_lease(next_provider),), ())):
             started = await self.controller.start()
 

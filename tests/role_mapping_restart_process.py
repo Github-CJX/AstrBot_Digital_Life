@@ -13,8 +13,8 @@ from unittest.mock import patch
 from tests.multi_host_support import MultiNativeContext, multi_config
 from tests.native_adapter_support import FakeEvent, FakeProvider, FakeReverseApi
 from tests.test_management_access import NOW
-from companion_v2.adapters.astrbot.staging import NativeAdapterTypes
-from companion_v2.execution.models import digest
+from digital_life_core.adapters.astrbot.staging import NativeAdapterTypes
+from digital_life_core.execution.models import digest
 from astrbot.core.config.astrbot_config import AstrBotConfig
 from astrbot.core import db_helper
 from astrbot.api.web import PluginRequest, bind_request_context
@@ -88,7 +88,7 @@ async def run():
                     assert response["status"] == "ok", response
                     return response["data"]
 
-                directory = await read("/astrbot_plugin_private_companion/page/targets")
+                directory = await read("/astrbot_plugin_digital_life/page/targets")
                 assert directory["targets"]
                 role = next(role for role in directory["targets"][0]["roles"] if role["role_id"] == "role-a")
                 await read(role["state_api"])

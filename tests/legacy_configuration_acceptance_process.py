@@ -17,24 +17,24 @@ from tests.astrbot_data_root import assert_sdk_database_isolated
 
 from astrbot.api.web import PluginRequest, bind_request_context
 from starlette.requests import Request
-from astrbot_host.legacy_api import LegacyMigrationWebAPI
-from astrbot_host.multi_controller import AstrBotMultiController
+from digital_life_host.legacy_api import LegacyMigrationWebAPI
+from digital_life_host.multi_controller import AstrBotMultiController
 from astrbot.core import db_helper
-from astrbot_host.identity_derivation import derive_role_id
-from astrbot_host.persona_catalog import available_personas
-from companion_v2.configuration.models import ConfigLayer
-from companion_v2.conversation.reply_settings import (
+from digital_life_host.identity_derivation import derive_role_id
+from digital_life_host.persona_catalog import available_personas
+from digital_life_core.configuration.models import ConfigLayer
+from digital_life_core.conversation.reply_settings import (
     GROUP as REPLY_GROUP, private_debounce_settings, target_for as reply_target, voice_policy,
 )
-from companion_v2.foundation.outcome import Outcome
-from companion_v2.foundation.refs import ScopeKind
-from companion_v2.legacy.migration import LegacyMigration
-from companion_v2.model_gateway.budget import effective_soft
-from astrbot_host.weather_settings import WeatherHostSettings, weather_settings
+from digital_life_core.foundation.outcome import Outcome
+from digital_life_core.foundation.refs import ScopeKind
+from digital_life_core.legacy.migration import LegacyMigration
+from digital_life_core.model_gateway.budget import effective_soft
+from digital_life_host.weather_settings import WeatherHostSettings, weather_settings
 from tests.multi_host_support import MultiNativeContext, multi_config
 from tests.native_adapter_support import FakeEvent, FakeProvider, FakeReverseApi
 from tests.test_management_access import NOW
-from companion_v2.adapters.astrbot.staging import NativeAdapterTypes
+from digital_life_core.adapters.astrbot.staging import NativeAdapterTypes
 
 
 def _require(outcome: Outcome, label: str):
@@ -91,7 +91,7 @@ def _consumer_report(controller, session, api):
     if state_settings["enabled"]:
         application.role_state.access.check(context, "role.state.read")
         application.role_state.access.check(context, "role.state.maintain")
-    from companion_v2.role_work.life.configuration import values as life_values, target_for as life_target
+    from digital_life_core.role_work.life.configuration import values as life_values, target_for as life_target
     life_settings = life_values(_require(application.configuration.read(api._operator(),
         target=life_target(context), group_id="role.life", observed_at=NOW), "life_settings"))
     if life_settings["enabled"]:
@@ -240,7 +240,7 @@ async def run(v1_root: Path, v1_config_path: Path) -> dict:
                         for item in intents],
                 }, ensure_ascii=False, sort_keys=True))
             supplementary = actual_receipts - expected_receipts
-            from companion_v2.role_work.life.configuration import SLEEP_FIELDS
+            from digital_life_core.role_work.life.configuration import SLEEP_FIELDS
             allowed_supplementary = {"role.life." + field for field in SLEEP_FIELDS}
             if set(supplementary) - allowed_supplementary:
                 raise RuntimeError("configuration_unexpected_supplementary_write")
@@ -300,7 +300,7 @@ async def run(v1_root: Path, v1_config_path: Path) -> dict:
                         if WeatherHostSettings(reloaded).view()["source_state"] != "configured":
                             raise RuntimeError("weather_consumer_configuration_invalid")
                     elif intent["target_kind"] == "image_output_config":
-                        from astrbot_host.native_extensions.image_native.output_configuration import settings
+                        from digital_life_host.native_extensions.image_native.output_configuration import settings
                         image_settings = settings(api._image_extension_api())
                         mismatched_fields.extend("image.output." + field
                             for field, value in intent["values"].items()
@@ -309,7 +309,7 @@ async def run(v1_root: Path, v1_config_path: Path) -> dict:
                         raise RuntimeError("configuration_verifier_missing:" + intent["target_kind"])
                     verified_fields += len(intent["fields"])
                 consumers = _consumer_report(reloaded, reloaded_session, api)
-                from companion_v2.legacy.configuration_migration import convert_configuration
+                from digital_life_core.legacy.configuration_migration import convert_configuration
                 expected_reply = convert_configuration(v1_config,
                     registry=reloaded_session.application.configuration.registry, window_kind="private")
                 debounce_key = REPLY_GROUP + ".private_debounce_enabled"

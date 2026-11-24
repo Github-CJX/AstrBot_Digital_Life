@@ -21,8 +21,8 @@ from unittest.mock import patch
 
 from PIL import Image
 
-from astrbot_host.core_reply import CORE_REPLY_CONTEXT_EXTRA
-from astrbot_host.core_reply_telemetry import (
+from digital_life_host.core_reply import CORE_REPLY_CONTEXT_EXTRA
+from digital_life_host.core_reply_telemetry import (
     finish_core_reply_telemetry,
     observe_core_agent_begin,
     observe_core_reply_delivery,
@@ -30,34 +30,34 @@ from astrbot_host.core_reply_telemetry import (
     observe_core_tool_started,
     prepare_core_reply_telemetry,
 )
-from astrbot_host.native_extensions.image_native.store import ImageStore
-from companion_v2.conversation import native_history, native_observations
-from companion_v2.conversation.native_observations import NativeConversationObservations
-from companion_v2.conversation.native_turns import (
+from digital_life_host.native_extensions.image_native.store import ImageStore
+from digital_life_core.conversation import native_history, native_observations
+from digital_life_core.conversation.native_observations import NativeConversationObservations
+from digital_life_core.conversation.native_turns import (
     NativeConversationTurns,
     context_rows,
     latest_role_contexts,
     turns_available,
 )
-from companion_v2.execution.models import TaskContext, digest, encode, stamp
-from companion_v2.foundation.refs import AudienceRef, ScopeKind, ScopeRef, SubjectKind, SubjectRef
-from companion_v2.identity_policy.models import (
+from digital_life_core.execution.models import TaskContext, digest, encode, stamp
+from digital_life_core.foundation.refs import AudienceRef, ScopeKind, ScopeRef, SubjectKind, SubjectRef
+from digital_life_core.identity_policy.models import (
     AuthenticatedHostPrincipal,
     ResolvedIdentity,
     RoleBinding,
 )
-from companion_v2.memory import recall_vectors
-from companion_v2.memory.search import SearchIndex
-from companion_v2.model_gateway.cache_diagnostics import checked_signature_record, signature_changes
-from companion_v2.model_gateway.core_observations import (
+from digital_life_core.memory import recall_vectors
+from digital_life_core.memory.search import SearchIndex
+from digital_life_core.model_gateway.cache_diagnostics import checked_signature_record, signature_changes
+from digital_life_core.model_gateway.core_observations import (
     available as core_observations_available,
     observations_for_role,
 )
-from companion_v2.model_gateway.embedding import EmbeddingGateway, QueryEmbeddingCache
-from companion_v2.model_gateway.semantic_search import CatalogSearch
-from companion_v2.storage import sqlite_tuning
-from companion_v2.storage.runtime import StorageRuntime, table_exists
-from companion_v2.storage.semantic import SemanticStore, VECTOR_BLOB_MAGIC
+from digital_life_core.model_gateway.embedding import EmbeddingGateway, QueryEmbeddingCache
+from digital_life_core.model_gateway.semantic_search import CatalogSearch
+from digital_life_core.storage import sqlite_tuning
+from digital_life_core.storage.runtime import StorageRuntime, table_exists
+from digital_life_core.storage.semantic import SemanticStore, VECTOR_BLOB_MAGIC
 from tests.multi_host_support import MultiFixture
 from tests.test_core_reply_telemetry import NativeRunnerFixture, response as llm_response
 from tests.test_host_application import HostFixture
@@ -126,7 +126,7 @@ class AdaptivePoolAndPragmaTests(unittest.TestCase):
             runtime = StorageRuntime.open(data_root=root, installation_id="wal-idx-inst")
             try:
                 # Create optional core_reply table and verify covering/expression indexes.
-                from companion_v2.model_gateway.core_observations import _ensure_schema as ensure_core
+                from digital_life_core.model_gateway.core_observations import _ensure_schema as ensure_core
                 ensure_core(runtime)
                 plan_src = _explain(
                     runtime,
@@ -781,7 +781,7 @@ class SidecarWalAndVectorAccelerationTests(unittest.IsolatedAsyncioTestCase):
         with TemporaryDirectory(prefix="pr02-reader-err-") as tmp:
             runtime = StorageRuntime.open(data_root=Path(tmp) / "v2", installation_id="pr02-inst")
             try:
-                with patch("companion_v2.storage.runtime.sqlite3.connect", side_effect=OSError("fd limit")):
+                with patch("digital_life_core.storage.runtime.sqlite3.connect", side_effect=OSError("fd limit")):
                     with self.assertRaises(OSError):
                         runtime.read_one("SELECT 1", ())
                 self.assertEqual(runtime._creating_readers, 0)
@@ -847,7 +847,7 @@ class SidecarWalAndVectorAccelerationTests(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(fail_gw.metrics["cache_hits"], 0)
 
     def test_decode_vector_f32_rejects_malformed_json_and_vectors_for_items_chunks_in(self):
-        from companion_v2.storage.semantic import decode_vector_f32
+        from digital_life_core.storage.semantic import decode_vector_f32
 
         for corrupt in (
             b'{"not": "a list"}',
@@ -891,9 +891,9 @@ class MaintenanceDomainEpochAndJournalBatchTests(HostFixture, unittest.IsolatedA
         self.role_context = self.context(self.app, batch)
 
     async def test_unrelated_and_core_writes_skip_legacy_watermark_while_legacy_write_invalidates(self):
-        from companion_v2.model_gateway import maintenance_cache as mc_mod
-        from companion_v2.model_gateway.core_observations import record_observation
-        from companion_v2.model_gateway.management import ModelManagement
+        from digital_life_core.model_gateway import maintenance_cache as mc_mod
+        from digital_life_core.model_gateway.core_observations import record_observation
+        from digital_life_core.model_gateway.management import ModelManagement
         from tests.test_maintenance_perf_cache import _make_observation
 
         app = self.app
@@ -958,8 +958,8 @@ class MaintenanceDomainEpochAndJournalBatchTests(HostFixture, unittest.IsolatedA
         self.assertGreaterEqual(len(seen_aux_calls), 1)
 
     async def test_journal_chain_validation_deduplicates_queries_and_still_observes_revocation(self):
-        from companion_v2.foundation.refs import RoleOwnerRef, SourceRef, VersionRef
-        from companion_v2.role_work.journal.models import (
+        from digital_life_core.foundation.refs import RoleOwnerRef, SourceRef, VersionRef
+        from digital_life_core.role_work.journal.models import (
             JournalContext,
             JournalDraft,
             JournalKey,
@@ -967,8 +967,8 @@ class MaintenanceDomainEpochAndJournalBatchTests(HostFixture, unittest.IsolatedA
             JournalOrigin,
             JournalRef,
         )
-        from companion_v2.role_work.life.management import RoleLifeManagement
-        from companion_v2.sources.models import SourceRecord
+        from digital_life_core.role_work.life.management import RoleLifeManagement
+        from digital_life_core.sources.models import SourceRecord
 
         app = self.app
         ctx = self.role_context
@@ -1033,18 +1033,18 @@ class MaintenanceDomainEpochAndJournalBatchTests(HostFixture, unittest.IsolatedA
         self.assertTrue(all(j["unavailable_reason"] == "source_revoked" for j in status_after["journals"]))
 
     async def test_validation_batch_clears_cached_validations_on_owner_guard_change_and_bg_write(self):
-        from companion_v2.execution.models import TaskError
-        from companion_v2.foundation.refs import RoleOwnerRef, SourceRef, VersionRef
-        from companion_v2.role_work.journal.models import (
+        from digital_life_core.execution.models import TaskError
+        from digital_life_core.foundation.refs import RoleOwnerRef, SourceRef, VersionRef
+        from digital_life_core.role_work.journal.models import (
             JournalContext,
             JournalDraft,
             JournalKey,
             JournalKind,
             JournalOrigin,
         )
-        from companion_v2.sources.dependencies import validation_batch
-        from companion_v2.sources.governance import bind
-        from companion_v2.sources.models import SourceRecord
+        from digital_life_core.sources.dependencies import validation_batch
+        from digital_life_core.sources.governance import bind
+        from digital_life_core.sources.models import SourceRecord
 
         app = self.app
         ctx = self.role_context
@@ -1119,10 +1119,10 @@ class MaintenanceDomainEpochAndJournalBatchTests(HostFixture, unittest.IsolatedA
             self.assertIsNone(app.role_journal._read_only_batch(now))
 
     async def test_cold_start_persistent_core_history_disk_cache_rollover_and_signature_validation(self):
-        from companion_v2.model_gateway import maintenance_cache as mc_mod
-        from companion_v2.model_gateway.core_observations import record_observation
-        from companion_v2.model_gateway.management import ModelManagement
-        from companion_v2.model_gateway.models import CacheSignature
+        from digital_life_core.model_gateway import maintenance_cache as mc_mod
+        from digital_life_core.model_gateway.core_observations import record_observation
+        from digital_life_core.model_gateway.management import ModelManagement
+        from digital_life_core.model_gateway.models import CacheSignature
         from tests.test_maintenance_perf_cache import _make_observation
 
         # 1. Verify C-level CacheSignature validation retains 100% strict rejection semantics.
@@ -1217,7 +1217,7 @@ class MaintenanceDomainEpochAndJournalBatchTests(HostFixture, unittest.IsolatedA
         self.assertEqual(mc_mod.maintenance_cache_stats(app.runtime)["day_cache_advances"], 1)
 
         # Verify exact parity with uncached full computation.
-        with patch("companion_v2.model_gateway.management.runtime_maintenance_cache", return_value=None):
+        with patch("digital_life_core.model_gateway.management.runtime_maintenance_cache", return_value=None):
             uncached = manager.maintenance(operator).unwrap()
         self.assertEqual(rolled["usage_sources"]["astrbot_core"]["totals"], uncached["usage_sources"]["astrbot_core"]["totals"])
         self.assertEqual(rolled["usage_sources"]["astrbot_core"]["cache_diagnostics"], uncached["usage_sources"]["astrbot_core"]["cache_diagnostics"])
@@ -1225,9 +1225,9 @@ class MaintenanceDomainEpochAndJournalBatchTests(HostFixture, unittest.IsolatedA
     async def test_malformed_disk_core_history_cache_falls_back_silently(self):
         import copy
         import zlib
-        from companion_v2.model_gateway import maintenance_cache as mc_mod
-        from companion_v2.model_gateway.core_observations import record_observation
-        from companion_v2.model_gateway.management import ModelManagement
+        from digital_life_core.model_gateway import maintenance_cache as mc_mod
+        from digital_life_core.model_gateway.core_observations import record_observation
+        from digital_life_core.model_gateway.management import ModelManagement
         from tests.test_maintenance_perf_cache import _make_observation
 
         app = self.app
@@ -1281,10 +1281,10 @@ class MaintenanceDomainEpochAndJournalBatchTests(HostFixture, unittest.IsolatedA
                 )
 
     async def test_external_sqlite_inplace_edit_invalidates_cold_start_prewarm_and_disk_save(self):
-        from companion_v2.model_gateway import maintenance_cache as mc_mod
-        from companion_v2.model_gateway.core_observations import record_observation
-        from companion_v2.model_gateway.management import ModelManagement
-        from companion_v2.storage.runtime import StorageRuntime
+        from digital_life_core.model_gateway import maintenance_cache as mc_mod
+        from digital_life_core.model_gateway.core_observations import record_observation
+        from digital_life_core.model_gateway.management import ModelManagement
+        from digital_life_core.storage.runtime import StorageRuntime
         from tests.test_maintenance_perf_cache import _make_observation
 
         app = self.app

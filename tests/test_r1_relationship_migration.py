@@ -27,11 +27,11 @@ from types import SimpleNamespace as NS
 import unittest
 from unittest.mock import patch
 
-from astrbot_host.legacy_api import LegacyMigrationWebAPI
-from companion_v2.execution.models import TaskError
-from companion_v2.foundation.outcome import Outcome
-from companion_v2.legacy.migration import LegacyMigration
-from companion_v2.relationships.profile import (
+from digital_life_host.legacy_api import LegacyMigrationWebAPI
+from digital_life_core.execution.models import TaskError
+from digital_life_core.foundation.outcome import Outcome
+from digital_life_core.legacy.migration import LegacyMigration
+from digital_life_core.relationships.profile import (
     FIELD_LIMITS,
     GROUP,
     RelationshipProfileConfigurationOwner,
@@ -122,13 +122,13 @@ class RelationshipSeedMigrationTests(MultiFixture, unittest.IsolatedAsyncioTestC
         # beside it in <data>/config. The API resolves its host snapshot from
         # here, so preview and apply read the same prompt the migration does.
         self.host_data_root = (Path(temporary.name) / "data" / "plugin_data"
-                               / "astrbot_plugin_private_companion")
+                               / "astrbot_plugin_digital_life")
         self.host_data_root.mkdir(parents=True)
         self.write_host_config()
 
     def write_host_config(self, prompt=PROMPT, *, primary_user_id="200"):
         path = (self.host_data_root.parents[1] / "config"
-                / "astrbot_plugin_private_companion_config.json")
+                / "astrbot_plugin_digital_life_config.json")
         path.parent.mkdir(parents=True, exist_ok=True)
         path.write_text(json.dumps(host_configuration(prompt, primary_user_id=primary_user_id),
                                    ensure_ascii=False), encoding="utf-8", newline="\n")
@@ -543,7 +543,7 @@ class GroupBatchMigrationTests(GroupFixture, unittest.IsolatedAsyncioTestCase):
 
         with patch.object(LegacyMigrationWebAPI, "_scope",
                           return_value=Outcome.success(scope)), \
-             patch("astrbot_host.legacy_group_data_api.LegacyGroupDataWebAPI", FakeGroupAPI):
+             patch("digital_life_host.legacy_group_data_api.LegacyGroupDataWebAPI", FakeGroupAPI):
             result = await api._batch_apply(None, None, None, {
                 "token": "scope-token", "personas": [],
                 "groups": [{"persona_id": "", "group_id": group_id}

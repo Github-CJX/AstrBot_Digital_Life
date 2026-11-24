@@ -9,55 +9,55 @@ from types import SimpleNamespace as NS
 import unittest
 from unittest.mock import patch
 
-from astrbot_host.core_reply import CORE_REPLY_CONTEXT_EXTRA
-from astrbot_host.core_reply_context import (
+from digital_life_host.core_reply import CORE_REPLY_CONTEXT_EXTRA
+from digital_life_host.core_reply_context import (
     LEGACY_MEMORY_INSTRUCTION,
     PRIVATE_GROUP_CONTEXT_INSTRUCTION,
     _MaterialSection,
 )
-from astrbot_host.core_reply_perception import (
+from digital_life_host.core_reply_perception import (
     _GROUP_STATIC_CONTRACT,
     _PRIVATE_STATIC_CONTRACT,
     inject_core_reply_perception_context,
     inject_core_reply_perception_policy,
 )
-from companion_v2.adapters.astrbot.model_wire import build_wire
-from companion_v2.agenda.calendar_prompt import CONTINUOUS_SCHEDULE_RULES, ORCHESTRATED_SCHEDULE_RULES
-from companion_v2.conversation.foreground import PromptMaterial, PromptRequest, SealedForegroundContext
-from companion_v2.conversation.participation_prompts import STATIC_GROUP_PARTICIPATION_RULES
-from companion_v2.conversation.private_reply_context import INSTRUCTION as PRIVATE_REPLY_CONTEXT_INSTRUCTION
-from companion_v2.conversation.style_context import EXPRESSION_STYLE_INSTRUCTION
-from companion_v2.configuration.registry import FieldRegistry
-from companion_v2.execution.models import (
+from digital_life_core.adapters.astrbot.model_wire import build_wire
+from digital_life_core.agenda.calendar_prompt import CONTINUOUS_SCHEDULE_RULES, ORCHESTRATED_SCHEDULE_RULES
+from digital_life_core.conversation.foreground import PromptMaterial, PromptRequest, SealedForegroundContext
+from digital_life_core.conversation.participation_prompts import STATIC_GROUP_PARTICIPATION_RULES
+from digital_life_core.conversation.private_reply_context import INSTRUCTION as PRIVATE_REPLY_CONTEXT_INSTRUCTION
+from digital_life_core.conversation.style_context import EXPRESSION_STYLE_INSTRUCTION
+from digital_life_core.configuration.registry import FieldRegistry
+from digital_life_core.execution.models import (
     Lane,
     TERMINAL,
     digest,
     encode,
     stamp,
 )
-from companion_v2.expression.configuration import DEFAULTS as EXPRESSION_DEFAULTS
-from companion_v2.expression.review import (
+from digital_life_core.expression.configuration import DEFAULTS as EXPRESSION_DEFAULTS
+from digital_life_core.expression.review import (
     CONTACT_KIND as REVIEW_CONTACT_KIND,
     KIND as REVIEW_KIND,
     expression_review_profile,
 )
-from companion_v2.expression.sharing import build_pack
-from companion_v2.expression.style_management import ExpressionStyleManagement
-from companion_v2.expression.style_service import (
+from digital_life_core.expression.sharing import build_pack
+from digital_life_core.expression.style_management import ExpressionStyleManagement
+from digital_life_core.expression.style_service import (
     EXISTING_PROPOSAL_SUMMARY_CHARS,
     RULE_READ_LIMIT,
     _compact_existing_rule,
 )
-from companion_v2.foundation.refs import ScopeKind
-from companion_v2.model_gateway.cache_diagnostics import signature_for_payload
-from companion_v2.model_gateway.models import ModelTaskProfile
-from companion_v2.model_gateway.routing import configuration_fields
-from companion_v2.proactive.configuration import GROUP as CONTACT_GROUP, configuration_fields as contact_fields
-from companion_v2.proactive.preferences import ContactPreferences
-from companion_v2.proactive.prompts import ORIGIN_INSTRUCTIONS, PURPOSE_INSTRUCTIONS, request_for as proactive_request_for
-from companion_v2.proactive.service import persona_judge_profile, plan_profile
-from companion_v2.proactive.staged_prompts import plan_request_for, write_request_for
-from companion_v2.role_work.state.maintenance import (
+from digital_life_core.foundation.refs import ScopeKind
+from digital_life_core.model_gateway.cache_diagnostics import signature_for_payload
+from digital_life_core.model_gateway.models import ModelTaskProfile
+from digital_life_core.model_gateway.routing import configuration_fields
+from digital_life_core.proactive.configuration import GROUP as CONTACT_GROUP, configuration_fields as contact_fields
+from digital_life_core.proactive.preferences import ContactPreferences
+from digital_life_core.proactive.prompts import ORIGIN_INSTRUCTIONS, PURPOSE_INSTRUCTIONS, request_for as proactive_request_for
+from digital_life_core.proactive.service import persona_judge_profile, plan_profile
+from digital_life_core.proactive.staged_prompts import plan_request_for, write_request_for
+from digital_life_core.role_work.state.maintenance import (
     IDLE_REFRESH_MAX_MINUTES,
     _calendar_transition_crossed,
     _local_day_bucket,
@@ -81,7 +81,7 @@ def _extract_context_tail(request) -> str:
     parts = getattr(request, "extra_user_content_parts", ())
     for part in parts:
         text = getattr(part, "text", "")
-        if "<companion_v2_context>" in text:
+        if "<digital_life_core_context>" in text:
             return text
     return ""
 
@@ -496,7 +496,7 @@ class ExpressionLearningSlimmingTests(unittest.TestCase):
             "proposal": long_prop,
             "state": "adopted",
         }
-        with patch("companion_v2.expression.style_service.rule_details.form_for", return_value={
+        with patch("digital_life_core.expression.style_service.rule_details.form_for", return_value={
             "situation": "睡前简短道别" * 20,
             "form": "早点睡呀",
             "usage": "不要堆砌长句",
@@ -565,7 +565,7 @@ class StateMaintenanceIdleSkipGateTests(StateFixture, unittest.IsolatedAsyncioTe
         self.assertGreater(row["next_at"], stamp(self.clock.now()))
 
         # 3. New dialogue arrives -> idle skip gate opens and dispatches LLM maintenance!
-        from companion_v2.conversation.native_observations import NativeConversationObservations
+        from digital_life_core.conversation.native_observations import NativeConversationObservations
         self.clock.advance(timedelta(minutes=30))
         NativeConversationObservations(app.messages).capture_together(
             context, observation_id="new-dialogue-trigger", event_id="new-dialogue-trigger",

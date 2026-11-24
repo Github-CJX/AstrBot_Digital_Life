@@ -76,8 +76,8 @@ function harness(responses) {
   };
   const window = {
     CompanionProduct: {
-      role: () => ({model_api: '/astrbot_plugin_private_companion/model',
-        config_api: '/astrbot_plugin_private_companion/config', role_id: 'role-a'}),
+      role: () => ({model_api: '/astrbot_plugin_digital_life/model',
+        config_api: '/astrbot_plugin_digital_life/config', role_id: 'role-a'}),
       bridgeNow: () => bridge,
     },
     lucide: {createIcons() {}},
@@ -194,7 +194,7 @@ test('core efficiency and cache views retain the native measurement basis', asyn
         request_hook_to_agent_ms: 200, tool_ms: 300, agent_ms: 1800, send_ms: 400},
       trace: {model_calls: [{position: 3, state: 'returned', measurement_basis: 'runner_aggregate', tokens: 1200}],
         preparation_steps: [{name: 'context_build', state: 'returned', started_at: at, elapsed_ms: 100}],
-        materials: [{owner: 'private_companion.v2', purpose: 'memory', state: 'ready', elapsed_ms: 35, chars: 1200}],
+        materials: [{owner: 'digital_life.v2', purpose: 'memory', state: 'ready', elapsed_ms: 35, chars: 1200}],
         offered_tools: ['read_file'], tool_calls: [], offered_tool_count: 4}}], daily: []};
   const h = harness({maintenance: {generated_at: at, summary: {calls: 2, tokens: 1200},
       daily: [], history: [], recent: [],
@@ -2235,7 +2235,7 @@ function resilienceHarness(options = {}) {
     },
   };
   const product = {
-    role: () => ({model_api: '/astrbot_plugin_private_companion/model', config_api: '/astrbot_plugin_private_companion/config', role_id: 'role-a'}),
+    role: () => ({model_api: '/astrbot_plugin_digital_life/model', config_api: '/astrbot_plugin_digital_life/config', role_id: 'role-a'}),
     roleLabel: () => '和纱',
     bridgeNow: () => bridge,
     bridgeFor: async () => {
@@ -2323,9 +2323,9 @@ test('group window resolves private role model_api instead of calling 404 group 
   const h = resilienceHarness({
     product: {
       scopeKey: () => 'inst-1:group-1:role-a',
-      target: () => ({target_id: 'group-1', scope_kind: 'group', roles: [{role_id: 'role-a', model_api: '/astrbot_plugin_private_companion/targets/group-1/roles/role-a/model'}]}),
-      roleTarget: () => ({target_id: 'priv-1', scope_kind: 'private', roles: [{role_id: 'role-a', model_api: '/astrbot_plugin_private_companion/targets/priv-1/roles/role-a/model'}]}),
-      role: () => ({role_id: 'role-a', model_api: '/astrbot_plugin_private_companion/targets/group-1/roles/role-a/model'}),
+      target: () => ({target_id: 'group-1', scope_kind: 'group', roles: [{role_id: 'role-a', model_api: '/astrbot_plugin_digital_life/targets/group-1/roles/role-a/model'}]}),
+      roleTarget: () => ({target_id: 'priv-1', scope_kind: 'private', roles: [{role_id: 'role-a', model_api: '/astrbot_plugin_digital_life/targets/priv-1/roles/role-a/model'}]}),
+      role: () => ({role_id: 'role-a', model_api: '/astrbot_plugin_digital_life/targets/group-1/roles/role-a/model'}),
     },
     onGet: route => {
       if (route.includes('/targets/group-1/')) {
@@ -2355,8 +2355,8 @@ test('group-only role without private model_api renders helpful non-error guidan
     product: {
       scopeKey: () => 'inst-1:group-only:role-g',
       target: () => ({target_id: 'group-only', scope_kind: 'group'}),
-      roleTarget: () => ({target_id: 'group-only', scope_kind: 'group', roles: [{role_id: 'role-g', model_api: '/astrbot_plugin_private_companion/targets/group-only/roles/role-g/model'}]}),
-      role: () => ({role_id: 'role-g', model_api: '/astrbot_plugin_private_companion/targets/group-only/roles/role-g/model'}),
+      roleTarget: () => ({target_id: 'group-only', scope_kind: 'group', roles: [{role_id: 'role-g', model_api: '/astrbot_plugin_digital_life/targets/group-only/roles/role-g/model'}]}),
+      role: () => ({role_id: 'role-g', model_api: '/astrbot_plugin_digital_life/targets/group-only/roles/role-g/model'}),
       roleLabel: () => '群聊助手',
     },
   });
@@ -2389,7 +2389,7 @@ test('non-destructive error handling preserves loaded snapshot on 45s poll and t
   const h = resilienceHarness({
     product: {
       scopeKey: () => 'inst-1:priv-1:role-a',
-      role: () => ({role_id: 'role-a', model_api: '/astrbot_plugin_private_companion/model'}),
+      role: () => ({role_id: 'role-a', model_api: '/astrbot_plugin_digital_life/model'}),
     },
     onGet: route => {
       if (route.endsWith('/maintenance')) {
@@ -2502,7 +2502,7 @@ test('mount race guard waits for checking/null catalog and auto-loads once scope
   // Once catalog finishes and dispatches companion:scope-changed, maintenance auto-loads cleanly!
   connState = 'connected';
   dir = {installation_id: 'inst-1', targets: [{target_id: 'priv-1'}]};
-  activeRole = {role_id: 'role-a', model_api: '/astrbot_plugin_private_companion/model'};
+  activeRole = {role_id: 'role-a', model_api: '/astrbot_plugin_digital_life/model'};
   h.window.dispatchEvent({type: 'companion:scope-changed'});
   await flush();
   assert.ok(h.requests.some(([m, r]) => m === 'GET' && r === '/model/maintenance'));

@@ -19,7 +19,7 @@ const vm = require("node:vm");
 const ROOT = path.resolve(__dirname, "..");
 const PAGES = path.join(ROOT, "pages", "陪伴小屋");
 const source = fs.readFileSync(path.join(PAGES, "native-extension-panel.js"), "utf8");
-const base = path.join(ROOT, "astrbot_host", "native_extensions", "reality");
+const base = path.join(ROOT, "digital_life_host", "native_extensions", "reality");
 const schema = JSON.parse(fs.readFileSync(path.join(base, "settings-schema.json"), "utf8"));
 const settings = JSON.parse(fs.readFileSync(path.join(base, "settings-defaults.json"), "utf8"));
 
@@ -43,8 +43,8 @@ function harness() {
   const window = {
     CompanionProduct: {
       request: async () => ({extensions: {reality: structuredClone(record)}}),
-      provider: () => ({owner: "companion_v2", assembled: true, desired_state: "active"}),
-      extension: () => ({owner: "companion_v2", assembled: true, desired_state: "active"}),
+      provider: () => ({owner: "digital_life_core", assembled: true, desired_state: "active"}),
+      extension: () => ({owner: "digital_life_core", assembled: true, desired_state: "active"}),
       refreshIntegrations: async () => {},
     },
   };

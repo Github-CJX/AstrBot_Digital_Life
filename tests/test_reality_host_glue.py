@@ -16,26 +16,26 @@ from tests import test_astrbot_staging_host as support
 from tests.multi_host_support import MultiNativeContext, multi_config
 from astrbot.core.provider.entities import LLMResponse, ProviderRequest, TokenUsage
 from astrbot.core.utils.astrbot_path import get_astrbot_temp_path
-from astrbot_host.integration_registry import UnifiedCompanionExtensionAPI
-from astrbot_host.multi_controller import AstrBotMultiController
-from astrbot_host.multi_settings import PrivateTarget
-from companion_v2.adapters.astrbot.native import HostAccount
-from companion_v2.identity_policy.object_access import ObjectAccessPolicy
-from astrbot_host.native_extensions.reality.host_events import RealityHostEvents
-from astrbot_host.native_extensions.reality import mobile_gateway
-from astrbot_host.native_extensions.reality.mobile_gateway import _MobileRequestState, _mobile_request_state
-from companion_v2.capabilities import CapabilityAuthorizationState, CapabilityRepository
-from companion_v2.conversation.native_history import body, reference
-from companion_v2.conversation.native_observations import REALITY_ASSISTANT_OWNER
-from companion_v2.execution.models import TaskError, require
-from companion_v2.foundation.outcome import Outcome
-from companion_v2.identity_policy.models import AuthorizationTier
+from digital_life_host.integration_registry import UnifiedCompanionExtensionAPI
+from digital_life_host.multi_controller import AstrBotMultiController
+from digital_life_host.multi_settings import PrivateTarget
+from digital_life_core.adapters.astrbot.native import HostAccount
+from digital_life_core.identity_policy.object_access import ObjectAccessPolicy
+from digital_life_host.native_extensions.reality.host_events import RealityHostEvents
+from digital_life_host.native_extensions.reality import mobile_gateway
+from digital_life_host.native_extensions.reality.mobile_gateway import _MobileRequestState, _mobile_request_state
+from digital_life_core.capabilities import CapabilityAuthorizationState, CapabilityRepository
+from digital_life_core.conversation.native_history import body, reference
+from digital_life_core.conversation.native_observations import REALITY_ASSISTANT_OWNER
+from digital_life_core.execution.models import TaskError, require
+from digital_life_core.foundation.outcome import Outcome
+from digital_life_core.identity_policy.models import AuthorizationTier
 
 
 class Event:
     def __init__(self, reminder_id, job_id="job-a"):
         self.unified_msg_origin = "qq-main:FriendMessage:200"
-        self.extra = {"cron_payload": {"origin": "companion_v2.reality", "sender_id": "200",
+        self.extra = {"cron_payload": {"origin": "digital_life_core.reality", "sender_id": "200",
             "reality_v2": {"reminder_id": reminder_id}}, "cron_job": {"id": job_id}}
 
     def get_extra(self, key, default=None):
@@ -221,7 +221,7 @@ class RealityHostGlueTests(unittest.IsolatedAsyncioTestCase):
         persistent = {self.runtime._alarm_task, getattr(self.runtime, "_care_task", None)}
         jobs = [
             job for job in self.runtime._background_tasks
-            if job not in persistent and job.get_name() != "companion_v2.reality:care"
+            if job not in persistent and job.get_name() != "digital_life_core.reality:care"
         ]
         if jobs:
             await asyncio.gather(*jobs)
@@ -304,7 +304,7 @@ class RealityHostGlueTests(unittest.IsolatedAsyncioTestCase):
         self.runtime._reply = AsyncMock()
         self.assertTrue(await self.runtime._maybe_handle_wakeup_feedback(event, "200", self.user, event.message_str))
         self.assertEqual(self.user["wakeup_alarm"]["contact_session"]["status"], "acknowledged")
-        self.assertEqual(event.get_extra("companion_v2_reality_wakeup_feedback")["intent"], "awake")
+        self.assertEqual(event.get_extra("digital_life_core_reality_wakeup_feedback")["intent"], "awake")
         event.stop_event.assert_not_called()
         self.runtime._reply.assert_not_awaited()
         self.native.send_message.assert_not_awaited()
@@ -333,7 +333,7 @@ class RealityHostGlueTests(unittest.IsolatedAsyncioTestCase):
     async def test_official_cron_tool_and_fallback_deliver_once_then_complete(self):
         reminder = await self.schedule()
         payload = self.native.cron_manager.add_active_job.await_args.kwargs["payload"]
-        self.assertEqual(payload["origin"], "companion_v2.reality")
+        self.assertEqual(payload["origin"], "digital_life_core.reality")
         self.assertEqual(reminder["context_key"], self.context.key)
         event, req = Event(reminder["id"]), ProviderRequest(system_prompt="原人格")
         owner = RealityHostEvents(self.runtime, lambda: True)
@@ -444,11 +444,11 @@ class RealityHostGlueTests(unittest.IsolatedAsyncioTestCase):
         await self.upload_mobile_samples(phone)
         retention = self.runtime._mobile_device_status["200"]["_rv1"]["retain_until"]
         observer = self.mobile_session("test-observer-paired-native-phone", ttl=60, name="observer")
-        before_close = await self.api.companion_v2_mobile_reality_snapshot(observer)
+        before_close = await self.api.digital_life_core_mobile_reality_snapshot(observer)
         for kind in ("location", "device", "activity", "telemetry"):
             self.assertTrue(before_close["snapshot"][kind]["available"], kind)
         self.assertTrue((await self.mobile_call(observer, self.runtime.mobile_close_session))[0]["ok"])
-        after_close = await self.api.companion_v2_mobile_reality_snapshot(phone)
+        after_close = await self.api.digital_life_core_mobile_reality_snapshot(phone)
         self.assertEqual(after_close["snapshot"]["device"]["battery_percent"], 68)
         self.assertTrue(self.runtime._mobile_screen_status("200")["online"])
         self.assertEqual(self.runtime._mobile_device_status["200"]["_rv1"]["retain_until"], retention)
@@ -503,7 +503,7 @@ class RealityHostGlueTests(unittest.IsolatedAsyncioTestCase):
         request = NS(can_read_body=True, content_length=100, transport=None, remote="127.0.0.1",
                      headers={"Authorization": "Bearer " + phone},
                      json=AsyncMock(return_value={"app_state": "foreground", "battery_percent": 68}))
-        with patch("astrbot_host.native_extensions.reality.mobile_gateway.logger") as logger:
+        with patch("digital_life_host.native_extensions.reality.mobile_gateway.logger") as logger:
             response = await self.runtime._mobile_aiohttp_dispatch(request, self.runtime.mobile_device_status)
             self.assertEqual(response.status, 200)
             logger.info.assert_called_once()
@@ -576,8 +576,8 @@ class RealityHostGlueTests(unittest.IsolatedAsyncioTestCase):
             with (patch.object(self.runtime, '_mobile_v2_together_status', new=AsyncMock(return_value=ready)),
                   patch.object(self.runtime, 'native_extension', return_value=NS()),
                   patch.object(self.runtime, '_mobile_prepare_together_access', new=AsyncMock(return_value={})),
-                  patch.object(host_api, 'companion_v2_mobile_together_create', new=creator),
-                  patch('astrbot_host.native_extensions.reality.mobile_gateway.logger') as logger):
+                  patch.object(host_api, 'digital_life_core_mobile_together_create', new=creator),
+                  patch('digital_life_host.native_extensions.reality.mobile_gateway.logger') as logger):
                 body, status = await self.mobile_call(phone, self.runtime.mobile_create_room,
                     {'mode': 'call', 'client': 'android_native', 'request_id': 'room-original'})
                 self.assertEqual(status, 409)
@@ -719,7 +719,7 @@ class RealityHostGlueTests(unittest.IsolatedAsyncioTestCase):
                 'start',
                 new=AsyncMock(side_effect=AssertionError('cloudflared must not start')),
               ) as tunnel_start,
-              self.assertLogs('astrbot_host.native_extensions', level='WARNING') as captured):
+              self.assertLogs('digital_life_host.native_extensions', level='WARNING') as captured):
             body, status = await self.mobile_call(
                 phone,
                 self.runtime.mobile_create_room,
@@ -745,7 +745,7 @@ class RealityHostGlueTests(unittest.IsolatedAsyncioTestCase):
                 'start',
                 new=AsyncMock(side_effect=AssertionError('cloudflared must not start')),
               ) as tunnel_start,
-              patch('astrbot_host.native_extensions.reality.mobile_gateway.logger') as gw_logger):
+              patch('digital_life_host.native_extensions.reality.mobile_gateway.logger') as gw_logger):
             invite_body, invite_status = await self.mobile_call(
                 phone,
                 self.runtime.mobile_invite_room,
@@ -773,7 +773,7 @@ class RealityHostGlueTests(unittest.IsolatedAsyncioTestCase):
                     "device": {"available": True, "battery_percent": 68}}
         self.runtime.mobile_context = Mock(return_value=snapshot)
         before = self.counts()
-        result = await self.api.companion_v2_mobile_reality_snapshot(token)
+        result = await self.api.digital_life_core_mobile_reality_snapshot(token)
         self.assertEqual((result["state"], result["effect"]), ("succeeded", "none"))
         self.assertEqual(result["snapshot"], snapshot)
         self.assertTrue(result["receipt_ref"].startswith("reality.native.operation:"))
@@ -785,7 +785,7 @@ class RealityHostGlueTests(unittest.IsolatedAsyncioTestCase):
         token = self.mobile_session()
         self.runtime.mobile_context = Mock()
         with self.assertRaises(TaskError) as error:
-            await self.api.companion_v2_mobile_reality_snapshot(token)
+            await self.api.digital_life_core_mobile_reality_snapshot(token)
         self.assertEqual(error.exception.code, "mobile_reality_not_authorized")
         self.runtime.mobile_context.assert_not_called()
 
@@ -797,7 +797,7 @@ class RealityHostGlueTests(unittest.IsolatedAsyncioTestCase):
             return {"available": False, "user_id": user_id}
         self.runtime.mobile_context = Mock(side_effect=revoke)
         with self.assertRaises(TaskError):
-            await self.api.companion_v2_mobile_reality_snapshot(token)
+            await self.api.digital_life_core_mobile_reality_snapshot(token)
         self.native.send_message.assert_not_awaited()
 
     def test_supported_screen_upload_does_not_imply_an_online_phone(self):
@@ -816,15 +816,15 @@ class RealityHostGlueTests(unittest.IsolatedAsyncioTestCase):
     async def test_shared_host_exposes_native_settings_and_unregisters_them(self):
         registered = self.native.registered_web_apis
         self.controller.web_api.register()
-        expected = {"/astrbot_plugin_private_companion/extensions" + suffix
+        expected = {"/astrbot_plugin_digital_life/extensions" + suffix
                     for suffix in ("", "/configure", "/action")}
         self.assertTrue(expected <= {entry[0] for entry in registered})
         await self.controller.terminate()
         self.assertFalse(expected & {entry[0] for entry in registered})
 
     async def test_location_notification_uses_per_user_snapshot_consent_and_contact_policy(self):
-        from companion_v2.conversation.native_turns import NativeConversationTurns
-        from companion_v2.execution.models import digest as v2_digest
+        from digital_life_core.conversation.native_turns import NativeConversationTurns
+        from digital_life_core.execution.models import digest as v2_digest
 
         NativeConversationTurns(self.app.runtime).mark(self.prepared, "completed", at=support.NOW)
         mobile = {"available": True, "location": {"available": True, "captured_at": 123,
@@ -893,6 +893,6 @@ class RealityHostGlueTests(unittest.IsolatedAsyncioTestCase):
             self.user["reality_touch_consent"]["confirmed"] = False
             return {"type": "record", "data": {"file": "base64://UklGRg=="}}
         self.runtime._open_reality_touch_audio_file = Mock()
-        with patch("astrbot_host.voice.NativeVoiceReply.render", side_effect=revoke):
+        with patch("digital_life_host.voice.NativeVoiceReply.render", side_effect=revoke):
             self.assertFalse(await self.runtime._play_reality_touch_text("起床啦", user_id="200"))
         self.runtime._open_reality_touch_audio_file.assert_not_called()

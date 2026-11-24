@@ -21,7 +21,7 @@ const flush = () => new Promise(resolve => setImmediate(resolve));
 const drains = async (times = 6) => { for (let index = 0; index < times; index += 1) await flush(); };
 const TOKEN = a => a.repeat(64);
 const plain = value => JSON.parse(JSON.stringify(value));
-const PREFIX = '/astrbot_plugin_private_companion/';
+const PREFIX = '/astrbot_plugin_digital_life/';
 
 const quota = {
   private_owner_max_daily: -1, private_friend_max_daily: -1, group_max_daily: -1, proactive_max_daily: -1,

@@ -5,10 +5,10 @@ from datetime import timedelta
 import json
 import unittest
 
-from companion_v2.conversation.state_context import ConversationStateContext
-from companion_v2.execution.models import TaskError
-from companion_v2.role_work.state.management import StateManagement
-from astrbot_host.management_identity import dashboard_operator
+from digital_life_core.conversation.state_context import ConversationStateContext
+from digital_life_core.execution.models import TaskError
+from digital_life_core.role_work.state.management import StateManagement
+from digital_life_host.management_identity import dashboard_operator
 from tests.multi_host_support import multi_config
 from tests.multi_life_support import MultiLifeFixture
 from tests.test_role_state import state_data

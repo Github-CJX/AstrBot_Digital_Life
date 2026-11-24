@@ -5,9 +5,9 @@ from types import SimpleNamespace as NS
 import unittest
 from unittest.mock import AsyncMock
 
-from companion_v2.adapters.astrbot.forwards import NativeForwardLocator, read_private_forwards
-from companion_v2.adapters.astrbot.quotes import NativeQuoteLocator, read_private_quote
-from companion_v2.execution.models import TaskError
+from digital_life_core.adapters.astrbot.forwards import NativeForwardLocator, read_private_forwards
+from digital_life_core.adapters.astrbot.quotes import NativeQuoteLocator, read_private_quote
+from digital_life_core.execution.models import TaskError
 from tests.forward_support import outer_raw
 from tests.native_adapter_support import FakeReverseApi
 from tests.test_conversation_quotes import quote_raw

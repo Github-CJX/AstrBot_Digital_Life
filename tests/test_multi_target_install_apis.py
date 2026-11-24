@@ -26,8 +26,8 @@ from astrbot.api.web import PluginRequest, bind_request_context
 from starlette.requests import Request
 
 
-BACKUP_PREFIX = "/astrbot_plugin_private_companion/backup"
-LEGACY_PREFIX = "/astrbot_plugin_private_companion/legacy"
+BACKUP_PREFIX = "/astrbot_plugin_digital_life/backup"
+LEGACY_PREFIX = "/astrbot_plugin_digital_life/legacy"
 
 
 class QueryArgs(dict):
@@ -47,7 +47,7 @@ def v1_weather_config() -> dict:
 
 def v1_root(parent: Path) -> Path:
     """在给定目录下造一份 V1 数据根：配置转储 + 一个 SQLite。"""
-    root = parent / "astrbot_plugin_private_companion"
+    root = parent / "astrbot_plugin_digital_life"
     root.mkdir(parents=True, exist_ok=True)
     (root / "companion_config.json").write_text(json.dumps(v1_weather_config(), ensure_ascii=False),
                                                 encoding="utf-8")
@@ -91,8 +91,8 @@ class MultiTargetInstallApiTests(multi_support.MultiFixture, unittest.IsolatedAs
         self.assertIn(BACKUP_PREFIX + "/restore", paths)
 
     async def test_account_migration_appends_new_routes_and_preserves_v2_persona_roles(self):
-        import astrbot_host.legacy_api as legacy_api
-        from companion_v2.legacy.migration import ConfigIntent
+        import digital_life_host.legacy_api as legacy_api
+        from digital_life_core.legacy.migration import ConfigIntent
 
         self.controller.save_plugin_config = lambda candidate: (
             self.controller.config.clear(), self.controller.config.update(candidate))
@@ -140,8 +140,8 @@ class MultiTargetInstallApiTests(multi_support.MultiFixture, unittest.IsolatedAs
         self.assertIn("preserved_v2", {item["kind"] for item in differences})
 
     async def test_invalid_runtime_setting_does_not_split_identity_migration_bundle(self):
-        import astrbot_host.legacy_api as legacy_api
-        from companion_v2.legacy.migration import ConfigIntent
+        import digital_life_host.legacy_api as legacy_api
+        from digital_life_core.legacy.migration import ConfigIntent
 
         self.controller.save_plugin_config = lambda candidate: (
             self.controller.config.clear(), self.controller.config.update(candidate))
@@ -179,7 +179,7 @@ class MultiTargetInstallApiTests(multi_support.MultiFixture, unittest.IsolatedAs
 
     async def test_staged_restore_is_applied_before_the_store_opens(self):
         """多目标下必须补上这一步：否则还原永远不生效。"""
-        import astrbot_host.multi_controller as multi_controller
+        import digital_life_host.multi_controller as multi_controller
 
         calls = []
         applied = {"applied": True, "reason": "test-restore"}
@@ -263,9 +263,9 @@ class MultiTargetInstallApiTests(multi_support.MultiFixture, unittest.IsolatedAs
     async def test_page_directory_publishes_a_legacy_route_per_role(self):
         await self.controller.initialize_profile()
         self.controller.register_routes()
-        caller = RouteCaller(self.native, __import__("astrbot_host.page_api", fromlist=["request"]))
+        caller = RouteCaller(self.native, __import__("digital_life_host.page_api", fromlist=["request"]))
 
-        result = await caller.call("/astrbot_plugin_private_companion/page/targets")
+        result = await caller.call("/astrbot_plugin_digital_life/page/targets")
 
         self.assertEqual(result["status"], "ok", result)
         data = result["data"]
@@ -284,7 +284,7 @@ class MultiTargetInstallApiTests(multi_support.MultiFixture, unittest.IsolatedAs
         self.controller = self.make_controller(config=config)
         await self.controller.initialize_profile()
         self.controller.register_routes()
-        from astrbot_host import group_model_api
+        from digital_life_host import group_model_api
 
         caller = RouteCaller(self.native, group_model_api)
         inventory = self.controller.web_api.target_inventory()
@@ -348,7 +348,7 @@ class MultiTargetLegacyApplyTests(multi_support.MultiFixture, unittest.IsolatedA
         await self._supplement_existing_role(auto=True)
 
     async def _supplement_existing_role(self, *, auto):
-        import astrbot_host.legacy_api as legacy_api
+        import digital_life_host.legacy_api as legacy_api
         from copy import deepcopy
 
         section = self.controller.config["multi_host"]
@@ -360,7 +360,7 @@ class MultiTargetLegacyApplyTests(multi_support.MultiFixture, unittest.IsolatedA
         clients = self.native.platform.client._wsr_api_clients
         self.native.platform.client._wsr_api_clients = {"100": clients["100"]}
         self.controller.refresh_settings()
-        config_path = self.root / "config" / "astrbot_plugin_private_companion_config.json"
+        config_path = self.root / "config" / "astrbot_plugin_digital_life_config.json"
         config_path.parent.mkdir()
         self.controller.default_data_root = self.root / "plugin_data" / "companion-7"
         config_path.write_text(json.dumps({
@@ -378,7 +378,7 @@ class MultiTargetLegacyApplyTests(multi_support.MultiFixture, unittest.IsolatedA
         runtime = self.controller.runtime
         route = self.controller.web_api.target_inventory()[0]["roles"][0]["legacy_api"]
         api = caller.routes[route].__self__
-        from companion_v2.legacy.migration import ConfigIntent
+        from digital_life_core.legacy.migration import ConfigIntent
         request = Request({"type": "http", "method": "POST", "path": route,
                            "headers": [], "query_string": b""})
         with bind_request_context(PluginRequest(request, username="admin")):
@@ -421,7 +421,7 @@ class MultiTargetLegacyApplyTests(multi_support.MultiFixture, unittest.IsolatedA
         self.assertEqual(config_path.read_bytes(), source_bytes)
 
     async def test_migration_writes_the_selected_roles_settings(self):
-        import astrbot_host.legacy_api as legacy_api
+        import digital_life_host.legacy_api as legacy_api
 
         await self.controller.initialize_profile()
         self.controller.register_routes()
@@ -468,8 +468,8 @@ class SingleTargetLegacyApplyTests(unittest.IsolatedAsyncioTestCase):
         self.addAsyncCleanup(self.controller.terminate)
 
     async def test_scope_targets_come_from_the_session_pipeline_context(self):
-        import astrbot_host.legacy_api as legacy_api
-        from companion_v2.legacy.migration import ConfigIntent
+        import digital_life_host.legacy_api as legacy_api
+        from digital_life_core.legacy.migration import ConfigIntent
 
         (await self.controller.initialize_profile()).unwrap()
         session = self.controller.session
@@ -487,7 +487,7 @@ class SingleTargetLegacyApplyTests(unittest.IsolatedAsyncioTestCase):
 
     async def test_plan_reports_scope_availability_before_applying(self):
         self.controller.register_routes()
-        caller = RouteCaller(self.native, __import__("astrbot_host.legacy_api", fromlist=["request"]))
+        caller = RouteCaller(self.native, __import__("digital_life_host.legacy_api", fromlist=["request"]))
         (await self.controller.initialize_profile()).unwrap()
 
         planned = await caller.call(LEGACY_PREFIX + "/plan")
@@ -501,7 +501,7 @@ class SingleTargetLegacyApplyTests(unittest.IsolatedAsyncioTestCase):
 
     async def test_apply_writes_the_planned_settings(self):
         self.controller.register_routes()
-        caller = RouteCaller(self.native, __import__("astrbot_host.legacy_api", fromlist=["request"]))
+        caller = RouteCaller(self.native, __import__("digital_life_host.legacy_api", fromlist=["request"]))
         (await self.controller.initialize_profile()).unwrap()
         planned = await caller.call(LEGACY_PREFIX + "/plan")
         token = planned["data"]["plan_token"]
@@ -515,8 +515,8 @@ class SingleTargetLegacyApplyTests(unittest.IsolatedAsyncioTestCase):
         self.assertTrue(applied["data"]["completion_recorded"])
 
     def _split_migration(self):
-        from companion_v2.foundation.outcome import Outcome
-        from companion_v2.legacy.migration import ConfigIntent, MigrationPlan, SourceFinding
+        from digital_life_core.foundation.outcome import Outcome
+        from digital_life_core.legacy.migration import ConfigIntent, MigrationPlan, SourceFinding
 
         plan = MigrationPlan(str(self.v1), findings=(
             SourceFinding("private.host_configuration", "private", "converted", "ready", ()),
@@ -531,8 +531,8 @@ class SingleTargetLegacyApplyTests(unittest.IsolatedAsyncioTestCase):
                   v1_root=self.v1, _configuration=lambda: {})
 
     async def test_split_plan_keeps_existing_role_values_and_matches_the_remaining_fields_token(self):
-        from astrbot_host.legacy_api import LegacyMigrationWebAPI
-        from companion_v2.legacy.migration import ConfigIntent
+        from digital_life_host.legacy_api import LegacyMigrationWebAPI
+        from digital_life_core.legacy.migration import ConfigIntent
 
         (await self.controller.initialize_profile()).unwrap()
         session = self.controller.session
@@ -558,10 +558,10 @@ class SingleTargetLegacyApplyTests(unittest.IsolatedAsyncioTestCase):
             self.assertEqual(snapshot.fields["role.state.maintenance_minutes"].value, 45)
 
     async def test_split_plan_rejects_changes_after_preparation_before_any_write(self):
-        from astrbot_host.legacy_api import LegacyMigrationWebAPI
-        from companion_v2.configuration.models import ConfigLayer
-        from companion_v2.configuration.owners import SparseConfigurationOwner
-        from companion_v2.legacy.migration import ConfigIntent
+        from digital_life_host.legacy_api import LegacyMigrationWebAPI
+        from digital_life_core.configuration.models import ConfigLayer
+        from digital_life_core.configuration.owners import SparseConfigurationOwner
+        from digital_life_core.legacy.migration import ConfigIntent
 
         (await self.controller.initialize_profile()).unwrap()
         session = self.controller.session
@@ -596,7 +596,7 @@ class SingleTargetLegacyApplyTests(unittest.IsolatedAsyncioTestCase):
             self.assertEqual(snapshot.fields["role.state.maintenance_minutes"].value, 50)
 
     async def test_upgrade_guide_route_lifecycle_imports_then_confirms_after_restart(self):
-        import astrbot_host.legacy_api as legacy_api
+        import digital_life_host.legacy_api as legacy_api
 
         self.controller.register_routes()
         caller = RouteCaller(self.native, legacy_api)
@@ -645,7 +645,7 @@ class SingleTargetLegacyApplyTests(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(source_config.read_bytes(), original_v1_config)
 
     async def test_upgrade_state_requires_restart_and_separates_data_migration(self):
-        from astrbot_host.legacy_api import LegacyMigrationWebAPI
+        from digital_life_host.legacy_api import LegacyMigrationWebAPI
 
         (await self.controller.initialize_profile()).unwrap()
         first_instance = LegacyMigrationWebAPI(self.controller)
@@ -680,7 +680,7 @@ class SingleTargetLegacyApplyTests(unittest.IsolatedAsyncioTestCase):
         self.assertFalse(after_additional_write["upgrade_verified"])
 
     async def test_no_change_import_is_verified_without_restart(self):
-        from astrbot_host.legacy_api import LegacyMigrationWebAPI
+        from digital_life_host.legacy_api import LegacyMigrationWebAPI
 
         (await self.controller.initialize_profile()).unwrap()
         api = LegacyMigrationWebAPI(self.controller)
@@ -697,7 +697,7 @@ class SingleTargetLegacyApplyTests(unittest.IsolatedAsyncioTestCase):
         self.assertTrue(state["upgrade_verified"])
 
     async def test_plugin_reload_reopens_configuration_without_a_process_restart(self):
-        from astrbot_host.legacy_api import LegacyMigrationWebAPI
+        from digital_life_host.legacy_api import LegacyMigrationWebAPI
 
         (await self.controller.initialize_profile()).unwrap()
         original = LegacyMigrationWebAPI(self.controller)
@@ -719,7 +719,7 @@ class SingleTargetLegacyApplyTests(unittest.IsolatedAsyncioTestCase):
         self.assertFalse(loaded._install_state(self.v1, [])["restart_required"])
 
     async def test_no_change_import_preserves_restart_pending_from_prior_write(self):
-        from astrbot_host.legacy_api import LegacyMigrationWebAPI
+        from digital_life_host.legacy_api import LegacyMigrationWebAPI
 
         (await self.controller.initialize_profile()).unwrap()
         api = LegacyMigrationWebAPI(self.controller)
@@ -738,7 +738,7 @@ class SingleTargetLegacyApplyTests(unittest.IsolatedAsyncioTestCase):
         self.assertFalse(state["upgrade_verified"])
 
     async def test_legacy_import_marker_without_scope_keeps_its_upgrade_state(self):
-        from astrbot_host.legacy_api import LegacyMigrationWebAPI
+        from digital_life_host.legacy_api import LegacyMigrationWebAPI
 
         (await self.controller.initialize_profile()).unwrap()
         with self.controller.runtime.transaction() as connection:
@@ -761,7 +761,7 @@ class SingleTargetLegacyApplyTests(unittest.IsolatedAsyncioTestCase):
         self.assertFalse(alternate["configuration_scope_unknown"])
 
     async def test_partial_scope_marker_does_not_inherit_legacy_completion(self):
-        from astrbot_host.legacy_api import LegacyMigrationWebAPI
+        from digital_life_host.legacy_api import LegacyMigrationWebAPI
 
         (await self.controller.initialize_profile()).unwrap()
         api = LegacyMigrationWebAPI(self.controller)
@@ -788,14 +788,14 @@ class HostConfigDiscoveryTests(unittest.IsolatedAsyncioTestCase):
         temporary = TemporaryDirectory(prefix="companion-legacy-hostcfg-")
         self.addCleanup(temporary.cleanup)
         base = Path(temporary.name) / "astrbot"
-        self.data_root = base / "plugin_data" / "astrbot_plugin_private_companion_v2"
+        self.data_root = base / "plugin_data" / "astrbot_plugin_digital_life_legacy"
         self.data_root.mkdir(parents=True)
         # V1 数据根留空：证明来源的就绪只靠宿主配置文件，不靠任何转储。
-        self.v1 = base / "plugin_data" / "astrbot_plugin_private_companion"
+        self.v1 = base / "plugin_data" / "astrbot_plugin_digital_life"
         self.v1.mkdir(parents=True)
         config_dir = base / "config"
         config_dir.mkdir()
-        self.host_config_path = config_dir / "astrbot_plugin_private_companion_config.json"
+        self.host_config_path = config_dir / "astrbot_plugin_digital_life_config.json"
         self.native = support.WebContext()
         types = support.NativeAdapterTypes("4.27.2", support.FakeEvent, support.FakeProvider, NS, NS,
                                            support.FakeReverseApi)
@@ -825,7 +825,7 @@ class HostConfigDiscoveryTests(unittest.IsolatedAsyncioTestCase):
     async def _plan(self, *, configuration_scope=None):
         self.controller.register_routes()
         (await self.controller.initialize_profile()).unwrap()
-        caller = RouteCaller(self.native, __import__("astrbot_host.legacy_api", fromlist=["request"]))
+        caller = RouteCaller(self.native, __import__("digital_life_host.legacy_api", fromlist=["request"]))
         query = ({"configuration_scope": configuration_scope}
                  if configuration_scope is not None else None)
         planned = await caller.call(LEGACY_PREFIX + "/plan", query=query)
@@ -865,7 +865,7 @@ class HostConfigDiscoveryTests(unittest.IsolatedAsyncioTestCase):
 
 
     async def test_auto_inheritance_rejects_unreadable_host_config_without_writing(self):
-        import astrbot_host.legacy_api as legacy_api
+        import digital_life_host.legacy_api as legacy_api
 
         self.host_config_path.write_text("{ invalid json", encoding="utf-8")
         self.controller.register_routes()
@@ -884,7 +884,7 @@ class HostConfigDiscoveryTests(unittest.IsolatedAsyncioTestCase):
         self.assertIsNone(api._runtime_metadata_value("legacy_configuration_imported_root"))
 
     def test_plugin_config_candidate_falls_back_for_noncopyable_runtime_mapping(self):
-        import astrbot_host.legacy_api as legacy_api
+        import digital_life_host.legacy_api as legacy_api
 
         class RuntimeConfig(dict):
             def __deepcopy__(self, memo):
@@ -949,8 +949,8 @@ class HostConfigDiscoveryTests(unittest.IsolatedAsyncioTestCase):
                          "qweather")
 
     async def test_weather_bundle_isolated_from_an_unrelated_invalid_plugin_setting(self):
-        import astrbot_host.legacy_api as legacy_api
-        from companion_v2.legacy.migration import ConfigIntent, MigrationPlan
+        import digital_life_host.legacy_api as legacy_api
+        from digital_life_core.legacy.migration import ConfigIntent, MigrationPlan
 
         (await self.controller.initialize_profile()).unwrap()
         api = legacy_api.LegacyMigrationWebAPI(self.controller)
@@ -1170,7 +1170,7 @@ class HostConfigDiscoveryTests(unittest.IsolatedAsyncioTestCase):
     async def test_plan_token_expires_when_config_dump_changes_without_stat_change(self):
         self.controller.register_routes()
         (await self.controller.initialize_profile()).unwrap()
-        caller = RouteCaller(self.native, __import__("astrbot_host.legacy_api", fromlist=["request"]))
+        caller = RouteCaller(self.native, __import__("digital_life_host.legacy_api", fromlist=["request"]))
         selected_root = v1_root(self.data_root.parent / "alternate-dump")
         planned = await caller.call(LEGACY_PREFIX + "/plan", query={"v1_root": str(selected_root)})
         self.assertEqual(planned["status"], "ok", planned)
@@ -1194,7 +1194,7 @@ class HostConfigDiscoveryTests(unittest.IsolatedAsyncioTestCase):
         self._write_host_config()
         self.controller.register_routes()
         (await self.controller.initialize_profile()).unwrap()
-        caller = RouteCaller(self.native, __import__("astrbot_host.legacy_api", fromlist=["request"]))
+        caller = RouteCaller(self.native, __import__("digital_life_host.legacy_api", fromlist=["request"]))
         selected_root = v1_root(self.data_root.parent / "alternate")
 
         discovered = await caller.call(LEGACY_PREFIX, query={"v1_root": str(selected_root)})

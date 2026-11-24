@@ -7,18 +7,18 @@ checked by the same code production uses, not by a stub that agrees with itself.
 from datetime import timedelta
 import unittest
 
-from companion_v2.capabilities.read_providers import ReadLimits, ReadProviderRegistry
-from companion_v2.configuration.models import ConfigLayer, ConfigTarget
-from companion_v2.configuration.registry import FieldDefinition, FieldRegistry
-from companion_v2.configuration.service import ConfigurationService
-from companion_v2.execution.models import TaskError, require, stamp
-from companion_v2.foundation.refs import OperationRef, VersionRef
-from companion_v2.identity_policy.personas import RuntimeIdentity
-from companion_v2.library.configuration import LibraryConfigurationOwner, configuration_fields as library_fields
-from companion_v2.library.models import AssetReference, EntryKind, EntryState
-from companion_v2.library.provider import (CATALOG_CAPABILITY, READ_CAPABILITY,
+from digital_life_core.capabilities.read_providers import ReadLimits, ReadProviderRegistry
+from digital_life_core.configuration.models import ConfigLayer, ConfigTarget
+from digital_life_core.configuration.registry import FieldDefinition, FieldRegistry
+from digital_life_core.configuration.service import ConfigurationService
+from digital_life_core.execution.models import TaskError, require, stamp
+from digital_life_core.foundation.refs import OperationRef, VersionRef
+from digital_life_core.identity_policy.personas import RuntimeIdentity
+from digital_life_core.library.configuration import LibraryConfigurationOwner, configuration_fields as library_fields
+from digital_life_core.library.models import AssetReference, EntryKind, EntryState
+from digital_life_core.library.provider import (CATALOG_CAPABILITY, READ_CAPABILITY,
                                            make_catalog_provider, make_read_provider)
-from companion_v2.library.service import ReadingArchiveService
+from digital_life_core.library.service import ReadingArchiveService
 from tests.memory_support import MemoryFixture
 from tests.test_management_access import NOW
 
@@ -75,17 +75,17 @@ class ShelfProviderTests(ShelfFixture):
         self.registry = ReadProviderRegistry(
             self.tasks, require_running=lambda: require(self.tasks.check_generation()))
         self.catalog_registration = self.registry.register(
-            "companion_v2.library", CATALOG_CAPABILITY,
+            "digital_life_core.library", CATALOG_CAPABILITY,
             lambda binding: make_catalog_provider(self.archive, binding,
                                                   runtime_identity=self.runtime_identity))
         self.read_registration = self.registry.register(
-            "companion_v2.library", READ_CAPABILITY,
+            "digital_life_core.library", READ_CAPABILITY,
             lambda binding: make_read_provider(self.archive, binding,
                                                runtime_identity=self.runtime_identity))
 
     def bind(self, capability, **changes):
         options = {"capability_id": capability.capability_id, "capability_version": capability.capability_version,
-                   "provider_id": "companion_v2.library"} | changes
+                   "provider_id": "digital_life_core.library"} | changes
         return self.registry.bind(self.context, **options)
 
     def request(self, capability, binding, payload, *, request_id="shelf-request-1"):
@@ -200,7 +200,7 @@ class ShelfProviderTests(ShelfFixture):
                          request_id="shelf-request-echo")).unwrap()
         self.assertEqual(result["request_id"], "shelf-request-echo")
         self.assertEqual(result["trace_id"], "shelf-trace-1")
-        self.assertEqual(result["provider_id"], "companion_v2.library")
+        self.assertEqual(result["provider_id"], "digital_life_core.library")
         self.assertEqual(result["provider_generation"], binding.provider.generation)
         self.assertEqual(result["capability_id"], READ_CAPABILITY.capability_id)
         self.assertEqual(result["capability_version"], READ_CAPABILITY.capability_version)

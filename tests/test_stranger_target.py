@@ -9,12 +9,12 @@ from datetime import datetime, timedelta, timezone
 from types import SimpleNamespace as NS
 from unittest.mock import AsyncMock, patch
 
-from astrbot_host.acquaintance_api import (AcquaintanceWebAPI, STRANGER_BLOCK_PATH,
+from digital_life_host.acquaintance_api import (AcquaintanceWebAPI, STRANGER_BLOCK_PATH,
                                             STRANGER_REMOVE_PATH, STRANGER_TARGET_PATH,
                                             STRANGER_UNBLOCK_PATH)
-from astrbot_host.multi_settings import HostControlError, MultiHostSettings
-from astrbot_host.stranger_notice import BLOCK_KIND, CONTACT_KIND
-from companion_v2.execution.models import TaskError
+from digital_life_host.multi_settings import HostControlError, MultiHostSettings
+from digital_life_host.stranger_notice import BLOCK_KIND, CONTACT_KIND
+from digital_life_core.execution.models import TaskError
 from tests.group_host_support import group_config
 from tests.multi_host_support import MultiFixture, multi_config
 
@@ -112,12 +112,12 @@ class StrangerTargetApiTests(unittest.IsolatedAsyncioTestCase):
 
     async def send(self, payload=None, *, raw=None, query=None):
         request = NS(username="admin", query=_Query(query or ()), body=_Body(payload, raw))
-        with patch("astrbot_host.acquaintance_api.request", request):
+        with patch("digital_life_host.acquaintance_api.request", request):
             return await self.api.add_stranger_target()
 
     async def read(self):
         request = NS(username="admin", query=_Query(), body=_Body({}))
-        with patch("astrbot_host.acquaintance_api.request", request):
+        with patch("digital_life_host.acquaintance_api.request", request):
             return await self.api.strangers()
 
     def payload(self, platform_id="qq-main", login="100", peer="999"):
@@ -130,14 +130,14 @@ class StrangerTargetApiTests(unittest.IsolatedAsyncioTestCase):
 
     async def test_an_unreadable_configuration_leaves_the_ledger_visible(self):
         self.rows = [{"document_json": _ledger("qq-main", "100", "999")}]
-        with patch("astrbot_host.acquaintance_api.request",
+        with patch("digital_life_host.acquaintance_api.request",
                    NS(username="admin", query=_Query(), body=_Body(None))):
             result = await self.broken_api().strangers()
         self.assertEqual(result["status"], "ok")
         self.assertEqual(result["data"]["items"][0]["target_state"], "unavailable")
 
     async def test_an_unreadable_configuration_refuses_the_command(self):
-        with patch("astrbot_host.acquaintance_api.request",
+        with patch("digital_life_host.acquaintance_api.request",
                    NS(username="admin", query=_Query(), body=_Body(self.payload()))):
             result = await self.broken_api().add_stranger_target()
         self.assertEqual(result["status"], "error")
@@ -167,7 +167,7 @@ class StrangerTargetApiTests(unittest.IsolatedAsyncioTestCase):
 
         self.controller.runtime = NS(transaction=transaction)
         self.controller.now = lambda: datetime(2026, 11, 21, tzinfo=timezone.utc)
-        with patch("astrbot_host.acquaintance_api.request",
+        with patch("digital_life_host.acquaintance_api.request",
                    NS(username="admin", query=_Query(), body=_Body(self.payload()))):
             result = await self.api.block_stranger()
         self.assertEqual(result["status"], "ok", result)
@@ -194,7 +194,7 @@ class StrangerTargetApiTests(unittest.IsolatedAsyncioTestCase):
             yield _Connection()
 
         self.controller.runtime = NS(transaction=transaction)
-        with patch("astrbot_host.acquaintance_api.request",
+        with patch("digital_life_host.acquaintance_api.request",
                    NS(username="admin", query=_Query(), body=_Body(self.payload()))):
             result = await self.api.unblock_stranger()
         self.assertEqual(result["status"], "ok", result)
@@ -204,7 +204,7 @@ class StrangerTargetApiTests(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(deleted[0][1], ("stranger-block:qq-main:100:999", BLOCK_KIND))
 
     async def test_blocking_a_stranger_rejects_unknown_fields(self):
-        with patch("astrbot_host.acquaintance_api.request",
+        with patch("digital_life_host.acquaintance_api.request",
                    NS(username="admin", query=_Query(),
                       body=_Body({**self.payload(), "extra": True}))):
             result = await self.api.block_stranger()
@@ -233,7 +233,7 @@ class StrangerTargetApiTests(unittest.IsolatedAsyncioTestCase):
             yield _Connection()
 
         self.controller.runtime = NS(transaction=transaction)
-        with patch("astrbot_host.acquaintance_api.request",
+        with patch("digital_life_host.acquaintance_api.request",
                    NS(username="admin", query=_Query(), body=_Body(self.payload()))):
             result = await self.api.remove_stranger()
         self.assertEqual(result["status"], "ok", result)
@@ -244,7 +244,7 @@ class StrangerTargetApiTests(unittest.IsolatedAsyncioTestCase):
                          ("stranger-contact:qq-main:100:999", CONTACT_KIND))
 
     async def test_removing_a_stranger_rejects_unknown_fields(self):
-        with patch("astrbot_host.acquaintance_api.request",
+        with patch("digital_life_host.acquaintance_api.request",
                    NS(username="admin", query=_Query(), body=_Body({**self.payload(), "extra": True}))):
             result = await self.api.remove_stranger()
         self.assertEqual(result["status"], "error")
@@ -466,16 +466,16 @@ class StrangerTargetHostTests(MultiFixture, unittest.IsolatedAsyncioTestCase):
         return event
 
     async def refuse(self, **kwargs):
-        from astrbot_host.stranger_notice import refuse_stranger
+        from digital_life_host.stranger_notice import refuse_stranger
 
         return await refuse_stranger(self.controller, self.event(**kwargs))
 
     def set_defaults(self, app, **changes):
-        from astrbot_host.management_identity import dashboard_operator
+        from digital_life_host.management_identity import dashboard_operator
 
-        from companion_v2.configuration.models import ConfigLayer, ConfigTarget
-        from companion_v2.foundation.refs import OperationRef, VersionRef
-        from companion_v2.relationships.private_access import GROUP
+        from digital_life_core.configuration.models import ConfigLayer, ConfigTarget
+        from digital_life_core.foundation.refs import OperationRef, VersionRef
+        from digital_life_core.relationships.private_access import GROUP
 
         target = ConfigTarget(app.runtime.installation_id, ConfigLayer.INSTALLATION)
         operator = dashboard_operator(app.runtime, "tester", at=self.clock.now())
@@ -491,10 +491,10 @@ class StrangerTargetHostTests(MultiFixture, unittest.IsolatedAsyncioTestCase):
             observed_at=self.clock.now()).unwrap()
 
     def defaults(self, app):
-        from astrbot_host.management_identity import dashboard_operator
+        from digital_life_host.management_identity import dashboard_operator
 
-        from companion_v2.configuration.models import ConfigLayer, ConfigTarget
-        from companion_v2.relationships.private_access import GROUP
+        from digital_life_core.configuration.models import ConfigLayer, ConfigTarget
+        from digital_life_core.relationships.private_access import GROUP
 
         target = ConfigTarget(app.runtime.installation_id, ConfigLayer.INSTALLATION)
         operator = dashboard_operator(app.runtime, "tester", at=self.clock.now())
@@ -503,16 +503,16 @@ class StrangerTargetHostTests(MultiFixture, unittest.IsolatedAsyncioTestCase):
 
     async def post(self, payload):
         request = NS(username="admin", query=_Query(), body=_Body(payload))
-        with patch("astrbot_host.acquaintance_api.request", request):
+        with patch("digital_life_host.acquaintance_api.request", request):
             return await AcquaintanceWebAPI(self.controller).add_stranger_target()
 
     async def read(self):
         request = NS(username="admin", query=_Query(), body=_Body({}))
-        with patch("astrbot_host.acquaintance_api.request", request):
+        with patch("digital_life_host.acquaintance_api.request", request):
             return await AcquaintanceWebAPI(self.controller).strangers()
 
     async def test_add_records_one_target_and_keeps_defaults_and_existing_grants(self):
-        from companion_v2.identity_policy.models import AuthorizationTier
+        from digital_life_core.identity_policy.models import AuthorizationTier
 
         app = await self.start_host()
         self.set_defaults(app, dialogue_default=False, proactive_default=False)
@@ -565,14 +565,14 @@ class StrangerTargetHostTests(MultiFixture, unittest.IsolatedAsyncioTestCase):
         query = self.authorization_query()
         request = NS(username="admin", query=_Query({**{"subject_id": query["subject_id"]},
                                                     **query["route"]}), body=_Body({}))
-        with patch("astrbot_host.acquaintance_api.request", request):
+        with patch("digital_life_host.acquaintance_api.request", request):
             result = await AcquaintanceWebAPI(self.controller).authorization()
         self.assertEqual(result["status"], "ok", result)
         return result["data"]
 
     def seed_personal_decisions(self):
         """One revoked and one expired decision beside the grants init already made."""
-        from companion_v2.identity_policy.models import AuthorizationTier
+        from digital_life_core.identity_policy.models import AuthorizationTier
 
         identity = self.controller.authority.identities
         context = self.controller.authority.context("first", "role-a")

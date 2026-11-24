@@ -143,7 +143,7 @@ def publish(*, check=False, preview=None):
              and p.suffix.lower() not in {".bak", ".backup"} and "__pycache__" not in p.parts}
     files.update(projected)
     hashes = {name: hashlib.sha256(payload).hexdigest() for name, payload in sorted(files.items())}
-    manifest = (json.dumps({"source": "astrbot_plugin_private_companion/pages/陪伴小屋",
+    manifest = (json.dumps({"source": "astrbot_plugin_digital_life/pages/陪伴小屋",
         "workspaces": WORKSPACES, "files": hashes}, ensure_ascii=False, indent=2) + "\n").encode("utf-8")
     emit(SOURCE / "page-build.json", manifest)
     if preview is not None:
@@ -154,7 +154,7 @@ def publish(*, check=False, preview=None):
                 raise ValueError("preview assets must remain inside the destination")
             if name == "index.html":
                 payload = payload.decode("utf-8").replace(
-                    '  <meta name="companion-api-host" content="astrbot_plugin_private_companion">\n', "").encode("utf-8")
+                    '  <meta name="companion-api-host" content="astrbot_plugin_digital_life">\n', "").encode("utf-8")
             emit(destination, payload)
         emit(preview / "page-build.json", manifest)
     return changed

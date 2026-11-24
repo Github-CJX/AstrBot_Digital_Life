@@ -6,11 +6,11 @@ from pathlib import Path
 from tempfile import TemporaryDirectory
 import unittest
 
-from companion_v2.configuration.models import ConfigLayer, ConfigTarget
-from companion_v2.configuration.owners import SparseConfigurationOwner
-from companion_v2.foundation.refs import ScopeKind, ScopeRef, SubjectKind, SubjectRef
-from companion_v2.proactive.configuration import GROUP, ContactConfigurationOwner, configuration_fields
-from companion_v2.storage.runtime import StorageRuntime
+from digital_life_core.configuration.models import ConfigLayer, ConfigTarget
+from digital_life_core.configuration.owners import SparseConfigurationOwner
+from digital_life_core.foundation.refs import ScopeKind, ScopeRef, SubjectKind, SubjectRef
+from digital_life_core.proactive.configuration import GROUP, ContactConfigurationOwner, configuration_fields
+from digital_life_core.storage.runtime import StorageRuntime
 
 
 class ContactRhythmConfigurationTests(unittest.TestCase):

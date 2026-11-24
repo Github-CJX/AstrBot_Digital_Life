@@ -21,11 +21,11 @@ from tempfile import TemporaryDirectory
 from types import SimpleNamespace
 import unittest
 
-from companion_v2.execution.models import TaskError, digest, stamp
-from companion_v2.foundation.refs import (RoleOwnerRef, ScopeKind, ScopeRef, SubjectKind,
+from digital_life_core.execution.models import TaskError, digest, stamp
+from digital_life_core.foundation.refs import (RoleOwnerRef, ScopeKind, ScopeRef, SubjectKind,
                                           SubjectRef)
-from companion_v2.role_work.journal.self_review_management import SelfReviewManagement
-from companion_v2.storage.runtime import StorageRuntime
+from digital_life_core.role_work.journal.self_review_management import SelfReviewManagement
+from digital_life_core.storage.runtime import StorageRuntime
 
 
 NOW = datetime(2026, 11, 1, 22, 0, tzinfo=timezone(timedelta(hours=8)))
@@ -102,7 +102,7 @@ class SelfReviewListTests(unittest.TestCase):
         app = SimpleNamespace(runtime=self.runtime, role_self_review_evidence=FakeEvidence(),
                               notify=lambda: None,
                               role_growth=SimpleNamespace(runtime=self.runtime))
-        from companion_v2.role_work.journal.self_review_service import SelfReviewService
+        from digital_life_core.role_work.journal.self_review_service import SelfReviewService
         service = SelfReviewService(self.runtime)
         service.app = app
         app.self_review = service
@@ -338,7 +338,7 @@ class SelfReviewListTests(unittest.TestCase):
             with self.subTest(error=type(error).__name__):
                 self.use_evidence(BrokenEvidence(error))
                 with self.assertLogs(
-                        "companion_v2.role_work.journal.self_review_management", level="ERROR"):
+                        "digital_life_core.role_work.journal.self_review_management", level="ERROR"):
                     result = self.management.list(operator=OPERATOR, context=CONTEXT,
                                                   state="active", limit=5)
                 self.assertTrue(result.is_success, result.failure)

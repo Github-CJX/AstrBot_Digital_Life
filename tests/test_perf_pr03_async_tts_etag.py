@@ -21,41 +21,41 @@ from starlette.responses import JSONResponse, Response
 from astrbot.api.web import PluginMultiDict, PluginRequest, bind_request_context
 from astrbot.core.message.components import Plain, Record
 from astrbot.core.message.message_event_result import MessageChain
-from companion_v2.conversation.segmentation import SegmentationPolicy
-from companion_v2.conversation.voice_reply import VoiceReplyPolicy
-from companion_v2.foundation.outcome import Outcome
-from companion_v2.foundation.refs import ScopeKind, ScopeRef, SubjectKind, SubjectRef
-from companion_v2.host.tick_offload import (
+from digital_life_core.conversation.segmentation import SegmentationPolicy
+from digital_life_core.conversation.voice_reply import VoiceReplyPolicy
+from digital_life_core.foundation.outcome import Outcome
+from digital_life_core.foundation.refs import ScopeKind, ScopeRef, SubjectKind, SubjectRef
+from digital_life_core.host.tick_offload import (
     advance_background_async,
     advance_state_maintenance_async,
 )
-from companion_v2.qzone.capability import CAPABILITIES as QZONE_CAPABILITIES
+from digital_life_core.qzone.capability import CAPABILITIES as QZONE_CAPABILITIES
 
-from astrbot_host.account_session_api import AccountSessionWebAPI
-from astrbot_host.acquaintance_api import AcquaintanceWebAPI
-from astrbot_host.core_reply import (
+from digital_life_host.account_session_api import AccountSessionWebAPI
+from digital_life_host.acquaintance_api import AcquaintanceWebAPI
+from digital_life_host.core_reply import (
     CORE_REPLY_CONTEXT_EXTRA,
     activate_core_reply_delivery_guard,
     prepare_core_reply_event,
 )
-from astrbot_host.core_reply_segmentation import prepare_core_reply_segmentation
-from astrbot_host.core_reply_voice import (
+from digital_life_host.core_reply_segmentation import prepare_core_reply_segmentation
+from digital_life_host.core_reply_voice import (
     MAX_CONCURRENT_TTS,
     prepare_core_reply_voice_message,
 )
-from astrbot_host.http_etag import (
+from digital_life_host.http_etag import (
     compute_etag,
     conditional_response,
     etag_matches,
 )
-from astrbot_host.memory_page_api import MEMORY_PLUGIN_ID, MemoryPageAPI
-from astrbot_host.model_api import ModelWebAPI
-from astrbot_host.multi_api import MultiHostWebAPI
-from astrbot_host.multi_controller import AstrBotMultiController
-from astrbot_host.multi_session import MultiHostSession
-from astrbot_host.native_perception_api import NativePerceptionWebAPI
-from astrbot_host.semantic_api import SemanticWebAPI
-from astrbot_host.setup_api import SetupWebAPI
+from digital_life_host.memory_page_api import MEMORY_PLUGIN_ID, MemoryPageAPI
+from digital_life_host.model_api import ModelWebAPI
+from digital_life_host.multi_api import MultiHostWebAPI
+from digital_life_host.multi_controller import AstrBotMultiController
+from digital_life_host.multi_session import MultiHostSession
+from digital_life_host.native_perception_api import NativePerceptionWebAPI
+from digital_life_host.semantic_api import SemanticWebAPI
+from digital_life_host.setup_api import SetupWebAPI
 
 from tests.group_host_support import GroupFixture
 from tests.native_adapter_support import FakePlatform
@@ -85,14 +85,14 @@ def _fake_request(*, username="admin", query=None, body=b"", headers=None, live_
             "headers": raw_headers,
             "app": object(),
         })
-        return PluginRequest(raw, username=username, plugin_name="astrbot_plugin_private_companion")
+        return PluginRequest(raw, username=username, plugin_name="astrbot_plugin_digital_life")
 
     return NS(
         username=username,
         query=_Query(query or {}),
         body=read,
         headers=hdrs,
-        plugin_name="astrbot_plugin_private_companion",
+        plugin_name="astrbot_plugin_digital_life",
     )
 
 
@@ -244,7 +244,7 @@ class AsyncTickUnitOffloadTests(HostFixture, unittest.IsolatedAsyncioTestCase):
 
     async def test_startup_rotation_coalesces_offload_and_rolls_back_on_sqlite_lock(self):
         import sqlite3
-        from companion_v2.host.tick_budget import StagedOffload, TickScheduler, TickUnit
+        from digital_life_core.host.tick_budget import StagedOffload, TickScheduler, TickUnit
 
         state = {"gate": None, "scanned": [], "applied": [], "cleaned": 0}
         fail_first = {"active": True}
@@ -378,9 +378,9 @@ class ManagementApiUnblockingTests(unittest.IsolatedAsyncioTestCase):
             "target_id": "profile-rt",
             "role_id": "role-a",
         }).encode("utf-8")
-        with patch("astrbot_host.semantic_api.request", _fake_request(body=body)), \
-                patch("astrbot_host.semantic_api.dashboard_operator", return_value=object()), \
-                patch("astrbot_host.semantic_api.ObjectAccessPolicy", return_value=ok_policy):
+        with patch("digital_life_host.semantic_api.request", _fake_request(body=body)), \
+                patch("digital_life_host.semantic_api.dashboard_operator", return_value=object()), \
+                patch("digital_life_host.semantic_api.ObjectAccessPolicy", return_value=ok_policy):
             task = asyncio.create_task(api.post())
             try:
                 self.assertTrue(await asyncio.to_thread(entered.wait, 5))
@@ -417,14 +417,14 @@ class ManagementApiUnblockingTests(unittest.IsolatedAsyncioTestCase):
         controller.resolved_settings = lambda: controller.settings
         api = AcquaintanceWebAPI(controller)
 
-        with patch("astrbot_host.acquaintance_api.request", _fake_request()), \
-                patch("astrbot_host.acquaintance_api.dashboard_operator", return_value=object()), \
-                patch("astrbot_host.acquaintance_api.ObjectAccessPolicy", return_value=ok_policy):
+        with patch("digital_life_host.acquaintance_api.request", _fake_request()), \
+                patch("digital_life_host.acquaintance_api.dashboard_operator", return_value=object()), \
+                patch("digital_life_host.acquaintance_api.ObjectAccessPolicy", return_value=ok_policy):
             res = await _assert_off_loop_and_lock_free(self, controller, api.strangers(), entered, release)
         self.assertEqual(res["status"], "ok", res)
 
         # Unauthenticated caller must get dashboard_identity_required before query/body validation.
-        with patch("astrbot_host.acquaintance_api.request", _fake_request(username="", query={"bad": "1"})):
+        with patch("digital_life_host.acquaintance_api.request", _fake_request(username="", query={"bad": "1"})):
             unauth = await api.member_settings()
         self.assertEqual(unauth["status"], "error")
         self.assertEqual(unauth["data"]["code"], "dashboard_identity_required")
@@ -445,8 +445,8 @@ class ManagementApiUnblockingTests(unittest.IsolatedAsyncioTestCase):
 
             controller.status = slow_status
             setup_api = SetupWebAPI(controller)
-            with patch("astrbot_host.setup_api.request", _fake_request()), \
-                    patch("astrbot_host.upgrade_setup.UpgradeSetup.plan", new=AsyncMock(return_value=({"present": False}, None))):
+            with patch("digital_life_host.setup_api.request", _fake_request()), \
+                    patch("digital_life_host.upgrade_setup.UpgradeSetup.plan", new=AsyncMock(return_value=({"present": False}, None))):
                 res = await _assert_off_loop_and_lock_free(self, controller, setup_api.status(), entered, release)
             self.assertEqual(res["status"], "ok", res)
 
@@ -462,10 +462,10 @@ class ManagementApiUnblockingTests(unittest.IsolatedAsyncioTestCase):
             controller.session_topology = NS(select=slow_select)
             acct_api = AccountSessionWebAPI(controller)
             body = json.dumps({"session_key": "k1", "llm_enabled": True}).encode("utf-8")
-            with patch("astrbot_host.account_session_api.request", _fake_request(body=body)), \
-                    patch("astrbot_host.management_identity.require_management_operator", return_value=object()), \
-                    patch("astrbot_host.account_session_api.sp.get_async", new=AsyncMock(return_value={})), \
-                    patch("astrbot_host.account_session_api.sp.put_async", new=AsyncMock()):
+            with patch("digital_life_host.account_session_api.request", _fake_request(body=body)), \
+                    patch("digital_life_host.management_identity.require_management_operator", return_value=object()), \
+                    patch("digital_life_host.account_session_api.sp.get_async", new=AsyncMock(return_value={})), \
+                    patch("digital_life_host.account_session_api.sp.put_async", new=AsyncMock()):
                 task = asyncio.create_task(acct_api.save_session())
                 try:
                     await asyncio.wait_for(select_entered.wait(), timeout=2.0)
@@ -494,10 +494,10 @@ class ManagementApiUnblockingTests(unittest.IsolatedAsyncioTestCase):
             "role.state.planning_weather_max_age_minutes": 30,
         }))
         controller.session.application.configuration = NS(read=lambda *a, **kw: cfg_read)
-        with patch("astrbot_host.native_perception_api.request", _fake_request(query={"scope": "role"})), \
-                patch("astrbot_host.native_perception_api.dashboard_operator", side_effect=slow_op), \
-                patch("astrbot_host.native_perception_api.StateManagement", return_value=NS(life=NS(authorize=lambda op: None))), \
-                patch("astrbot_host.native_perception_api.PerceptionManagement", return_value=NS(
+        with patch("digital_life_host.native_perception_api.request", _fake_request(query={"scope": "role"})), \
+                patch("digital_life_host.native_perception_api.dashboard_operator", side_effect=slow_op), \
+                patch("digital_life_host.native_perception_api.StateManagement", return_value=NS(life=NS(authorize=lambda op: None))), \
+                patch("digital_life_host.native_perception_api.PerceptionManagement", return_value=NS(
                     status=lambda op: Outcome.success({"settings": {"calendar_enabled": False}}))):
             res = await _assert_off_loop_and_lock_free(self, controller, api.runtime_snapshot(), entered, release)
         self.assertEqual(res["status"], "ok", res)
@@ -721,7 +721,7 @@ class ConcurrentTtsTests(unittest.IsolatedAsyncioTestCase):
         activate_core_reply_delivery_guard(event)
 
         # Force 4 explicit segments via LLM segment marker.
-        from companion_v2.conversation.segment_control import LLM_SEGMENT_MARKER
+        from digital_life_core.conversation.segment_control import LLM_SEGMENT_MARKER
         body = f"\n{LLM_SEGMENT_MARKER}\n".join(delays.keys())
         await event.send(MessageChain(chain=[Plain(body)]))
 
@@ -778,7 +778,7 @@ class ConcurrentTtsTests(unittest.IsolatedAsyncioTestCase):
         prepare_core_reply_segmentation(event)
         activate_core_reply_delivery_guard(event)
 
-        from companion_v2.conversation.segment_control import LLM_SEGMENT_MARKER
+        from digital_life_core.conversation.segment_control import LLM_SEGMENT_MARKER
         body = f"\n{LLM_SEGMENT_MARKER}\n".join(("第一段。", "第二段。", "第三段。"))
         with self.assertRaises(RuntimeError):
             await event.send(MessageChain(chain=[Plain(body)]))
@@ -789,7 +789,7 @@ class ConcurrentTtsTests(unittest.IsolatedAsyncioTestCase):
         self.assertNotIn("_voice_segment_prefetch", core)
 
     async def test_multi_segment_prefetch_cancels_and_reaps_task_when_authorize_fails(self):
-        from companion_v2.execution.models import TaskError
+        from digital_life_core.execution.models import TaskError
 
         event = FakeEvent()
         policy = VoiceReplyPolicy(generation_mode="plain", segment_mode="each", position="after_text")
@@ -835,7 +835,7 @@ class ConcurrentTtsTests(unittest.IsolatedAsyncioTestCase):
         prepare_core_reply_segmentation(event)
         activate_core_reply_delivery_guard(event)
 
-        from companion_v2.conversation.segment_control import LLM_SEGMENT_MARKER
+        from digital_life_core.conversation.segment_control import LLM_SEGMENT_MARKER
         body = f"\n{LLM_SEGMENT_MARKER}\n".join(("第一段。", "第二段。"))
         await event.send(MessageChain(chain=[Plain(body)]))
 
@@ -884,17 +884,17 @@ class HttpEtagPollingTests(unittest.IsolatedAsyncioTestCase):
         controller.status = lambda: dict(state)
         api = MultiHostWebAPI(controller)
 
-        with patch("astrbot_host.management_identity.require_management_operator",
+        with patch("digital_life_host.management_identity.require_management_operator",
                    return_value=object()) as authorize, \
-                patch("astrbot_host.multi_api.display_names", return_value=NS(targets=AsyncMock(return_value=[]))):
-            with patch("astrbot_host.multi_api.request", _fake_request()):
+                patch("digital_life_host.multi_api.display_names", return_value=NS(targets=AsyncMock(return_value=[]))):
+            with patch("digital_life_host.multi_api.request", _fake_request()):
                 first = await api.api_status()
             self.assertIsInstance(first, dict)
             self.assertEqual(first["status"], "ok")
             etag = first["etag"]
             self.assertTrue(etag.startswith('W/"'))
 
-            with patch("astrbot_host.multi_api.request", _fake_request(headers={"If-None-Match": etag})):
+            with patch("digital_life_host.multi_api.request", _fake_request(headers={"If-None-Match": etag})):
                 second = await api.api_status()
             self.assertIsInstance(second, Response)
             self.assertEqual(second.status_code, 304)
@@ -902,19 +902,19 @@ class HttpEtagPollingTests(unittest.IsolatedAsyncioTestCase):
             self.assertEqual(authorize.call_count, 4)
 
             state["counter"] = 2
-            with patch("astrbot_host.multi_api.request", _fake_request(headers={"If-None-Match": etag})):
+            with patch("digital_life_host.multi_api.request", _fake_request(headers={"If-None-Match": etag})):
                 third = await api.api_status()
             self.assertIsInstance(third, dict)
             self.assertEqual(third["data"]["counter"], 2)
             self.assertNotEqual(third["etag"], etag)
 
         # api_performance ETag / 304
-        with patch("astrbot_host.management_identity.require_management_operator", return_value=object()):
-            with patch("astrbot_host.multi_api.request", _fake_request()):
+        with patch("digital_life_host.management_identity.require_management_operator", return_value=object()):
+            with patch("digital_life_host.multi_api.request", _fake_request()):
                 perf1 = await api.api_performance()
             self.assertIsInstance(perf1, dict)
             perf_etag = perf1["etag"]
-            with patch("astrbot_host.multi_api.request", _fake_request(headers={"If-None-Match": perf_etag})):
+            with patch("digital_life_host.multi_api.request", _fake_request(headers={"If-None-Match": perf_etag})):
                 perf2 = await api.api_performance()
         self.assertIsInstance(perf2, Response)
         self.assertEqual(perf2.status_code, 304)
@@ -939,19 +939,19 @@ class HttpEtagPollingTests(unittest.IsolatedAsyncioTestCase):
             }
 
         with patch.object(model_api, "_run", side_effect=fake_run):
-            with patch("astrbot_host.model_api.request", _fake_request()):
+            with patch("digital_life_host.model_api.request", _fake_request()):
                 m1 = await model_api.maintenance()
             self.assertIsInstance(m1, dict)
             m_etag = m1["etag"]
             maint_data["generated_at"] = "2026-01-01T00:01:00+00:00"
             maint_data["observed_at"] = "2026-01-01T00:01:00Z"
             maint_data["reply_efficiency"]["generated_at"] = "2026-01-01T00:01:00+00:00"
-            with patch("astrbot_host.model_api.request", _fake_request(headers={"If-None-Match": m_etag})):
+            with patch("digital_life_host.model_api.request", _fake_request(headers={"If-None-Match": m_etag})):
                 m2 = await model_api.maintenance()
             self.assertIsInstance(m2, Response)
             self.assertEqual(m2.status_code, 304)
             maint_data["pending"] = 3
-            with patch("astrbot_host.model_api.request", _fake_request(headers={"If-None-Match": m_etag})):
+            with patch("digital_life_host.model_api.request", _fake_request(headers={"If-None-Match": m_etag})):
                 m3 = await model_api.maintenance()
             self.assertIsInstance(m3, dict)
             self.assertEqual(m3["data"]["pending"], 3)
@@ -969,11 +969,11 @@ class HttpEtagPollingTests(unittest.IsolatedAsyncioTestCase):
         controller.session.application.configuration = NS(read=lambda *a, **kw: cfg_read)
         perc_api = NativePerceptionWebAPI(controller)
 
-        with patch("astrbot_host.native_perception_api.dashboard_operator", return_value=object()), \
-                patch("astrbot_host.native_perception_api.StateManagement", return_value=NS(life=NS(authorize=lambda op: None))), \
-                patch("astrbot_host.native_perception_api.PerceptionManagement", return_value=NS(
+        with patch("digital_life_host.native_perception_api.dashboard_operator", return_value=object()), \
+                patch("digital_life_host.native_perception_api.StateManagement", return_value=NS(life=NS(authorize=lambda op: None))), \
+                patch("digital_life_host.native_perception_api.PerceptionManagement", return_value=NS(
                     status=lambda op: Outcome.success({"settings": {"calendar_enabled": False}}))):
-            with patch("astrbot_host.native_perception_api.request", _fake_request(query={"scope": "role"})):
+            with patch("digital_life_host.native_perception_api.request", _fake_request(query={"scope": "role"})):
                 r1 = await perc_api.runtime_snapshot()
             self.assertIsInstance(r1, dict)
             self.assertEqual(set(r1["data"]), {"weather", "calendar", "observed_at"})
@@ -981,7 +981,7 @@ class HttpEtagPollingTests(unittest.IsolatedAsyncioTestCase):
 
             # Clock advances, underlying data unchanged -> 304!
             clock[0] = NOW + timedelta(seconds=30)
-            with patch("astrbot_host.native_perception_api.request",
+            with patch("digital_life_host.native_perception_api.request",
                        _fake_request(query={"scope": "role"}, headers={"If-None-Match": r_etag})):
                 r2 = await perc_api.runtime_snapshot()
             self.assertIsInstance(r2, Response)

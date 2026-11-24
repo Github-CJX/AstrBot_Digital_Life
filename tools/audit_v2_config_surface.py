@@ -13,7 +13,7 @@ from pathlib import Path
 
 
 ROOT = Path(__file__).resolve().parents[1]
-HOST = ROOT / "astrbot_host"
+HOST = ROOT / "digital_life_host"
 # group_id -> the management/service class that owns its read-write contract.
 CONSUMERS = {
     "conversation.presentation": "ReplyManagement",
@@ -44,7 +44,7 @@ ROUTES = {
 def registered_groups():
     """Read the group ids from the modules that declare them rather than guessing."""
     groups = set()
-    for path in ROOT.joinpath("companion_v2").rglob("*.py"):
+    for path in ROOT.joinpath("digital_life_core").rglob("*.py"):
         text = path.read_text(encoding="utf-8", errors="ignore")
         for match in re.finditer(r'^GROUP\s*=\s*"([^"]+)"', text, re.MULTILINE):
             groups.add((match.group(1), path.relative_to(ROOT).as_posix()))

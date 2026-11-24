@@ -2,12 +2,12 @@ import unittest
 from types import SimpleNamespace
 from unittest.mock import patch
 
-from companion_v2.conversation.reset import ConversationWindow
-from companion_v2.foundation.outcome import Outcome
+from digital_life_core.conversation.reset import ConversationWindow
+from digital_life_core.foundation.outcome import Outcome
 from tests.test_management_access import SCOPE
 
-from astrbot_host.functional_commands import parse_functional_command
-from astrbot_host.reset_command import _decide, reset_confirmation_code
+from digital_life_host.functional_commands import parse_functional_command
+from digital_life_host.reset_command import _decide, reset_confirmation_code
 
 
 class _FakeManagement:
@@ -50,7 +50,7 @@ class ResetCommandTests(unittest.TestCase):
         return parse_functional_command(text, channel="private")
 
     def decide(self, command):
-        with patch("astrbot_host.reset_command.MemoryManagement", _FakeManagement):
+        with patch("digital_life_host.reset_command.MemoryManagement", _FakeManagement):
             return _decide(command, self.context, self.session)
 
     def test_preview_lists_scope_and_requires_an_echoed_code(self):

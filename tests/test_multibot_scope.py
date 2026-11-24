@@ -7,29 +7,29 @@ from pathlib import Path
 from tempfile import TemporaryDirectory
 import unittest
 
-from companion_v2.adapters.astrbot.inbound import AstrBotInboundAdapter
-from companion_v2.agenda.models import AgendaTarget
-from companion_v2.agenda.service import AgendaService
-from companion_v2.capabilities import CapabilityRepository
-from companion_v2.configuration.models import ConfigLayer, ConfigTarget
-from companion_v2.configuration.service import ConfigurationService
-from companion_v2.foundation.outcome import Outcome
-from companion_v2.foundation.clock import DeterministicClock
-from companion_v2.foundation.refs import (
+from digital_life_core.adapters.astrbot.inbound import AstrBotInboundAdapter
+from digital_life_core.agenda.models import AgendaTarget
+from digital_life_core.agenda.service import AgendaService
+from digital_life_core.capabilities import CapabilityRepository
+from digital_life_core.configuration.models import ConfigLayer, ConfigTarget
+from digital_life_core.configuration.service import ConfigurationService
+from digital_life_core.foundation.outcome import Outcome
+from digital_life_core.foundation.clock import DeterministicClock
+from digital_life_core.foundation.refs import (
     AudienceRef, OperationRef, ReferenceValidationError, RoleOwnerRef, ScopeKind, ScopeRef,
     SourceRef, SubjectKind, SubjectRef, VersionRef,
 )
-from companion_v2.identity_policy.models import AuthenticatedHostPrincipal, AuthorizationTier
-from companion_v2.identity_policy.personas import ConversationRoute, PersonaBinding, PersonaDirectory, RuntimeIdentity, SelectorKind
-from companion_v2.identity_policy.object_access import ObjectAccessPolicy
-from companion_v2.identity_policy.repository import PersistentIdentityDirectory
-from companion_v2.role_work.models import RoleActivity, RoleActivityState, RoleArtifact, RoleArtifactKind, RoleLifeLedger
-from companion_v2.sharing.models import ShareMaterial
-from companion_v2.sharing.planner import ShareCatalog, SharePlanner
-from companion_v2.sources.models import SourceRecord
-from companion_v2.sources.repositories import AssetRepository, SourceRepository
-from companion_v2.storage.repositories import OperationRepository
-from companion_v2.storage.runtime import StorageRuntime
+from digital_life_core.identity_policy.models import AuthenticatedHostPrincipal, AuthorizationTier
+from digital_life_core.identity_policy.personas import ConversationRoute, PersonaBinding, PersonaDirectory, RuntimeIdentity, SelectorKind
+from digital_life_core.identity_policy.object_access import ObjectAccessPolicy
+from digital_life_core.identity_policy.repository import PersistentIdentityDirectory
+from digital_life_core.role_work.models import RoleActivity, RoleActivityState, RoleArtifact, RoleArtifactKind, RoleLifeLedger
+from digital_life_core.sharing.models import ShareMaterial
+from digital_life_core.sharing.planner import ShareCatalog, SharePlanner
+from digital_life_core.sources.models import SourceRecord
+from digital_life_core.sources.repositories import AssetRepository, SourceRepository
+from digital_life_core.storage.repositories import OperationRepository
+from digital_life_core.storage.runtime import StorageRuntime
 from tests import test_configuration as configuration_fixture
 from tests import test_foreground_conversation as foreground_fixture
 from tests.g6_support import descriptor

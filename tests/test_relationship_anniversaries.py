@@ -7,10 +7,10 @@ from tempfile import TemporaryDirectory
 import unittest
 from types import SimpleNamespace
 
-from companion_v2.foundation.refs import ScopeKind
-from companion_v2.memory.reflection_output import OutputProblem, parse_output
-from companion_v2.relationships import anniversaries
-from companion_v2.storage.runtime import StorageRuntime
+from digital_life_core.foundation.refs import ScopeKind
+from digital_life_core.memory.reflection_output import OutputProblem, parse_output
+from digital_life_core.relationships import anniversaries
+from digital_life_core.storage.runtime import StorageRuntime
 
 
 def _context():

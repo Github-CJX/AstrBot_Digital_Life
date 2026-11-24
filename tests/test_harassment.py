@@ -2,9 +2,9 @@ import unittest
 from pathlib import Path
 from tempfile import TemporaryDirectory
 
-from astrbot_host.harassment import HarassmentGuard
-from companion_v2.relationships import harassment
-from companion_v2.storage.runtime import StorageRuntime
+from digital_life_host.harassment import HarassmentGuard
+from digital_life_core.relationships import harassment
+from digital_life_core.storage.runtime import StorageRuntime
 
 
 class HarassmentStoreTests(unittest.TestCase):

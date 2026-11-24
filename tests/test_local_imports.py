@@ -1,7 +1,7 @@
 """Every absolute local import in the shipped source must resolve to a file.
 
 Release packaging has shipped ZIPs that referenced modules absent from the
-archive (for example ``astrbot_host.group_standing``).  This check runs against
+archive (for example ``digital_life_host.group_standing``).  This check runs against
 the working tree, so a module that is created but never committed cannot pass.
 """
 
@@ -12,7 +12,7 @@ import unittest
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
-LOCAL_ROOTS = ("astrbot_host", "companion_v2")
+LOCAL_ROOTS = ("digital_life_host", "digital_life_core")
 
 
 def resolves(module: str) -> bool:

@@ -5,9 +5,9 @@ import json
 import unittest
 from unittest.mock import Mock, patch
 
-from companion_v2.configuration.models import ConfigLayer, ConfigTarget
-from companion_v2.delivery.media import ImageDeliveryEnvelope, image_manifest, manifest_hash
-from companion_v2.delivery.service import DeliveryRequest
+from digital_life_core.configuration.models import ConfigLayer, ConfigTarget
+from digital_life_core.delivery.media import ImageDeliveryEnvelope, image_manifest, manifest_hash
+from digital_life_core.delivery.service import DeliveryRequest
 from tests.proactive_support import ContactFixture
 from tests.test_role_tool_loop import answered
 from tests.test_semantic_integration import SemanticPort, animation, picture
@@ -24,7 +24,7 @@ class ProactiveReactionTests(ContactFixture, unittest.IsolatedAsyncioTestCase):
         self.semantic.store.configure({"reactions_proactive_enabled": proactive,
                                        "reactions_trigger_probability": 1.0,
                                        "reactions_cooldown_seconds": 0}, 0)
-        from companion_v2.conversation.media.output_settings import GROUP as IMAGE_OUTPUT_GROUP
+        from digital_life_core.conversation.media.output_settings import GROUP as IMAGE_OUTPUT_GROUP
         context = self.contact_context()
         target = ConfigTarget(context.scope.installation_id, ConfigLayer.ROLE,
                               context.role_binding.role, bot_id=context.scope.bot_id)
@@ -101,7 +101,7 @@ class ProactiveReactionTests(ContactFixture, unittest.IsolatedAsyncioTestCase):
         self.semantic.store.configure({"reactions_proactive_enabled": False,
                                        "reactions_trigger_probability": 0.0,
                                        "reactions_cooldown_seconds": 3600}, 1)
-        from companion_v2.conversation.media.output_settings import GROUP as IMAGE_OUTPUT_GROUP
+        from digital_life_core.conversation.media.output_settings import GROUP as IMAGE_OUTPUT_GROUP
         target = ConfigTarget(context.scope.installation_id, ConfigLayer.ROLE, context.role_binding.role,
                               bot_id=context.scope.bot_id)
         snapshot = app.configuration.read(self.core, target=target, group_id=IMAGE_OUTPUT_GROUP,
@@ -218,9 +218,9 @@ class ProactiveReactionTests(ContactFixture, unittest.IsolatedAsyncioTestCase):
         self.assertEqual(self.uses(), 1)
 
     async def test_judged_contact_attaches_reaction_after_judge_approves(self):
-        from companion_v2.configuration.registry import FieldRegistry
-        from companion_v2.model_gateway.routing import configuration_fields as model_fields
-        from companion_v2.proactive.service import persona_judge_profile
+        from digital_life_core.configuration.registry import FieldRegistry
+        from digital_life_core.model_gateway.routing import configuration_fields as model_fields
+        from digital_life_core.proactive.service import persona_judge_profile
 
         self.sender = replace(self.sender, supports_images=True)
         self.profiles += (persona_judge_profile("primary", max_output_tokens=100),)
@@ -234,7 +234,7 @@ class ProactiveReactionTests(ContactFixture, unittest.IsolatedAsyncioTestCase):
         self.semantic.store.configure({"reactions_proactive_enabled": True,
                                        "reactions_trigger_probability": 1.0,
                                        "reactions_cooldown_seconds": 0}, 0)
-        from companion_v2.conversation.media.output_settings import GROUP as IMAGE_OUTPUT_GROUP
+        from digital_life_core.conversation.media.output_settings import GROUP as IMAGE_OUTPUT_GROUP
         context = self.contact_context()
         target = ConfigTarget(context.scope.installation_id, ConfigLayer.ROLE,
                               context.role_binding.role, bot_id=context.scope.bot_id)

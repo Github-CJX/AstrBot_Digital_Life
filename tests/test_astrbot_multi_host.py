@@ -11,29 +11,29 @@ from types import SimpleNamespace as NS
 from unittest.mock import AsyncMock, patch
 
 from astrbot.core.message.components import Video
-from astrbot_host.media_components import private_components
-from astrbot_host.video.loader import load_native_video
-from companion_v2.execution.models import TaskError, stamp
-from companion_v2.foundation.refs import ScopeRef, SubjectKind, SubjectRef
-from companion_v2.identity_policy.models import AuthorizationTier
-from companion_v2.identity_policy.object_access import ObjectAccessPolicy
-from companion_v2.memory.models import AtomRef, owner_key
-from companion_v2.adapters.astrbot.staging import NativeAdapterTypes
+from digital_life_host.media_components import private_components
+from digital_life_host.video.loader import load_native_video
+from digital_life_core.execution.models import TaskError, stamp
+from digital_life_core.foundation.refs import ScopeRef, SubjectKind, SubjectRef
+from digital_life_core.identity_policy.models import AuthorizationTier
+from digital_life_core.identity_policy.object_access import ObjectAccessPolicy
+from digital_life_core.memory.models import AtomRef, owner_key
+from digital_life_core.adapters.astrbot.staging import NativeAdapterTypes
 from tests.multi_host_support import MultiFixture, multi_config
 from tests.native_adapter_support import completion
 from tests.staging_bootstrap_support import database_contents, wait_for_batch
 from tests.memory_stream_support import StreamFixture
 from tests.video_support import video_bytes
-from astrbot_host.multi_settings import MultiHostSettings, find_persona_mapping
-from astrbot_host.shared_host_migration import migrate_single_target_config
-from astrbot_host.multi_authority import MultiAuthority
-from astrbot_host.binding_store import PendingBinding, write_binding
-from astrbot_host.settings import INSTALLATION_PREFIX
-from companion_v2.storage.runtime import StorageRuntime
-from astrbot_host.multi_api import PREFIX as MULTI_HOST_PREFIX
-from astrbot_host.host_options_api import HostOptionsWebAPI
-from astrbot_host.native_perception_api import PREFIX as NATIVE_PERCEPTION_PREFIX
-from astrbot_host.native import resolve_native_persona_selection
+from digital_life_host.multi_settings import MultiHostSettings, find_persona_mapping
+from digital_life_host.shared_host_migration import migrate_single_target_config
+from digital_life_host.multi_authority import MultiAuthority
+from digital_life_host.binding_store import PendingBinding, write_binding
+from digital_life_host.settings import INSTALLATION_PREFIX
+from digital_life_core.storage.runtime import StorageRuntime
+from digital_life_host.multi_api import PREFIX as MULTI_HOST_PREFIX
+from digital_life_host.host_options_api import HostOptionsWebAPI
+from digital_life_host.native_perception_api import PREFIX as NATIVE_PERCEPTION_PREFIX
+from digital_life_host.native import resolve_native_persona_selection
 
 
 class _Query(dict):
@@ -54,7 +54,7 @@ class MultiSettingsTests(unittest.TestCase):
             MultiHostSettings.parse(config)
 
     def test_follow_window_mapping_applies_only_when_it_is_the_bot_single_mapping(self):
-        from astrbot_host.multi_settings import PersonaMapping
+        from digital_life_host.multi_settings import PersonaMapping
 
         default = PersonaMapping("bot-a", "[%None]", "role-default")
         explicit = PersonaMapping("bot-a", "second", "role-second")
@@ -121,7 +121,7 @@ class MultiSettingsTests(unittest.TestCase):
             self.assertEqual(parsed.canonical_role_id(old_role), canonical_role)
 
     def test_existing_manifest_accepts_one_shared_role_after_upgrade(self):
-        from astrbot_host.multi_authority import MultiAuthority
+        from digital_life_host.multi_authority import MultiAuthority
 
         pinned = {"personas": [
             {"bot_id": "bot-a", "persona_id": "星缘-私聊", "role_id": "星缘"},
@@ -150,7 +150,7 @@ class MultiSettingsTests(unittest.TestCase):
 
 class NativePersonaSelectionTests(unittest.IsolatedAsyncioTestCase):
     async def test_group_window_ignores_the_private_conversation_default(self):
-        from astrbot_host.session_topology import SessionTopology
+        from digital_life_host.session_topology import SessionTopology
 
         lookup = AsyncMock(return_value="group-persona")
         context = NS(get_config=lambda **_kwargs: {
@@ -212,7 +212,7 @@ class LegacyStagingReceiptTests(unittest.TestCase):
 
 class MultiHostTests(MultiFixture, unittest.IsolatedAsyncioTestCase):
     async def test_enabled_private_context_grants_are_repaired_without_reissuing_revoked_grants(self):
-        from companion_v2.role_work.life.configuration import LifeConfigurationOwner, configuration_fields, target_for
+        from digital_life_core.role_work.life.configuration import LifeConfigurationOwner, configuration_fields, target_for
 
         await self.start_host()
         authority = self.controller.authority
@@ -240,7 +240,7 @@ class MultiHostTests(MultiFixture, unittest.IsolatedAsyncioTestCase):
         app = await self.start_host()
         self.assertIsNotNone(app.configuration_store)
         store = app.configuration_store
-        from companion_v2.model_gateway.routing import CONSUMER
+        from digital_life_core.model_gateway.routing import CONSUMER
         current = store.read_one("SELECT generation FROM configuration_consumers WHERE consumer_id = ?", (CONSUMER,))
         app.configuration.start_consumer(CONSUMER, expected_generation=current["generation"] if current else 0)
         store_count = store.read_one("SELECT COUNT(*) AS n FROM configuration_consumers", ())["n"]
@@ -398,14 +398,14 @@ class MultiHostTests(MultiFixture, unittest.IsolatedAsyncioTestCase):
         self.assertTrue(accepted.is_success, accepted.failure)
 
     async def test_window_link_api_saves_primary_mode(self):
-        from astrbot_host.account_session_api import AccountSessionWebAPI
+        from digital_life_host.account_session_api import AccountSessionWebAPI
         from types import SimpleNamespace as NS
 
         api = AccountSessionWebAPI(self.controller)
         body = json.dumps({"primary_target_id": "first", "alias_target_ids": ["second"],
                            "mode": "primary"}).encode("utf-8")
         fake_request = NS(username="admin", query={}, body=AsyncMock(return_value=body))
-        with patch("astrbot_host.account_session_api.request", fake_request), \
+        with patch("digital_life_host.account_session_api.request", fake_request), \
                 patch.object(self.controller, "apply_bindings", AsyncMock(return_value={"started": False})) as apply:
             response = await api.link_window()
         self.assertEqual(response["status"], "ok")
@@ -559,7 +559,7 @@ class MultiHostTests(MultiFixture, unittest.IsolatedAsyncioTestCase):
         self.assertIsNone(self.controller.runtime)
 
     async def test_profile_initialization_does_not_load_the_global_identity_grant_snapshot(self):
-        with patch("companion_v2.identity_policy.repository.PersistentIdentityDirectory.snapshot",
+        with patch("digital_life_core.identity_policy.repository.PersistentIdentityDirectory.snapshot",
                    side_effect=AssertionError("profile provisioning should read only the current subject")):
             result = await self.controller.initialize_profile()
 
@@ -658,7 +658,7 @@ class MultiHostTests(MultiFixture, unittest.IsolatedAsyncioTestCase):
         authority = self.controller.authority
         original = authority.require_manifest()
         changed = {**original, "fingerprint": "new-runtime-fingerprint"}
-        with self.assertLogs("astrbot_host.multi_authority", level="INFO") as captured:
+        with self.assertLogs("digital_life_host.multi_authority", level="INFO") as captured:
             self.assertEqual(authority.require_manifest(changed), original)
             authority.require_manifest(changed)
             recreated = MultiAuthority(authority.runtime, authority.settings, now=authority.now)
@@ -691,7 +691,7 @@ class MultiHostTests(MultiFixture, unittest.IsolatedAsyncioTestCase):
 
     async def test_missing_plugin_module_reports_import_failure_without_exception_values(self):
         with patch.object(self.controller, "_assemble", side_effect=ModuleNotFoundError("synthetic-private-value")):
-            with self.assertLogs("astrbot_host.multi_controller", level="ERROR") as captured:
+            with self.assertLogs("digital_life_host.multi_controller", level="ERROR") as captured:
                 result = await self.controller.initialize_profile()
         self.assertEqual(result.failure.code, "host_module_unavailable")
         self.assertIn("重新加载 V2 插件", result.failure.reason)
@@ -701,7 +701,7 @@ class MultiHostTests(MultiFixture, unittest.IsolatedAsyncioTestCase):
 
     async def test_unexpected_initialization_failure_logs_source_locations_without_exception_values(self):
         with patch.object(self.controller, "_assemble", side_effect=ValueError("synthetic-private-value")):
-            with self.assertLogs("astrbot_host.multi_controller", level="ERROR") as captured:
+            with self.assertLogs("digital_life_host.multi_controller", level="ERROR") as captured:
                 result = await self.controller.initialize_profile()
         self.assertEqual(result.failure.code, "host_control_failed")
         self.assertEqual(self.controller.status()["last_failure"]["operation"], "initialize_profile")
@@ -718,7 +718,7 @@ class MultiHostTests(MultiFixture, unittest.IsolatedAsyncioTestCase):
         config = multi_config()
         config["multi_host"]["targets"][0]["participant_id"] = "*"
         if damaged:
-            from companion_v2.execution.models import digest
+            from digital_life_core.execution.models import digest
             config["multi_host"]["targets"].append({"target_id": "legacy-" + digest(["qq-main", "100", "200"])[:20],
                 "platform_id": "qq-main", "account_id": "100", "bot_id": "bot-a", "participant_id": "200"})
         return config
@@ -737,7 +737,7 @@ class MultiHostTests(MultiFixture, unittest.IsolatedAsyncioTestCase):
         self.assertTrue(status["accepting"])
 
     async def test_saved_role_mapping_recovers_from_repeated_legacy_import_and_survives_restart(self):
-        from astrbot_host.multi_authority import MANIFEST
+        from digital_life_host.multi_authority import MANIFEST
         saved = self.make_controller(self.repeated_legacy_config(damaged=False))
         (await saved.initialize_profile()).unwrap()
         manifest = saved.authority.read(MANIFEST)
@@ -780,7 +780,7 @@ class MultiHostTests(MultiFixture, unittest.IsolatedAsyncioTestCase):
         self.assertEqual(len(persisted), 1)
 
     async def test_automatic_mapping_recovery_reports_save_failure_and_leaves_saved_binding_intact(self):
-        from astrbot_host.multi_authority import MANIFEST
+        from digital_life_host.multi_authority import MANIFEST
         saved = self.make_controller(self.repeated_legacy_config(damaged=False))
         (await saved.initialize_profile()).unwrap()
         manifest = saved.authority.read(MANIFEST)
@@ -830,15 +830,15 @@ class MultiHostTests(MultiFixture, unittest.IsolatedAsyncioTestCase):
         }
         materials_route = NATIVE_PERCEPTION_PREFIX + "/materials"
         self.assertTrue({
-            "/astrbot_plugin_private_companion/host-options",
-            "/astrbot_plugin_private_companion/host-options/voice",
-            "/astrbot_plugin_private_companion/host-options/poke",
-            "/astrbot_plugin_private_companion/host-options/forward_intake",
-            "/astrbot_plugin_private_companion/host-options/balance",
-            "/astrbot_plugin_private_companion/storage",
+            "/astrbot_plugin_digital_life/host-options",
+            "/astrbot_plugin_digital_life/host-options/voice",
+            "/astrbot_plugin_digital_life/host-options/poke",
+            "/astrbot_plugin_digital_life/host-options/forward_intake",
+            "/astrbot_plugin_digital_life/host-options/balance",
+            "/astrbot_plugin_digital_life/storage",
         }.issubset(registered))
         storage_methods = {tuple(methods) for route, _, methods, _ in self.native.registered_web_apis
-                           if route == "/astrbot_plugin_private_companion/storage"}
+                           if route == "/astrbot_plugin_digital_life/storage"}
         self.assertEqual(storage_methods, {("GET",), ("POST",)})
         self.assertTrue(expected.issubset(registered))
         self.assertIn(materials_route, registered)
@@ -857,15 +857,15 @@ class MultiHostTests(MultiFixture, unittest.IsolatedAsyncioTestCase):
 
         request = NS(username="dashboard-admin", query=_Query())
         expected_parsers = {".pdf": True, ".docx": False, ".xlsx": True, ".pptx": False}
-        with patch("astrbot_host.multi_api.request", request), patch("astrbot_host.memory_api.request", request), \
-                patch("astrbot_host.multi_controller.parser_availability", return_value=expected_parsers):
+        with patch("digital_life_host.multi_api.request", request), patch("digital_life_host.memory_api.request", request), \
+                patch("digital_life_host.multi_controller.parser_availability", return_value=expected_parsers):
             status_response = await registered[MULTI_HOST_PREFIX + "/status"]()
             self.assertEqual(status_response["status"], "ok")
             self.assertEqual(status_response["data"]["parser_availability"], expected_parsers)
             self.assertEqual((await registered[MULTI_HOST_PREFIX + "/probe"]())["status"], "ok")
             self.assertEqual((await registered[MULTI_HOST_PREFIX + "/initialize"]())["status"], "ok")
             self.assertEqual((await registered[MULTI_HOST_PREFIX + "/start"]())["status"], "ok")
-            with patch("astrbot_host.native_perception_api.request", request):
+            with patch("digital_life_host.native_perception_api.request", request):
                 materials = await registered[materials_route]()
             self.assertEqual(materials["status"], "ok", materials)
             self.assertEqual(materials["data"]["items"], [])
@@ -903,7 +903,7 @@ class MultiHostTests(MultiFixture, unittest.IsolatedAsyncioTestCase):
             await allow_probe.wait()
             return await original_lookup(umo)
 
-        with patch("astrbot_host.memory_api.request", dashboard_request):
+        with patch("digital_life_host.memory_api.request", dashboard_request):
             with patch.object(conversation_manager, "get_curr_conversation_id", hold_probe):
                 starting = asyncio.create_task(self.controller.start())
                 try:
@@ -1005,7 +1005,7 @@ class MultiHostTests(MultiFixture, unittest.IsolatedAsyncioTestCase):
         manager = self.native.conversation_manager
         for method, stage in (("get_curr_conversation_id", "conversation_id"),):
             with self.subTest(stage=stage), patch.object(manager, method, AsyncMock(side_effect=unresponsive)), \
-                    patch("companion_v2.adapters.astrbot.native.NATIVE_LOOKUP_TIMEOUT_SECONDS", 0.01):
+                    patch("digital_life_core.adapters.astrbot.native.NATIVE_LOOKUP_TIMEOUT_SECONDS", 0.01):
                 result = await self.controller.probe()
                 self.assertEqual(result.failure.code, "host_native_lookup_timeout__" + stage)
                 self.assertEqual(self.controller.last_failure["code"], result.failure.code)
@@ -1052,7 +1052,7 @@ class MultiHostTests(MultiFixture, unittest.IsolatedAsyncioTestCase):
         with patch.object(self.native.persona_manager, "resolve_selected_persona",
                           side_effect=AssertionError("AstrBot persona resolution must not choose a V2 role")), \
                 patch.object(controller.session_topology, "services", services), \
-                patch("companion_v2.adapters.astrbot.native.NATIVE_LOOKUP_TIMEOUT_SECONDS", 0.3):
+                patch("digital_life_core.adapters.astrbot.native.NATIVE_LOOKUP_TIMEOUT_SECONDS", 0.3):
             _, conversations = await controller._probe()
         self.assertEqual(len(conversations), 16)
         self.assertEqual(len(lookups), 16)

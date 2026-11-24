@@ -10,15 +10,15 @@ from types import ModuleType, SimpleNamespace as NS
 import unittest
 from unittest.mock import AsyncMock, Mock, patch
 
-from astrbot_host.logging_bridge import PLUGIN_NAME as ASTRBOT_PLUGIN
+from digital_life_host.logging_bridge import PLUGIN_NAME as ASTRBOT_PLUGIN
 from tests import test_astrbot_staging_host as _astrbot_test_runtime
 from tests.test_management_access import INSTALLATION, NOW
-from companion_v2.foundation.outcome import Outcome
-from companion_v2.storage.runtime import StorageRuntime
+from digital_life_core.foundation.outcome import Outcome
+from digital_life_core.storage.runtime import StorageRuntime
 
 
 ROOT = Path(__file__).resolve().parents[1]
-PACKAGE_NAME = "_companion_v2_no_reply_entry_test"
+PACKAGE_NAME = "_digital_life_core_no_reply_entry_test"
 PACKAGE = ModuleType(PACKAGE_NAME)
 PACKAGE.__path__ = [str(ROOT)]
 sys.modules[PACKAGE_NAME] = PACKAGE
@@ -91,7 +91,7 @@ class MainNoReplyTests(unittest.IsolatedAsyncioTestCase):
         self.staging.target_for_event = lambda _event: self.target
         event = private_event()
 
-        with self.assertLogs("companion_v2.diagnostics.inbound", level="WARNING") as captured:
+        with self.assertLogs("digital_life_core.diagnostics.inbound", level="WARNING") as captured:
             await self.plugin.receive_companion_message(event)
 
         row = self.runtime.read_one("SELECT * FROM inbound_no_replies", ())

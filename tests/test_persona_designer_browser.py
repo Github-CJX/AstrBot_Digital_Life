@@ -20,7 +20,7 @@ iframe{display:block;width:100%;border:0;min-height:800px}.product-workspace-loa
 <script>
 window.mock={hold:false,fail:false,saveFail:false,calls:[],reply:'先从她与你的关系开始。\n<svg onload="window.injected=true">只是设计材料</svg>'};
 const clone=value=>JSON.parse(JSON.stringify(value));
-window.AstrBotPluginPage={ready:async()=>({pluginName:'astrbot_plugin_private_companion'}),
+window.AstrBotPluginPage={ready:async()=>({pluginName:'astrbot_plugin_digital_life'}),
 apiGet:async(endpoint,body)=>{
   mock.calls.push({method:'GET',endpoint,body});
   if(endpoint==='page/targets')throw Object.assign(new Error('staging_not_initialized'),{code:'staging_not_initialized'});

@@ -19,7 +19,7 @@
  */
 "use strict";
 window.CompanionMemoryPage = (() => {
-  const HOST = "astrbot_plugin_private_companion";
+  const HOST = "astrbot_plugin_digital_life";
   const PREFIX = "/" + HOST + "/";
   const STORE = "companion-memory-page-v1:";
   const askConfirm = options => typeof window.CompanionConfirm === "function"
@@ -143,7 +143,7 @@ window.CompanionMemoryPage = (() => {
   function current() { return data?.catalog?.targets[data.target]; }
   function role() { return current()?.roles[data.role]; }
   /* 桥要的是**插件相对路径**：目录给的是绝对地址
-     `/astrbot_plugin_private_companion/host/targets/...`，交给桥之前
+     `/astrbot_plugin_digital_life/host/targets/...`，交给桥之前
      要切掉插件目录名，让它变成 `host/targets/...`。
      真实 SDK（AstrBot 的 plugin_page_bridge.js）自己会把插件目录名拼回去。
      这一条是查出来的，不是猜的：`tools/check_product_page.cjs` 的合成 SDK

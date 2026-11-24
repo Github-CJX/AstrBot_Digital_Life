@@ -20,7 +20,7 @@ const managementSource = fs.readFileSync(path.join(pageRoot, "native-extension-m
 const css = ["tokens.css", "tokens-bridge.css", "styles.css", "native-extension-panel.css"]
   .map(name => fs.readFileSync(path.join(pageRoot, name), "utf8")).join("\n");
 const records = Object.fromEntries(["reality", "together", "game", "live"].map(name => {
-  const base = path.join(root, "astrbot_host/native_extensions", name);
+  const base = path.join(root, "digital_life_host/native_extensions", name);
   return [name, {settings:JSON.parse(fs.readFileSync(path.join(base, "settings-defaults.json"), "utf8")),
     schema:JSON.parse(fs.readFileSync(path.join(base, "settings-schema.json"), "utf8")),
     revision:"revision-" + name, runtime:{state:"running", error_code:null}}];
@@ -58,7 +58,7 @@ async function harness(name, viewport = {width:1360, height:900}, panelOptions =
       return window.confirmationResult;
     };
     window.providers = Object.fromEntries(Object.keys(records).map(key => [key, {capability_id:key,
-      extension_id:key, owner:"companion_v2", desired_state:"active", assembled:true, installed_revision:7}]));
+      extension_id:key, owner:"digital_life_core", desired_state:"active", assembled:true, installed_revision:7}]));
     function merge(target, updates) {
       for (const [key, value] of Object.entries(updates)) {
         if (value && typeof value === "object" && !Array.isArray(value)) merge(target[key] ??= {}, value);

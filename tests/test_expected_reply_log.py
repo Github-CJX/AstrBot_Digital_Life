@@ -18,20 +18,20 @@ from types import ModuleType, SimpleNamespace as NS
 import unittest
 from unittest.mock import AsyncMock, patch
 
-from companion_v2.adapters.astrbot.model_wire import tool_alias
-from companion_v2.configuration.models import ConfigLayer, ConfigTarget
-from companion_v2.conversation.delivery import DeliveryReceipt
-from companion_v2.conversation.flow import ConversationPolicy
-from companion_v2.conversation.participation import ACTION, SKIPPED
-from companion_v2.conversation.reply_settings import (
+from digital_life_core.adapters.astrbot.model_wire import tool_alias
+from digital_life_core.configuration.models import ConfigLayer, ConfigTarget
+from digital_life_core.conversation.delivery import DeliveryReceipt
+from digital_life_core.conversation.flow import ConversationPolicy
+from digital_life_core.conversation.participation import ACTION, SKIPPED
+from digital_life_core.conversation.reply_settings import (
     GROUP, ReplyConfigurationOwner, configuration_fields as reply_configuration_fields,
 )
-from companion_v2.conversation.segmentation import SegmentationPolicy
-from companion_v2.diagnostics import inbound
-from companion_v2.execution.models import TaskContext, encode
-from companion_v2.model_gateway.models import Amount, BudgetPolicy
-from companion_v2.model_gateway.budget import BudgetLedger
-from companion_v2.storage.runtime import StorageRuntime
+from digital_life_core.conversation.segmentation import SegmentationPolicy
+from digital_life_core.diagnostics import inbound
+from digital_life_core.execution.models import TaskContext, encode
+from digital_life_core.model_gateway.models import Amount, BudgetPolicy
+from digital_life_core.model_gateway.budget import BudgetLedger
+from digital_life_core.storage.runtime import StorageRuntime
 from tests.group_host_support import GroupFixture, group_config
 from tests.native_adapter_support import completion, final_text
 from tests.staging_bootstrap_support import wait_for_batch
@@ -41,7 +41,7 @@ from tests.test_role_tool_loop import answered
 
 
 ROOT = Path(__file__).resolve().parents[1]
-PACKAGE_NAME = "_companion_v2_expected_reply_log_entry_test"
+PACKAGE_NAME = "_digital_life_core_expected_reply_log_entry_test"
 PACKAGE = ModuleType(PACKAGE_NAME)
 PACKAGE.__path__ = [str(ROOT)]
 sys.modules[PACKAGE_NAME] = PACKAGE

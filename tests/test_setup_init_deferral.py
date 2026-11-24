@@ -8,7 +8,7 @@ while a real configuration problem still fails the step.
 from types import SimpleNamespace
 import unittest
 
-from astrbot_host.setup_api import INIT_DEFERRED_CODES, deferred_initialization
+from digital_life_host.setup_api import INIT_DEFERRED_CODES, deferred_initialization
 
 
 def failure(code, reason="配置的 Bot 账号 default:123 当前未连接 AstrBot"):

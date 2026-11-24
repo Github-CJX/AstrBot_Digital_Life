@@ -1,3 +1,16 @@
+# Digital Life · M1 开发快照（0.1.0）
+
+基于 [menglimi/astrbot_plugin_private_companion](https://github.com/menglimi/astrbot_plugin_private_companion) 7.3.1，原作者及 AGPL-3.0-only 许可证保留。2026-11-24 修改插件身份、源码包、数据根、路由及研发资料。
+
+**仅限独立测试 AstrBot；未完成真实宿主验收。不要覆盖原插件、使用生产账号或导入旧数据。** M2 功能裁剪未开始，旧能力仍存在；M3 界面与新心理/生活系统尚未改动。
+
+- 开发路线与需求：`docs/digital-life/`
+- 研究索引：`docs/digital-life/references/INDEX.md`
+- 验证：`docs/digital-life/validation/M1.md`
+- 以下保留上游 README 内容作为历史参考，其中安装命令、旧版本及功能介绍不能视为 Fork 的发布说明。
+
+---
+
 # 我会永远陪着你
 
 <div align="center">
@@ -26,9 +39,9 @@
 
 | 项目 | 当前信息 |
 | --- | --- |
-| 插件名 | `astrbot_plugin_private_companion` |
+| 插件名 | `astrbot_plugin_digital_life` |
 | 显示名 | 我会永远陪着你 |
-| 当前版本 | `7.3.1`（7.x 架构线，内部领域标识 `private_companion.v2`） |
+| 当前版本 | `7.3.1`（7.x 架构线，内部领域标识 `digital_life.v2`） |
 | AstrBot 版本 | `>= 4.27.2` |
 | 声明支持平台 | `aiocqhttp`（OneBot v11）、`qq_official`、`qq_official_webhook`、`weixin_oc`（个人微信）、`wechat_native`（WeChat Native） |
 | 管理入口 | AstrBot 插件扩展页「陪伴小屋」（支持低配设备开启「性能模式」切换为轻量状态页） |
@@ -44,7 +57,7 @@ WeChat Native 接入沿用 AstrBot 核心普通回复与适配器的原事件发
 - 服务余额：[NewAPI 与高级请求／提取脚本](docs/service-balance.md)
 - 开发者入口：[开发文档索引](docs/README.md) · [贡献指南](CONTRIBUTING.md) · [第三方扩展开发规范](docs/extension-development.md)
 - 源代码：[GitHub 仓库](https://github.com/menglimi/astrbot_plugin_private_companion)
-- 6.7.x 稳定版备份：[只读备份仓库](https://github.com/menglimi/astrbot_plugin_private_companion_v2)
+- 6.7.x 稳定版备份：[只读备份仓库](https://github.com/menglimi/astrbot_plugin_private_companion_legacy)
 - 问题反馈/交流群：QQ 群 `1097283005`
 - 自愿支持：[爱发电](https://ifdian.net/a/xuhaun)
 
@@ -121,7 +134,7 @@ WeChat Native 接入沿用 AstrBot 核心普通回复与适配器的原事件发
 
 #### 插件市场 / Git 安装
 
-在 AstrBot WebUI 插件市场搜索 `astrbot_plugin_private_companion`，或选择从 Git 安装并填写仓库地址：
+在 AstrBot WebUI 插件市场搜索 `astrbot_plugin_digital_life`，或选择从 Git 安装并填写仓库地址：
 
 ```text
 https://github.com/menglimi/astrbot_plugin_private_companion
@@ -130,7 +143,7 @@ https://github.com/menglimi/astrbot_plugin_private_companion
 #### 本地 ZIP / 手动安装
 
 - 使用官方发布的完整交付包 ZIP 在 AstrBot WebUI 中选择「从本地上传」安装。
-- 手动安装时，将完整插件目录放入 AstrBot 插件目录，并确保目录名为 `astrbot_plugin_private_companion`（例如 `C:\Users\<用户名>\.astrbot\data\plugins\astrbot_plugin_private_companion`）。
+- 手动安装时，将完整插件目录放入 AstrBot 插件目录，并确保目录名为 `astrbot_plugin_digital_life`（例如 `C:\Users\<用户名>\.astrbot\data\plugins\astrbot_plugin_digital_life`）。
 
 #### 性能模式（低配置或远程访问设备）
 
@@ -184,7 +197,7 @@ https://github.com/menglimi/astrbot_plugin_private_companion
 
 ### 3.3 从 6.7.0 升级与回退指南
 
-7.x 继续使用原仓库和插件名 `astrbot_plugin_private_companion`，通过现有安装原地更新即可，**不要并行安装第二份同名插件，也不要先删除原数据目录**。
+7.x 继续使用原仓库和插件名 `astrbot_plugin_digital_life`，通过现有安装原地更新即可，**不要并行安装第二份同名插件，也不要先删除原数据目录**。
 
 离线替换插件代码后须完整重启 AstrBot。仅重新启用已禁用的插件可能复用进程中已导入的旧模块，不能据此确认新版代码已加载。
 
@@ -226,8 +239,8 @@ https://github.com/menglimi/astrbot_plugin_private_companion
 7.x 没有一键降级。若迁移结果不符合预期，**不要重复执行迁移或清理数据**，先正常停止 AstrBot，再按以下步骤恢复：
 
 1. **封存 7.x 现场**：将当前插件目录、AstrBot 配置目录和实际运行数据根（如 `companion-7` 或配置的外部路径）完整复制到插件扫描目录之外，留作后续取回 7.x 新增资料。
-2. **恢复 6.7.0 代码**：使用发布附件中的 `astrbot_plugin_private_companion-6.7.0-rollback.zip`（来自正式 `v6.7.0` 标签，提交 `f2f87183993a0667800056f73bcf12df298cdbcb`，SHA-256：`C8812D861942D0274E74D48A383EFD330537E7155C787D30D33220075A050CEA`），校验哈希后完整替换原插件代码目录，不要混用新旧代码。
-3. **恢复 6.7.0 插件配置**：将 `astrbot_plugin_private_companion_config.json` 恢复为升级前备份；若未手动备份，可在 AstrBot 配置目录下检查 `.private-companion-upgrade/source.json`，按其中记录的 SHA-256 找到同目录归档 JSON，校验无误后复制回原配置文件名。
+2. **恢复 6.7.0 代码**：使用发布附件中的 `astrbot_plugin_digital_life-6.7.0-rollback.zip`（来自正式 `v6.7.0` 标签，提交 `f2f87183993a0667800056f73bcf12df298cdbcb`，SHA-256：`C8812D861942D0274E74D48A383EFD330537E7155C787D30D33220075A050CEA`），校验哈希后完整替换原插件代码目录，不要混用新旧代码。
+3. **恢复 6.7.0 插件配置**：将 `astrbot_plugin_digital_life_config.json` 恢复为升级前备份；若未手动备份，可在 AstrBot 配置目录下检查 `.digital-life-upgrade/source.json`，按其中记录的 SHA-256 找到同目录归档 JSON，校验无误后复制回原配置文件名。
 4. **让 6.7.0 使用原数据**：确认 6.7.0 原始数据目录完整，不要将 `companion-7` 数据库覆盖回旧版。
 5. **启动并核验**：启动 AstrBot，确认加载日志显示 `6.7.0`，核对账号、人格、主要用户与记忆。
 
@@ -516,7 +529,7 @@ flowchart LR
 
 ### 7.1 数据隔离与备份还原
 
-- **数据根安全边界**：7.x 运行数据与插件代码目录、6.x 旧数据目录严格隔离。若宿主将插件代码目录当作数据目录返回，插件会自动切换到标准 `plugin_data/astrbot_plugin_private_companion`，绝不把数据库写进代码树。
+- **数据根安全边界**：7.x 运行数据与插件代码目录、6.x 旧数据目录严格隔离。若宿主将插件代码目录当作数据目录返回，插件会自动切换到标准 `plugin_data/astrbot_plugin_digital_life`，绝不把数据库写进代码树。
 - **自动滚动备份**：在「陪伴小屋 → 资料与维护 → 存储位置与清理策略」开启（默认关闭），设置间隔 1–43200 分钟（默认 1440），以及同页的目录、保留份数和天数。设置保存后无需重载；运行档加载后约 30 秒内检查，最近完整快照（含手动快照）已到期或不存在时创建一份，不补建停机期间错过的多份。自动与手动快照共用保留策略，可在备份列表看到「自动滚动备份」备注。关闭只停止后续计划，不删除已有快照；有待重启恢复请求时暂停自动备份。删除最后一份后，开启状态下会在后续检查中重新补建；想保持目录为空请先关闭自动备份。时间戳晚于当前时间的快照暂不计入轮转份数，也不会自动删除。
 - **手动删除快照**：「资料与维护 → 备份与还原」中可逐份删除，需二次确认；不会删除当前运行资料。有待重启的还原请求时暂停删除。
 - **快照备份与跨盘迁移**：「资料与维护」支持一键创建备份快照、按保留数量/天数自动清理旧快照，以及将运行资料目录平滑迁移到其他磁盘。
@@ -549,12 +562,12 @@ flowchart LR
 
 ### 8.1 项目结构
 
-本仓库交付单一插件 `astrbot_plugin_private_companion`，内部依赖方向严格遵循 `main.py → astrbot_host → companion_v2`（核心领域包不反向导入宿主层或 AstrBot SDK）：
+本仓库交付单一插件 `astrbot_plugin_digital_life`，内部依赖方向严格遵循 `main.py → digital_life_host → digital_life_core`（核心领域包不反向导入宿主层或 AstrBot SDK）：
 
 ```text
 main.py                         唯一 Star 注册、生命周期、事件转发与退出入口
-astrbot_host/                   AstrBot SDK 适配、核心回复协同、Dashboard 路由与七项原生能力宿主桥接
-companion_v2/                   平台无关的领域核心实现（状态日程、关系记忆、主动引擎、学习反思、配置与迁移）
+digital_life_host/                   AstrBot SDK 适配、核心回复协同、Dashboard 路由与七项原生能力宿主桥接
+digital_life_core/                   平台无关的领域核心实现（状态日程、关系记忆、主动引擎、学习反思、配置与迁移）
 pages/陪伴小屋/                 唯一公开 Dashboard 页面规范源（3D 体素小屋、主题令牌与各专题配置工作台）
 tools/                          页面同步、运行目录同步、交付包构建与宿主验证脚本
 tests/ & fixtures/              自动化回归测试与合成夹具
@@ -591,10 +604,10 @@ python -X utf8 tools/build_v2_release.py --output <安装目录以外的交付�
 
 ### Star History
 
-<a href="https://www.star-history.com/?repos=menglimi%2Fastrbot_plugin_private_companion&type=timeline&legend=top-left">
+<a href="https://www.star-history.com/?repos=menglimi%2Fastrbot_plugin_digital_life&type=timeline&legend=top-left">
  <picture>
-   <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/chart?repos=menglimi/astrbot_plugin_private_companion&type=timeline&theme=dark&legend=top-left&sealed_token=Am7AYWUWfiXCJxpYCYtYw7pYaSazhbj7ZljIMHOj7V-Qq2Pa1kFTi6tnOFr54KuUX7AAm4EZ7hZPIavsI5RZdqpg2PYZiU8D-lxdTsDCgZTbbb4twCIqnQ" />
-   <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/chart?repos=menglimi/astrbot_plugin_private_companion&type=timeline&legend=top-left&sealed_token=Am7AYWUWfiXCJxpYCYtYw7pYaSazhbj7ZljIMHOj7V-Qq2Pa1kFTi6tnOFr54KuUX7AAm4EZ7hZPIavsI5RZdqpg2PYZiU8D-lxdTsDCgZTbbb4twCIqnQ" />
-   <img alt="Star History Chart" src="https://api.star-history.com/chart?repos=menglimi/astrbot_plugin_private_companion&type=timeline&legend=top-left&sealed_token=Am7AYWUWfiXCJxpYCYtYw7pYaSazhbj7ZljIMHOj7V-Qq2Pa1kFTi6tnOFr54KuUX7AAm4EZ7hZPIavsI5RZdqpg2PYZiU8D-lxdTsDCgZTbbb4twCIqnQ" />
+   <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/chart?repos=menglimi/astrbot_plugin_digital_life&type=timeline&theme=dark&legend=top-left&sealed_token=Am7AYWUWfiXCJxpYCYtYw7pYaSazhbj7ZljIMHOj7V-Qq2Pa1kFTi6tnOFr54KuUX7AAm4EZ7hZPIavsI5RZdqpg2PYZiU8D-lxdTsDCgZTbbb4twCIqnQ" />
+   <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/chart?repos=menglimi/astrbot_plugin_digital_life&type=timeline&legend=top-left&sealed_token=Am7AYWUWfiXCJxpYCYtYw7pYaSazhbj7ZljIMHOj7V-Qq2Pa1kFTi6tnOFr54KuUX7AAm4EZ7hZPIavsI5RZdqpg2PYZiU8D-lxdTsDCgZTbbb4twCIqnQ" />
+   <img alt="Star History Chart" src="https://api.star-history.com/chart?repos=menglimi/astrbot_plugin_digital_life&type=timeline&legend=top-left&sealed_token=Am7AYWUWfiXCJxpYCYtYw7pYaSazhbj7ZljIMHOj7V-Qq2Pa1kFTi6tnOFr54KuUX7AAm4EZ7hZPIavsI5RZdqpg2PYZiU8D-lxdTsDCgZTbbb4twCIqnQ" />
  </picture>
 </a>

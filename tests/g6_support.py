@@ -5,15 +5,15 @@ from pathlib import Path
 from tempfile import TemporaryDirectory
 import unittest
 
-from companion_v2.capabilities import (
+from digital_life_core.capabilities import (
     CapabilityAuthorizationState, CapabilityPackageDescriptor, CapabilityRepository, FurnitureDescriptor,
 )
-from companion_v2.foundation.clock import DeterministicClock
-from companion_v2.foundation.refs import ScopeKind, ScopeRef, SubjectKind, SubjectRef
-from companion_v2.identity_policy.directory import IdentityDirectory
-from companion_v2.identity_policy.models import AuthenticatedHostPrincipal, AuthorizationTier
-from companion_v2.screen.models import SCREEN_EXTENSION, SCREEN_PROCESS, SCREEN_READ
-from companion_v2.storage.runtime import StorageRuntime
+from digital_life_core.foundation.clock import DeterministicClock
+from digital_life_core.foundation.refs import ScopeKind, ScopeRef, SubjectKind, SubjectRef
+from digital_life_core.identity_policy.directory import IdentityDirectory
+from digital_life_core.identity_policy.models import AuthenticatedHostPrincipal, AuthorizationTier
+from digital_life_core.screen.models import SCREEN_EXTENSION, SCREEN_PROCESS, SCREEN_READ
+from digital_life_core.storage.runtime import StorageRuntime
 
 
 NOW = datetime(2026, 9, 21, tzinfo=timezone.utc)

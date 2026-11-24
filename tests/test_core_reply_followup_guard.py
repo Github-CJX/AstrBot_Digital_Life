@@ -9,15 +9,15 @@ from types import SimpleNamespace as NS
 import unittest
 from unittest.mock import AsyncMock, Mock
 
-from astrbot_host.core_reply import CORE_REPLY_CONTEXT_EXTRA
-from astrbot_host.core_reply_followup_guard import (
+from digital_life_host.core_reply import CORE_REPLY_CONTEXT_EXTRA
+from digital_life_host.core_reply_followup_guard import (
     CoreReplyFollowUpGuard,
     event_media_kinds,
     event_requires_media_serialization,
     runner_can_capture_followup,
 )
-from astrbot_host.core_reply_tracking import CORE_REPLY_TRACKING_EXTRA
-from companion_v2.foundation.outcome import Outcome
+from digital_life_host.core_reply_tracking import CORE_REPLY_TRACKING_EXTRA
+from digital_life_core.foundation.outcome import Outcome
 
 _HAS_ASTRBOT_SDK = importlib.util.find_spec("astrbot") is not None
 
@@ -678,15 +678,15 @@ class EndToEndPluginFollowUpTests(unittest.IsolatedAsyncioTestCase):
                 return any(other != event_id for other in self.live)
 
         fake_admission = admission_store if admission_store is not None else FakeAdmission()
-        from companion_v2.execution.models import TaskContext
-        from companion_v2.foundation.refs import (
+        from digital_life_core.execution.models import TaskContext
+        from digital_life_core.foundation.refs import (
             AudienceRef,
             ScopeKind,
             ScopeRef,
             SubjectKind,
             SubjectRef,
         )
-        from companion_v2.identity_policy.models import (
+        from digital_life_core.identity_policy.models import (
             AuthenticatedHostPrincipal,
             ResolvedIdentity,
             RoleBinding,
@@ -800,8 +800,8 @@ class EndToEndPluginFollowUpTests(unittest.IsolatedAsyncioTestCase):
         )
 
         # Avoid real debounce delay for group plain text in this deterministic E2E test.
-        from companion_v2.conversation.private_debounce import Policy
-        from astrbot_host.group_debounce import GroupDebounce
+        from digital_life_core.conversation.private_debounce import Policy
+        from digital_life_host.group_debounce import GroupDebounce
 
         plugin._group_debounce = GroupDebounce(Policy(min_seconds=0.01, max_seconds=0.01, total_seconds=0.02))
 
@@ -970,8 +970,8 @@ class EndToEndPluginFollowUpTests(unittest.IsolatedAsyncioTestCase):
 
     async def test_e2e_group_captured_followup_cleans_tracking_and_live_turns(self):
         from astrbot.core.pipeline.process_stage import follow_up
-        from companion_v2.conversation.private_debounce import Policy
-        from astrbot_host.group_debounce import GroupDebounce
+        from digital_life_core.conversation.private_debounce import Policy
+        from digital_life_host.group_debounce import GroupDebounce
 
         plugin, admission, phases = self._build_plugin(channel="group")
         plugin._group_debounce = GroupDebounce(Policy(min_seconds=0.01, max_seconds=0.01, total_seconds=0.02))
@@ -1059,8 +1059,8 @@ class EndToEndPluginFollowUpTests(unittest.IsolatedAsyncioTestCase):
             channel="group",
             message_id="co-2",
         )
-        from companion_v2.conversation.private_debounce import Policy
-        from astrbot_host.group_debounce import GroupDebounce
+        from digital_life_core.conversation.private_debounce import Policy
+        from digital_life_host.group_debounce import GroupDebounce
 
         plugin._group_debounce = GroupDebounce(Policy(min_seconds=0.01, max_seconds=0.01, total_seconds=0.02))
         session_lock = asyncio.Lock()
@@ -1094,8 +1094,8 @@ class EndToEndPluginFollowUpTests(unittest.IsolatedAsyncioTestCase):
 
     async def test_e2e_cancelled_waiting_media_cleans_group_tracking(self):
         plugin, admission, phases = self._build_plugin(channel="group")
-        from companion_v2.conversation.private_debounce import Policy
-        from astrbot_host.group_debounce import GroupDebounce
+        from digital_life_core.conversation.private_debounce import Policy
+        from digital_life_host.group_debounce import GroupDebounce
 
         plugin._group_debounce = GroupDebounce(Policy(min_seconds=0.01, max_seconds=0.01, total_seconds=0.02))
         umo = "onebot_qq:GroupMessage:e2e-cancel"
@@ -1182,7 +1182,7 @@ class EndToEndPluginFollowUpTests(unittest.IsolatedAsyncioTestCase):
 
     async def test_e2e_passthrough_awakened_media_is_also_serialized(self):
         from astrbot.core.pipeline.process_stage import follow_up
-        from companion_v2.execution.models import TaskError
+        from digital_life_core.execution.models import TaskError
 
         plugin, _admission, _phases = self._build_plugin(channel="group")
         umo = "onebot_qq:GroupMessage:e2e-passthrough"
@@ -1203,8 +1203,8 @@ class EndToEndPluginFollowUpTests(unittest.IsolatedAsyncioTestCase):
             message_id="pt-2",
         )
         ev2.is_at_or_wake_command = True
-        from companion_v2.conversation.private_debounce import Policy
-        from astrbot_host.group_debounce import GroupDebounce
+        from digital_life_core.conversation.private_debounce import Policy
+        from digital_life_host.group_debounce import GroupDebounce
 
         plugin._group_debounce = GroupDebounce(Policy(min_seconds=0.01, max_seconds=0.01, total_seconds=0.02))
 
@@ -1251,8 +1251,8 @@ class EndToEndPluginFollowUpTests(unittest.IsolatedAsyncioTestCase):
 
     async def test_e2e_private_pre_request_fold_does_not_overtake_waiting_media(self):
         from astrbot.core.pipeline.process_stage import follow_up
-        from companion_v2.conversation.private_debounce import Policy
-        from astrbot_host.private_debounce import PrivateDebounce
+        from digital_life_core.conversation.private_debounce import Policy
+        from digital_life_host.private_debounce import PrivateDebounce
 
         plugin, _admission, _phases = self._build_plugin(channel="private")
         plugin._private_debounce = PrivateDebounce(

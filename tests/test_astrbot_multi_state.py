@@ -12,12 +12,12 @@ from tests.test_role_state import state_data, calendar_data
 from tests.native_adapter_support import completion
 from astrbot.api.web import PluginRequest, bind_request_context
 from starlette.requests import Request
-from astrbot_host.management_identity import dashboard_operator
-from companion_v2.agenda.models import Schedule
-from companion_v2.proactive.external_materials import WeatherSnapshot
-from companion_v2.execution.models import encode
-from companion_v2.identity_policy.models import AuthorizationTier
-from companion_v2.identity_policy.object_access import ObjectAccessPolicy
+from digital_life_host.management_identity import dashboard_operator
+from digital_life_core.agenda.models import Schedule
+from digital_life_core.proactive.external_materials import WeatherSnapshot
+from digital_life_core.execution.models import encode
+from digital_life_core.identity_policy.models import AuthorizationTier
+from digital_life_core.identity_policy.object_access import ObjectAccessPolicy
 
 
 class MultiStateTests(MultiFixture, unittest.IsolatedAsyncioTestCase):

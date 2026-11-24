@@ -14,30 +14,30 @@ from astrbot.core.agent.message import TextPart
 from astrbot.core.agent.tool import FunctionTool, ToolSet
 from astrbot.core.provider.entities import ProviderRequest
 
-from astrbot_host.core_reply import CORE_REPLY_CONTEXT_EXTRA, prepare_core_reply_event
-from astrbot_host.core_reply_mentions import (
+from digital_life_host.core_reply import CORE_REPLY_CONTEXT_EXTRA, prepare_core_reply_event
+from digital_life_host.core_reply_mentions import (
     BARE_MENTION_SENTINEL_PROMPT,
     prepare_bare_mention_request,
     restore_group_mentions,
 )
-from astrbot_host.core_reply_perception import (
+from digital_life_host.core_reply_perception import (
     inject_core_reply_perception_context,
     request_has_host_kb_results,
 )
-from astrbot_host.core_reply_telemetry import _request_signature
-from astrbot_host.core_reply_tools import (
+from digital_life_host.core_reply_telemetry import _request_signature
+from digital_life_host.core_reply_tools import (
     KB_TOOL_INSTRUCTION,
     LEAN_PRESERVED_HOST_TOOLS,
     close_core_reply_tools,
     inject_core_reply_tools,
 )
-from companion_v2.conversation.group_timing import SELF_MENTION
-from companion_v2.conversation.tool_loop import LocalRoleTools
-from companion_v2.execution.models import TaskContext, require
-from companion_v2.foundation.outcome import Outcome
-from companion_v2.foundation.refs import ScopeKind
-from companion_v2.identity_policy.group_audience import group_audience
-from companion_v2.identity_policy.personas import ConversationRoute
+from digital_life_core.conversation.group_timing import SELF_MENTION
+from digital_life_core.conversation.tool_loop import LocalRoleTools
+from digital_life_core.execution.models import TaskContext, require
+from digital_life_core.foundation.outcome import Outcome
+from digital_life_core.foundation.refs import ScopeKind
+from digital_life_core.identity_policy.group_audience import group_audience
+from digital_life_core.identity_policy.personas import ConversationRoute
 from tests.test_astrbot_core_reply import FakeEvent
 from tests.test_conversation_messages import MessageFixture
 from tests.test_management_access import NOW, SCOPE
@@ -210,9 +210,9 @@ class BareMentionAndDoubleInjectionTests(unittest.IsolatedAsyncioTestCase):
         await inject_core_reply_perception_context(event_dedup, req_with_host_kb)
         v2_part = next(
             part.text for part in req_with_host_kb.extra_user_content_parts
-            if part.text.startswith("<companion_v2_context>")
+            if part.text.startswith("<digital_life_core_context>")
         )
-        payload = json.loads(v2_part.removeprefix("<companion_v2_context>\n").removesuffix("\n</companion_v2_context>"))
+        payload = json.loads(v2_part.removeprefix("<digital_life_core_context>\n").removesuffix("\n</digital_life_core_context>"))
         sections = payload["companion_background"]["sections"]
         all_kinds = [mat["kind"] for sec in sections for mat in sec.get("materials", ())]
         self.assertIn("knowledge_reference:worldbook-local", all_kinds)
@@ -227,10 +227,10 @@ class BareMentionAndDoubleInjectionTests(unittest.IsolatedAsyncioTestCase):
         await inject_core_reply_perception_context(event_keep, req_without_host_kb)
         v2_part_keep = next(
             part.text for part in req_without_host_kb.extra_user_content_parts
-            if part.text.startswith("<companion_v2_context>")
+            if part.text.startswith("<digital_life_core_context>")
         )
         payload_keep = json.loads(
-            v2_part_keep.removeprefix("<companion_v2_context>\n").removesuffix("\n</companion_v2_context>")
+            v2_part_keep.removeprefix("<digital_life_core_context>\n").removesuffix("\n</digital_life_core_context>")
         )
         kept_kinds = [
             mat["kind"] for sec in payload_keep["companion_background"]["sections"]
@@ -255,8 +255,8 @@ class BareMentionAndDoubleInjectionTests(unittest.IsolatedAsyncioTestCase):
 
     async def test_together_room_background_uses_async_official_kb_hits(self):
         from unittest.mock import patch
-        from astrbot_host.native_extensions.together import native_context as together_ctx
-        from companion_v2.knowledge.retrieval import KnowledgeCandidate
+        from digital_life_host.native_extensions.together import native_context as together_ctx
+        from digital_life_core.knowledge.retrieval import KnowledgeCandidate
 
         fake_hit = KnowledgeCandidate(
             "astrbot:kb-1:doc-1:0", "维也纳音乐会剧情摘要",
@@ -273,7 +273,7 @@ class BareMentionAndDoubleInjectionTests(unittest.IsolatedAsyncioTestCase):
             return NS(instruction="rendered-room-bg")
 
         with patch.object(together_ctx, "resolve_room_context", AsyncMock(return_value=resolved)), \
-                patch("astrbot_host.knowledge_sources.prepare_official_knowledge_hits",
+                patch("digital_life_host.knowledge_sources.prepare_official_knowledge_hits",
                       AsyncMock(return_value=(fake_hit,))) as prep_mock, \
                 patch.object(together_ctx, "build_core_reply_prompt", side_effect=fake_build):
             result = await together_ctx.room_background(runtime, NS(), "聊聊维也纳音乐会")
@@ -289,8 +289,8 @@ class BareMentionAndDoubleInjectionTests(unittest.IsolatedAsyncioTestCase):
         from tempfile import TemporaryDirectory
         import threading
         from unittest.mock import patch
-        from astrbot_host.knowledge_sources import AstrBotKnowledgeSources, KnowledgeSourceReader
-        from companion_v2.knowledge.parsing import KnowledgeChunk, ParseBatch
+        from digital_life_host.knowledge_sources import AstrBotKnowledgeSources, KnowledgeSourceReader
+        from digital_life_core.knowledge.parsing import KnowledgeChunk, ParseBatch
 
         with TemporaryDirectory(prefix="kb-doc-names-race-") as tmp:
             data_root = Path(tmp)
@@ -331,9 +331,9 @@ class BareMentionAndDoubleInjectionTests(unittest.IsolatedAsyncioTestCase):
             def worker(key, kb_id):
                 results[key] = sources.candidates([f"kb:{kb_id}"])
 
-            with patch("astrbot_host.knowledge_sources.available_source_ids", return_value={"kb:kb-a", "kb:kb-b"}), \
+            with patch("digital_life_host.knowledge_sources.available_source_ids", return_value={"kb:kb-a", "kb:kb-b"}), \
                     patch.object(KnowledgeSourceReader, "_knowledge_rows", fake_rows), \
-                    patch("astrbot_host.knowledge_sources.parse_knowledge_rows", side_effect=fake_parse):
+                    patch("digital_life_host.knowledge_sources.parse_knowledge_rows", side_effect=fake_parse):
                 t1 = threading.Thread(target=worker, args=("a", "kb-a"))
                 t2 = threading.Thread(target=worker, args=("b", "kb-b"))
                 t1.start()

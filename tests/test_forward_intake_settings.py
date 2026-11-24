@@ -9,7 +9,7 @@
 **字段存在**（不然 dataclass 构造直接 TypeError，插件加载失败）
 与**值真的透到底**（不然是静默失效，比崩溃更难发现）。
 
-注意：本模块只导入插件自身的模块，不导入 `astrbot_host.controller`，
+注意：本模块只导入插件自身的模块，不导入 `digital_life_host.controller`，
 后者会拉进真实 AstrBot SDK。宿主端到端装配在 AstrBot 自带 Python 下另跑。
 """
 
@@ -18,9 +18,9 @@ import json
 from pathlib import Path
 import unittest
 
-from astrbot_host.settings import HostSettings
-from companion_v2.adapters.astrbot.staging_config import StagingConfiguration
-from companion_v2.conversation.forwards.models import (
+from digital_life_host.settings import HostSettings
+from digital_life_core.adapters.astrbot.staging_config import StagingConfiguration
+from digital_life_core.conversation.forwards.models import (
     DEFAULT_MAX_NODES, MAX_DEPTH, MAX_FORWARDS, MAX_NODES, ForwardIntakePolicy)
 
 

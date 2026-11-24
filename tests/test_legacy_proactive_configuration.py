@@ -9,13 +9,13 @@ from types import SimpleNamespace
 import unittest
 from unittest.mock import patch
 
-from companion_v2.configuration.models import ConfigLayer
-from companion_v2.legacy.migration import ConfigIntent, LegacyMigration
-from companion_v2.legacy.proactive_configuration import (
+from digital_life_core.configuration.models import ConfigLayer
+from digital_life_core.legacy.migration import ConfigIntent, LegacyMigration
+from digital_life_core.legacy.proactive_configuration import (
     PRIVATE_RELATIONSHIP, PRIVATE_WINDOW, private_contact_configuration,
 )
-from companion_v2.proactive.configuration import GROUP, target_for
-from companion_v2.proactive.management import ContactManagement, GRANT_PREFIX
+from digital_life_core.proactive.configuration import GROUP, target_for
+from digital_life_core.proactive.management import ContactManagement, GRANT_PREFIX
 from tests.proactive_support import ContactFixture
 
 
@@ -81,8 +81,8 @@ class PrivateContactConversionTests(unittest.TestCase):
 
 class PrivateContactMigrationHostTests(ContactFixture, unittest.IsolatedAsyncioTestCase):
     async def ready(self):
-        from astrbot_host.legacy_api import LegacyMigrationWebAPI
-        from astrbot_host.legacy_contact_configuration import append_private_contact_plan
+        from digital_life_host.legacy_api import LegacyMigrationWebAPI
+        from digital_life_host.legacy_contact_configuration import append_private_contact_plan
         self.append_plan = append_private_contact_plan
         self.app = self.host().application
         self.context = self.contact_context()

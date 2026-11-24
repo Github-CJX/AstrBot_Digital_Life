@@ -36,7 +36,7 @@ class FixtureManager(PluginManager):
         # no package installation or external providers in the test process.
         entry = __import__(path, fromlist=[module_str])
         if not getattr(entry, "_reload_fixture", False):
-            adapter = importlib.import_module("companion_v2.adapters.astrbot.staging")
+            adapter = importlib.import_module("digital_life_core.adapters.astrbot.staging")
             types = adapter.NativeAdapterTypes("4.28.2", FakeEvent, FakeProvider,
                                               SimpleNamespace, SimpleNamespace, FakeReverseApi)
             controller = partial(entry.AstrBotMultiController, native_types=types, now=lambda: NOW)
@@ -61,7 +61,7 @@ async def run():
     # AstrBot imports by the plugin directory but registers the public metadata
     # name. These intentionally differ during the v7 migration workspace.
     plugin_dir_name = source.name
-    plugin_name = "astrbot_plugin_private_companion"
+    plugin_name = "astrbot_plugin_digital_life"
     entry_name = "data.plugins." + plugin_dir_name + ".main"
     for name, paths in (("data", []), ("data.plugins", [str(source.parent)])):
         package = ModuleType(name)
@@ -78,7 +78,7 @@ async def run():
     manager = FixtureManager(native, {})
     manager.plugin_store_path = str(source.parent)
     manager._get_plugin_modules = lambda: [{"pname": plugin_dir_name, "module": "main"}]
-    foreign = ModuleType("companion_v2.foreign_reload_fixture")
+    foreign = ModuleType("digital_life_core.foreign_reload_fixture")
     foreign.__file__ = str(source.parent / "another-plugin" / "foreign.py")
     sys.modules[foreign.__name__] = foreign
     with TemporaryDirectory(prefix="companion-plugin-reload-") as temporary:
@@ -104,14 +104,14 @@ async def run():
             assert controller.session.application.state == "running"
             assert metadata.module is sys.modules[entry_name]
             assert metadata.star_cls_type is metadata.module.PrivateCompanionV2StagingPlugin
-            refs = importlib.import_module("companion_v2.foundation.refs")
+            refs = importlib.import_module("digital_life_core.foundation.refs")
             context = controller.authority.context("first", "role-a")
             assert isinstance(context.scope, refs.ScopeRef)
             assert isinstance(context.actor.subject, refs.SubjectRef)
             assert context.role_binding.role.kind is refs.SubjectKind.BOT
             owner = (context.actor.subject.subject_id, context.scope, context.role_binding.role.subject_id)
             owner = json.dumps([owner[0], vars(owner[1]), owner[2]], default=lambda item: item.value, sort_keys=True)
-            manifest_key = importlib.import_module(metadata.module.__package__ + ".astrbot_host.multi_authority").MANIFEST
+            manifest_key = importlib.import_module(metadata.module.__package__ + ".digital_life_host.multi_authority").MANIFEST
             manifest = controller.authority.read(manifest_key)
             routes = {(route, tuple(methods)) for route, _, methods, _ in native.registered_web_apis}
             assert len(routes) == len(native.registered_web_apis)
@@ -145,7 +145,7 @@ async def run():
             assert plugin.staging.runtime is None
             assert native.registered_web_apis == []
             assert entry_name not in sys.modules
-            assert not any(name == "companion_v2" or (name.startswith("companion_v2.") and name != foreign.__name__)
+            assert not any(name == "digital_life_core" or (name.startswith("digital_life_core.") and name != foreign.__name__)
                            for name in sys.modules)
             assert not any(name.startswith("data.plugins." + plugin_dir_name + ".") for name in sys.modules)
             assert str(source) not in sys.path
@@ -154,9 +154,9 @@ async def run():
 
         def check_failed_initialization_cleanup():
             assert entry_name not in sys.modules
-            assert not any(name == "companion_v2" or name.startswith("companion_v2.")
+            assert not any(name == "digital_life_core" or name.startswith("digital_life_core.")
                            for name in sys.modules if name != foreign.__name__)
-            assert not any(name == "astrbot_host" or name.startswith("astrbot_host.")
+            assert not any(name == "digital_life_host" or name.startswith("digital_life_host.")
                            for name in sys.modules)
             assert str(source) not in sys.path
             assert not hasattr(sys.modules["data.plugins"], plugin_dir_name)
@@ -196,9 +196,9 @@ async def run():
                 draining = entry.PrivateCompanionV2StagingPlugin.__new__(entry.PrivateCompanionV2StagingPlugin)
                 draining.staging = SimpleNamespace(runtime=object(), terminate=AsyncMock())
                 await draining.terminate()
-                assert sys.modules[entry_name] is entry and "companion_v2" in sys.modules
+                assert sys.modules[entry_name] is entry and "digital_life_core" in sys.modules
                 assert str(source) not in sys.path
-                assert importlib.util.find_spec("companion_v2.model_gateway.replacement_rules") is not None
+                assert importlib.util.find_spec("digital_life_core.model_gateway.replacement_rules") is not None
                 draining.staging.runtime = None
                 await draining.terminate()
                 assert sys.modules[entry_name] is entry and plugin.staging._accepting

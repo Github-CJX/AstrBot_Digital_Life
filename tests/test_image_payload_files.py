@@ -3,7 +3,7 @@ from pathlib import Path
 import tempfile
 import unittest
 
-from companion_v2.storage.image_payloads import (
+from digital_life_core.storage.image_payloads import (
     MARKER_PREFIX,
     is_marker,
     load_image,

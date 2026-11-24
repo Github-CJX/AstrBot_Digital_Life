@@ -21,7 +21,7 @@ const style = fs.readFileSync(path.resolve(__dirname, '../pages/陪伴小屋/con
 const flush = () => new Promise(resolve => setImmediate(resolve));
 const settle = async () => { for (let i = 0; i < 8; i++) await flush(); };
 
-const HOST = 'astrbot_plugin_private_companion';
+const HOST = 'astrbot_plugin_digital_life';
 const NATIVE = '/' + HOST + '/perception-native';
 const CONFIG = '/' + HOST + '/config';
 const activeHarnesses = new Set();

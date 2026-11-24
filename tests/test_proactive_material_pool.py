@@ -6,14 +6,14 @@ from types import SimpleNamespace as NS
 import unittest
 from unittest.mock import Mock
 
-from companion_v2.execution.models import digest
-from companion_v2.foundation.refs import ScopeKind
-from companion_v2.proactive.balance_events import SOURCE_OWNER as BALANCE_OWNER
-from companion_v2.proactive.material_pool import (read_active_material_pool, read_material_pool,
+from digital_life_core.execution.models import digest
+from digital_life_core.foundation.refs import ScopeKind
+from digital_life_core.proactive.balance_events import SOURCE_OWNER as BALANCE_OWNER
+from digital_life_core.proactive.material_pool import (read_active_material_pool, read_material_pool,
                                                   read_proactive_contact_traces, read_role_material_pool,
                                                   read_shared_material_pool)
-from companion_v2.proactive.news_events import SOURCE_OWNER as NEWS_OWNER
-from companion_v2.proactive.official_alert_events import SOURCE_OWNER as ALERT_OWNER
+from digital_life_core.proactive.news_events import SOURCE_OWNER as NEWS_OWNER
+from digital_life_core.proactive.official_alert_events import SOURCE_OWNER as ALERT_OWNER
 
 
 NOW = datetime(2026, 10, 7, 12, 0, tzinfo=timezone.utc)

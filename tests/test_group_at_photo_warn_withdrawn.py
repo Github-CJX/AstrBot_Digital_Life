@@ -14,21 +14,21 @@ from unittest.mock import AsyncMock, Mock, patch
 from tests.test_main_no_reply import ENTRY
 from astrbot.core.message.components import At, Plain
 from astrbot.core.message.message_event_result import MessageChain, MessageEventResult, ResultContentType
-from astrbot_host import core_reply_image_prompt as image_prompt_mod
-from astrbot_host.core_reply import (
+from digital_life_host import core_reply_image_prompt as image_prompt_mod
+from digital_life_host.core_reply import (
     CORE_REPLY_CONTEXT_EXTRA,
     activate_core_reply_delivery_guard,
     prepare_core_reply_event,
 )
-from astrbot_host.core_reply_segmentation import (
+from digital_life_host.core_reply_segmentation import (
     activate_core_reply_segmentation,
     prepare_core_reply_segmentation,
 )
-from companion_v2.adapters.astrbot.group import NativeGroupBridge
-from companion_v2.adapters.astrbot.group_mentions import group_message_parts
-from companion_v2.conversation.group_timing import SELF_MENTION
-from companion_v2.execution.models import TaskError
-from companion_v2.foundation.outcome import Outcome
+from digital_life_core.adapters.astrbot.group import NativeGroupBridge
+from digital_life_core.adapters.astrbot.group_mentions import group_message_parts
+from digital_life_core.conversation.group_timing import SELF_MENTION
+from digital_life_core.execution.models import TaskError
+from digital_life_core.foundation.outcome import Outcome
 
 
 class PhotoReferenceDisabledLogTests(unittest.TestCase):

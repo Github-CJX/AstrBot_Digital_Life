@@ -14,11 +14,11 @@ import json
 from types import SimpleNamespace as NS
 import unittest
 
-from companion_v2.execution.models import TaskError
-from companion_v2.foundation.outcome import Outcome
+from digital_life_core.execution.models import TaskError
+from digital_life_core.foundation.outcome import Outcome
 from tests.test_core_reply_tools import CoreReplyToolFixture
-from astrbot_host.core_reply_tools import CoreReplyToolSession
-from companion_v2.foundation.refs import ScopeKind
+from digital_life_host.core_reply_tools import CoreReplyToolSession
+from digital_life_core.foundation.refs import ScopeKind
 
 WAKE_FACTS = {"mentioned": True, "native_wakeup": False, "mentions_others": False,
               "reply_ids": (), "mentions_all": False, "quoted_bot": False, "has_image": False}
@@ -31,7 +31,7 @@ class CoreReplyMentionGuardTests(CoreReplyToolFixture, unittest.IsolatedAsyncioT
         async def authorize(_prepared):
             return Outcome.success(True)
 
-        from astrbot_host.core_reply import CORE_REPLY_CONTEXT_EXTRA, prepare_core_reply_event
+        from digital_life_host.core_reply import CORE_REPLY_CONTEXT_EXTRA, prepare_core_reply_event
         prepare_core_reply_event(event, prepared, authorize=authorize)
         state = event.get_extra(CORE_REPLY_CONTEXT_EXTRA)
         from dataclasses import replace as _replace
@@ -107,10 +107,10 @@ class CoreReplyMentionGuardTests(CoreReplyToolFixture, unittest.IsolatedAsyncioT
     # -- PR-B: mention_force_reply_enabled (opt-in hard rule) ----------------
 
     def _set_force_reply(self, value):
-        from companion_v2.conversation.participation import (CONFIG_GROUP,
+        from digital_life_core.conversation.participation import (CONFIG_GROUP,
                                                              GroupParticipationConfigurationOwner,
                                                              configuration_fields)
-        from companion_v2.configuration.models import ConfigLayer, ConfigTarget
+        from digital_life_core.configuration.models import ConfigLayer, ConfigTarget
         from dataclasses import replace as _replace
         owner = GroupParticipationConfigurationOwner(self.app.runtime)
         fields = configuration_fields()
@@ -162,7 +162,7 @@ class CoreReplyMentionGuardTests(CoreReplyToolFixture, unittest.IsolatedAsyncioT
         self.assertEqual(decision["payload"]["mode"], "skip")
 
     async def test_force_reply_bypasses_laya_and_rejects_skip_for_direct_word(self):
-        from astrbot_host.core_reply_decision import prepare_core_reply_decision
+        from digital_life_host.core_reply_decision import prepare_core_reply_decision
         from unittest.mock import Mock
 
         event, _ = self.prepare("direct-word")
@@ -189,7 +189,7 @@ class CoreReplyMentionGuardTests(CoreReplyToolFixture, unittest.IsolatedAsyncioT
         # Issue #836: the policy dict only carries mention_force_reply_enabled
         # when the window opted in, so the off (default) rendering stays
         # byte-identical to the pre-switch model state.
-        from companion_v2.decision.prompt import build_state, render_model_state
+        from digital_life_core.decision.prompt import build_state, render_model_state
         base = {"scope_kind": "group", "user_text": "x",
                 "group_participation_policy": {"question_enabled": True, "interjection_enabled": True}}
         off = json.loads(render_model_state(build_state(dict(base))))

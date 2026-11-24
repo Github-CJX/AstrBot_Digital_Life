@@ -2,9 +2,9 @@
 
 from types import SimpleNamespace
 
-from astrbot_host.native_extensions import NativeExtensionRegistry
-from astrbot_host.native_extensions.builtins import BundledNativeLease, MANAGED_EXTENSIONS
-from companion_v2.capabilities.models import FurnitureDescriptor
+from digital_life_host.native_extensions import NativeExtensionRegistry
+from digital_life_host.native_extensions.builtins import BundledNativeLease, MANAGED_EXTENSIONS
+from digital_life_core.capabilities.models import FurnitureDescriptor
 
 
 def internal_lease(port):

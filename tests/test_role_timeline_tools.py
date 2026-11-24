@@ -3,13 +3,13 @@
 import json
 import unittest
 
-from companion_v2.conversation.tool_loop import LocalRoleTools
-from companion_v2.execution.models import TaskError
-from companion_v2.identity_policy.models import AuthorizationTier
-from companion_v2.role_work.journal import RoleJournalService
-from companion_v2.role_work.ledger import PersistentRoleLifeLedger
-from companion_v2.role_work.life.context import RoleLifeContextReader
-from companion_v2.role_work.timeline import RoleTimeline
+from digital_life_core.conversation.tool_loop import LocalRoleTools
+from digital_life_core.execution.models import TaskError
+from digital_life_core.identity_policy.models import AuthorizationTier
+from digital_life_core.role_work.journal import RoleJournalService
+from digital_life_core.role_work.ledger import PersistentRoleLifeLedger
+from digital_life_core.role_work.life.context import RoleLifeContextReader
+from digital_life_core.role_work.timeline import RoleTimeline
 from tests.test_management_access import NOW, SCOPE
 from tests.test_role_growth_tools import GrowthToolFixture
 from tests.test_role_tool_loop import answered, call, requested

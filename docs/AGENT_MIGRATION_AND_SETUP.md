@@ -23,7 +23,7 @@
 
 ## 首次配置
 
-首次使用入口为插件扩展页「陪伴小屋 → 开始使用」。开始时检查 Dashboard 返回的 `binding`、`step`、`prepared`、`settings_error` 和模型来源；状态接口为 `/astrbot_plugin_private_companion/setup/status`。
+首次使用入口为插件扩展页「陪伴小屋 → 开始使用」。开始时检查 Dashboard 返回的 `binding`、`step`、`prepared`、`settings_error` 和模型来源；状态接口为 `/astrbot_plugin_digital_life/setup/status`。
 
 按向导逐项处理：
 
@@ -33,7 +33,7 @@
 4. **主动功能、生活和群聊**：按用户要求设置。对每个群聊确认平台范围及 Bot；没有明确授权时保持关闭，不因旧版开关或旧设备权限而自动开启新版采集、设备控制或群聊参与。
 5. **完成向导和主动测试**：只有前置配置就绪后再测。测试正文和投递结果都要通过页面回执核实。`unknown` 不是失败确认，也不是重试许可。
 
-保存初始模型的宿主接口为 `POST /astrbot_plugin_private_companion/setup/model`，绑定确认、准备档案和记录分步完成分别使用 `/setup/binding/confirm`、`/setup/prepare` 与 `/setup/complete`。优先由 Dashboard 操作，不要自行拼接请求绕过向导状态顺序。
+保存初始模型的宿主接口为 `POST /astrbot_plugin_digital_life/setup/model`，绑定确认、准备档案和记录分步完成分别使用 `/setup/binding/confirm`、`/setup/prepare` 与 `/setup/complete`。优先由 Dashboard 操作，不要自行拼接请求绕过向导状态顺序。
 
 ## 升级与配置交接
 
@@ -41,9 +41,9 @@
 
 先要求用户确认已备份 V1 插件配置和数据；正在使用中的 SQLite 数据不要用普通文件复制代替一致性快照。通过「资料与维护 → 旧版资料迁入」查看发现结果和配置预览。相关接口为：
 
-- `GET /astrbot_plugin_private_companion/legacy`：发现旧版来源。
-- `GET /astrbot_plugin_private_companion/legacy/plan`：试算配置转换，不写入。
-- `GET /astrbot_plugin_private_companion/setup/status`：查看首次配置、已有配置及升级状态。
+- `GET /astrbot_plugin_digital_life/legacy`：发现旧版来源。
+- `GET /astrbot_plugin_digital_life/legacy/plan`：试算配置转换，不写入。
+- `GET /astrbot_plugin_digital_life/setup/status`：查看首次配置、已有配置及升级状态。
 
 检查 `supported_v1_versions`、`v1_root`、每项 `source_id`、`state`、`paths`、`detail`、变更数量和差异。常见状态包括 `ready`、`data_ready`、`absent`、`unreadable`、`no_handler`、`read_only`、`external`、`held` 和 `documented_skip`。状态说明以当前返回值为准；不支持、无法读取或归属不明的来源不得手工强行迁入。
 
@@ -51,15 +51,15 @@
 
 ### 2. 经确认后写入配置
 
-用户确认具体交接范围后，通过 `POST /astrbot_plugin_private_companion/legacy/apply` 提交当前 `plan_token`，以及页面允许的配置范围和选择字段。服务端会重新试算并比对来源、目标、V2 配置指纹；客户端不能提交任意字段值。若返回 `legacy_plan_stale`，重新发现和预览，再让用户确认变化，不复用旧 token。
+用户确认具体交接范围后，通过 `POST /astrbot_plugin_digital_life/legacy/apply` 提交当前 `plan_token`，以及页面允许的配置范围和选择字段。服务端会重新试算并比对来源、目标、V2 配置指纹；客户端不能提交任意字段值。若返回 `legacy_plan_stale`，重新发现和预览，再让用户确认变化，不复用旧 token。
 
-配置已写入且要求重载时，先重载插件或重启 AstrBot。随后重新读取状态并核对账号、角色、模型和运行档；只有看到重启后的实际运行状态并完成核对，才调用 `POST /astrbot_plugin_private_companion/legacy/upgrade-confirm` 确认升级核对。这个接口用于**重启后的核验**，不是迁移前同意书。
+配置已写入且要求重载时，先重载插件或重启 AstrBot。随后重新读取状态并核对账号、角色、模型和运行档；只有看到重启后的实际运行状态并完成核对，才调用 `POST /astrbot_plugin_digital_life/legacy/upgrade-confirm` 确认升级核对。这个接口用于**重启后的核验**，不是迁移前同意书。
 
 `POST /legacy/auto` 是无预览的兼容入口，不作为 Agent 的默认操作方式。除非用户明确要求该自动配置交接且页面已清楚展示其作用范围，否则用 `/legacy/plan` 后再 `/legacy/apply`。
 
 ## 导入旧版资料
 
-角色资料属于一对多映射，不从配置交接推断资料目的地。以当前已选择的新版角色打开迁移页，逐个旧版人格和群聊读取计划；主要预览入口为 `GET /astrbot_plugin_private_companion/legacy/data-plan`，角色/群范围总览为 `/legacy/scope`。在提交前向用户展示源人格、目标 Bot/账号/参与者/角色、导入类别、匹配数量、冲突和需要确认的身份映射。
+角色资料属于一对多映射，不从配置交接推断资料目的地。以当前已选择的新版角色打开迁移页，逐个旧版人格和群聊读取计划；主要预览入口为 `GET /astrbot_plugin_digital_life/legacy/data-plan`，角色/群范围总览为 `/legacy/scope`。在提交前向用户展示源人格、目标 Bot/账号/参与者/角色、导入类别、匹配数量、冲突和需要确认的身份映射。
 
 `POST /legacy/data-apply` 接收服务端生成的 `plan_token`、目标来源 ID、类别选择及页面确认字段。只勾选已预览且用户批准的类别。身份、记忆归属或群成员映射未核实就不要确认对应字段；出现冲突、目标不符、来源变化或 token 过期时停止并重新预览。
 

@@ -10,10 +10,10 @@ import unittest
 
 from astrbot.core.agent.tool import FunctionTool, ToolSet
 
-from astrbot_host.core_reply import CORE_REPLY_CONTEXT_EXTRA
-from astrbot_host.core_reply_cleanup import clean_reply_text
-from astrbot_host.core_reply_perception import _compact_private_reply_context
-from astrbot_host.core_reply_tools import (
+from digital_life_host.core_reply import CORE_REPLY_CONTEXT_EXTRA
+from digital_life_host.core_reply_cleanup import clean_reply_text
+from digital_life_host.core_reply_perception import _compact_private_reply_context
+from digital_life_host.core_reply_tools import (
     CoreReplyToolSession,
     TOOL_INSTRUCTION,
     _OfferedTool,
@@ -21,16 +21,16 @@ from astrbot_host.core_reply_tools import (
     private_tool_group,
     private_tool_manifest,
 )
-from companion_v2.configuration.models import ConfigLayer, ConfigurationError
-from companion_v2.conversation.diagnostic_tools import DIAGNOSTIC_INSTRUCTION
-from companion_v2.conversation.private_reply_context import (
+from digital_life_core.configuration.models import ConfigLayer, ConfigurationError
+from digital_life_core.conversation.diagnostic_tools import DIAGNOSTIC_INSTRUCTION
+from digital_life_core.conversation.private_reply_context import (
     BEFORE_TURNS,
     INSTRUCTION as PRIVATE_REPLY_CONTEXT_INSTRUCTION,
     capture_private_reply_context,
 )
-from companion_v2.conversation.relay_settings import DEFAULTS as RELAY_DEFAULTS, GROUP as RELAY_GROUP, target_for as relay_target_for
-from companion_v2.conversation.relay_tools import RELAY_ACTIONS, tool_descriptors as relay_tool_descriptors
-from companion_v2.conversation.reply_settings import (
+from digital_life_core.conversation.relay_settings import DEFAULTS as RELAY_DEFAULTS, GROUP as RELAY_GROUP, target_for as relay_target_for
+from digital_life_core.conversation.relay_tools import RELAY_ACTIONS, tool_descriptors as relay_tool_descriptors
+from digital_life_core.conversation.reply_settings import (
     GROUP as REPLY_GROUP,
     LEAN_PRIVATE_TOOL_GROUPS,
     PRIVATE_TOOL_DEFAULTS,
@@ -42,10 +42,10 @@ from companion_v2.conversation.reply_settings import (
     target_for as reply_target_for,
     validate as validate_reply_settings,
 )
-from companion_v2.conversation.segmentation import SegmentationPolicy
-from companion_v2.execution.models import TaskError, encode, stamp
-from companion_v2.model_gateway.cache_diagnostics import signature_for_payload
-from companion_v2.model_gateway.models import ToolSpec
+from digital_life_core.conversation.segmentation import SegmentationPolicy
+from digital_life_core.execution.models import TaskError, encode, stamp
+from digital_life_core.model_gateway.cache_diagnostics import signature_for_payload
+from digital_life_core.model_gateway.models import ToolSpec
 from dataclasses import asdict
 from tests.multi_host_support import MultiFixture
 
@@ -159,7 +159,7 @@ class PrivateToolProfileHostTests(MultiFixture, unittest.IsolatedAsyncioTestCase
         prepared = (await self.controller.prepare_core_reply(event)).unwrap()
         await self.flush()
         async def _authorize(_prepared):
-            from companion_v2.foundation.outcome import Outcome
+            from digital_life_core.foundation.outcome import Outcome
             return Outcome.success(True)
 
         event.set_extra(CORE_REPLY_CONTEXT_EXTRA, {
@@ -325,8 +325,8 @@ class PrivateToolProfileHostTests(MultiFixture, unittest.IsolatedAsyncioTestCase
                 self._set_role_reply_settings(seed["context"], cfg)
                 event, _ = await self._prepare("普通聊天", f"priv-media-skip-{label}")
                 req = NS(prompt="普通聊天", system_prompt="原人格", func_tool=ToolSet(tools=list(persona_tools)))
-                with patch("astrbot_host.image_access.ensure_image_access") as ensure_mock, \
-                        patch("astrbot_host.core_reply_image_prompt.core_image_tools") as image_tools_mock:
+                with patch("digital_life_host.image_access.ensure_image_access") as ensure_mock, \
+                        patch("digital_life_host.core_reply_image_prompt.core_image_tools") as image_tools_mock:
                     inject_core_reply_tools(event, req, application=self.app)
                     ensure_mock.assert_not_called()
                     image_tools_mock.assert_not_called()
@@ -339,8 +339,8 @@ class PrivateToolProfileHostTests(MultiFixture, unittest.IsolatedAsyncioTestCase
                 self._set_role_reply_settings(seed["context"], cfg)
                 event, _ = await self._prepare("画一张图", f"priv-media-keep-{label}")
                 req = NS(prompt="画一张图", system_prompt="原人格", func_tool=ToolSet(tools=list(persona_tools)))
-                with patch("astrbot_host.image_access.ensure_image_access") as ensure_mock, \
-                        patch("astrbot_host.core_reply_image_prompt.core_image_tools",
+                with patch("digital_life_host.image_access.ensure_image_access") as ensure_mock, \
+                        patch("digital_life_host.core_reply_image_prompt.core_image_tools",
                               side_effect=lambda session, offered: (offered, None)) as image_tools_mock:
                     inject_core_reply_tools(event, req, application=self.app)
                     ensure_mock.assert_called_once()
@@ -363,7 +363,7 @@ class PrivateToolProfileHostTests(MultiFixture, unittest.IsolatedAsyncioTestCase
                 })
                 event, _ = await self._prepare("普通聊天", f"priv-content-{profile}-{groups}")
                 request = NS(prompt="普通聊天", system_prompt="原人格", func_tool=ToolSet(tools=[]))
-                with patch("astrbot_host.content_access.ensure_content_access") as ensure_content:
+                with patch("digital_life_host.content_access.ensure_content_access") as ensure_content:
                     inject_core_reply_tools(event, request, application=self.app)
                 self.assertEqual(ensure_content.call_count, expected_calls)
 
@@ -471,7 +471,7 @@ class PrivateTurnMergeAndRepeatGuardTests(MultiFixture, unittest.IsolatedAsyncio
             self.clock.advance(timedelta(seconds=2))
 
         _, current = await self.prepare("换个话题吧", "loop-current")
-        with self.assertLogs("companion_v2.conversation.private_reply_context", level="WARNING") as logs:
+        with self.assertLogs("digital_life_core.conversation.private_reply_context", level="WARNING") as logs:
             ctx = self.capture(current)
         self.assertTrue(any("suppressed repeated assistant turns count=2" in msg for msg in logs.output))
         self.assertEqual(ctx.get("repeat_suppression"), {"detected": True, "suppressed_turns": 2})

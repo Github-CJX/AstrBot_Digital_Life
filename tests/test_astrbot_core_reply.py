@@ -5,17 +5,17 @@ import inspect
 from types import SimpleNamespace
 import unittest
 
-from astrbot_host.core_reply import (
+from digital_life_host.core_reply import (
     activate_core_reply_delivery_guard,
     inject_core_reply_prompt,
     prepare_core_reply_event,
     restore_core_reply_event,
 )
-from companion_v2.execution.models import TaskError
-from companion_v2.foundation.outcome import Outcome
+from digital_life_core.execution.models import TaskError
+from digital_life_core.foundation.outcome import Outcome
 
 
-CONTEXT_EXTRA_KEY = "_companion_v2_core_reply_context"
+CONTEXT_EXTRA_KEY = "_digital_life_core_core_reply_context"
 
 
 @dataclass

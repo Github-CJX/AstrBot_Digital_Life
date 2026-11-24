@@ -7,8 +7,8 @@ import unittest
 from unittest.mock import AsyncMock, patch
 
 from tests import astrbot_data_root  # Establish isolation before the SDK import.
-from astrbot_host.account_session_api import AccountSessionWebAPI
-from astrbot_host.bootstrap_provider import supported_text_provider, text_provider_predicate
+from digital_life_host.account_session_api import AccountSessionWebAPI
+from digital_life_host.bootstrap_provider import supported_text_provider, text_provider_predicate
 from tests.group_host_support import group_config
 
 
@@ -36,13 +36,13 @@ class AccountTargetSyncTests(unittest.IsolatedAsyncioTestCase):
     async def save(self, **body):
         request = NS(username="admin", query={},
             body=AsyncMock(return_value=json.dumps(body).encode("utf-8")))
-        with patch("astrbot_host.account_session_api.request", request):
+        with patch("digital_life_host.account_session_api.request", request):
             return await self.api.save()
 
     async def add_role(self, **body):
         request = NS(username="admin", query={},
             body=AsyncMock(return_value=json.dumps(body, ensure_ascii=False).encode("utf-8")))
-        with patch("astrbot_host.account_session_api.request", request):
+        with patch("digital_life_host.account_session_api.request", request):
             return await self.api.add_role()
 
     async def test_inline_role_preserves_other_accounts_and_group_routes(self):
@@ -248,7 +248,7 @@ class SharedModelProviderBootstrapTests(unittest.IsolatedAsyncioTestCase):
     async def call(self, **body):
         request = NS(username="admin", query={},
             body=AsyncMock(return_value=json.dumps(body, ensure_ascii=False).encode("utf-8")))
-        with patch("astrbot_host.account_session_api.request", request):
+        with patch("digital_life_host.account_session_api.request", request):
             return await self.api.save_model_provider()
 
     def test_blank_config_uses_astrbot_current_provider_automatically(self):

@@ -2,12 +2,12 @@ from datetime import timedelta
 import json
 import unittest
 
-from companion_v2.execution.models import TaskContext, stamp
-from companion_v2.foundation.refs import AudienceRef
-from companion_v2.identity_policy.personas import RuntimeIdentity
-from companion_v2.memory import codec
-from companion_v2.memory.management import MemoryManagement
-from companion_v2.memory.models import Proposal
+from digital_life_core.execution.models import TaskContext, stamp
+from digital_life_core.foundation.refs import AudienceRef
+from digital_life_core.identity_policy.personas import RuntimeIdentity
+from digital_life_core.memory import codec
+from digital_life_core.memory.management import MemoryManagement
+from digital_life_core.memory.models import Proposal
 from tests.test_host_application import HostFixture
 from tests.test_management_access import SCOPE
 
@@ -19,7 +19,7 @@ class MemoryProviderHostTests(HostFixture, unittest.IsolatedAsyncioTestCase):
 
     def bind(self, app, context):
         return app.provider_registry.bind(context, capability_id="memory.query", capability_version="1.0",
-                                           provider_id="companion_v2.memory").unwrap()
+                                           provider_id="digital_life_core.memory").unwrap()
 
     def request(self, bound):
         return dict(schema_version="memory.query.v1", capability_id="memory.query", capability_version="1.0",

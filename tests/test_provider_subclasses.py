@@ -13,9 +13,9 @@ import unittest
 from astrbot.core.agent.tool import FunctionTool, ToolSet
 from astrbot.core.provider.sources.openai_source import ProviderOpenAIOfficial
 
-from companion_v2.adapters.astrbot.provider import AstrBotTextProvider, UsageTariff, provider_fingerprint
-from companion_v2.adapters.astrbot.provider_catalog import TextProviderSettings, assemble_providers
-from companion_v2.execution.models import ProviderBinding
+from digital_life_core.adapters.astrbot.provider import AstrBotTextProvider, UsageTariff, provider_fingerprint
+from digital_life_core.adapters.astrbot.provider_catalog import TextProviderSettings, assemble_providers
+from digital_life_core.execution.models import ProviderBinding
 from tests.segmentation_stream_support import native_provider
 
 

@@ -5,16 +5,16 @@ from datetime import timedelta
 import json
 import unittest
 
-from companion_v2.conversation.diagnostic_tools import (
+from digital_life_core.conversation.diagnostic_tools import (
     DiagnosticRoleSession, diagnostic_query, diagnostic_tool_specs, proposal_document,
 )
-from companion_v2.conversation.foreground import ClaimKind, DraftClaim, EvidencePromptCompiler, ForegroundContextAssembler, ModelDraft, PromptMaterial
-from companion_v2.conversation.models import InboundConversationEvent
-from companion_v2.diagnostics.models import DiagnosticError
-from companion_v2.foundation.refs import SourceRef, SubjectKind, SubjectRef, VersionRef
-from companion_v2.identity_policy.models import AuthorizationTier
-from companion_v2.sources.models import SourceRecord
-from companion_v2.sources.repositories import SourceRepository
+from digital_life_core.conversation.foreground import ClaimKind, DraftClaim, EvidencePromptCompiler, ForegroundContextAssembler, ModelDraft, PromptMaterial
+from digital_life_core.conversation.models import InboundConversationEvent
+from digital_life_core.diagnostics.models import DiagnosticError
+from digital_life_core.foundation.refs import SourceRef, SubjectKind, SubjectRef, VersionRef
+from digital_life_core.identity_policy.models import AuthorizationTier
+from digital_life_core.sources.models import SourceRecord
+from digital_life_core.sources.repositories import SourceRepository
 from tests.test_diagnostics import DiagnosticFixture
 from tests.test_management_access import INSTALLATION, NOW, SCOPE
 

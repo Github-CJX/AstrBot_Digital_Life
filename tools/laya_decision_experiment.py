@@ -18,7 +18,7 @@ ROOT = Path(__file__).resolve().parents[1]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
-from companion_v2.decision.prompt import DECISION_QUESTIONS, build_state
+from digital_life_core.decision.prompt import DECISION_QUESTIONS, build_state
 
 
 DEFAULT_LABELS = {
@@ -1315,8 +1315,8 @@ def evaluate(args) -> None:
 
 def evaluate_client(args) -> None:
     from laya import Router
-    from companion_v2.decision import client as decision_client
-    from astrbot_host.laya_client import LayaDecisionClient
+    from digital_life_core.decision import client as decision_client
+    from digital_life_host.laya_client import LayaDecisionClient
 
     _, cases = datasets()
     router = Router(models={"multilingual": args.model}, default="multilingual", max_loaded=1)

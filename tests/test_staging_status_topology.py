@@ -10,10 +10,10 @@ from unittest.mock import AsyncMock, patch
 from tests.test_astrbot_staging_host import WebContext, host_config
 from tests.native_adapter_support import FakeEvent, FakeProvider, FakeReverseApi
 from tests.test_management_access import NOW
-from astrbot_host.binding_store import PendingBinding, write_binding
-from astrbot_host.controller import AstrBotStagingController
-from astrbot_host.identity_derivation import derive_bot_id, derive_role_id
-from companion_v2.adapters.astrbot.staging import NativeAdapterTypes
+from digital_life_host.binding_store import PendingBinding, write_binding
+from digital_life_host.controller import AstrBotStagingController
+from digital_life_host.identity_derivation import derive_bot_id, derive_role_id
+from digital_life_core.adapters.astrbot.staging import NativeAdapterTypes
 
 
 class StagingStatusTopologyTests(unittest.IsolatedAsyncioTestCase):
@@ -46,8 +46,8 @@ class StagingStatusTopologyTests(unittest.IsolatedAsyncioTestCase):
         handler = next(handler for route, handler, _, _ in self.native.registered_web_apis
                        if route.endswith("/staging/status"))
         before = self.files()
-        with patch("astrbot_host.web_api.request", NS(username="admin", query={})), \
-             patch("astrbot_host.web_api.display_names",
+        with patch("digital_life_host.web_api.request", NS(username="admin", query={})), \
+             patch("digital_life_host.web_api.display_names",
                    return_value=NS(targets=AsyncMock(side_effect=lambda rows: rows))):
             response = await handler()
         self.assertEqual(response["status"], "ok")
@@ -70,8 +70,8 @@ class StagingStatusTopologyTests(unittest.IsolatedAsyncioTestCase):
         handler = next(handler for route, handler, _, _ in self.native.registered_web_apis
                        if route.endswith("/staging/status"))
         expected = {".pdf": True, ".docx": False, ".xlsx": True, ".pptx": False}
-        with patch("astrbot_host.controller.parser_availability", return_value=expected), \
-             patch("astrbot_host.web_api.request", NS(username="admin", query={})):
+        with patch("digital_life_host.controller.parser_availability", return_value=expected), \
+             patch("digital_life_host.web_api.request", NS(username="admin", query={})):
             response = await handler()
         self.assertEqual(response["status"], "ok")
         self.assertEqual(response["data"]["parser_availability"], expected)
@@ -121,7 +121,7 @@ class StagingStatusTopologyTests(unittest.IsolatedAsyncioTestCase):
         self.controller.intent_path.parent.mkdir(parents=True)
         self.controller.intent_path.write_text("{broken pin\n", encoding="utf-8", newline="\n")
         before = self.files()
-        with patch("astrbot_host.web_api.request", NS(username="admin", query={})):
+        with patch("digital_life_host.web_api.request", NS(username="admin", query={})):
             status = await self.controller.web_api.api_status()
         self.assertEqual(status["status"], "ok")
         self.assertFalse(status["data"]["settings_valid"])

@@ -16,28 +16,28 @@ from astrbot.api import logger
 from astrbot.api.event import AstrMessageEvent, filter
 from astrbot.api.star import Context, Star, StarTools, register
 
-from .astrbot_host.upgrade_source import preserve_host_configuration
+from .digital_life_host.upgrade_source import preserve_host_configuration
 
 # Keep recent plugin log records in memory for the governance page. This is
 # process-local and dashboard-only; it never creates or rotates a log file.
-from .astrbot_host.log_buffer import install_log_buffer
+from .digital_life_host.log_buffer import install_log_buffer
 install_log_buffer()
 
 # AstrBot can prune keys unknown to the new schema before constructing the Star.
 preserve_host_configuration()
 
-from .astrbot_host.import_lifecycle import activate_plugin_imports, retire_plugin_imports
+from .digital_life_host.import_lifecycle import activate_plugin_imports, retire_plugin_imports
 
 # AstrBot imports plugins as ``data.plugins.<directory>.main`` without adding
 # the plugin directory itself to sys.path.  The isolated core intentionally
-# keeps its release package name ``companion_v2``; this host entry owns that
+# keeps its release package name ``digital_life_core``; this host entry owns that
 # one import path and releases it after a clean plugin shutdown.
 _PLUGIN_ROOT = str(Path(__file__).resolve().parent)
 _CORE_PATH_INSERTED = activate_plugin_imports(_PLUGIN_ROOT, __name__)
 
-from .astrbot_host.multi_controller import AstrBotMultiController
-from .astrbot_host.conversation_reset import install_native_reset_marker
-from .astrbot_host.core_reply import (
+from .digital_life_host.multi_controller import AstrBotMultiController
+from .digital_life_host.conversation_reset import install_native_reset_marker
+from .digital_life_host.core_reply import (
     CORE_REPLY_CONTEXT_EXTRA,
     SILENT_SEND_DENIAL_CODES,
     activate_core_reply_delivery_guard,
@@ -49,18 +49,18 @@ from .astrbot_host.core_reply import (
     restore_core_reply_event,
     restore_core_reply_prepared,
 )
-from .astrbot_host.core_reply_tools import inject_core_reply_tools, inject_core_turn_notes
-from .astrbot_host.core_reply_preparation import measure_core_preparation
-from .astrbot_host.core_reply_decision import prepare_core_reply_decision
-from .astrbot_host.core_reply_closing import prepare_private_closing_decision
-from .astrbot_host.native import warm_session_settings
-from .astrbot_host.core_reply_tool_dispatch import observe_core_tool_dispatch_begin, restore_core_tool_dispatch
-from .astrbot_host.core_reply_turn_gate import close_core_reply_turn, install_core_reply_turn
-from .astrbot_host.core_reply_tool_guard import (
+from .digital_life_host.core_reply_tools import inject_core_reply_tools, inject_core_turn_notes
+from .digital_life_host.core_reply_preparation import measure_core_preparation
+from .digital_life_host.core_reply_decision import prepare_core_reply_decision
+from .digital_life_host.core_reply_closing import prepare_private_closing_decision
+from .digital_life_host.native import warm_session_settings
+from .digital_life_host.core_reply_tool_dispatch import observe_core_tool_dispatch_begin, restore_core_tool_dispatch
+from .digital_life_host.core_reply_turn_gate import close_core_reply_turn, install_core_reply_turn
+from .digital_life_host.core_reply_tool_guard import (
     close_core_reply_tool_guard, install_core_reply_tool_guard, mark_managed_turn,
 )
-from .astrbot_host.core_reply_mentions import prepare_bare_mention_request
-from .astrbot_host.core_reply_forwards import (
+from .digital_life_host.core_reply_mentions import prepare_bare_mention_request
+from .digital_life_host.core_reply_forwards import (
     apply_debounced_private_merge,
     await_event_forwards_parsed,
     claim_core_reply_forward_injection,
@@ -80,55 +80,55 @@ from .astrbot_host.core_reply_forwards import (
     private_debounce_input,
     resolve_forward_intake_policy,
 )
-from .astrbot_host.core_reply_native_send import inject_core_reply_send_tool
-from .astrbot_host.core_reply_perception import (
+from .digital_life_host.core_reply_native_send import inject_core_reply_send_tool
+from .digital_life_host.core_reply_perception import (
     inject_core_reply_perception_context, inject_core_reply_perception_policy,
 )
-from .astrbot_host.native_extensions.host_events import (
+from .digital_life_host.native_extensions.host_events import (
     prepare_native_host_request, observe_native_host_response, observe_native_host_result,
 )
-from .astrbot_host.core_reply_segmentation import (
+from .digital_life_host.core_reply_segmentation import (
     activate_core_reply_segmentation, prepare_core_reply_segmentation,
     prepare_core_reply_streaming_boundary, prepare_core_result_decoration,
 )
-from .astrbot_host.core_reply_tracking import (
+from .digital_life_host.core_reply_tracking import (
     activate_core_reply_tracking, adopt_core_reply_tracking, finish_core_reply_tracking,
     mark_core_reply_inflight, observe_core_group_participation, prepare_core_reply_tracking,
 )
-from .astrbot_host.core_reply_telemetry import (
+from .digital_life_host.core_reply_telemetry import (
     finish_core_reply_telemetry, observe_core_agent_begin, observe_core_agent_done,
     observe_core_llm_response, observe_core_reply_delivery, observe_core_tool_finished,
     observe_core_tool_started, observe_core_waiting_llm_request, prepare_core_reply_telemetry,
     observe_core_reply_suppressed,
 )
-from .astrbot_host.calendar_command import parse_calendar_command
-from .astrbot_host.functional_commands import classify_functional_command, inject_functional_command_instruction
-from .astrbot_host.group_command import receive_group_llm_command
-from .astrbot_host.reset_command import receive_reset_command
-from .astrbot_host.phone_command import receive_phone_confirmation
-from companion_v2.conversation.group_llm_block import GroupLLMBlock
-from companion_v2.conversation.group_timing import SELF_MENTION
-from companion_v2.conversation import debounce_log
-from .astrbot_host.private_debounce import PrivateDebounce, PrivateDeliveryDedup
-from .astrbot_host.group_debounce import GroupDebounce, group_plain_text, replace_group_plain_text
-from companion_v2.adapters.astrbot.group import group_event_route
-from companion_v2.adapters.astrbot.voice_stt import has_external_stt_extra, read_stt_extra
-from .astrbot_host.private_reply_followup import PrivateReplyFollowUps
-from .astrbot_host.core_reply_followup_guard import CoreReplyFollowUpGuard
-from .astrbot_host.event_routing import (
+from .digital_life_host.calendar_command import parse_calendar_command
+from .digital_life_host.functional_commands import classify_functional_command, inject_functional_command_instruction
+from .digital_life_host.group_command import receive_group_llm_command
+from .digital_life_host.reset_command import receive_reset_command
+from .digital_life_host.phone_command import receive_phone_confirmation
+from digital_life_core.conversation.group_llm_block import GroupLLMBlock
+from digital_life_core.conversation.group_timing import SELF_MENTION
+from digital_life_core.conversation import debounce_log
+from .digital_life_host.private_debounce import PrivateDebounce, PrivateDeliveryDedup
+from .digital_life_host.group_debounce import GroupDebounce, group_plain_text, replace_group_plain_text
+from digital_life_core.adapters.astrbot.group import group_event_route
+from digital_life_core.adapters.astrbot.voice_stt import has_external_stt_extra, read_stt_extra
+from .digital_life_host.private_reply_followup import PrivateReplyFollowUps
+from .digital_life_host.core_reply_followup_guard import CoreReplyFollowUpGuard
+from .digital_life_host.event_routing import (
     COMPANION_INTAKE_PRIORITY, competing_command_handler, suppress_default_reply,
 )
-from .astrbot_host.shared_host_migration import migrate_single_target_config
-from .astrbot_host.storage_location import prepare_storage_root, resolve_data_root
-from companion_v2.product import PRODUCT_VERSION
-from companion_v2.diagnostics.inbound import InboundNoReplyLedger, SUPPRESSED, UNMET
-from companion_v2.conversation.private_reply_context import merged_input_sequence
-from .astrbot_host.integration_registry import UnifiedCompanionExtensionAPI
-from .astrbot_host.recalls import is_notice_event
-from .astrbot_host.stranger_notice import refuse_stranger
+from .digital_life_host.shared_host_migration import migrate_single_target_config
+from .digital_life_host.storage_location import prepare_storage_root, resolve_data_root
+from digital_life_core.product import PRODUCT_VERSION
+from digital_life_core.diagnostics.inbound import InboundNoReplyLedger, SUPPRESSED, UNMET
+from digital_life_core.conversation.private_reply_context import merged_input_sequence
+from .digital_life_host.integration_registry import UnifiedCompanionExtensionAPI
+from .digital_life_host.recalls import is_notice_event
+from .digital_life_host.stranger_notice import refuse_stranger
 
 
-PLUGIN_NAME = "astrbot_plugin_private_companion"
+PLUGIN_NAME = "astrbot_plugin_digital_life"
 PLUGIN_VERSION = PRODUCT_VERSION
 _ACTIVE_EXTENSION_API = None
 
@@ -288,7 +288,7 @@ def _should_skip_hijacked_external_stt(event: Any) -> bool:
 @register(
     PLUGIN_NAME,
     "menglimi",
-    "我会永远陪着你 V2.0 统一陪伴宿主，整合核心生活能力与公开拓展 API。",
+    "Digital Life 开发版（基于 menglimi 的陪伴插件 7.3.1）",
     PLUGIN_VERSION,
 )
 class PrivateCompanionV2StagingPlugin(Star):
@@ -306,7 +306,9 @@ class PrivateCompanionV2StagingPlugin(Star):
             self._session_settings_warm_task = None
             self._qzone_life_publisher = None
             self.config = config if config is not None else {}
-            default_data_root = resolve_data_root(Path(StarTools.get_data_dir(PLUGIN_NAME)).resolve())
+            raw_data_root = Path(StarTools.get_data_dir(PLUGIN_NAME))
+            from .digital_life_host.fork_guard import validate_default_data_root
+            default_data_root = resolve_data_root(validate_default_data_root(raw_data_root))
             data_root = prepare_storage_root(default_data_root, self.config)
             data_root.mkdir(parents=True, exist_ok=True)
             migrated, changed = migrate_single_target_config(self.config)
@@ -410,7 +412,7 @@ class PrivateCompanionV2StagingPlugin(Star):
     def _harassment_guard(self):
         guard = getattr(self, "_harassment", None)
         if guard is None:
-            from .astrbot_host.harassment import HarassmentGuard
+            from .digital_life_host.harassment import HarassmentGuard
             guard = HarassmentGuard()
             self._harassment = guard
         return guard
@@ -720,10 +722,10 @@ class PrivateCompanionV2StagingPlugin(Star):
                 warm_session_settings(), name="companion-v2-session-settings-warmup")
         # Start both drivers before host startup; each checks its own readiness.
         if getattr(self, "_automatic_backup", None) is None:
-            from .astrbot_host.automatic_backup import AutomaticBackup
+            from .digital_life_host.automatic_backup import AutomaticBackup
             self._automatic_backup = AutomaticBackup(self.staging).start()
         if self._qzone_life_publisher is None:
-            from .astrbot_host.qzone_life_publish import QzoneLifePublisher
+            from .digital_life_host.qzone_life_publish import QzoneLifePublisher
             self._qzone_life_publisher = QzoneLifePublisher(self.staging).start()
         if self.staging.settings is None or not self.staging.settings.enabled:
             logger.info("[CompanionV2] 共享宿主已加载，等待账号与人格配置")
@@ -1045,14 +1047,14 @@ class PrivateCompanionV2StagingPlugin(Star):
                 observe_core_reply_delivery(event, stage)
 
         def finish_core_reply_end():
-            from .astrbot_host.core_reply_presence import observe_native_reply_presence
+            from .digital_life_host.core_reply_presence import observe_native_reply_presence
             application = getattr(getattr(self.staging, "session", None), "application", None)
             observe_native_reply_presence(application, prepared, "finished")
 
         async def prepare_core_voice(current, message, authorize, segment_index, segment_count):
-            from .astrbot_host.core_reply_voice import prepare_core_reply_voice_message
-            from .astrbot_host.core_reply_reaction_delivery import prepare_core_reaction_message
-            from .astrbot_host.core_reply_outbound import prepare_core_reply_outbound_message
+            from .digital_life_host.core_reply_voice import prepare_core_reply_voice_message
+            from .digital_life_host.core_reply_reaction_delivery import prepare_core_reaction_message
+            from .digital_life_host.core_reply_outbound import prepare_core_reply_outbound_message
             session = getattr(self.staging, "session", None)
             message = await prepare_core_reaction_message(
                 event, message, authorize=authorize,
@@ -1719,16 +1721,16 @@ class PrivateCompanionV2StagingPlugin(Star):
     def _video_fusion(self):
         fusion = getattr(self, "_video_fusion_service", None)
         if fusion is None:
-            from .astrbot_host.video.fusion import VideoFusionService
+            from .digital_life_host.video.fusion import VideoFusionService
 
             fusion = VideoFusionService()
             self._video_fusion_service = fusion
         return fusion
 
     async def _route_core_video_to_image_provider(self, event):
-        from .astrbot_host.core_reply_perception import event_has_video
-        from .astrbot_host.core_reply_video_sources import key_from_context, peek
-        from companion_v2.conversation.media.understanding import media_scope_enabled
+        from .digital_life_host.core_reply_perception import event_has_video
+        from .digital_life_host.core_reply_video_sources import key_from_context, peek
+        from digital_life_core.conversation.media.understanding import media_scope_enabled
 
         state = event.get_extra(CORE_REPLY_CONTEXT_EXTRA)
         prepared = state.get("prepared") if isinstance(state, dict) else None
@@ -1809,8 +1811,8 @@ class PrivateCompanionV2StagingPlugin(Star):
             return
         if not hasattr(context, "scope") or not hasattr(context, "actor"):
             return
-        from companion_v2.configuration.models import ConfigLayer, ConfigTarget
-        from companion_v2.model_gateway.replacement_rules import checked_rules, match_route
+        from digital_life_core.configuration.models import ConfigLayer, ConfigTarget
+        from digital_life_core.model_gateway.replacement_rules import checked_rules, match_route
         at = application.tasks.now()
         target = ConfigTarget(context.scope.installation_id, ConfigLayer.WINDOW,
                               context.role_binding.role, context.scope)
@@ -1937,7 +1939,7 @@ class PrivateCompanionV2StagingPlugin(Star):
                         submit=getattr(observer, "submit", None), now=self.staging.now)
             except Exception as error:
                 logger.warning("[CompanionV2] 核心回复统计暂不可用，继续回复 error_type=%s", type(error).__name__)
-        from .astrbot_host.core_reply_presentation import capture_core_reply_tool_names
+        from .digital_life_host.core_reply_presentation import capture_core_reply_tool_names
         capture_core_reply_tool_names(event, req)
 
     @staticmethod
@@ -1973,13 +1975,13 @@ class PrivateCompanionV2StagingPlugin(Star):
         """Try visual video understanding (native Gemini / OpenAI relay + compression), then sample frames on failure."""
         from pathlib import Path
         from astrbot.core.agent.message import TextPart
-        from companion_v2.conversation.media.models import MAX_TURN_BYTES, MAX_TURN_FRAMES
-        from companion_v2.conversation.media.video.models import MAX_TURN_VIDEO_MS, MAX_VIDEOS, MAX_VIDEO_BYTES
-        from .astrbot_host.core_reply_perception import neutralize_video_placeholder
-        from .astrbot_host.video.container import inspect_container
-        from .astrbot_host.video.core_understanding import (
+        from digital_life_core.conversation.media.models import MAX_TURN_BYTES, MAX_TURN_FRAMES
+        from digital_life_core.conversation.media.video.models import MAX_TURN_VIDEO_MS, MAX_VIDEOS, MAX_VIDEO_BYTES
+        from .digital_life_host.core_reply_perception import neutralize_video_placeholder
+        from .digital_life_host.video.container import inspect_container
+        from .digital_life_host.video.core_understanding import (
             select_native_video_routes, summarize_original_video)
-        from .astrbot_host.video.loader import decode_video
+        from .digital_life_host.video.loader import decode_video
 
         parts = getattr(request, "extra_user_content_parts", None)
         if not isinstance(parts, list) or (not originals and not fetch_errors) or len(originals) > MAX_VIDEOS:
@@ -2124,7 +2126,7 @@ class PrivateCompanionV2StagingPlugin(Star):
 
     async def _attach_core_reply_videos(self, prepared, request, *, event=None):
         """把上一条群消息里被文本化丢弃的视频补挂进这一轮请求。"""
-        from .astrbot_host.core_reply_video_sources import key_from_context, take
+        from .digital_life_host.core_reply_video_sources import key_from_context, take
         state = prepared if isinstance(prepared, Mapping) else {}
         context = state.get("context")
         scope = getattr(context, "scope", None)
@@ -2133,20 +2135,20 @@ class PrivateCompanionV2StagingPlugin(Star):
         locators = take(key_from_context(context))
         if not locators:
             return
-        from .astrbot_host.core_reply_perception import extract_video_question, video_request_state
+        from .digital_life_host.core_reply_perception import extract_video_question, video_request_state
         if video_request_state(request) in ("native_summary", "sampled_frames", "native_and_sampled", "external_summary"):
             return
         application = getattr(getattr(self.staging, "session", None), "application", None)
         settings = self._video_understanding_settings(application, context)
         if settings.get("video_understanding_enabled") is not True:
             return
-        from companion_v2.conversation.media.understanding import media_scope_enabled
+        from digital_life_core.conversation.media.understanding import media_scope_enabled
         if not media_scope_enabled(settings, "video_understanding", scope):
             return
-        from companion_v2.conversation.media.video.models import MAX_VIDEOS
-        from .astrbot_host.video.fusion import MAX_CORE_VIDEO_DOWNLOAD_BYTES
-        from .astrbot_host.video.loader import fetch_native_video_bytes
-        from .astrbot_host.video.openai_compat_video import sanitize_video_error
+        from digital_life_core.conversation.media.video.models import MAX_VIDEOS
+        from .digital_life_host.video.fusion import MAX_CORE_VIDEO_DOWNLOAD_BYTES
+        from .digital_life_host.video.loader import fetch_native_video_bytes
+        from .digital_life_host.video.openai_compat_video import sanitize_video_error
         originals = []
         fetch_errors = []
         for idx, locator in enumerate(locators[:MAX_VIDEOS], 1):
@@ -2175,7 +2177,7 @@ class PrivateCompanionV2StagingPlugin(Star):
         scope = getattr(context, "scope", None)
         if getattr(getattr(scope, "kind", None), "value", None) not in ("private", "group"):
             return
-        from .astrbot_host.core_reply_perception import (
+        from .digital_life_host.core_reply_perception import (
             extract_video_question, neutralize_video_placeholder,
             video_placeholders, video_request_state)
 
@@ -2185,7 +2187,7 @@ class PrivateCompanionV2StagingPlugin(Star):
         settings = self._video_understanding_settings(application, context)
         if settings.get("video_understanding_enabled") is not True:
             return
-        from companion_v2.conversation.media.understanding import media_scope_enabled
+        from digital_life_core.conversation.media.understanding import media_scope_enabled
 
         if not media_scope_enabled(settings, "video_understanding", scope):
             return
@@ -2195,11 +2197,11 @@ class PrivateCompanionV2StagingPlugin(Star):
             return
         from pathlib import Path
         from urllib.parse import urlparse
-        from companion_v2.conversation.media.video.models import MAX_VIDEOS
-        from .astrbot_host.video.fusion import MAX_CORE_VIDEO_DOWNLOAD_BYTES
-        from .astrbot_host.video.loader import (
+        from digital_life_core.conversation.media.video.models import MAX_VIDEOS
+        from .digital_life_host.video.fusion import MAX_CORE_VIDEO_DOWNLOAD_BYTES
+        from .digital_life_host.video.loader import (
             fetch_placeholder_ref_video_bytes, read_host_resolved_video_bytes)
-        from .astrbot_host.video.openai_compat_video import sanitize_video_error
+        from .digital_life_host.video.openai_compat_video import sanitize_video_error
 
         originals = []
         fetch_errors = []
@@ -2237,7 +2239,7 @@ class PrivateCompanionV2StagingPlugin(Star):
         """读这个窗口的媒体理解设置；读不到就返回 {}（等于本轮不挂）。
 
         必须走 ``reply_settings.capture``：媒体理解字段属于
-        ``conversation.presentation``（``companion_v2/conversation/reply_settings.py:24-26``
+        ``conversation.presentation``（``digital_life_core/conversation/reply_settings.py:24-26``
         导入的 ``UNDERSTANDING_DEFAULTS``），``capture`` 会补上文档化的默认值并跑
         一遍 ``understanding.settings`` 校验。读不到时必须等于不挂——这些开关的默认
         值是 True，把异常吞成默认开就成了绕过用户的显式关闭。
@@ -2254,9 +2256,9 @@ class PrivateCompanionV2StagingPlugin(Star):
 
     @filter.on_agent_begin(priority=-1000000)
     async def observe_companion_core_agent_begin(self, event: AstrMessageEvent, run_context):
-        from .astrbot_host.core_reply_media_prompt import finalize_core_reply_media_prompt
+        from .digital_life_host.core_reply_media_prompt import finalize_core_reply_media_prompt
         finalize_core_reply_media_prompt(event, run_context)
-        from .astrbot_host.core_reply_voice_authoring import prepare_core_voice_authoring
+        from .digital_life_host.core_reply_voice_authoring import prepare_core_voice_authoring
         prepare_core_voice_authoring(event, run_context)
         # One reply per turn: hold a tool round's prose until the turn says which
         # text is the answer. The dispatch observer installs first because it owns
@@ -2276,7 +2278,7 @@ class PrivateCompanionV2StagingPlugin(Star):
 
     @filter.on_agent_done()
     async def observe_companion_core_agent_done(self, event: AstrMessageEvent, run_context, response):
-        from .astrbot_host.core_reply_voice_authoring import restore_core_voice_authoring
+        from .digital_life_host.core_reply_voice_authoring import restore_core_voice_authoring
         self._private_reply_followups().finish(event)
         restore_core_voice_authoring(event)
         await close_core_reply_turn(event, response, release=True)
@@ -2308,7 +2310,7 @@ class PrivateCompanionV2StagingPlugin(Star):
     # sees every other plugin's rewrite of the same request.
     @filter.on_llm_request(priority=-1000000)
     async def repair_companion_core_request_history(self, event: AstrMessageEvent, req):
-        from .astrbot_host.core_reply_history_guard import repair_request_history
+        from .digital_life_host.core_reply_history_guard import repair_request_history
         repair_request_history(event, req)
 
     # 外部视频插件晚于感知注入，当前视频和跨轮视频也在这里补上。优先本轮视频，
@@ -2317,7 +2319,7 @@ class PrivateCompanionV2StagingPlugin(Star):
     # 改写失败只记一行告警：一句感知标注不值得让整轮回复失败。
     @filter.on_llm_request(priority=-1000000)
     async def restate_companion_core_video_state(self, event: AstrMessageEvent, req):
-        from .astrbot_host.core_reply_perception import rewrite_core_reply_video_state
+        from .digital_life_host.core_reply_perception import rewrite_core_reply_video_state
         state = event.get_extra(CORE_REPLY_CONTEXT_EXTRA)
         prepared = state.get("prepared") if isinstance(state, dict) else None
         try:
@@ -2337,12 +2339,12 @@ class PrivateCompanionV2StagingPlugin(Star):
 
     @filter.on_agent_begin(priority=-1000000)
     async def repair_companion_core_runner_history(self, event: AstrMessageEvent, run_context):
-        from .astrbot_host.core_reply_history_guard import repair_run_context_history
+        from .digital_life_host.core_reply_history_guard import repair_run_context_history
         repair_run_context_history(event, run_context)
 
     @filter.after_message_sent(priority=1000000)
     async def observe_companion_core_reply_sent(self, event: AstrMessageEvent):
-        from .astrbot_host.core_reply_voice_authoring import restore_core_voice_authoring
+        from .digital_life_host.core_reply_voice_authoring import restore_core_voice_authoring
         followup_guard = getattr(self, "_core_followup_guard", None)
         if followup_guard is not None:
             followup_guard.finish_turn(event)
@@ -2390,7 +2392,7 @@ class PrivateCompanionV2StagingPlugin(Star):
         try:
             getter = getattr(event, "get_result", None)
             result = getter() if callable(getter) else None
-            from companion_v2.conversation.text_processing import strip_internal_expression_protocol
+            from digital_life_core.conversation.text_processing import strip_internal_expression_protocol
             # Both the sendable chain and the provider chain can carry the raw
             # model text; strip every plain part of each so a result assembled
             # after the response observer still cannot leak the protocol.
@@ -2444,8 +2446,8 @@ class PrivateCompanionV2StagingPlugin(Star):
             except (KeyError, TypeError, ValueError):
                 return
         from astrbot.core.message.message_event_result import MessageChain
-        from .astrbot_host.core_reply_voice import capture_core_voice_message
-        from .astrbot_host.core_reply_idempotency import should_drop_native_tool_response
+        from .digital_life_host.core_reply_voice import capture_core_voice_message
+        from .digital_life_host.core_reply_idempotency import should_drop_native_tool_response
 
         visible = capture_core_voice_message(event, MessageChain(chain=list(result.chain)))
         if should_drop_native_tool_response(event, visible):
@@ -2469,9 +2471,9 @@ class PrivateCompanionV2StagingPlugin(Star):
 
     @filter.on_llm_response()
     async def observe_companion_model_session(self, event: AstrMessageEvent, response):
-        from .astrbot_host.core_reply_reaction_delivery import observe_core_reaction_response
+        from .digital_life_host.core_reply_reaction_delivery import observe_core_reaction_response
         observe_core_reaction_response(event, response)
-        from .astrbot_host.core_reply_cleanup import clean_reply_text
+        from .digital_life_host.core_reply_cleanup import clean_reply_text
         if (response is not None and getattr(response, "role", None) == "assistant"
                 and not getattr(response, "is_chunk", False)):
             text = getattr(response, "completion_text", "") or ""
@@ -2482,7 +2484,7 @@ class PrivateCompanionV2StagingPlugin(Star):
                 for part in getattr(getattr(response, "result_chain", None), "chain", ()) or ():
                     if type(getattr(part, "text", None)) is str:
                         part.text, _ = clean_reply_text(part.text)
-        from .astrbot_host.core_reply_voice import observe_core_voice_response
+        from .digital_life_host.core_reply_voice import observe_core_voice_response
         observe_core_voice_response(event, response)
         observe_native_host_response(self.staging, event, response)
         observe_core_llm_response(event, response)
@@ -2584,17 +2586,17 @@ class PrivateCompanionV2StagingPlugin(Star):
                             else "[CompanionV2] 共享宿主正在收尾")
             finally:
                 try:
-                    from .astrbot_host.huawei_health.service import close_all_huawei_health_services
+                    from .digital_life_host.huawei_health.service import close_all_huawei_health_services
                     await close_all_huawei_health_services()
                 except Exception as error:
                     logger.warning("[CompanionV2] 华为健康服务停机清理失败 error_type=%s", type(error).__name__)
                 try:
-                    from .astrbot_host.laya_client import shutdown_laya_resources
+                    from .digital_life_host.laya_client import shutdown_laya_resources
                     await shutdown_laya_resources()
                 except Exception as error:
                     logger.warning("[CompanionV2] Laya 资源停机清理失败 error_type=%s", type(error).__name__)
                 try:
-                    from .astrbot_host.service_balance_script import shutdown_balance_script_workers
+                    from .digital_life_host.service_balance_script import shutdown_balance_script_workers
                     shutdown_balance_script_workers()
                 except Exception as error:
                     logger.warning("[CompanionV2] 余额脚本线程池停机清理失败 error_type=%s", type(error).__name__)

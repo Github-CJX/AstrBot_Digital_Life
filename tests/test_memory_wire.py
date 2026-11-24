@@ -4,14 +4,14 @@ from datetime import timedelta
 import sqlite3
 import unittest
 
-from companion_v2.execution.models import stamp
-from companion_v2.memory.service import MemoryService
-from companion_v2.memory.wire import EvidenceBudget, runtime_scope_from_task_context
+from digital_life_core.execution.models import stamp
+from digital_life_core.memory.service import MemoryService
+from digital_life_core.memory.wire import EvidenceBudget, runtime_scope_from_task_context
 from tests.memory_support import MemoryFixture
 from tests.test_management_access import NOW
 
 
-PROVIDER_ID = "companion_v2.memory"
+PROVIDER_ID = "digital_life_core.memory"
 PROVIDER_GENERATION = "test-generation-1"
 
 

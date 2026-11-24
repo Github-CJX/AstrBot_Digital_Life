@@ -8,8 +8,8 @@ from __future__ import annotations
 
 import unittest
 
-from companion_v2.legacy.relationship_profiles import config_relationship_profile
-from companion_v2.relationships.profile import FIELD_LIMITS
+from digital_life_core.legacy.relationship_profiles import config_relationship_profile
+from digital_life_core.relationships.profile import FIELD_LIMITS
 
 PROMPT = """对用户的称呼：比折
 用户性别：男

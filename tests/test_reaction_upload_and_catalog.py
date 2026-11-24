@@ -11,13 +11,13 @@ import unittest
 
 from PIL import Image
 
-from astrbot_host.media import inspect_image
-from astrbot_host.management_identity import dashboard_operator
-from companion_v2.conversation.media.models import MAX_IMAGE_BYTES
-from companion_v2.execution.models import TaskError
-from companion_v2.identity_policy.models import AuthorizationTier
-from companion_v2.identity_policy.object_access import ObjectAccessPolicy
-from companion_v2.storage.semantic import SemanticStore
+from digital_life_host.media import inspect_image
+from digital_life_host.management_identity import dashboard_operator
+from digital_life_core.conversation.media.models import MAX_IMAGE_BYTES
+from digital_life_core.execution.models import TaskError
+from digital_life_core.identity_policy.models import AuthorizationTier
+from digital_life_core.identity_policy.object_access import ObjectAccessPolicy
+from digital_life_core.storage.semantic import SemanticStore
 from tests import test_astrbot_staging_host as support
 from tests.animation_support import animation_bytes
 from tests.group_memory_management_support import GroupMemoryManagementFixture

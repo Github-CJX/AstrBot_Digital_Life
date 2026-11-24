@@ -5,17 +5,17 @@ from dataclasses import replace
 import json
 import unittest
 
-from companion_v2.configuration.models import ConfigLayer, ConfigTarget, ConfigurationError
-from companion_v2.conversation.delivery import DeliveryEnvelope
-from companion_v2.conversation.outbound_plan import component_order, outbound_plan
-from companion_v2.conversation.reply_settings import (
+from digital_life_core.configuration.models import ConfigLayer, ConfigTarget, ConfigurationError
+from digital_life_core.conversation.delivery import DeliveryEnvelope
+from digital_life_core.conversation.outbound_plan import component_order, outbound_plan
+from digital_life_core.conversation.reply_settings import (
     GROUP, OUTBOUND_DEFAULTS, OUTBOUND_LIMITS, ReplyConfigurationOwner,
     configuration_fields as reply_configuration_fields, outbound_settings,
 )
-from companion_v2.conversation.segmentation import SegmentationPolicy
-from companion_v2.delivery.components import build_component_plan
-from companion_v2.delivery.plan import OutboundPlan, PokePlan, VoicePlan
-from companion_v2.execution.models import TaskContext, digest
+from digital_life_core.conversation.segmentation import SegmentationPolicy
+from digital_life_core.delivery.components import build_component_plan
+from digital_life_core.delivery.plan import OutboundPlan, PokePlan, VoicePlan
+from digital_life_core.execution.models import TaskContext, digest
 from tests.group_host_support import GroupFixture, group_config
 from tests.native_adapter_support import NativeFixture, completion, final_text
 from tests.staging_bootstrap_support import wait_for_batch

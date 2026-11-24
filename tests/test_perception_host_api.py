@@ -11,7 +11,7 @@ from tests import test_astrbot_staging_host as support
 from astrbot.api.web import PluginRequest, bind_request_context
 from starlette.requests import Request
 
-from astrbot_host.perception_api import PREFIX
+from digital_life_host.perception_api import PREFIX
 
 
 class LegacyScreenProvider:
@@ -20,28 +20,28 @@ class LegacyScreenProvider:
         self.reads = 0
         self.updates = []
 
-    def companion_v2_perception_settings(self):
+    def digital_life_core_perception_settings(self):
         self.reads += 1
         return {"groups": [{"id": "runtime", "title": "运行", "fields": ["enabled"]}],
                 "fields": {"enabled": {"type": "bool"}}, "values": dict(self.values)}
 
-    def companion_v2_update_perception_settings(self, updates):
+    def digital_life_core_update_perception_settings(self, updates):
         self.updates.append(dict(updates))
         self.values.update(updates)
-        return self.companion_v2_perception_settings()
+        return self.digital_life_core_perception_settings()
 
 
 class RealityProvider:
     def __init__(self):
         self.updates = []
 
-    def companion_v2_perception_settings(self):
+    def digital_life_core_perception_settings(self):
         return {"camera": {"camera_enabled": False}, "mobile": {"enabled": False},
                 "secrets": {"pairing_token_configured": True}}
 
-    async def companion_v2_update_perception_settings(self, section, updates):
+    async def digital_life_core_update_perception_settings(self, section, updates):
         self.updates.append((section, dict(updates)))
-        return self.companion_v2_perception_settings()
+        return self.digital_life_core_perception_settings()
 
 
 class PerceptionAPITests(unittest.IsolatedAsyncioTestCase):

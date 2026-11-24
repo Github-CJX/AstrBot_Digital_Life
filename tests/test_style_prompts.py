@@ -5,19 +5,19 @@ import json
 from types import SimpleNamespace
 import unittest
 
-from companion_v2.conversation.humanized_expression import (DEFAULT_PROMPT, MAX_PROMPT_CHARS,
+from digital_life_core.conversation.humanized_expression import (DEFAULT_PROMPT, MAX_PROMPT_CHARS,
                                                            GUIDED_PROMPT, HumanizedExpressionPolicy, instruction)
-from companion_v2.conversation.text_processing import TEXT_DEFAULTS, text_policy
-from companion_v2.conversation.reply_settings import ROLE_SHARED_FIELDS, configuration_fields as reply_fields
-from companion_v2.conversation.segmentation import SegmentationPolicy
-from companion_v2.proactive.configuration import GROUP as CONTACT_GROUP, configuration_fields as contact_fields
-from companion_v2.proactive.preferences import ContactPreferences
-from companion_v2.proactive.prompts import (INSTRUCTION as CONTACT_INSTRUCTION, DEDUP_INSTRUCTION, ORIGIN_INSTRUCTIONS,
+from digital_life_core.conversation.text_processing import TEXT_DEFAULTS, text_policy
+from digital_life_core.conversation.reply_settings import ROLE_SHARED_FIELDS, configuration_fields as reply_fields
+from digital_life_core.conversation.segmentation import SegmentationPolicy
+from digital_life_core.proactive.configuration import GROUP as CONTACT_GROUP, configuration_fields as contact_fields
+from digital_life_core.proactive.preferences import ContactPreferences
+from digital_life_core.proactive.prompts import (INSTRUCTION as CONTACT_INSTRUCTION, DEDUP_INSTRUCTION, ORIGIN_INSTRUCTIONS,
                                            PURPOSES, PURPOSE_INSTRUCTIONS, VOICE_INSTRUCTION, request_for)
-from companion_v2.proactive.persona_judge import INSTRUCTION as JUDGE_INSTRUCTION
-from companion_v2.proactive.service import role_state_for_prompt
-from companion_v2.role_work.journal.models import JournalKind
-from companion_v2.role_work.journal.prompts import request_for as journal_request_for
+from digital_life_core.proactive.persona_judge import INSTRUCTION as JUDGE_INSTRUCTION
+from digital_life_core.proactive.service import role_state_for_prompt
+from digital_life_core.role_work.journal.models import JournalKind
+from digital_life_core.role_work.journal.prompts import request_for as journal_request_for
 from tests.test_management_access import ROLE, SCOPE
 from tests.test_dream_preferences import RequestForDreamTests
 
@@ -433,7 +433,7 @@ class ProactiveStyleTests(unittest.TestCase):
         self.assertIn("不要求对方先说亲近的话", PURPOSE_INSTRUCTIONS["affection"])
         self.assertIn("不要求对方先说难过", PURPOSE_INSTRUCTIONS["care"])
         self.assertIn("可核验分歧", ORIGIN_INSTRUCTIONS["relationship_event"])
-        from companion_v2.proactive.configuration import GROUP, configuration_fields
+        from digital_life_core.proactive.configuration import GROUP, configuration_fields
         fields = {field.field_id for field in configuration_fields()}
         self.assertIn(GROUP + ".contact_followup_after_minutes", fields)
         self.assertIn(GROUP + ".contact_followup_cooldown_minutes", fields)
@@ -480,8 +480,8 @@ class PromptGuardTests(unittest.TestCase):
         self.assertIn("必须有材料直接支持", JUDGE_INSTRUCTION)
 
     def test_chinese_voice_instruction_asks_for_speakable_text(self):
-        from companion_v2.conversation.voice_reply import VoiceReplyPolicy
-        from companion_v2.proactive.prompts import voice_instruction
+        from digital_life_core.conversation.voice_reply import VoiceReplyPolicy
+        from digital_life_core.proactive.prompts import voice_instruction
 
         zh = voice_instruction(VoiceReplyPolicy(language="zh"), 30)
         self.assertIn("直接朗读 text", zh)

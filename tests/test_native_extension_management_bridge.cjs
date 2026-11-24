@@ -72,7 +72,7 @@ async function harness(initial = "initial") {
     });
   }, {receipts, initial});
   await page.addScriptTag({content:sdkSource});
-  await page.evaluate(() => window.AstrBotPluginPage.__setInitialContext({pluginName:"astrbot_plugin_private_companion"}));
+  await page.evaluate(() => window.AstrBotPluginPage.__setInitialContext({pluginName:"astrbot_plugin_digital_life"}));
   for (const name of ["product-page.js", "native-extension-management.js"])
     await page.addScriptTag({content:fs.readFileSync(path.join(pageRoot, name), "utf8")});
   await page.evaluate(async () => {

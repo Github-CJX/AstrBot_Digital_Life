@@ -43,19 +43,19 @@ def _cleanup_astrbot_test_root():
 os.environ["ASTRBOT_ROOT"] = _astrbot_test_root.name
 atexit.register(_cleanup_astrbot_test_root)
 
-from astrbot_host.qzone_api import QzoneWebAPI
-from companion_v2.capabilities.qzone_access import QzoneAccess
-from companion_v2.execution.models import TaskContext, TaskError
-from companion_v2.foundation.outcome import Outcome
-from companion_v2.foundation.refs import (AudienceRef, ScopeKind, ScopeRef, SubjectKind, SubjectRef)
-from companion_v2.identity_policy.models import AuthenticatedHostPrincipal, AuthorizationTier, RoleBinding
-from companion_v2.identity_policy.object_access import ObjectAccessPolicy
-from companion_v2.identity_policy.personas import (ConversationRoute, PersonaBinding, PersonaDirectory,
+from digital_life_host.qzone_api import QzoneWebAPI
+from digital_life_core.capabilities.qzone_access import QzoneAccess
+from digital_life_core.execution.models import TaskContext, TaskError
+from digital_life_core.foundation.outcome import Outcome
+from digital_life_core.foundation.refs import (AudienceRef, ScopeKind, ScopeRef, SubjectKind, SubjectRef)
+from digital_life_core.identity_policy.models import AuthenticatedHostPrincipal, AuthorizationTier, RoleBinding
+from digital_life_core.identity_policy.object_access import ObjectAccessPolicy
+from digital_life_core.identity_policy.personas import (ConversationRoute, PersonaBinding, PersonaDirectory,
                                                    PersonaSelector, SelectorKind)
-from companion_v2.identity_policy.repository import PersistentIdentityDirectory
-from companion_v2.qzone import protocol as P
-from companion_v2.qzone.service import QzoneService
-from companion_v2.storage.runtime import StorageRuntime
+from digital_life_core.identity_policy.repository import PersistentIdentityDirectory
+from digital_life_core.qzone import protocol as P
+from digital_life_core.qzone.service import QzoneService
+from digital_life_core.storage.runtime import StorageRuntime
 
 
 NOW = datetime(2026, 10, 31, 5, 0, tzinfo=timezone.utc)
@@ -151,8 +151,8 @@ class QzoneCredentialStatusTests(unittest.IsolatedAsyncioTestCase):
 
     async def call(self, name):
         request = SimpleNamespace(username="administrator")
-        with patch("astrbot_host.qzone_api.request", request), \
-             patch("astrbot_host.qzone_api.dashboard_operator", return_value=self.operator):
+        with patch("digital_life_host.qzone_api.request", request), \
+             patch("digital_life_host.qzone_api.dashboard_operator", return_value=self.operator):
             return await getattr(self.api, name)()
 
     async def test_status_before_any_acquisition_reports_unknown_not_failed(self):

@@ -5,7 +5,7 @@ from __future__ import annotations
 import unittest
 from types import SimpleNamespace
 
-from companion_v2.adapters.astrbot.native import native_client_connected
+from digital_life_core.adapters.astrbot.native import native_client_connected
 
 
 def platform(name="aiocqhttp", client=None):

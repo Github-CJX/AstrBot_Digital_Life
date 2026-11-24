@@ -3,13 +3,13 @@
 from dataclasses import replace
 import unittest
 
-from companion_v2.conversation.relationship_context import RelationshipContext
-from companion_v2.execution.models import TaskError
-from companion_v2.foundation.refs import ScopeKind, SubjectKind, SubjectRef
-from companion_v2.identity_policy.models import AuthorizationTier
-from companion_v2.identity_policy.personas import PersonaBinding, SelectorKind
-from companion_v2.relationships.management import RelationshipMemoryManagement
-from companion_v2.relationships.service import RelationshipMemoryService
+from digital_life_core.conversation.relationship_context import RelationshipContext
+from digital_life_core.execution.models import TaskError
+from digital_life_core.foundation.refs import ScopeKind, SubjectKind, SubjectRef
+from digital_life_core.identity_policy.models import AuthorizationTier
+from digital_life_core.identity_policy.personas import PersonaBinding, SelectorKind
+from digital_life_core.relationships.management import RelationshipMemoryManagement
+from digital_life_core.relationships.service import RelationshipMemoryService
 from tests.test_conversation_messages import MessageFixture
 from tests.test_management_access import INSTALLATION, NOW, SCOPE
 from tests.test_relationship_context import remember

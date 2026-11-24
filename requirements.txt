@@ -17,7 +17,7 @@ cryptography>=42
 lunardate>=0.2
 # Bounded execution for administrator-configured presentation cleanup patterns.
 regex>=2024.11.6
-# Attachment text extraction (astrbot_host/files/parsing.py). These are imported
+# Attachment text extraction (digital_life_host/files/parsing.py). These are imported
 # lazily per suffix, so a missing one only breaks that format — and until 7.0.1
 # none of them were declared, which meant PDF and PPTX failed on a clean install
 # even though the feature was switched on.
@@ -25,8 +25,8 @@ PyMuPDF>=1.24
 python-docx>=1.1
 openpyxl>=3.1
 python-pptx>=0.6.23
-# RSS/Atom news parsing (astrbot_host/news_parsing.py) refuses entity expansion.
-# astrbot_host/controller.py imports that parser while the plugin loads, so this
+# RSS/Atom news parsing (digital_life_host/news_parsing.py) refuses entity expansion.
+# digital_life_host/controller.py imports that parser while the plugin loads, so this
 # one is not optional per feature; AstrBot declares no dependency on it either.
 defusedxml>=0.7
 # Local Reality audio device enumeration, decoding, and playback.

@@ -3,7 +3,7 @@
 import unittest
 
 from tests import astrbot_data_root  # noqa: F401 - isolate the SDK before import
-from astrbot_host.integration_api import _lifecycle_identifier
+from digital_life_host.integration_api import _lifecycle_identifier
 
 
 class LifecycleIdentifierTests(unittest.TestCase):

@@ -11,23 +11,23 @@ from unittest.mock import patch
 
 from PIL import Image
 
-from companion_v2.capabilities.models import CapabilityPackageDescriptor
-from companion_v2.conversation.external_tools import ExtensionToolDescriptor, ExternalToolInvocation
-from companion_v2.conversation.foreground import ContextContribution, ContributionState, PromptMaterial
-from companion_v2.conversation.media.generated import GeneratedImages, GeneratedImageView, INSTRUCTION, OWNER
-from companion_v2.conversation.media.models import CapturedImage, ImageDescriptor, ImageConversationEvent
-from companion_v2.conversation.messages import source_from_document
-from companion_v2.conversation.models import InboundConversationEvent
-from companion_v2.execution.models import ProviderBinding, SideEffect, TaskContext, TaskError, digest, encode, stamp
-from companion_v2.execution.runner import TaskRun
-from companion_v2.foundation.refs import AssetRef, ScopeKind, SourceRef, VersionRef
-from companion_v2.identity_policy.group_audience import group_audience
-from companion_v2.identity_policy.personas import ConversationRoute
-from companion_v2.model_gateway.models import ToolSpec
-from companion_v2.model_gateway.routing import ModelRouter
-from companion_v2.model_gateway.service import LocalModelGateway
-from companion_v2.sources.dependencies import key
-from companion_v2.sources.models import SourceRecord
+from digital_life_core.capabilities.models import CapabilityPackageDescriptor
+from digital_life_core.conversation.external_tools import ExtensionToolDescriptor, ExternalToolInvocation
+from digital_life_core.conversation.foreground import ContextContribution, ContributionState, PromptMaterial
+from digital_life_core.conversation.media.generated import GeneratedImages, GeneratedImageView, INSTRUCTION, OWNER
+from digital_life_core.conversation.media.models import CapturedImage, ImageDescriptor, ImageConversationEvent
+from digital_life_core.conversation.messages import source_from_document
+from digital_life_core.conversation.models import InboundConversationEvent
+from digital_life_core.execution.models import ProviderBinding, SideEffect, TaskContext, TaskError, digest, encode, stamp
+from digital_life_core.execution.runner import TaskRun
+from digital_life_core.foundation.refs import AssetRef, ScopeKind, SourceRef, VersionRef
+from digital_life_core.identity_policy.group_audience import group_audience
+from digital_life_core.identity_policy.personas import ConversationRoute
+from digital_life_core.model_gateway.models import ToolSpec
+from digital_life_core.model_gateway.routing import ModelRouter
+from digital_life_core.model_gateway.service import LocalModelGateway
+from digital_life_core.sources.dependencies import key
+from digital_life_core.sources.models import SourceRecord
 from tests.test_conversation_messages import MessageFixture
 from tests.test_management_access import NOW
 
@@ -203,7 +203,7 @@ class GeneratedImageSourceTests(GeneratedImageSourceFixture, unittest.IsolatedAs
         with self.assertRaises(TaskError) as caught:
             self.generated.accept(invocation, NS(**{**vars(response), "images": (capture(position=1), capture("blue", 0))}))
         self.assertEqual(caught.exception.code, "image_manifest_invalid")
-        from companion_v2.conversation.media.animation import AnimationDescriptor, CapturedAnimation, FrameDescriptor
+        from digital_life_core.conversation.media.animation import AnimationDescriptor, CapturedAnimation, FrameDescriptor
         frame = capture()
         animation = AnimationDescriptor(0, "image/png", 3, 2, len(frame.content), frame.descriptor.content_hash,
                                        1, 100, 0, False, (FrameDescriptor(0, 0, 100, frame.descriptor),))

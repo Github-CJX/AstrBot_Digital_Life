@@ -12,7 +12,7 @@ from types import SimpleNamespace as NS
 import unittest
 from unittest.mock import AsyncMock
 
-from companion_v2.foundation.outcome import Failure
+from digital_life_core.foundation.outcome import Failure
 from tests.multi_host_support import MultiFixture, multi_config
 
 
@@ -219,7 +219,7 @@ class PrivateRefusalRoutingTests(MultiFixture, unittest.IsolatedAsyncioTestCase)
 
 class MainRefusalWiringTests(unittest.IsolatedAsyncioTestCase):
     async def test_main_forwards_the_failed_preparations_explicit_refusal_context(self):
-        from companion_v2.storage.runtime import StorageRuntime
+        from digital_life_core.storage.runtime import StorageRuntime
         from tests.test_main_no_reply import ENTRY
         from tests.test_management_access import INSTALLATION, NOW
 

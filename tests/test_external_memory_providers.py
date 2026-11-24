@@ -7,11 +7,11 @@ from types import SimpleNamespace as NS
 import unittest
 from unittest.mock import AsyncMock, Mock, patch
 
-from companion_v2.adapters.astrbot.memory_owner import read_memory_owner
-from companion_v2.adapters.astrbot.memory_providers import ExternalMemoryProviderRegistry, memory_provider_registry
-from companion_v2.adapters.astrbot.memory_push import memory_push_provider
-from companion_v2.capabilities.memory_push import MemoryPushRecord, push_memory
-from companion_v2.execution.models import TaskError
+from digital_life_core.adapters.astrbot.memory_owner import read_memory_owner
+from digital_life_core.adapters.astrbot.memory_providers import ExternalMemoryProviderRegistry, memory_provider_registry
+from digital_life_core.adapters.astrbot.memory_push import memory_push_provider
+from digital_life_core.capabilities.memory_push import MemoryPushRecord, push_memory
+from digital_life_core.execution.models import TaskError
 from tests.group_host_support import GroupFixture
 
 
@@ -158,7 +158,7 @@ class ExternalMemoryRegistryTests(unittest.IsolatedAsyncioTestCase):
 
 class ExternalMemoryHostTests(GroupFixture, unittest.IsolatedAsyncioTestCase):
     async def asyncSetUp(self):
-        from astrbot_host.integration_registry import UnifiedCompanionExtensionAPI
+        from digital_life_host.integration_registry import UnifiedCompanionExtensionAPI
 
         self.app = await self.start_host()
         self.plugin = object()
@@ -240,10 +240,10 @@ class ExternalMemoryHostTests(GroupFixture, unittest.IsolatedAsyncioTestCase):
         self.assertEqual(self.writes[0]["content"], record.content)
         self.assertEqual(self.writes[0]["context"]["scope"], prepared["context"].scope.document())
         self.assertEqual(self.writes[0]["schema"], self.api.memory_provider_api_version)
-        self.assertEqual(self.writes[0]["source_plugin"], "astrbot_plugin_private_companion")
+        self.assertEqual(self.writes[0]["source_plugin"], "astrbot_plugin_digital_life")
 
     async def test_summary_uses_registered_callback_and_redacts_extra_material(self):
-        from astrbot_host.memory_linkage import read_external_memory_summary
+        from digital_life_host.memory_linkage import read_external_memory_summary
 
         summary = AsyncMock(return_value={"counts": {"preference": 3, "total": 3},
                                           "private_debug": "must not escape"})
@@ -256,7 +256,7 @@ class ExternalMemoryHostTests(GroupFixture, unittest.IsolatedAsyncioTestCase):
         self.assertEqual(summary.await_args.args[0]["purpose"], "summary")
 
     async def test_failed_read_keeps_reply_and_scoped_material_cannot_be_reused(self):
-        from astrbot_host.external_memory import external_memory_section, prepare_external_memory
+        from digital_life_host.external_memory import external_memory_section, prepare_external_memory
 
         self.register(read=AsyncMock(side_effect=RuntimeError("private provider detail")))
         prepared = await self.prepared("external-broken")
@@ -269,7 +269,7 @@ class ExternalMemoryHostTests(GroupFixture, unittest.IsolatedAsyncioTestCase):
         self.assertEqual(external_memory_section(material, self.app, prepared["context"]), "")
 
     async def test_recall_enforces_budget_and_rechecks_policy_after_await(self):
-        from astrbot_host.external_memory import prepare_external_memory
+        from digital_life_host.external_memory import prepare_external_memory
 
         prepared = await self.prepared("external-budget")
         context = prepared["context"]
@@ -294,7 +294,7 @@ class ExternalMemoryHostTests(GroupFixture, unittest.IsolatedAsyncioTestCase):
         self.assertIsNone(material)
 
     async def test_second_facade_does_not_orphan_registered_providers(self):
-        from astrbot_host.integration_registry import UnifiedCompanionExtensionAPI
+        from digital_life_host.integration_registry import UnifiedCompanionExtensionAPI
 
         self.register()
         another = UnifiedCompanionExtensionAPI(self.controller)
@@ -304,7 +304,7 @@ class ExternalMemoryHostTests(GroupFixture, unittest.IsolatedAsyncioTestCase):
         self.assertEqual(another.list_memory_providers()[0]["provider_id"], "third_party")
 
     async def test_stale_facade_close_does_not_close_replacement_registry(self):
-        from astrbot_host.integration_registry import UnifiedCompanionExtensionAPI
+        from digital_life_host.integration_registry import UnifiedCompanionExtensionAPI
 
         old_api = self.api
         old_registry = old_api._memory_providers
@@ -323,7 +323,7 @@ class ExternalMemoryHostTests(GroupFixture, unittest.IsolatedAsyncioTestCase):
         self.assertEqual(replacement_registry.snapshot()[0]["provider_id"], "replacement")
 
     async def test_new_controller_replaces_unclosed_previous_generation_registry(self):
-        from astrbot_host.integration_registry import UnifiedCompanionExtensionAPI
+        from digital_life_host.integration_registry import UnifiedCompanionExtensionAPI
 
         class LegacyRegistry:
             _closed = False
@@ -348,7 +348,7 @@ class ExternalMemoryHostTests(GroupFixture, unittest.IsolatedAsyncioTestCase):
         self.assertTrue(fresh_api.list_memory_providers()[0]["linked_memory_read"])
 
     async def test_new_controller_replaces_unclosed_registry_from_previous_controller(self):
-        from astrbot_host.integration_registry import UnifiedCompanionExtensionAPI
+        from digital_life_host.integration_registry import UnifiedCompanionExtensionAPI
 
         previous_controller = NS(context=self.controller.context, _terminated=False)
         previous_api = UnifiedCompanionExtensionAPI(previous_controller, claim=True)
@@ -366,7 +366,7 @@ class ExternalMemoryHostTests(GroupFixture, unittest.IsolatedAsyncioTestCase):
         self.assertFalse(current_registry.closed)
 
     async def test_terminated_old_facade_query_and_late_unregister_do_not_affect_current_providers(self):
-        from astrbot_host.integration_registry import UnifiedCompanionExtensionAPI
+        from digital_life_host.integration_registry import UnifiedCompanionExtensionAPI
 
         previous_controller = NS(context=self.controller.context, _terminated=False)
         previous_api = UnifiedCompanionExtensionAPI(previous_controller, claim=True)
@@ -392,7 +392,7 @@ class ExternalMemoryHostTests(GroupFixture, unittest.IsolatedAsyncioTestCase):
         self.assertIn("你喜欢听雨声。", prepared["prompt_instruction"])
 
     async def test_unclosed_stale_facade_cannot_replace_or_mutate_current_registry(self):
-        from astrbot_host.integration_registry import UnifiedCompanionExtensionAPI
+        from digital_life_host.integration_registry import UnifiedCompanionExtensionAPI
 
         previous_controller = NS(context=self.controller.context, _terminated=False)
         previous_api = UnifiedCompanionExtensionAPI(previous_controller, claim=True)
@@ -417,8 +417,8 @@ class ExternalMemoryHostTests(GroupFixture, unittest.IsolatedAsyncioTestCase):
         self.assertEqual([item["provider_id"] for item in current_api.list_memory_providers()], ["current"])
 
     async def test_unterminated_old_controller_lazy_v2_api_and_facade_do_not_displace_current_registry(self):
-        from astrbot_host.integration_registry import UnifiedCompanionExtensionAPI
-        from astrbot_host.native_extensions.service import NativeService
+        from digital_life_host.integration_registry import UnifiedCompanionExtensionAPI
+        from digital_life_host.native_extensions.service import NativeService
 
         # Newer host owner=B installs and registers the active "current" provider.
         current_api = UnifiedCompanionExtensionAPI(self.controller, claim=True)

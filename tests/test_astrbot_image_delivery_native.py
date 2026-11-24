@@ -16,18 +16,18 @@ from astrbot.core.message.components import Forward, Image, Plain, Reply
 from astrbot.core.platform.astrbot_message import AstrBotMessage, MessageMember
 from astrbot.core.platform.message_type import MessageType
 from astrbot.core.platform.sources.aiocqhttp.aiocqhttp_message_event import AiocqhttpMessageEvent
-from astrbot_host.forwards import load_native_forwards
-from astrbot_host.media import load_native_image
-from astrbot_host.quotes import load_native_quote
-from companion_v2.conversation.media.reply import OWNER
-from companion_v2.execution.models import TaskContext
+from digital_life_host.forwards import load_native_forwards
+from digital_life_host.media import load_native_image
+from digital_life_host.quotes import load_native_quote
+from digital_life_core.conversation.media.reply import OWNER
+from digital_life_core.execution.models import TaskContext
 from tests.forward_support import outer_raw
 from tests.image_delivery_support import attach_originals
 from tests.image_delivery_support import image_reply
 from tests.staging_bootstrap_support import wait_for_batch
 from tests.test_conversation_images import image_bytes
 from tests.test_conversation_quotes import quote_raw
-from companion_v2.conversation.segmentation import LLM_SEGMENT_MARKER
+from digital_life_core.conversation.segmentation import LLM_SEGMENT_MARKER
 
 
 class ImageSocket:
@@ -79,7 +79,7 @@ class NativeImageDeliveryTests(MultiFixture, unittest.IsolatedAsyncioTestCase):
         native API call. The mutation therefore races exactly the boundary these
         tests describe. Returns the list of part ids the mutation ran for.
         """
-        from companion_v2.adapters.astrbot.onebot import OneBotTextSender
+        from digital_life_core.adapters.astrbot.onebot import OneBotTextSender
         original, ran = OneBotTextSender._final_dispatch_check, []
 
         async def check(sender, envelope, scope, context):
@@ -190,7 +190,7 @@ class NativeImageDeliveryTests(MultiFixture, unittest.IsolatedAsyncioTestCase):
 
         self.native.get_using_tts_provider = select
         self.native.provider.client.state.behavior = segmented
-        with patch("astrbot_host.voice.get_astrbot_temp_path", return_value=str(audio_root)):
+        with patch("digital_life_host.voice.get_astrbot_temp_path", return_value=str(audio_root)):
             await self.start_host()
             for target, identifier in (("first", "851"), ("second", "852")):
                 (await self.controller.authorize_delivery(target)).unwrap()
@@ -244,7 +244,7 @@ class NativeImageDeliveryTests(MultiFixture, unittest.IsolatedAsyncioTestCase):
             return image_reply(payload, text=text)
 
         self.native.provider.client.state.behavior = tagged
-        with patch("astrbot_host.voice.get_astrbot_temp_path", return_value=str(audio_root)):
+        with patch("digital_life_host.voice.get_astrbot_temp_path", return_value=str(audio_root)):
             app = await self.start_host()
             (await self.controller.authorize_delivery("first")).unwrap()
             report = await self.reply(identifier="855", advance_part_clock=True)
@@ -306,7 +306,7 @@ class NativeImageDeliveryTests(MultiFixture, unittest.IsolatedAsyncioTestCase):
         self.native.get_using_tts_provider = lambda _: NS(get_audio=synthesize)
         self.native.provider.client.state.behavior = segmented
         self.sockets["qq-main"]["100"].status = "timeout"
-        with patch("astrbot_host.voice.get_astrbot_temp_path", return_value=str(audio_root)):
+        with patch("digital_life_host.voice.get_astrbot_temp_path", return_value=str(audio_root)):
             await self.start_host()
             (await self.controller.authorize_delivery("first")).unwrap()
             report = await self.reply(identifier="854")

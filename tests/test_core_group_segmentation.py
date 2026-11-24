@@ -7,16 +7,16 @@ import unittest
 
 from astrbot.core.message.components import At, Image, Plain, Reply
 from astrbot.core.message.message_event_result import MessageChain, MessageEventResult
-from astrbot_host.core_reply import (CORE_REPLY_CONTEXT_EXTRA, activate_core_reply_delivery_guard,
+from digital_life_host.core_reply import (CORE_REPLY_CONTEXT_EXTRA, activate_core_reply_delivery_guard,
                                     inject_core_reply_prompt, prepare_core_reply_event)
-from astrbot_host.core_reply_segmentation import (
+from digital_life_host.core_reply_segmentation import (
     prepare_core_reply_segmentation, prepare_core_reply_streaming_boundary, split_message,
 )
-from astrbot_host.core_reply_perception import inject_core_reply_perception_context
-from companion_v2.conversation.segment_control import LLM_SEGMENT_MARKER as MARKER
-from companion_v2.conversation.segmentation import SegmentationPolicy
-from companion_v2.conversation.text_processing import ReplyTextPolicy
-from companion_v2.foundation.outcome import Outcome
+from digital_life_host.core_reply_perception import inject_core_reply_perception_context
+from digital_life_core.conversation.segment_control import LLM_SEGMENT_MARKER as MARKER
+from digital_life_core.conversation.segmentation import SegmentationPolicy
+from digital_life_core.conversation.text_processing import ReplyTextPolicy
+from digital_life_core.foundation.outcome import Outcome
 from tests.test_astrbot_core_reply import FakeEvent
 
 
@@ -48,14 +48,14 @@ class CoreGroupSegmentationTests(unittest.IsolatedAsyncioTestCase):
         core = event.get_extra(CORE_REPLY_CONTEXT_EXTRA)
         core["_reply_segmentation"]["settings"]["part_gap_ms"] = 800
         activate_core_reply_delivery_guard(event)
-        with patch("astrbot_host.core_reply_segmentation.asyncio.sleep", new_callable=AsyncMock) as sleep_mock:
+        with patch("digital_life_host.core_reply_segmentation.asyncio.sleep", new_callable=AsyncMock) as sleep_mock:
             await event.send(MessageChain(chain=[Plain(FIRST + SECOND)]))
             sleep_mock.assert_awaited()
             self.assertEqual(sleep_mock.await_args.args[0], 0.8)
 
     async def test_group_stream_parts_keep_the_configured_gap(self):
         from unittest.mock import AsyncMock, patch
-        from astrbot_host.core_reply_segmentation import send_group_stream
+        from digital_life_host.core_reply_segmentation import send_group_stream
 
         event = self.prepare(channel="group", streaming=True)
         core = event.get_extra(CORE_REPLY_CONTEXT_EXTRA)
@@ -67,14 +67,14 @@ class CoreGroupSegmentationTests(unittest.IsolatedAsyncioTestCase):
             yield FIRST
             yield SECOND
 
-        with patch("astrbot_host.core_reply_segmentation.asyncio.sleep", new_callable=AsyncMock) as sleep_mock:
+        with patch("digital_life_host.core_reply_segmentation.asyncio.sleep", new_callable=AsyncMock) as sleep_mock:
             await send_group_stream(event, chunks())
             sleep_mock.assert_awaited()
             self.assertEqual(sleep_mock.await_args.args[0], 0.8)
 
     async def test_concurrent_group_turns_skip_inter_segment_sleep_to_prevent_interleaving(self):
         from unittest.mock import AsyncMock, patch
-        from astrbot_host.core_reply_tracking import CORE_REPLY_TRACKING_EXTRA
+        from digital_life_host.core_reply_tracking import CORE_REPLY_TRACKING_EXTRA
 
         event = self.prepare(channel="group")
         core = event.get_extra(CORE_REPLY_CONTEXT_EXTRA)
@@ -84,7 +84,7 @@ class CoreGroupSegmentationTests(unittest.IsolatedAsyncioTestCase):
             "admission": admission, "context": object(), "event_id": "segmented-event",
         })
         activate_core_reply_delivery_guard(event)
-        with patch("astrbot_host.core_reply_segmentation.asyncio.sleep", new_callable=AsyncMock) as sleep_mock:
+        with patch("digital_life_host.core_reply_segmentation.asyncio.sleep", new_callable=AsyncMock) as sleep_mock:
             await event.send(MessageChain(chain=[Plain(FIRST + SECOND)]))
             sleep_mock.assert_not_awaited()
         self.assertEqual([args[0].get_plain_text() for args, _ in event.sent], [FIRST, SECOND])
@@ -257,7 +257,7 @@ class CoreGroupSegmentationTests(unittest.IsolatedAsyncioTestCase):
                     await inject_core_reply_perception_context(event, request)
                     self.assertEqual(request.system_prompt, "原人格")
                     payload = json.loads(request.extra_user_content_parts[0].text.split("\n", 1)[1]
-                                         .removesuffix("\n</companion_v2_context>"))
+                                         .removesuffix("\n</digital_life_core_context>"))
                     self.assertEqual(payload["companion_background"], "背景")
                     self.assertNotIn("reply_format_guidance", payload)
                     for text in ("消息正文组织", "正文呈现偏好", "清理词", "替换", "自定义模型分段", MARKER):
@@ -273,7 +273,7 @@ class CoreGroupSegmentationTests(unittest.IsolatedAsyncioTestCase):
                 await inject_core_reply_perception_context(event, request)
                 self.assertEqual(request.system_prompt, "原人格")
                 payload = json.loads(request.extra_user_content_parts[0].text.split("\n", 1)[1]
-                                     .removesuffix("\n</companion_v2_context>"))
+                                     .removesuffix("\n</digital_life_core_context>"))
                 self.assertEqual(payload["reply_format_guidance"], f"用 {MARKER} 标记自然的消息边界。")
 
     async def test_native_group_turn_context_uses_free_text_segmentation_instructions(self):

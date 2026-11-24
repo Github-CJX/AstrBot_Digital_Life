@@ -9,12 +9,12 @@ from tests import test_astrbot_staging_host as host_support
 from astrbot.api.web import PluginRequest, bind_request_context
 from starlette.requests import Request
 
-from astrbot_host.management_identity import dashboard_operator
-from astrbot_host.relationships_api import MANAGEMENT_PREFIX
-from companion_v2.foundation.refs import RoleOwnerRef
-from companion_v2.identity_policy.models import AuthorizationTier
-from companion_v2.identity_policy.object_access import ObjectAccessPolicy
-from companion_v2.relationships.models import RelationshipMemory, RelationshipMemoryKind
+from digital_life_host.management_identity import dashboard_operator
+from digital_life_host.relationships_api import MANAGEMENT_PREFIX
+from digital_life_core.foundation.refs import RoleOwnerRef
+from digital_life_core.identity_policy.models import AuthorizationTier
+from digital_life_core.identity_policy.object_access import ObjectAccessPolicy
+from digital_life_core.relationships.models import RelationshipMemory, RelationshipMemoryKind
 from tests.native_adapter_support import FakeEvent, FakeProvider, FakeReverseApi
 from tests.test_management_access import NOW
 

@@ -14,7 +14,7 @@ from collections import defaultdict
 from pathlib import Path
 
 _ROOT = Path(__file__).resolve().parents[1]
-DEFAULT_V1_SCHEMA = _ROOT.parent / "astrbot_plugin_private_companion" / "_conf_schema.json"
+DEFAULT_V1_SCHEMA = _ROOT.parent / "astrbot_plugin_digital_life" / "_conf_schema.json"
 AUDIT = _ROOT / "docs/V1_V2_CONFIG_COVERAGE_AUDIT_20260927.csv"
 OUT = _ROOT / ".verify-shards"
 SHARD_SIZE = 16

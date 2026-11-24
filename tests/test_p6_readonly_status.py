@@ -6,8 +6,8 @@ from contextlib import contextmanager
 from types import SimpleNamespace
 import unittest
 
-from astrbot_host.integration_registry import UnifiedCompanionExtensionAPI
-from companion_v2.diagnostics.readonly_status import (
+from digital_life_host.integration_registry import UnifiedCompanionExtensionAPI
+from digital_life_core.diagnostics.readonly_status import (
     P6_READONLY_STATUS_FIELDS,
     P6_READONLY_STATUS_FINGERPRINT,
     P6_READONLY_STATUS_SCHEMA,

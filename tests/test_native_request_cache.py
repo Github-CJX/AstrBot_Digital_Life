@@ -9,9 +9,9 @@ from tests import astrbot_data_root as _host_import_root
 from astrbot.core.agent.message import Message, TextPart, dump_messages_with_checkpoints
 from astrbot.core.agent.runners.tool_loop_agent_runner import ToolLoopAgentRunner
 from astrbot.core.provider.entities import LLMResponse, ProviderRequest
-from astrbot_host.native_extensions.host_events import prepare_native_host_request
-from astrbot_host.native_extensions.live.activity_methods import LiveActivityMethods
-from astrbot_host.native_extensions.live.model_methods import LiveModelMethods
+from digital_life_host.native_extensions.host_events import prepare_native_host_request
+from digital_life_host.native_extensions.live.activity_methods import LiveActivityMethods
+from digital_life_host.native_extensions.live.model_methods import LiveModelMethods
 from tests.test_native_host_events import HostEvent, LocalGame, LocalLive, context_text, controller, game_room
 
 
@@ -60,7 +60,7 @@ class NativeRequestCacheTests(unittest.IsolatedAsyncioTestCase):
         saved = dump_messages_with_checkpoints(run.messages[1:])
         self.assertNotIn("提问 3 次", str(saved))
         self.assertNotIn("今天的声音好可爱", str(saved))
-        self.assertNotIn("companion_v2_native_", str(saved))
+        self.assertNotIn("digital_life_core_native_", str(saved))
         self.assertIn(req.prompt, str(saved[-1]))
         self.assertIn("另一插件的本轮材料", str(saved[-1]))
 

@@ -10,14 +10,14 @@ import sys
 from tempfile import TemporaryDirectory
 import unittest
 
-from companion_v2.configuration.models import ApplyMode, ConfigLayer, ConfigTarget, ConfigurationError
-from companion_v2.configuration.contract import contract_of
-from companion_v2.configuration.registry import FieldDefinition, FieldRegistry, LegacyProbabilityRule, LegacyProbabilityUnit, ValueKind
-from companion_v2.configuration.service import ConfigurationService
-from companion_v2.foundation.refs import OperationRef, ScopeKind, ScopeRef, SubjectKind, SubjectRef, VersionRef
-from companion_v2.identity_policy.models import AuthenticatedHostPrincipal, AuthorizationTier
-from companion_v2.identity_policy.repository import PersistentIdentityDirectory
-from companion_v2.storage.runtime import StorageRuntime
+from digital_life_core.configuration.models import ApplyMode, ConfigLayer, ConfigTarget, ConfigurationError
+from digital_life_core.configuration.contract import contract_of
+from digital_life_core.configuration.registry import FieldDefinition, FieldRegistry, LegacyProbabilityRule, LegacyProbabilityUnit, ValueKind
+from digital_life_core.configuration.service import ConfigurationService
+from digital_life_core.foundation.refs import OperationRef, ScopeKind, ScopeRef, SubjectKind, SubjectRef, VersionRef
+from digital_life_core.identity_policy.models import AuthenticatedHostPrincipal, AuthorizationTier
+from digital_life_core.identity_policy.repository import PersistentIdentityDirectory
+from digital_life_core.storage.runtime import StorageRuntime
 
 
 NOW = datetime(2026, 9, 21, tzinfo=timezone.utc)
@@ -327,9 +327,9 @@ class ConfigurationTests(unittest.TestCase):
         script = """
 import json, sys
 from tests.test_configuration import INSTALLATION, PRINCIPAL, NOW, WINDOW_TARGET, registry
-from companion_v2.storage.runtime import StorageRuntime
-from companion_v2.configuration.service import ConfigurationService
-from companion_v2.identity_policy.repository import PersistentIdentityDirectory
+from digital_life_core.storage.runtime import StorageRuntime
+from digital_life_core.configuration.service import ConfigurationService
+from digital_life_core.identity_policy.repository import PersistentIdentityDirectory
 with StorageRuntime.open(data_root=sys.argv[1], installation_id=INSTALLATION) as runtime:
     identity = PersistentIdentityDirectory(runtime)
     actor = identity.resolve_authenticated(PRINCIPAL, observed_at=NOW).unwrap()

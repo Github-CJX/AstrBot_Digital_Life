@@ -494,7 +494,7 @@ test("global search opens a setting section and focuses the matching field", () 
 
 test("relay settings render in access rules and search focuses the requested field", () => {
   const h = harness();
-  h.window.CompanionProduct.role = () => ({config_api: "/astrbot_plugin_private_companion/targets/first/roles/role/config"});
+  h.window.CompanionProduct.role = () => ({config_api: "/astrbot_plugin_digital_life/targets/first/roles/role/config"});
   const html = h.run("renderIdentityAccessPage()");
   assert.match(html, /id="relayConfigWorkspace"/);
   const field = {dataset: {wbField: "allowed_targets"}, matches: () => true,
@@ -631,7 +631,7 @@ test("native companion furniture opens its real workbench or settings surface", 
   const h = harness();
   const ids = ["content", "image", "screen", "reality", "together", "game", "live"];
   h.manifest.extensions = ids.map(id => ({capability_id:id, label:`${id} label`, reason:`${id} ready`,
-    owner:"companion_v2", extension_id:id, assembled:true, desired_state:"active",
+    owner:"digital_life_core", extension_id:id, assembled:true, desired_state:"active",
     integration_state:"connected", installed_revision:1}));
 
   const destinations = JSON.parse(h.run("JSON.stringify(directory.filter(item=>item.cap).map(({id,detail})=>[id,detail]))"));
@@ -677,7 +677,7 @@ test("furniture directory filters, search and attention counts use the same reco
   const labels = {content: "创作与 QQ 空间", image: "生图与相册", together: "共处与实时活动",
     game: "共同游玩", screen: "屏幕陪伴", reality: "现实触及", live: "直播与表演"};
   h.manifest.extensions = Object.entries(labels).map(([capability_id, label]) => ({capability_id,
-    label, owner: "companion_v2", assembled: true, desired_state: "active", integration_state: "connected"}));
+    label, owner: "digital_life_core", assembled: true, desired_state: "active", integration_state: "connected"}));
   h.manifest.providers = [{capability_id: "image", label: "旧版图像插件", integration_state: "missing"}];
   const extension = id => h.window.CompanionProduct.extension(id);
   const ids = () => Array.from(h.run("filteredFurniture().map(item=>item.id)"));

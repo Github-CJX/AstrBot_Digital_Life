@@ -1,7 +1,7 @@
 """A tool this request never declared must be named, and must not cost the turn.
 
 Production audit (2026-11-07 22:41:53 and 2026-11-08 14:59:56): the model asked
-for ``companion_v2_group_participation_choose`` in a turn whose request declared
+for ``digital_life_core_group_participation_choose`` in a turn whose request declared
 no companion tool at all -- V2 had declined the turn and handed it to AstrBot's
 own pipeline -- so the host logged ``未找到指定的工具`` and executed nothing. The
 name came from the history this plugin writes: every companion turn stores its
@@ -36,8 +36,8 @@ from astrbot.core.astr_agent_tool_exec import FunctionToolExecutor
 from astrbot.core.pipeline.process_stage.follow_up import _ACTIVE_AGENT_RUNNERS
 from astrbot.core.provider.entities import ProviderRequest
 
-from astrbot_host.core_reply_history_guard import repair_request_history
-from astrbot_host.core_reply_tool_guard import (
+from digital_life_host.core_reply_history_guard import repair_request_history
+from digital_life_host.core_reply_tool_guard import (
     CORE_TOOL_GUARD_EXTRA, close_core_reply_tool_guard, install_core_reply_tool_guard,
     mark_managed_turn, managed_turn, summarize_names,
 )
@@ -161,7 +161,7 @@ class GuardRunnerTests(unittest.IsolatedAsyncioTestCase):
         mark_managed_turn(event, channel="group", event_ref="host-turn-1")
         host_tool = HostTool()
         request = ProviderRequest(prompt="为什么不考德语", func_tool=ToolSet(tools=[host_tool]))
-        with captured_warnings("astrbot_host.core_reply_tool_guard") as lines:
+        with captured_warnings("digital_life_host.core_reply_tool_guard") as lines:
             result = await self.run_turn(
                 [tool_round_for(TOOL, call_id="call-9"), text_round(ANSWER)], request=request,
                 event=event)
@@ -182,7 +182,7 @@ class GuardRunnerTests(unittest.IsolatedAsyncioTestCase):
         event = GateEvent()
         mark_managed_turn(event, channel="group", event_ref="host-turn-2")
         request = ProviderRequest(prompt="为什么不考德语", func_tool=None)
-        with captured_warnings("astrbot_host.core_reply_tool_guard") as lines:
+        with captured_warnings("digital_life_host.core_reply_tool_guard") as lines:
             result = await self.run_turn(
                 [tool_round_for(TOOL, text="", call_id="call-7"), text_round(ANSWER)],
                 request=request, event=event)
@@ -246,7 +246,7 @@ class HistoryDeclarationTests(unittest.TestCase):
     def test_an_undeclared_companion_example_is_removed_with_its_result(self):
         event = self.event()
         request = self.request([HostTool()])
-        with captured_warnings("astrbot_host.core_reply_history_guard") as lines:
+        with captured_warnings("digital_life_host.core_reply_history_guard") as lines:
             repair_request_history(event, request)
         self.assertEqual([message["role"] for message in request.contexts],
                          ["user", "assistant", "assistant"])
@@ -262,7 +262,7 @@ class HistoryDeclarationTests(unittest.TestCase):
     def test_a_request_without_any_tool_still_drops_the_example(self):
         event = self.event()
         request = self.request(None)
-        with captured_warnings("astrbot_host.core_reply_history_guard"):
+        with captured_warnings("digital_life_host.core_reply_history_guard"):
             repair_request_history(event, request)
         self.assertNotIn("call-1", str(request.contexts))
         self.assertNotIn(TOOL, str(request.contexts))

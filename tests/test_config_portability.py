@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import unittest
 
-from companion_v2.configuration.portability import (
+from digital_life_core.configuration.portability import (
     EXCLUDED_SECTIONS, SCHEMA, changes_for, portable,
 )
 

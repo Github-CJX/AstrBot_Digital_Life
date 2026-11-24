@@ -7,7 +7,7 @@ unknown / observed。``context_mode`` / ``polarity`` / ``retention`` 早就有�
 """
 import unittest
 
-from companion_v2.memory.reflection_output import normalize_proposal
+from digital_life_core.memory.reflection_output import normalize_proposal
 
 ALLOWED = {
     "attribution": {"user", "third_party", "bot", "unknown", "observed"},

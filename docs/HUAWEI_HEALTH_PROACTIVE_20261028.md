@@ -29,8 +29,8 @@
 
 ## 主要代码
 
-- `astrbot_host/huawei_health/service.py`：把云端数据整理为睡眠、运动、周回顾和恢复趋势事件。
-- `companion_v2/proactive/health_events.py`：把事件投影成现有 `ContactIntent`。
-- `companion_v2/proactive/scheduling.py`：在现有候选择序中读取健康素材。
-- `companion_v2/host/application.py`：注入感知配置读取器。
-- `astrbot_host/multi_session.py`：把华为健康服务绑定到现有联系调度器。
+- `digital_life_host/huawei_health/service.py`：把云端数据整理为睡眠、运动、周回顾和恢复趋势事件。
+- `digital_life_core/proactive/health_events.py`：把事件投影成现有 `ContactIntent`。
+- `digital_life_core/proactive/scheduling.py`：在现有候选择序中读取健康素材。
+- `digital_life_core/host/application.py`：注入感知配置读取器。
+- `digital_life_host/multi_session.py`：把华为健康服务绑定到现有联系调度器。

@@ -13,39 +13,39 @@ from types import SimpleNamespace as NS
 import unittest
 from unittest.mock import patch
 
-from astrbot_host.core_reply_context import build_core_reply_prompt
-from astrbot_host.core_reply_mobile import screen_scene_snapshot
-from companion_v2.product import PRODUCT_VERSION
-from astrbot_host.integration_registry import IntegrationRegistry
-from astrbot_host.mobile_together import MobileTogetherBridge
-from astrbot_host.native_extensions.together.activity_methods import TogetherActivityMethods
-from astrbot_host.native_extensions.together.media_methods import TogetherMediaMethods
-from astrbot_host.native_extensions.together.model_methods import TogetherModelMethods
-from astrbot_host.native_extensions.together.rooms_methods import TogetherRoomsMethods
-from astrbot_host.native_extensions.together.settings_methods import TogetherSettingsMethods
-from astrbot_host.native_extensions.together.speech_methods import TogetherSpeechMethods
-from companion_v2.adapters.astrbot.memory_push import (
+from digital_life_host.core_reply_context import build_core_reply_prompt
+from digital_life_host.core_reply_mobile import screen_scene_snapshot
+from digital_life_core.product import PRODUCT_VERSION
+from digital_life_host.integration_registry import IntegrationRegistry
+from digital_life_host.mobile_together import MobileTogetherBridge
+from digital_life_host.native_extensions.together.activity_methods import TogetherActivityMethods
+from digital_life_host.native_extensions.together.media_methods import TogetherMediaMethods
+from digital_life_host.native_extensions.together.model_methods import TogetherModelMethods
+from digital_life_host.native_extensions.together.rooms_methods import TogetherRoomsMethods
+from digital_life_host.native_extensions.together.settings_methods import TogetherSettingsMethods
+from digital_life_host.native_extensions.together.speech_methods import TogetherSpeechMethods
+from digital_life_core.adapters.astrbot.memory_push import (
     AstrBotMemoryPush,
     PUSH_SOURCE_PLUGIN,
     memory_push_provider,
 )
-from companion_v2.capabilities.memory_push import (
+from digital_life_core.capabilities.memory_push import (
     PUSH_SHARED_EXPERIENCE,
     MemoryPushRecord,
     push_memory_id,
 )
-from companion_v2.capabilities.models import CapabilityPackageDescriptor
-from companion_v2.capabilities.native_catalog import register_native_replacement
-from companion_v2.capabilities.repositories import CapabilityRepository
-from companion_v2.conversation.awareness_context import ConversationAwarenessContext, MAX_ITEMS
-from companion_v2.conversation.screen_context import (
+from digital_life_core.capabilities.models import CapabilityPackageDescriptor
+from digital_life_core.capabilities.native_catalog import register_native_replacement
+from digital_life_core.capabilities.repositories import CapabilityRepository
+from digital_life_core.conversation.awareness_context import ConversationAwarenessContext, MAX_ITEMS
+from digital_life_core.conversation.screen_context import (
     MAX_AGE_SECONDS,
     SCREEN_CONTEXT_INSTRUCTION,
     project_screen_context,
 )
-from companion_v2.execution.models import TaskContext, TaskError, encode, require
-from companion_v2.foundation.outcome import Outcome
-from companion_v2.foundation.refs import (
+from digital_life_core.execution.models import TaskContext, TaskError, encode, require
+from digital_life_core.foundation.outcome import Outcome
+from digital_life_core.foundation.refs import (
     AudienceRef,
     RoleOwnerRef,
     ScopeKind,
@@ -53,18 +53,18 @@ from companion_v2.foundation.refs import (
     SubjectKind,
     SubjectRef,
 )
-from companion_v2.identity_policy.models import (
+from digital_life_core.identity_policy.models import (
     AuthenticatedHostPrincipal,
     ResolvedIdentity,
     RoleBinding,
 )
-from companion_v2.references.models import ReferenceKind, ReferenceRole
-from companion_v2.references.prompts import image_reference_instruction, text_wardrobe_instruction
-from companion_v2.references.service import OWNED_REFERENCE_PREFIX, ReferenceAssetService
-from companion_v2.role_work.awareness.service import RoleAwareness
-from companion_v2.storage.runtime import StorageRuntime
-from companion_v2.together.models import NativeRoomBinding, RoomMember, RoomSession
-from companion_v2.together.provider import (
+from digital_life_core.references.models import ReferenceKind, ReferenceRole
+from digital_life_core.references.prompts import image_reference_instruction, text_wardrobe_instruction
+from digital_life_core.references.service import OWNED_REFERENCE_PREFIX, ReferenceAssetService
+from digital_life_core.role_work.awareness.service import RoleAwareness
+from digital_life_core.storage.runtime import StorageRuntime
+from digital_life_core.together.models import NativeRoomBinding, RoomMember, RoomSession
+from digital_life_core.together.provider import (
     NativeTogetherError,
     NativeTogetherProvider,
     OperationStore,
@@ -225,7 +225,7 @@ class TogetherVisualAndSharedExperienceTests(MemoryPluginDeclaration, MultiFixtu
 
     async def test_watch_silent_observation_and_room_close_persist_to_v2_and_memory_companion(self):
         import sys
-        from companion_v2.adapters.astrbot.memory_owner import MEMORY_OWNER_MODULE_NAMES
+        from digital_life_core.adapters.astrbot.memory_owner import MEMORY_OWNER_MODULE_NAMES
         from tests.test_memory_linkage import FakeModule
 
         bridge = _RecordingEventBridge()
@@ -294,7 +294,7 @@ class TogetherVisualAndSharedExperienceTests(MemoryPluginDeclaration, MultiFixtu
 
     async def test_revoked_v2_room_skips_v2_and_external_memory_persistence(self):
         import sys
-        from companion_v2.adapters.astrbot.memory_owner import MEMORY_OWNER_MODULE_NAMES
+        from digital_life_core.adapters.astrbot.memory_owner import MEMORY_OWNER_MODULE_NAMES
         from tests.test_memory_linkage import FakeModule
 
         bridge = _RecordingEventBridge()
@@ -313,7 +313,7 @@ class TogetherVisualAndSharedExperienceTests(MemoryPluginDeclaration, MultiFixtu
 
     async def test_v2_access_denied_blocks_both_v2_and_memory_companion_writes(self):
         import sys
-        from companion_v2.adapters.astrbot.memory_owner import MEMORY_OWNER_MODULE_NAMES
+        from digital_life_core.adapters.astrbot.memory_owner import MEMORY_OWNER_MODULE_NAMES
         from tests.test_memory_linkage import FakeModule
 
         bridge = _RecordingEventBridge()
@@ -336,7 +336,7 @@ class TogetherVisualAndSharedExperienceTests(MemoryPluginDeclaration, MultiFixtu
 
     async def test_watch_ending_then_post_discussion_and_second_video_are_all_retained(self):
         import sys
-        from companion_v2.adapters.astrbot.memory_owner import MEMORY_OWNER_MODULE_NAMES
+        from digital_life_core.adapters.astrbot.memory_owner import MEMORY_OWNER_MODULE_NAMES
         from tests.test_memory_linkage import FakeModule
 
         bridge = _RecordingEventBridge()
@@ -391,7 +391,7 @@ class TogetherVisualAndSharedExperienceTests(MemoryPluginDeclaration, MultiFixtu
 
     async def test_multi_user_invite_room_skips_private_memory_persistence(self):
         import sys
-        from companion_v2.adapters.astrbot.memory_owner import MEMORY_OWNER_MODULE_NAMES
+        from digital_life_core.adapters.astrbot.memory_owner import MEMORY_OWNER_MODULE_NAMES
         from tests.test_memory_linkage import FakeModule
 
         bridge = _RecordingEventBridge()
@@ -484,8 +484,8 @@ class TogetherVisualAndSharedExperienceTests(MemoryPluginDeclaration, MultiFixtu
         self.assertEqual(binding["bot_id"], self.persona["bot_id"])
 
     def test_screen_context_enabled_round_trips_through_perception_management(self):
-        from companion_v2.conversation.perception_management import PerceptionManagement
-        from astrbot_host.management_identity import dashboard_operator
+        from digital_life_core.conversation.perception_management import PerceptionManagement
+        from digital_life_host.management_identity import dashboard_operator
 
         operator = dashboard_operator(self.app.runtime, "admin", at=self.clock.now())
         manager = PerceptionManagement(self.app, self.context)
@@ -653,7 +653,7 @@ class Issue832TogetherOperationRetryAndHashTests(unittest.IsolatedAsyncioTestCas
         repo = CapabilityRepository(runtime)
         first = CapabilityPackageDescriptor(
             extension_id="together",
-            package_id="astrbot_plugin_private_companion.together",
+            package_id="astrbot_plugin_digital_life.together",
             publisher_id="menglimi",
             package_version="7.3.0",
             artifact_hash="hash-aaa",
@@ -761,8 +761,8 @@ class Issue835ReferenceSwitchDecouplingTests(unittest.TestCase):
         # Generate-only route (no image.edit) with photo_reference.enabled=False still injects
         # text wardrobe and daily outfit without offering edit-only reference_ids instructions.
         from astrbot.core.provider.entities import ProviderRequest
-        from astrbot_host.core_reply_image_prompt import inject_core_image_prompt
-        from companion_v2.conversation.media.output_settings import DEFAULTS as IMAGE_DEFAULTS
+        from digital_life_host.core_reply_image_prompt import inject_core_image_prompt
+        from digital_life_core.conversation.media.output_settings import DEFAULTS as IMAGE_DEFAULTS
 
         state = {}
         prepared = {

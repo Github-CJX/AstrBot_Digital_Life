@@ -5,8 +5,8 @@ import sqlite3
 import unittest
 from types import SimpleNamespace as NS
 
-from companion_v2.expression.configuration import _sole_private_participant
-from companion_v2.storage.native_conversation_schema import STATEMENTS
+from digital_life_core.expression.configuration import _sole_private_participant
+from digital_life_core.storage.native_conversation_schema import STATEMENTS
 
 
 class FakeRuntime:

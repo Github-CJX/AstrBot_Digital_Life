@@ -7,11 +7,11 @@ import unittest
 from unittest.mock import Mock
 from types import SimpleNamespace
 
-from astrbot_host.native_extensions import NativeExtensionRegistry
-from companion_v2.capabilities import native_reads
-from companion_v2.execution.models import TaskError, digest, encode
-from companion_v2.foundation.refs import AudienceRef, ScopeKind, ScopeRef, SubjectKind, SubjectRef
-from companion_v2.sources.models import GovernanceState
+from digital_life_host.native_extensions import NativeExtensionRegistry
+from digital_life_core.capabilities import native_reads
+from digital_life_core.execution.models import TaskError, digest, encode
+from digital_life_core.foundation.refs import AudienceRef, ScopeKind, ScopeRef, SubjectKind, SubjectRef
+from digital_life_core.sources.models import GovernanceState
 
 from tests.test_native_provider_contract import FakeContext, manifest
 from tests.test_daily_token_soft_limit import ModelFixture
@@ -71,7 +71,7 @@ class Api:
     def __init__(self, port):
         self.port = port
 
-    def companion_v2_native(self):
+    def digital_life_core_native(self):
         return self.port
 
 
@@ -454,7 +454,7 @@ class NativeRegistryTests(unittest.IsolatedAsyncioTestCase):
 
     async def test_discovery_does_not_promote_status_or_duplicate_instances(self):
         self.registry.context.star.star_cls.extension_api = SimpleNamespace(
-            companion_v2_status=lambda: self.fail("status must not be consulted for native execution"))
+            digital_life_core_status=lambda: self.fail("status must not be consulted for native execution"))
         self.assertEqual(NativeExtensionRegistry(self.registry.context).declarations(), ())
         context = SimpleNamespace(get_all_stars=lambda: (Star(Port()), Star(Port())))
         duplicate = NativeExtensionRegistry(context)

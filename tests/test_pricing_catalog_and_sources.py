@@ -13,7 +13,7 @@ import unittest
 
 import aiohttp
 
-from astrbot_host.pricing_sources import (
+from digital_life_host.pricing_sources import (
     MAX_CATALOG_RESPONSE_BYTES,
     PricingCatalogService,
     derive_newapi_root,
@@ -21,8 +21,8 @@ from astrbot_host.pricing_sources import (
     normalized_origin,
     same_origin,
 )
-from companion_v2.model_gateway.pricing import PricingSettingsStore
-from companion_v2.model_gateway.pricing_catalog import (
+from digital_life_core.model_gateway.pricing import PricingSettingsStore
+from digital_life_core.model_gateway.pricing_catalog import (
     CatalogPrice,
     PriceCatalogStore,
     SourceStatus,

@@ -8,7 +8,7 @@ import time
 import unittest
 from unittest.mock import AsyncMock, patch
 
-from companion_v2.adapters.astrbot.native import (
+from digital_life_core.adapters.astrbot.native import (
     HostAccount,
     HostPersona,
     NativeInputPorts,
@@ -16,9 +16,9 @@ from companion_v2.adapters.astrbot.native import (
     persona_instruction,
     report_slow_native_lookup,
 )
-from companion_v2.execution.models import TaskError, digest
-from companion_v2.foundation.refs import SubjectKind, SubjectRef
-from companion_v2.identity_policy.personas import PersonaBinding, PersonaSelector, SelectorKind
+from digital_life_core.execution.models import TaskError, digest
+from digital_life_core.foundation.refs import SubjectKind, SubjectRef
+from digital_life_core.identity_policy.personas import PersonaBinding, PersonaSelector, SelectorKind
 from tests.native_adapter_support import FakeEvent, FakePlatform, NativeFixture
 from tests.test_management_access import INSTALLATION, NOW, ROLE
 
@@ -288,8 +288,8 @@ class NativeInputTests(NativeFixture, unittest.IsolatedAsyncioTestCase):
         async def pending_lookup():
             await release.wait()
 
-        with patch("companion_v2.adapters.astrbot.native.NATIVE_LOOKUP_TIMEOUT_SECONDS", 0.01):
-            with self.assertLogs("companion_v2.adapters.astrbot.native", level="WARNING") as captured:
+        with patch("digital_life_core.adapters.astrbot.native.NATIVE_LOOKUP_TIMEOUT_SECONDS", 0.01):
+            with self.assertLogs("digital_life_core.adapters.astrbot.native", level="WARNING") as captured:
                 task = asyncio.create_task(bounded_native_lookup(pending_lookup(), operation="persona"))
                 await asyncio.sleep(0)
                 time.sleep(0.03)
@@ -305,8 +305,8 @@ class NativeInputTests(NativeFixture, unittest.IsolatedAsyncioTestCase):
         self.assertNotIn("private host details", line)
 
     async def test_slow_lookup_warnings_are_aggregated_per_operation(self):
-        with patch("companion_v2.adapters.astrbot.native.NATIVE_LOOKUP_SLOW_LOG_INTERVAL_SECONDS", 60):
-            with self.assertLogs("companion_v2.adapters.astrbot.native", level="WARNING") as captured:
+        with patch("digital_life_core.adapters.astrbot.native.NATIVE_LOOKUP_SLOW_LOG_INTERVAL_SECONDS", 60):
+            with self.assertLogs("digital_life_core.adapters.astrbot.native", level="WARNING") as captured:
                 report_slow_native_lookup("conversation_aggregation_test", 2100, now=100)
                 report_slow_native_lookup("conversation_aggregation_test", 2300, now=101)
                 report_slow_native_lookup("conversation_aggregation_test", 2400, now=161)

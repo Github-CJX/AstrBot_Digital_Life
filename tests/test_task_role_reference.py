@@ -5,8 +5,8 @@ from dataclasses import dataclass
 from types import SimpleNamespace
 import unittest
 
-from companion_v2.conversation.foreground import PromptRequest
-from companion_v2.model_gateway.service import LocalModelGateway, TASK_ROLE_REFERENCE_KINDS
+from digital_life_core.conversation.foreground import PromptRequest
+from digital_life_core.model_gateway.service import LocalModelGateway, TASK_ROLE_REFERENCE_KINDS
 
 
 class TaskRoleReferenceTests(unittest.TestCase):

@@ -16,13 +16,13 @@ from datetime import timedelta
 import json
 import unittest
 
-from companion_v2.adapters.astrbot.memory_output import response_format
-from companion_v2.adapters.astrbot.model_wire import build_wire
-from companion_v2.execution.models import ProviderBinding, TaskError, digest, encode, stamp
-from companion_v2.expression.style_management import ExpressionStyleManagement
-from companion_v2.expression.style_service import MIN_EXISTING_RULES, RULE_READ_LIMIT, trim_reference_rules
-from companion_v2.model_gateway.models import Amount, BudgetPolicy, LocalProvider
-from companion_v2.role_profile.configuration import (GROUP as ROLE_PROFILE_GROUP,
+from digital_life_core.adapters.astrbot.memory_output import response_format
+from digital_life_core.adapters.astrbot.model_wire import build_wire
+from digital_life_core.execution.models import ProviderBinding, TaskError, digest, encode, stamp
+from digital_life_core.expression.style_management import ExpressionStyleManagement
+from digital_life_core.expression.style_service import MIN_EXISTING_RULES, RULE_READ_LIMIT, trim_reference_rules
+from digital_life_core.model_gateway.models import Amount, BudgetPolicy, LocalProvider
+from digital_life_core.role_profile.configuration import (GROUP as ROLE_PROFILE_GROUP,
     RoleProfileConfigurationOwner, configuration_fields as role_profile_fields,
     target_for as role_profile_target_for)
 from tests import test_expression_v1_pipeline as pipeline
@@ -351,7 +351,7 @@ class ExpressionLearningTrimTests(ExpressionFixture, HostFixture, unittest.Isola
         # and it must not trim below the priors a batch needs to deduplicate.
         app, context = await self.prepare(ceiling=TRIM_FLOOR_CEILING)
         rows = self.seed_rules(app, context)
-        with self.assertLogs("companion_v2.expression.style_service", level="WARNING"):
+        with self.assertLogs("digital_life_core.expression.style_service", level="WARNING"):
             last = await self.learn(app, context)
         self.assertEqual(last["state"], "failed", last)
         self.assertEqual(last["code"], "expression_model_profile_exceeded")

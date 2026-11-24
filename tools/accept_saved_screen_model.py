@@ -31,12 +31,12 @@ def arguments():
 async def run(args):
     from astrbot.core.provider.sources.openai_source import ProviderOpenAIOfficial
 
-    from companion_v2.adapters.astrbot.model_wire import build_wire
-    from companion_v2.adapters.astrbot.provider import AstrBotTextProvider, UsageTariff
-    from companion_v2.conversation.foreground import PromptMaterial, SealedForegroundContext
-    from companion_v2.conversation.media.models import ImageDescriptor
-    from companion_v2.conversation.media.screen import INSTRUCTION, ScreenPromptImage
-    from companion_v2.foundation.refs import SourceRef, VersionRef
+    from digital_life_core.adapters.astrbot.model_wire import build_wire
+    from digital_life_core.adapters.astrbot.provider import AstrBotTextProvider, UsageTariff
+    from digital_life_core.conversation.foreground import PromptMaterial, SealedForegroundContext
+    from digital_life_core.conversation.media.models import ImageDescriptor
+    from digital_life_core.conversation.media.screen import INSTRUCTION, ScreenPromptImage
+    from digital_life_core.foundation.refs import SourceRef, VersionRef
     from tests.native_adapter_support import NativeFixture
     from tests.test_management_access import NOW
 

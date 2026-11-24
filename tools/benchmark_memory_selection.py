@@ -12,9 +12,9 @@ from types import SimpleNamespace
 import unittest
 from unittest.mock import patch
 
-from companion_v2.execution.models import digest, encode, stamp
-from companion_v2.memory.models import owner_key
-from companion_v2.memory.reflection import MemoryReflection
+from digital_life_core.execution.models import digest, encode, stamp
+from digital_life_core.memory.models import owner_key
+from digital_life_core.memory.reflection import MemoryReflection
 from tests.test_memory_selection import SelectionFixture
 
 
@@ -26,7 +26,7 @@ class Fixture(SelectionFixture, unittest.TestCase):
 def load_baseline(directory):
     modules = {}
     for name in ("reflection_recovery", "reflection"):
-        spec = importlib.util.spec_from_file_location("companion_v2.memory.selection_baseline_" + name, directory / (name + ".py"))
+        spec = importlib.util.spec_from_file_location("digital_life_core.memory.selection_baseline_" + name, directory / (name + ".py"))
         module = importlib.util.module_from_spec(spec)
         spec.loader.exec_module(module)
         modules[name] = module

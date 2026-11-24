@@ -5,16 +5,16 @@ from types import SimpleNamespace
 import unittest
 from unittest.mock import patch
 
-from astrbot_host.private_debounce import PrivateDebounce, PrivateDeliveryDedup
-from companion_v2.configuration.models import ConfigurationError
-from companion_v2.conversation.private_debounce import (
+from digital_life_host.private_debounce import PrivateDebounce, PrivateDeliveryDedup
+from digital_life_core.configuration.models import ConfigurationError
+from digital_life_core.conversation.private_debounce import (
     Policy,
     merge_texts,
     quiet_seconds,
     visible_characters,
 )
-from companion_v2.conversation.private_reply_context import merged_input_sequence
-from companion_v2.conversation.reply_settings import private_debounce_settings
+from digital_life_core.conversation.private_reply_context import merged_input_sequence
+from digital_life_core.conversation.reply_settings import private_debounce_settings
 
 
 class PrivateDebounceConfigurationTests(unittest.TestCase):
@@ -201,7 +201,7 @@ class PrivateDebounceStateTests(unittest.IsolatedAsyncioTestCase):
                 if status != "superseded":
                     return status
 
-        with patch("astrbot_host.private_debounce.asyncio.wait_for", receive_next_message):
+        with patch("digital_life_host.private_debounce.asyncio.wait_for", receive_next_message):
             self.assertEqual(await wait_for_latest_owner(), "ready")
         entries = await manager.finish(latest_reservation[0], latest_event[0])
         elapsed = now[0] - started
@@ -212,7 +212,7 @@ class PrivateDebounceStateTests(unittest.IsolatedAsyncioTestCase):
     async def test_logs_wake_followup_and_quiet_end_with_full_text(self):
         manager = self.make_manager()
         owner = object()
-        with self.assertLogs("companion_v2.conversation.debounce_log", level="INFO") as captured:
+        with self.assertLogs("digital_life_core.conversation.debounce_log", level="INFO") as captured:
             first = manager.reserve("target", owner, "在吗？")
             await manager.configure(first, owner, manager.policy)
             follow = manager.reserve("target", object(), "我想问你个事")
@@ -232,7 +232,7 @@ class PrivateDebounceStateTests(unittest.IsolatedAsyncioTestCase):
     async def test_logs_quiet_end_without_a_followup(self):
         manager = self.make_manager()
         owner = object()
-        with self.assertLogs("companion_v2.conversation.debounce_log", level="INFO") as captured:
+        with self.assertLogs("digital_life_core.conversation.debounce_log", level="INFO") as captured:
             first = manager.reserve("target", owner, "直接说完")
             await manager.configure(first, owner, manager.policy)
             await manager.wait_for_quiet(first, owner)

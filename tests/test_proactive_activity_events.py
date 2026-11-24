@@ -7,18 +7,18 @@ import json
 import unittest
 from unittest.mock import patch
 
-from companion_v2.execution.models import TaskError, digest
-from companion_v2.foundation.refs import AudienceRef, RoleOwnerRef, SourceRef, VersionRef
-from companion_v2.proactive.events import ActivityContactEvents, PAGE_SIZE
-from companion_v2.proactive.models import ThoughtKind
-from companion_v2.relationships.models import (
+from digital_life_core.execution.models import TaskError, digest
+from digital_life_core.foundation.refs import AudienceRef, RoleOwnerRef, SourceRef, VersionRef
+from digital_life_core.proactive.events import ActivityContactEvents, PAGE_SIZE
+from digital_life_core.proactive.models import ThoughtKind
+from digital_life_core.relationships.models import (
     EmotionSubject,
     RelationshipMemory,
     RelationshipMemoryKind,
     RelationshipMemoryState,
 )
-from companion_v2.role_work.growth.models import GrowthKind, GrowthState, RoleGrowthRecord
-from companion_v2.role_work.models import (
+from digital_life_core.role_work.growth.models import GrowthKind, GrowthState, RoleGrowthRecord
+from digital_life_core.role_work.models import (
     RoleActivity,
     RoleActivityState as State,
     RoleArtifact,
@@ -26,8 +26,8 @@ from companion_v2.role_work.models import (
     RoleArtifactKind,
     RoleReadingReceipt,
 )
-from companion_v2.role_work.work_models import RoleWorkSpec
-from companion_v2.sources.models import SourceRecord
+from digital_life_core.role_work.work_models import RoleWorkSpec
+from digital_life_core.sources.models import SourceRecord
 from tests.contact_schedule_support import ContactScheduleFixture
 from tests.test_management_access import SCOPE
 from tests.test_role_tool_loop import answered

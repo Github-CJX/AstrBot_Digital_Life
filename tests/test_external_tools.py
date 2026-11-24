@@ -7,20 +7,20 @@ import json
 import unittest
 from types import SimpleNamespace
 
-from companion_v2.capabilities.models import CapabilityAuthorizationState, CapabilityPackageDescriptor
-from companion_v2.capabilities.repositories import CapabilityRepository
-from companion_v2.conversation.external_tools import (
+from digital_life_core.capabilities.models import CapabilityAuthorizationState, CapabilityPackageDescriptor
+from digital_life_core.capabilities.repositories import CapabilityRepository
+from digital_life_core.conversation.external_tools import (
     ExtensionToolDescriptor, ExternalToolExecutor, ExternalToolProvider, ExternalToolResponse,
 )
-from companion_v2.conversation.foreground import ClaimKind, DraftClaim
-from companion_v2.conversation.tool_loop import LocalRoleTools
-from companion_v2.execution.models import Lane, ProviderBinding, SideEffect, TaskError, digest, encode
-from companion_v2.execution.runner import TaskRun
-from companion_v2.foundation.refs import ScopeKind, SourceRef, VersionRef
-from companion_v2.model_gateway.models import ToolCall, ToolSpec
-from companion_v2.model_gateway.routing import ModelRouter
-from companion_v2.model_gateway.service import LocalModelGateway
-from companion_v2.sources.models import SourceRecord
+from digital_life_core.conversation.foreground import ClaimKind, DraftClaim
+from digital_life_core.conversation.tool_loop import LocalRoleTools
+from digital_life_core.execution.models import Lane, ProviderBinding, SideEffect, TaskError, digest, encode
+from digital_life_core.execution.runner import TaskRun
+from digital_life_core.foundation.refs import ScopeKind, SourceRef, VersionRef
+from digital_life_core.model_gateway.models import ToolCall, ToolSpec
+from digital_life_core.model_gateway.routing import ModelRouter
+from digital_life_core.model_gateway.service import LocalModelGateway
+from digital_life_core.sources.models import SourceRecord
 from tests.test_conversation_messages import MessageFixture
 from tests.test_management_access import NOW
 from tests.test_role_tool_loop import answered, requested
@@ -411,7 +411,7 @@ class ExternalToolTests(ExternalFixture, unittest.IsolatedAsyncioTestCase):
         _, run, completion = await self.stage()
         changed = replace(self.bindings["device.read"], version="2", generation="host-generation-2")
         self.bindings["device.read"] = changed
-        with self.assertLogs("companion_v2.conversation.external_tools", level="WARNING") as logs:
+        with self.assertLogs("digital_life_core.conversation.external_tools", level="WARNING") as logs:
             self.assertIn("device.read", {s.action for s in self.tools.catalog_for(self.context)})
             exchange = await self.tools.execute_async(run, completion.call_id, completion.tool_calls[0])
         self.assertEqual(json.loads(exchange.result_json)["state"], "succeeded")
@@ -450,7 +450,7 @@ class ExternalToolTests(ExternalFixture, unittest.IsolatedAsyncioTestCase):
 
     async def test_a_stable_binding_logs_nothing_and_keeps_the_original_declaration(self):
         _, run, completion = await self.stage()
-        with self.assertNoLogs("companion_v2.conversation.external_tools", level="WARNING"):
+        with self.assertNoLogs("digital_life_core.conversation.external_tools", level="WARNING"):
             self.assertIn("device.read", {s.action for s in self.tools.catalog_for(self.context)})
             exchange = await self.tools.execute_async(run, completion.call_id, completion.tool_calls[0])
         self.assertEqual(json.loads(exchange.result_json)["state"], "succeeded")
@@ -550,7 +550,7 @@ class ExternalToolTests(ExternalFixture, unittest.IsolatedAsyncioTestCase):
         self.model_uses()
         batch = await self.generate()
         await self.deliver_next(batch)
-        from companion_v2.conversation.messages import source_from_document
+        from digital_life_core.conversation.messages import source_from_document
         reference = source_from_document(json.loads(self.rows()[0]["result_source_json"]))
         self.messages.sources.revoke(reference, expected_governance_revision=1, observed_at=NOW).unwrap()
         self.assertFalse(self.history()[0]["body_available"])
@@ -608,9 +608,9 @@ class ExternalToolTests(ExternalFixture, unittest.IsolatedAsyncioTestCase):
         self.assertEqual(tasks.read(self.context, run.task.task_id).unwrap().state, "uncertain")
 
     async def test_same_person_on_another_account_or_bot_does_not_inherit_consent(self):
-        from companion_v2.execution.models import TaskContext
-        from companion_v2.foundation.refs import AudienceRef
-        from companion_v2.identity_policy.personas import ConversationRoute, PersonaBinding, PersonaSelector, SelectorKind
+        from digital_life_core.execution.models import TaskContext
+        from digital_life_core.foundation.refs import AudienceRef
+        from digital_life_core.identity_policy.personas import ConversationRoute, PersonaBinding, PersonaSelector, SelectorKind
         for bot, account in (("bot-a", "login-b"), ("bot-b", "login-a")):
             principal = replace(self.important.principal, bot_id=bot, account_id=account)
             self.identity.bind(binding_id=bot + account, principal=principal, subject=self.important.subject,

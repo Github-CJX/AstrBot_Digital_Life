@@ -5,14 +5,14 @@ from datetime import timedelta
 import json
 import unittest
 
-from companion_v2.execution.models import TaskContext, TaskError, digest
-from companion_v2.foundation.refs import AudienceRef, RoleOwnerRef, SourceRef, VersionRef
-from companion_v2.role_work.journal import (JournalContext, JournalKey, JournalKind,
+from digital_life_core.execution.models import TaskContext, TaskError, digest
+from digital_life_core.foundation.refs import AudienceRef, RoleOwnerRef, SourceRef, VersionRef
+from digital_life_core.role_work.journal import (JournalContext, JournalKey, JournalKind,
     JournalDraft, MaterialKind, RoleActivityJournalMaterialProducer,
     RoleTextArtifactJournalMaterialProducer)
-from companion_v2.role_work.models import (RoleActivity, RoleActivityState, RoleArtifact,
+from digital_life_core.role_work.models import (RoleActivity, RoleActivityState, RoleArtifact,
     RoleArtifactJournalMeaning as Meaning, RoleArtifactKind)
-from companion_v2.sources.models import SourceRecord
+from digital_life_core.sources.models import SourceRecord
 from tests.test_host_application import HostFixture
 from tests.test_management_access import NOW, ROLE, SCOPE
 

@@ -7,13 +7,13 @@ from unittest.mock import AsyncMock, patch
 
 from tests import astrbot_data_root  # noqa: F401
 from tests.test_astrbot_core_reply import FakeEvent
-from astrbot_host.core_reply import (
+from digital_life_host.core_reply import (
     CORE_REPLY_CONTEXT_EXTRA, activate_core_reply_delivery_guard, prepare_core_reply_event,
 )
-from astrbot_host.core_reply_tools import CoreReplyToolSession
-from astrbot_host.core_reply_tool_dispatch import observe_core_tool_dispatch_begin
-from companion_v2.execution.models import TaskError
-from companion_v2.foundation.outcome import Outcome
+from digital_life_host.core_reply_tools import CoreReplyToolSession
+from digital_life_host.core_reply_tool_dispatch import observe_core_tool_dispatch_begin
+from digital_life_core.execution.models import TaskError
+from digital_life_core.foundation.outcome import Outcome
 
 
 class Connection:
@@ -44,7 +44,7 @@ class CoreReplyConnectionTests(unittest.IsolatedAsyncioTestCase):
             await asyncio.sleep(0)
             return message
 
-        with patch("astrbot_host.core_reply_media_delivery.native_wire_message", converted):
+        with patch("digital_life_host.core_reply_media_delivery.native_wire_message", converted):
             with self.assertRaises(TaskError) as stopped:
                 await event.send("old reply")
         self.assertEqual(stopped.exception.code, "host_connection_changed")
@@ -62,7 +62,7 @@ class CoreReplyConnectionTests(unittest.IsolatedAsyncioTestCase):
 
         event.send = send
         self.prepare(connection, event=event)
-        with patch("astrbot_host.core_reply_media_delivery.native_reply_messages", return_value=("first", "second")):
+        with patch("digital_life_host.core_reply_media_delivery.native_reply_messages", return_value=("first", "second")):
             with self.assertRaises(TaskError):
                 await event.send("two bubbles")
         self.assertEqual(event.sent, ["first"])
@@ -85,8 +85,8 @@ class CoreReplyConnectionTests(unittest.IsolatedAsyncioTestCase):
             connection.changed.set()
             yield "second"
 
-        with patch("astrbot_host.core_reply_presentation.strip_internal_expression_stream", side_effect=lambda value: value), \
-                patch("astrbot_host.core_reply_presentation.core_reply_presentation", return_value=None):
+        with patch("digital_life_host.core_reply_presentation.strip_internal_expression_stream", side_effect=lambda value: value), \
+                patch("digital_life_host.core_reply_presentation.core_reply_presentation", return_value=None):
             with self.assertRaises(TaskError):
                 await event.send_streaming(chunks())
         self.assertEqual(event.sent, ["first"])
@@ -153,7 +153,7 @@ class CoreReplyConnectionTests(unittest.IsolatedAsyncioTestCase):
                 return False
 
         runner = Runner()
-        with patch("astrbot_host.core_reply_tool_dispatch.active_core_runner", return_value=runner):
+        with patch("digital_life_host.core_reply_tool_dispatch.active_core_runner", return_value=runner):
             self.assertIsNotNone(observe_core_tool_dispatch_begin(event, object()))
             connection.changed.set()
             with self.assertRaises(TaskError):

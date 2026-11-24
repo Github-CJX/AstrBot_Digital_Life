@@ -7,14 +7,14 @@ import unittest
 
 from tests import astrbot_data_root  # noqa: F401
 from astrbot.core.message.components import At, Image, Plain, Reply
-from astrbot_host.core_reply_decision import core_decision_facts
-from astrbot_host.core_reply_tools import CoreReplyToolSession, native_tool_name
-from companion_v2.configuration.models import ConfigLayer, ConfigTarget
-from companion_v2.conversation.native_participation import native_participation_turn
-from companion_v2.conversation.participation import (
+from digital_life_host.core_reply_decision import core_decision_facts
+from digital_life_host.core_reply_tools import CoreReplyToolSession, native_tool_name
+from digital_life_core.configuration.models import ConfigLayer, ConfigTarget
+from digital_life_core.conversation.native_participation import native_participation_turn
+from digital_life_core.conversation.participation import (
     CONFIG_GROUP, GroupParticipationConfigurationOwner, configuration_fields,
 )
-from companion_v2.conversation.participation_prompts import mention_attribution_instruction
+from digital_life_core.conversation.participation_prompts import mention_attribution_instruction
 from tests.group_host_support import GroupFixture
 
 

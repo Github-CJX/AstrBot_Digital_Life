@@ -30,9 +30,9 @@ async def _cleanup(case):
 
 async def run_image(root, guard, report):
     from tests.test_native_image_flow import NativeImageFlowTests
-    from companion_v2.capabilities.models import CapabilityAuthorizationState
-    from companion_v2.execution.models import TaskError
-    from companion_v2.capabilities.repositories import CapabilityRepository
+    from digital_life_core.capabilities.models import CapabilityAuthorizationState
+    from digital_life_core.execution.models import TaskError
+    from digital_life_core.capabilities.repositories import CapabilityRepository
     from tests.native_image_support import NativeImageFixture
     from tests.test_host_application import HostFixture
 

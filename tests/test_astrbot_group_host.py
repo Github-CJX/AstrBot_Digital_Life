@@ -12,18 +12,18 @@ from unittest.mock import patch
 from tests.multi_host_support import multi_config
 from tests.group_host_support import GroupFixture, Query, group_config
 from tests.staging_bootstrap_support import database_contents, wait_for_batch
-from companion_v2.capabilities.repositories import CapabilityRepository
-from companion_v2.execution.models import TaskContext, digest
-from companion_v2.foundation.refs import AudienceRef, ScopeKind, SubjectKind
-from companion_v2.identity_policy.personas import PersonaDirectory
-from companion_v2.memory.models import AtomRef
+from digital_life_core.capabilities.repositories import CapabilityRepository
+from digital_life_core.execution.models import TaskContext, digest
+from digital_life_core.foundation.refs import AudienceRef, ScopeKind, SubjectKind
+from digital_life_core.identity_policy.personas import PersonaDirectory
+from digital_life_core.memory.models import AtomRef
 from astrbot.core.message.components import File
-from astrbot_host.group_authority import GroupAuthority
-from astrbot_host.image_access import GROUP_IMAGE_CAPABILITIES
-from astrbot_host.multi_api import PREFIX
-from astrbot_host.multi_settings import MultiHostSettings
-from astrbot_host.settings import HostControlError
-from astrbot_host.video.loader import load_native_video
+from digital_life_host.group_authority import GroupAuthority
+from digital_life_host.image_access import GROUP_IMAGE_CAPABILITIES
+from digital_life_host.multi_api import PREFIX
+from digital_life_host.multi_settings import MultiHostSettings
+from digital_life_host.settings import HostControlError
+from digital_life_host.video.loader import load_native_video
 
 
 class GroupVideo:
@@ -221,7 +221,7 @@ class GroupHostTests(GroupFixture, unittest.IsolatedAsyncioTestCase):
         self.assertIn("未读取正文", captured.unwrap().text)
 
     async def test_text_only_group_capture_remembers_its_video_positions(self):
-        from astrbot_host import core_reply_video_sources as sources
+        from digital_life_host import core_reply_video_sources as sources
         sources.reset()
         self.addCleanup(sources.reset)
         # 群聊核心回复路径只走 capture_text_only，它把 Video 折成「[视频不可用]」。
@@ -285,8 +285,8 @@ class GroupHostTests(GroupFixture, unittest.IsolatedAsyncioTestCase):
                          ["send_group_msg", "send_private_msg"])
 
     async def test_group_core_admin_keeps_image_tools_without_window_consent(self):
-        from companion_v2.identity_policy.models import AuthorizationTier
-        from companion_v2.identity_policy.object_access import ObjectAccessPolicy
+        from digital_life_core.identity_policy.models import AuthorizationTier
+        from digital_life_core.identity_policy.object_access import ObjectAccessPolicy
 
         app = await self.start_host()
         repository = CapabilityRepository(app.runtime)
@@ -352,7 +352,7 @@ class GroupHostTests(GroupFixture, unittest.IsolatedAsyncioTestCase):
         routes = {route: handler for route, handler, _, _ in self.native.registered_web_apis}
         self.assertFalse(any("/targets/group-" in route and "/memory" in route for route in routes))
         request = NS(username="dashboard-admin", query=Query(target_id="group-a", batch_id=batch))
-        with patch("astrbot_host.multi_api.request", request):
+        with patch("digital_life_host.multi_api.request", request):
             preview = await routes[PREFIX + "/preview"]()
             self.assertTrue(preview["data"]["preview_ready"])
             self.assertTrue(preview["data"]["sent"])

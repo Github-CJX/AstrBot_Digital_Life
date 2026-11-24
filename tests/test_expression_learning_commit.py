@@ -24,22 +24,22 @@ from types import SimpleNamespace
 import unittest
 from unittest.mock import patch
 
-from astrbot_host.management_identity import dashboard_operator
+from digital_life_host.management_identity import dashboard_operator
 
-from companion_v2.configuration.models import ConfigLayer, ConfigTarget
-from companion_v2.execution.models import TaskContext, TaskError, digest
-from companion_v2.execution.runner import RunResult
-from companion_v2.expression import learning, style_service
-from companion_v2.expression.configuration import (GROUP, ExpressionConfigurationOwner,
+from digital_life_core.configuration.models import ConfigLayer, ConfigTarget
+from digital_life_core.execution.models import TaskContext, TaskError, digest
+from digital_life_core.execution.runner import RunResult
+from digital_life_core.expression import learning, style_service
+from digital_life_core.expression.configuration import (GROUP, ExpressionConfigurationOwner,
                                                    configuration_fields)
-from companion_v2.expression.style_management import ExpressionStyleManagement
-from companion_v2.expression.style_service import (KIND, LEARN_LEASE_SECONDS, ExpressionStyleService,
+from digital_life_core.expression.style_management import ExpressionStyleManagement
+from digital_life_core.expression.style_service import (KIND, LEARN_LEASE_SECONDS, ExpressionStyleService,
     parse_output)
-from companion_v2.foundation.outcome import Outcome
-from companion_v2.foundation.refs import ScopeKind, ScopeRef
-from companion_v2.storage.models import OperationState
-from companion_v2.storage.repositories import OperationRepository
-from companion_v2.storage.runtime import StorageRuntime
+from digital_life_core.foundation.outcome import Outcome
+from digital_life_core.foundation.refs import ScopeKind, ScopeRef
+from digital_life_core.storage.models import OperationState
+from digital_life_core.storage.repositories import OperationRepository
+from digital_life_core.storage.runtime import StorageRuntime
 from tests.group_host_support import GroupFixture
 from tests.multi_host_support import MultiFixture, multi_config
 from tests.native_adapter_support import completion
@@ -296,7 +296,7 @@ class PrivateScanAttributionTests(unittest.TestCase):
             return False
 
         service._scan = scan
-        with patch("companion_v2.expression.private_scope.role_private_contexts",
+        with patch("digital_life_core.expression.private_scope.role_private_contexts",
                    return_value=(first, second)):
             service.advance()
 

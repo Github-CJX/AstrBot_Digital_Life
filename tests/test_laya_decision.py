@@ -9,13 +9,13 @@ from urllib.error import HTTPError, URLError
 
 import pytest
 
-from companion_v2.decision.client import LayaClientError
-from astrbot_host import laya_client as laya_module
-from astrbot_host.laya_client import LayaDecisionClient, _LOCAL_ROUTERS, _decision_from_result
-from companion_v2.decision.contract import DecisionContractError, deterministic_skip_reason, parse_decision
-from companion_v2.decision.prompt import DECISION_QUESTIONS, build_state
-from companion_v2.decision.service import LayaDecisionService
-from companion_v2.decision.store import (DEFAULTS, MODE_MODELS, LayaSettingsStore,
+from digital_life_core.decision.client import LayaClientError
+from digital_life_host import laya_client as laya_module
+from digital_life_host.laya_client import LayaDecisionClient, _LOCAL_ROUTERS, _decision_from_result
+from digital_life_core.decision.contract import DecisionContractError, deterministic_skip_reason, parse_decision
+from digital_life_core.decision.prompt import DECISION_QUESTIONS, build_state
+from digital_life_core.decision.service import LayaDecisionService
+from digital_life_core.decision.store import (DEFAULTS, MODE_MODELS, LayaSettingsStore,
                                           LayaSettingsError, role_storage_key)
 
 
@@ -300,7 +300,7 @@ def test_laya_questions_use_official_choice_types_without_numeric_controls():
 
 def test_local_inference_uses_dedicated_executor_and_keeps_runtime_profile(monkeypatch):
     import threading
-    from astrbot_host import laya_client
+    from digital_life_host import laya_client
 
     observed = {}
 
@@ -343,7 +343,7 @@ def test_laya_state_uses_stable_fact_order():
 
 
 def test_model_state_uses_current_message_and_authorized_context_without_routing_ids():
-    from companion_v2.decision.prompt import render_model_state
+    from digital_life_core.decision.prompt import render_model_state
     facts = {"scope_kind": "group", "user_text": "继续等我补充", "mentioned": True,
              "companion_role_id": "persona-binding-id", "bot_account_id": "bot-account-id",
              "recent_group_messages": [{"speaker_id": "synthetic-member", "text": "此前消息"}],
@@ -367,7 +367,7 @@ def test_robot_message_and_quote_are_rule_owned():
 
 def test_runtime_facts_skip_bot_authored_events_and_quotes():
     from types import SimpleNamespace as NS
-    from companion_v2.conversation.generation import LocalReplyGenerator
+    from digital_life_core.conversation.generation import LocalReplyGenerator
 
     request = NS(
         event=NS(
@@ -391,7 +391,7 @@ def test_runtime_facts_skip_bot_authored_events_and_quotes():
 
 def test_model_page_and_single_runtime_share_laya_storage_key(tmp_path):
     from types import SimpleNamespace as NS
-    from astrbot_host.model_api import ModelWebAPI
+    from digital_life_host.model_api import ModelWebAPI
 
     settings = NS(profile_id="private-profile", role_id="role-a")
     controller = NS(data_root=tmp_path, settings=settings,
@@ -403,7 +403,7 @@ def test_model_page_and_single_runtime_share_laya_storage_key(tmp_path):
 
 def test_model_page_and_multi_runtime_share_target_storage_key(tmp_path):
     from types import SimpleNamespace as NS
-    from astrbot_host.model_api import ModelWebAPI
+    from digital_life_host.model_api import ModelWebAPI
 
     controller = NS(data_root=tmp_path, target_id="target-a", role_id="role-a")
     page_service = ModelWebAPI(controller)._laya_service()
@@ -455,7 +455,7 @@ def test_legacy_latest_configuration_is_adopted_globally_without_changing_origin
 
 def test_local_router_adapter_calls_predict_and_maps_choices(monkeypatch):
     _LOCAL_ROUTERS.clear()
-    monkeypatch.setattr("astrbot_host.laya_client.cached_multilingual_model", lambda: None)
+    monkeypatch.setattr("digital_life_host.laya_client.cached_multilingual_model", lambda: None)
     calls = []
 
     class Router:
@@ -545,7 +545,7 @@ def test_remote_adapter_uses_systemone_contract_and_parses_answers(monkeypatch):
         captured["timeout"] = timeout
         return Response()
 
-    monkeypatch.setattr("astrbot_host.laya_client.urlopen", open_url)
+    monkeypatch.setattr("digital_life_host.laya_client.urlopen", open_url)
     client = LayaDecisionClient(mode="remote", endpoint="http://127.0.0.1:8000/v1",
                                 api_key="private-key", timeout_seconds=17)
     result = asyncio.run(client.decide({"message_kind": "text", "user_text": "你好"}))
@@ -581,7 +581,7 @@ def test_workers_ai_adapter_wraps_input_and_parses_result(monkeypatch):
         captured["timeout"] = timeout
         return Response()
 
-    monkeypatch.setattr("astrbot_host.laya_client.urlopen", open_url)
+    monkeypatch.setattr("digital_life_host.laya_client.urlopen", open_url)
     client = LayaDecisionClient(
         mode="workers_ai",
         endpoint="https://api.cloudflare.com/client/v4/accounts/acc-1/ai/run",
@@ -646,7 +646,7 @@ def test_workers_ai_parses_json_string_result_and_reports_errors(monkeypatch):
                 "response": json.dumps(laya_result(), ensure_ascii=False)}},
                 ensure_ascii=False).encode("utf-8")
 
-    monkeypatch.setattr("astrbot_host.laya_client.urlopen", lambda request, timeout: Response())
+    monkeypatch.setattr("digital_life_host.laya_client.urlopen", lambda request, timeout: Response())
     client = LayaDecisionClient(mode="workers_ai",
                                 endpoint="https://api.cloudflare.com/client/v4/accounts/acc-1/ai/run",
                                 model="typesafe/jev-1.14.0")
@@ -664,7 +664,7 @@ def test_workers_ai_parses_json_string_result_and_reports_errors(monkeypatch):
                 {"code": 2021, "message": "Insufficient balance"}]},
                 ensure_ascii=False).encode("utf-8")
 
-    monkeypatch.setattr("astrbot_host.laya_client.urlopen", lambda request, timeout: Rejected())
+    monkeypatch.setattr("digital_life_host.laya_client.urlopen", lambda request, timeout: Rejected())
     with pytest.raises(LayaClientError) as error:
         asyncio.run(client.decide({"message_kind": "text", "user_text": "你好"}))
     assert error.value.code == "laya_response_invalid"
@@ -672,7 +672,7 @@ def test_workers_ai_parses_json_string_result_and_reports_errors(monkeypatch):
 
 
 def test_call_log_persists_model_input_raw_answer_and_processed_decision(tmp_path):
-    from companion_v2.storage.runtime import StorageRuntime
+    from digital_life_core.storage.runtime import StorageRuntime
 
     store = LayaSettingsStore(tmp_path / "settings", "target", "role")
     status = store.read()
@@ -711,7 +711,7 @@ def test_call_log_persists_model_input_raw_answer_and_processed_decision(tmp_pat
 
 
 def test_call_diagnostic_json_truncation_respects_column_limit():
-    from companion_v2.decision.service import _diagnostic_json
+    from digital_life_core.decision.service import _diagnostic_json
 
     for value in ('"' * 1000, "\\" * 1000, "\u0000" * 1000):
         encoded = _diagnostic_json({"body": value}, 256)
@@ -730,7 +730,7 @@ def test_remote_adapter_rejects_openai_chat_shape(monkeypatch):
         def read(self, _limit):
             return b'{"choices":[]}'
 
-    monkeypatch.setattr("astrbot_host.laya_client.urlopen", lambda *_args, **_kwargs: Response())
+    monkeypatch.setattr("digital_life_host.laya_client.urlopen", lambda *_args, **_kwargs: Response())
     client = LayaDecisionClient(mode="remote", endpoint="https://example.test")
     with pytest.raises(LayaClientError) as error:
         asyncio.run(client.decide({"message_kind": "text", "user_text": "hello"}))
@@ -754,7 +754,7 @@ def test_disabled_decision_fields_are_omitted_and_fall_back_to_plugin_defaults(m
         captured["body"] = json.loads(request.data.decode("utf-8"))
         return Response()
 
-    monkeypatch.setattr("astrbot_host.laya_client.urlopen", open_url)
+    monkeypatch.setattr("digital_life_host.laya_client.urlopen", open_url)
     enabled = {name: False for name in decision_document() if name != "reason_codes"}
     enabled["reply_style"] = True
     client = LayaDecisionClient(mode="remote", endpoint="https://example.test")
@@ -767,7 +767,7 @@ def test_disabled_decision_fields_are_omitted_and_fall_back_to_plugin_defaults(m
 
 
 def test_decision_field_settings_and_runtime_events_are_persisted(tmp_path):
-    from companion_v2.storage.runtime import StorageRuntime
+    from digital_life_core.storage.runtime import StorageRuntime
 
     store = LayaSettingsStore(tmp_path / "settings", "target", "role")
     status = store.read()
@@ -794,7 +794,7 @@ def test_decision_field_settings_and_runtime_events_are_persisted(tmp_path):
 
 
 def test_failure_logs_keep_http_status_without_persisting_remote_error_body(tmp_path):
-    from companion_v2.storage.runtime import StorageRuntime
+    from digital_life_core.storage.runtime import StorageRuntime
 
     store = LayaSettingsStore(tmp_path / "settings", "target", "role")
     status = store.read()
@@ -836,7 +836,7 @@ def test_store_reports_runtime_and_keeps_api_key_secret(tmp_path, monkeypatch):
 
 
 def test_store_detects_complete_multilingual_hub_snapshot(tmp_path, monkeypatch):
-    from companion_v2.decision import store as laya_store
+    from digital_life_core.decision import store as laya_store
 
     cache = tmp_path / "hub"
     model = cache / "models--convaiinnovations--laya" / "snapshots" / "revision" / "multilingual"
@@ -856,7 +856,7 @@ def test_store_detects_complete_multilingual_hub_snapshot(tmp_path, monkeypatch)
 
 
 def test_local_adapter_reuses_complete_download_and_pins_multilingual(tmp_path, monkeypatch):
-    from companion_v2.decision import store as laya_store
+    from digital_life_core.decision import store as laya_store
 
     cache = tmp_path / "hub"
     model = cache / "models--convaiinnovations--laya" / "snapshots" / "cached" / "multilingual"
@@ -899,7 +899,7 @@ def test_old_mode_less_laya_settings_migrate_to_multilingual(tmp_path):
 
 
 def test_selected_checkpoint_is_used_instead_of_official_cached_weights(tmp_path, monkeypatch):
-    from astrbot_host import laya_client
+    from digital_life_host import laya_client
     model = tmp_path / "fine-tuned"
     for relative in ("rl_agent_config.json", "model.safetensors", "tokenizer/tokenizer.json", "encoder/config.json"):
         path = model / relative
@@ -942,8 +942,8 @@ def test_missing_selected_checkpoint_has_explicit_error_and_cannot_download_anot
 
 def test_background_warmup_is_shared_and_does_not_queue_expired_message_inference(tmp_path, monkeypatch):
     import threading
-    from astrbot_host import laya_client
-    from companion_v2.storage.runtime import StorageRuntime
+    from digital_life_host import laya_client
+    from digital_life_core.storage.runtime import StorageRuntime
 
     store = LayaSettingsStore(tmp_path / "settings")
     store.update(store.raw()["revision"], {"enabled": True})
@@ -1017,7 +1017,7 @@ def jev_response(monkeypatch, payload):
         def read(self, _limit):
             return json.dumps(payload, ensure_ascii=False).encode("utf-8")
 
-    monkeypatch.setattr("astrbot_host.laya_client.urlopen", lambda *_args, **_kwargs: Response())
+    monkeypatch.setattr("digital_life_host.laya_client.urlopen", lambda *_args, **_kwargs: Response())
 
 
 def test_jev_adapter_wraps_the_decision_document_in_one_chat_message(monkeypatch):
@@ -1040,7 +1040,7 @@ def test_jev_adapter_wraps_the_decision_document_in_one_chat_message(monkeypatch
         captured["timeout"] = timeout
         return Response()
 
-    monkeypatch.setattr("astrbot_host.laya_client.urlopen", open_url)
+    monkeypatch.setattr("digital_life_host.laya_client.urlopen", open_url)
     client = LayaDecisionClient(mode="jev", endpoint="https://gateway.test/v1",
                                 api_key="jev-key", timeout_seconds=23)
     result = asyncio.run(client.decide({"message_kind": "text", "user_text": "你好"}))
@@ -1094,7 +1094,7 @@ def test_laya_rejects_cross_protocol_endpoint_before_request(monkeypatch):
     def no_request(*_args, **_kwargs):
         raise AssertionError("endpoint validation must not send a request")
 
-    monkeypatch.setattr("astrbot_host.laya_client.urlopen", no_request)
+    monkeypatch.setattr("digital_life_host.laya_client.urlopen", no_request)
 
     with pytest.raises(LayaClientError) as error:
         LayaDecisionClient(mode="remote", endpoint="https://gateway.test/v1/chat/completions")
@@ -1146,7 +1146,7 @@ def test_jev_ignores_leftover_cloudflare_request_format(monkeypatch):
         captured["body"] = json.loads(request.data.decode("utf-8"))
         return Response()
 
-    monkeypatch.setattr("astrbot_host.laya_client.urlopen", open_url)
+    monkeypatch.setattr("digital_life_host.laya_client.urlopen", open_url)
     client = LayaDecisionClient(mode="jev", endpoint="https://gateway.test/v1",
                                 request_format="cloudflare")
     decision = asyncio.run(client.decide({"message_kind": "text", "user_text": "你好"}))
@@ -1169,7 +1169,7 @@ def test_jev_adapter_reports_a_rejected_credential_without_leaking_it(monkeypatc
     def reject(*_args, **_kwargs):
         raise HTTPError("https://gateway.test/v1/chat/completions", 401, "Unauthorized", {}, Rejected())
 
-    monkeypatch.setattr("astrbot_host.laya_client.urlopen", reject)
+    monkeypatch.setattr("digital_life_host.laya_client.urlopen", reject)
     client = LayaDecisionClient(mode="jev", endpoint="https://gateway.test", api_key="jev-key")
     with pytest.raises(LayaClientError) as error:
         asyncio.run(client.decide({"message_kind": "text", "user_text": "你好"}))
@@ -1182,7 +1182,7 @@ def test_jev_adapter_reports_a_transport_failure(monkeypatch):
     def offline(*_args, **_kwargs):
         raise URLError("connection refused")
 
-    monkeypatch.setattr("astrbot_host.laya_client.urlopen", offline)
+    monkeypatch.setattr("digital_life_host.laya_client.urlopen", offline)
     client = LayaDecisionClient(mode="jev", endpoint="https://gateway.test")
     with pytest.raises(LayaClientError) as error:
         asyncio.run(client.decide({"message_kind": "text", "user_text": "你好"}))
@@ -1216,7 +1216,7 @@ def test_jev_adapter_requires_every_enabled_answer(monkeypatch):
 
 def test_workers_ai_decisions_are_recorded_with_the_remote_ledger_mode(tmp_path, monkeypatch):
     """Workers AI must not lose its ledger row to the three-backend CHECK constraint."""
-    from companion_v2.storage.runtime import StorageRuntime
+    from digital_life_core.storage.runtime import StorageRuntime
 
     class Response:
         def __enter__(self):
@@ -1229,7 +1229,7 @@ def test_workers_ai_decisions_are_recorded_with_the_remote_ledger_mode(tmp_path,
             return json.dumps({"success": True, "result": laya_result()},
                               ensure_ascii=False).encode("utf-8")
 
-    monkeypatch.setattr("astrbot_host.laya_client.urlopen", lambda request, timeout: Response())
+    monkeypatch.setattr("digital_life_host.laya_client.urlopen", lambda request, timeout: Response())
     store = LayaSettingsStore(tmp_path / "settings", "target", "role")
     store.update(store.raw()["revision"], {
         "enabled": True, "mode": "workers_ai",
@@ -1287,7 +1287,7 @@ def test_jev_mode_requires_an_endpoint_before_any_request(tmp_path):
 
 def test_jev_decisions_are_recorded_in_the_runtime_ledger(tmp_path, monkeypatch):
     """The ledger DDL must accept the third backend, not just local and remote."""
-    from companion_v2.storage.runtime import StorageRuntime
+    from digital_life_core.storage.runtime import StorageRuntime
 
     jev_response(monkeypatch, jev_envelope())
     store = LayaSettingsStore(tmp_path / "settings", "target", "role")
@@ -1375,7 +1375,7 @@ def test_jev_mode_never_falls_back_to_a_local_checkpoint_at_call_time(tmp_path, 
         captured["body"] = json.loads(request.data.decode("utf-8"))
         raise URLError("stop after one captured request")
 
-    monkeypatch.setattr("astrbot_host.laya_client.urlopen", open_url)
+    monkeypatch.setattr("digital_life_host.laya_client.urlopen", open_url)
     store = LayaSettingsStore(tmp_path, "target", "role")
     store.update(store.raw()["revision"], {"enabled": True, **_mode_settings("jev")})
     service = LayaDecisionService(store, client_factory=LayaDecisionClient)
@@ -1385,7 +1385,7 @@ def test_jev_mode_never_falls_back_to_a_local_checkpoint_at_call_time(tmp_path, 
 
 
 def test_auth_failed_reason_preserves_http_status_and_whitelisted_summary_without_secrets():
-    from companion_v2.decision.service import _safe_log_reason, safe_laya_client_error_reason
+    from digital_life_core.decision.service import _safe_log_reason, safe_laya_client_error_reason
 
     summary_403 = _safe_log_reason(
         "laya_auth_failed",
@@ -1435,7 +1435,7 @@ def test_auth_failed_reason_preserves_http_status_and_whitelisted_summary_withou
 
 
 def test_auth_failure_persists_safe_summary_to_ledger(tmp_path):
-    from companion_v2.storage.runtime import StorageRuntime
+    from digital_life_core.storage.runtime import StorageRuntime
 
     store = LayaSettingsStore(tmp_path / "settings", "target", "role")
     store.update(store.raw()["revision"], {"enabled": True})
@@ -1463,8 +1463,8 @@ def test_auth_failure_persists_safe_summary_to_ledger(tmp_path):
 
 
 def test_recent_all_origins_and_scope_key_filtering_with_legacy_observations(tmp_path):
-    from companion_v2.foundation.refs import ScopeKind, ScopeRef
-    from companion_v2.storage.runtime import StorageRuntime
+    from digital_life_core.foundation.refs import ScopeKind, ScopeRef
+    from digital_life_core.storage.runtime import StorageRuntime
 
     store = LayaSettingsStore(tmp_path / "settings", "target", "role")
     store.update(store.raw()["revision"], {"enabled": True})
@@ -1503,7 +1503,7 @@ def test_recent_all_origins_and_scope_key_filtering_with_legacy_observations(tmp
         svc_priv_legacy.set_trace(event_ref="role-intervention-legacy-1", source="role_intervention")
         svc_priv_legacy._record(store.raw(), "ok", 15, decision={"intervention_need": "none"})
 
-        from companion_v2.storage.core_reply_telemetry_schema import STATEMENTS as TELEMETRY_STATEMENTS
+        from digital_life_core.storage.core_reply_telemetry_schema import STATEMENTS as TELEMETRY_STATEMENTS
 
         with runtime.transaction() as connection:
             for statement in TELEMETRY_STATEMENTS:
@@ -1557,10 +1557,10 @@ def test_recent_all_origins_and_scope_key_filtering_with_legacy_observations(tmp
 def test_model_api_laya_logs_scope_and_auth_bridge_payloads(tmp_path, monkeypatch):
     from types import SimpleNamespace as NS
     from unittest.mock import AsyncMock
-    from astrbot_host import model_api as model_api_module
-    from companion_v2.foundation.outcome import Outcome
-    from companion_v2.foundation.refs import ScopeKind, ScopeRef
-    from companion_v2.storage.runtime import StorageRuntime
+    from digital_life_host import model_api as model_api_module
+    from digital_life_core.foundation.outcome import Outcome
+    from digital_life_core.foundation.refs import ScopeKind, ScopeRef
+    from digital_life_core.storage.runtime import StorageRuntime
 
     runtime = StorageRuntime.open(data_root=tmp_path / "runtime", installation_id="inst-api")
     priv_scope = ScopeRef("inst-api", "onebot_qq", ScopeKind.PRIVATE, "153000127",
@@ -1632,7 +1632,7 @@ def test_model_api_laya_logs_scope_and_auth_bridge_payloads(tmp_path, monkeypatc
                     f'Laya HTTP 401：{{"error":{{"message":"invalid token {secret_key}"}}}}',
                 )
 
-        monkeypatch.setattr("astrbot_host.laya_client.LayaDecisionClient", FakeRejectClient)
+        monkeypatch.setattr("digital_life_host.laya_client.LayaDecisionClient", FakeRejectClient)
         monkeypatch.setattr(model_api_module, "request",
                             NS(query={}, username="admin", body=AsyncMock(return_value=b"{}")))
         test_res = asyncio.run(api.laya_test())
@@ -1657,10 +1657,10 @@ def test_model_api_laya_logs_scope_and_auth_bridge_payloads(tmp_path, monkeypatc
 
 def test_recent_scope_key_is_sql_bounded_across_2000_rows_and_legacy_null_fallback(tmp_path):
     from unittest.mock import patch
-    from companion_v2.decision.service import _LEGACY_SCOPE_SCAN_BUDGET
-    from companion_v2.foundation.refs import ScopeKind, ScopeRef
-    from companion_v2.storage.core_reply_telemetry_schema import STATEMENTS as TELEMETRY_STATEMENTS
-    from companion_v2.storage.runtime import StorageRuntime
+    from digital_life_core.decision.service import _LEGACY_SCOPE_SCAN_BUDGET
+    from digital_life_core.foundation.refs import ScopeKind, ScopeRef
+    from digital_life_core.storage.core_reply_telemetry_schema import STATEMENTS as TELEMETRY_STATEMENTS
+    from digital_life_core.storage.runtime import StorageRuntime
 
     store = LayaSettingsStore(tmp_path / "settings", "target", "role")
     store.update(store.raw()["revision"], {"enabled": True})

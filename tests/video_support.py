@@ -6,8 +6,8 @@ from pathlib import Path
 from tempfile import TemporaryDirectory
 import unittest
 
-from astrbot_host.video.decoder import inspect_video
-from astrbot_host.video.loader import load_native_video
+from digital_life_host.video.decoder import inspect_video
+from digital_life_host.video.loader import load_native_video
 from tests.audio_support import AudioFixture
 from tests.native_adapter_support import FakeEvent
 

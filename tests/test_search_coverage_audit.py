@@ -16,9 +16,9 @@ from tests.group_host_support import group_config
 from astrbot.api.web import PluginRequest, bind_request_context
 from starlette.requests import Request
 
-from astrbot_host.account_session_api import AccountSessionWebAPI
-from astrbot_host.page_api import PREFIX
-from astrbot_host.search_catalog import build_search_catalog
+from digital_life_host.account_session_api import AccountSessionWebAPI
+from digital_life_host.page_api import PREFIX
+from digital_life_host.search_catalog import build_search_catalog
 from tools.audit_search_coverage import run_audit
 
 
@@ -144,7 +144,7 @@ class FallbackProviderSaveTests(unittest.IsolatedAsyncioTestCase):
 
     async def _post_model(self, body: dict):
         req = NS(username="admin", query={}, body=AsyncMock(return_value=json.dumps(body).encode("utf-8")))
-        with patch("astrbot_host.account_session_api.request", req):
+        with patch("digital_life_host.account_session_api.request", req):
             return await self.api.save_model_provider()
 
     async def test_save_clear_preserve_and_validate_fallback_provider_id(self):

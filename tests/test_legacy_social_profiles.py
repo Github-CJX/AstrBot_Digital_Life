@@ -7,11 +7,11 @@ from tempfile import TemporaryDirectory
 from types import SimpleNamespace
 import unittest
 
-from companion_v2.foundation.refs import ScopeKind
-from companion_v2.knowledge.catalog import KnowledgeCatalog, MemberEntry, SourceBinding
-from companion_v2.knowledge.members import select_member_clues
-from companion_v2.legacy.data_migration import build_data_plan, map_legacy_worldbook
-from companion_v2.storage.runtime import StorageRuntime
+from digital_life_core.foundation.refs import ScopeKind
+from digital_life_core.knowledge.catalog import KnowledgeCatalog, MemberEntry, SourceBinding
+from digital_life_core.knowledge.members import select_member_clues
+from digital_life_core.legacy.data_migration import build_data_plan, map_legacy_worldbook
+from digital_life_core.storage.runtime import StorageRuntime
 
 
 class LegacySocialProfileTests(unittest.TestCase):
@@ -94,7 +94,7 @@ class LegacySocialProfileTests(unittest.TestCase):
         self.assertNotIn("未识别隐私", group_prompt)
 
     def test_group_mapping_keeps_the_full_social_material_in_the_mapped_group(self):
-        from astrbot_host.legacy_group_data_api import LegacyGroupDataWebAPI
+        from digital_life_host.legacy_group_data_api import LegacyGroupDataWebAPI
 
         plan = self.plan({"worldbook_member_profiles": {"200": {
             "name": "阿岚", "content": "群内相处资料", "identity_note": "身份备注",
@@ -110,7 +110,7 @@ class LegacySocialProfileTests(unittest.TestCase):
         self.assertEqual(mapped[0].important_memories[0].content, "群内印象")
 
     def test_group_import_merges_curated_account_profiles_into_the_group(self):
-        from astrbot_host.legacy_group_data_api import LegacyGroupDataWebAPI
+        from digital_life_host.legacy_group_data_api import LegacyGroupDataWebAPI
 
         plan = self.plan({"worldbook_member_profiles": {
             "200": {"name": "比折", "aliases": ["珝环"], "content": "最亲密的人", "priority": 120},
@@ -128,7 +128,7 @@ class LegacySocialProfileTests(unittest.TestCase):
         self.assertEqual(by_account["201"].group_ids, ("790",))
 
     def test_group_import_limits_accounts_and_preserves_ambiguous_people(self):
-        from astrbot_host.legacy_group_data_api import LegacyGroupDataWebAPI
+        from digital_life_host.legacy_group_data_api import LegacyGroupDataWebAPI
 
         curated = MemberEntry("curated", name="甲", declared_account_ids=("200", "999"),
                               content="人工维护资料", priority=120)
@@ -158,7 +158,7 @@ class LegacySocialProfileTests(unittest.TestCase):
         self.assertLessEqual(len(prompt), 200)
 
     def test_reimport_updates_impressions_and_remains_idempotent(self):
-        from astrbot_host.legacy_api import LegacyMigrationWebAPI
+        from digital_life_host.legacy_api import LegacyMigrationWebAPI
 
         runtime = StorageRuntime.open(data_root=self.root / "v2", installation_id="install")
         self.addCleanup(runtime.close)

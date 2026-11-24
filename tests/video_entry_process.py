@@ -10,7 +10,7 @@ from types import SimpleNamespace as NS
 
 
 def run():
-    from astrbot_host.video.decoder import _ffmpeg_binary
+    from digital_life_host.video.decoder import _ffmpeg_binary
 
     binary = _ffmpeg_binary()
     if binary is None:
@@ -29,7 +29,7 @@ def run():
 
         from astrbot.core.agent.message import TextPart
         from astrbot.core.provider.sources.gemini_source import ProviderGoogleGenAI
-        from astrbot_host.core_reply_perception import video_request_state
+        from digital_life_host.core_reply_perception import video_request_state
         from tests.test_core_reply_video_sources import ENTRY, private_context
 
         context = private_context()

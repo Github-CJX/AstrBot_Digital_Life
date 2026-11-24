@@ -4,8 +4,8 @@ from datetime import datetime, timedelta, timezone
 from pathlib import Path
 import unittest
 
-from companion_v2.foundation.clock import DeterministicClock
-from companion_v2.foundation.sqlite import temporary_sqlite_database
+from digital_life_core.foundation.clock import DeterministicClock
+from digital_life_core.foundation.sqlite import temporary_sqlite_database
 
 
 class DeterministicClockTests(unittest.TestCase):

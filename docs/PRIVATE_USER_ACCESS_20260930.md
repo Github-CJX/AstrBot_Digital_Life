@@ -11,10 +11,10 @@
 
 | 需要的东西 | V2 现成的 | 位置 |
 | --- | --- | --- |
-| 对话权限 | `conversation.reply` grant | 动作定义 `companion_v2/identity_policy/object_access.py:56`；执行点 `conversation/messages.py:192` |
+| 对话权限 | `conversation.reply` grant | 动作定义 `digital_life_core/identity_policy/object_access.py:56`；执行点 `conversation/messages.py:192` |
 | 主动权限 | `proactive.contact` grant | 动作定义同上 `:57`；执行点 `proactive/preferences.py:92`、`proactive/service.py:363/373/815` |
-| 按人存储 | `identity_grants(grant_id, subject_kind, subject_id, capability, payload_json)` | `companion_v2/storage/schema.py:428`（索引 `:436`） |
-| 每窗口主动授权 | `ContactManagement._grants`（`proactive-managed:` 前缀） | `companion_v2/proactive/management.py:66-76` |
+| 按人存储 | `identity_grants(grant_id, subject_kind, subject_id, capability, payload_json)` | `digital_life_core/storage/schema.py:428`（索引 `:436`） |
+| 每窗口主动授权 | `ContactManagement._grants`（`proactive-managed:` 前缀） | `digital_life_core/proactive/management.py:66-76` |
 
 `docs/V2_USER_PAGE_GAP_PLAN_20260930.md:19/160` 已经明确否掉"再造一个用户级开关"——
 **页面改了 grant、grant 又有一份副本**，迟早出现"页面说关了、grant 还开着"的双源状态。
@@ -26,8 +26,8 @@
 
 | # | 要补什么 | 为什么 | 落点 |
 | --- | --- | --- | --- |
-| 1 | **优雅拒绝** | 今天撤销 `conversation.reply` 会抛 `host_grant_changed`（`astrbot_host/multi_authority.py:142-144`，在 `select()` 内，早于 `check_context_access`）→ 只有一行 warning，既没拒绝也没文案 | `multi_authority.provision_scope`：只对**必需** capability 硬失败；`conversation.reply` 撤销视为操作员意图 |
-| 2 | **统一闸** | 单/多目标唯一汇合点是 `CompanionApplication.accept` | `companion_v2/host/application.py:504`（`flow.accept` 的事务之前，零残留） |
+| 1 | **优雅拒绝** | 今天撤销 `conversation.reply` 会抛 `host_grant_changed`（`digital_life_host/multi_authority.py:142-144`，在 `select()` 内，早于 `check_context_access`）→ 只有一行 warning，既没拒绝也没文案 | `multi_authority.provision_scope`：只对**必需** capability 硬失败；`conversation.reply` 撤销视为操作员意图 |
+| 2 | **统一闸** | 单/多目标唯一汇合点是 `CompanionApplication.accept` | `digital_life_core/host/application.py:504`（`flow.accept` 的事务之前，零残留） |
 | 3 | **拒绝文案出口** | 文案必须在"对话权限为假"时仍能发出 | 新 `DeliveryOwner`，照 `ImageReviewFallback`（`conversation/media/fallback.py:31` + `application.py:236` 注册）；需自己调一次 `forbidden_word_guard`，且不会写 `conversation_sent_history` |
 | 4 | **主动短路** | 撤销 `proactive.contact` 其实已生效（四处都在查），只差"别在读取预算/模型前白跑" | `proactive/scheduling.py:149` 之后 `return None`；**不要写状态**（写 `proactive_contacts` 行会被 `service.py:380-381` 判为"已退休"，永久封死该对象） |
 
@@ -37,7 +37,7 @@
 
 ## 三、配置面（本轮已落地）
 
-新组 `private_access`（`companion_v2/relationships/private_access.py`，层：安装 → 角色）：
+新组 `private_access`（`digital_life_core/relationships/private_access.py`，层：安装 → 角色）：
 
 | 字段 | 默认 | 含义 |
 | --- | --- | --- |
@@ -68,7 +68,7 @@
 | 触发条件 | 私聊事件、插件处于运行态、发送者解析不到任何目标/绑定、`stranger_notice_enabled` 为真 |
 | 发送内容 | **只有** `denied_reply` 这一行；不读记忆、不调模型、不建身份、不进相识目录 |
 | 频率 | 同一账号 `notice_cooldown_seconds` 内只回一次；每天总量不超过 `stranger_notice_daily_cap` |
-| 归属层 | 发送实现必须在 `astrbot_host/`（依赖 AstrBot SDK），核心包不得反向导入 |
+| 归属层 | 发送实现必须在 `digital_life_host/`（依赖 AstrBot SDK），核心包不得反向导入 |
 | 记录 | 记一条有界回执（账号、时间、命中哪条配置），便于"为什么回了这个人"可查 |
 | 不做 | 不签发任何 grant、不创建 binding、不写 `conversation_*` 表、不进入投递队列的对话语义 |
 
@@ -93,7 +93,7 @@
 
 ### 陌生首触通道的实现要点（2026-09-30 完成）
 
-`astrbot_host/stranger_notice.py` + `main.py` 的一处分支：
+`digital_life_host/stranger_notice.py` + `main.py` 的一处分支：
 
 | 项 | 做法 |
 | --- | --- |
@@ -112,7 +112,7 @@
    而 `feature_access` 对 STANDARD 主体还要求该动作的 grant——对"刚被收回权限的人"
    甚至"没有任何身份的陌生号"根本走不通（顺带发现既有的 `conversation.image_review_fallback`
    也是这个状态）。因此改为：**核心只做决定**（`PrivateRefusalNotice.due()` + 冷却记账），
-   **发送在 `astrbot_host/private_notice.py`**，用平台反向 WebSocket 直发一行纯文本。
+   **发送在 `digital_life_host/private_notice.py`**，用平台反向 WebSocket 直发一行纯文本。
 2. **路由认证复用 notice 那一套**。`authenticate_notice_route` 原本只认 `post_type == "notice"`；
    加一个 `expected_post` 参数后，消息事件用 `expected_post="message"` 走同一套严格认证
    （账号、平台、客户端、会话来源），不另写一份。

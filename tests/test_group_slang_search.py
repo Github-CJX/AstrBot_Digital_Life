@@ -2,8 +2,8 @@
 
 import unittest
 
-from companion_v2.memory.group.slang import CANDIDATE_PROMPT, EXTERNAL_NOTE, GroupSlang
-from companion_v2.storage.semantic import DEFAULTS
+from digital_life_core.memory.group.slang import CANDIDATE_PROMPT, EXTERNAL_NOTE, GroupSlang
+from digital_life_core.storage.semantic import DEFAULTS
 
 
 class FakeStore:
@@ -134,7 +134,7 @@ class SettingsContractTests(unittest.TestCase):
         self.assertIn("以本群样例为准", EXTERNAL_NOTE)
 
     def test_configure_rejects_out_of_range_search_settings(self):
-        from companion_v2.storage.semantic import SemanticStore
+        from digital_life_core.storage.semantic import SemanticStore
         from tempfile import TemporaryDirectory
         from pathlib import Path
 

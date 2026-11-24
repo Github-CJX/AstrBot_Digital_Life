@@ -15,12 +15,12 @@ from astrbot.api.web import PluginRequest, bind_request_context
 from PIL import Image
 from starlette.requests import Request
 
-from astrbot_host.management_identity import dashboard_operator
-from astrbot_host.semantic_api import PREFIX
-from companion_v2.adapters.astrbot.model_wire import tool_alias
-from companion_v2.execution.models import TaskContext, encode
-from companion_v2.identity_policy.models import AuthorizationTier
-from companion_v2.identity_policy.object_access import ObjectAccessPolicy
+from digital_life_host.management_identity import dashboard_operator
+from digital_life_host.semantic_api import PREFIX
+from digital_life_core.adapters.astrbot.model_wire import tool_alias
+from digital_life_core.execution.models import TaskContext, encode
+from digital_life_core.identity_policy.models import AuthorizationTier
+from digital_life_core.identity_policy.object_access import ObjectAccessPolicy
 from tests import test_astrbot_staging_host as support
 from tests.group_memory_management_support import GroupMemoryManagementFixture
 from tests.native_adapter_support import completion, final_text
@@ -272,7 +272,7 @@ class GroupSemanticAPITests(SemanticRequests, GroupMemoryManagementFixture, unit
 
         async def observe_at(timestamp, wording):
             fake_time = NS(time=lambda: timestamp, monotonic=time.monotonic)
-            with patch("companion_v2.memory.group.slang.time", fake_time):
+            with patch("digital_life_core.memory.group.slang.time", fake_time):
                 return await self.conversation(remember=False, wording=wording)
 
         await observe_at(1000.0, "“集合灯”与“观星局”“摸鱼王”都是今晚集合的说法")

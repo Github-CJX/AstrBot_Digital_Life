@@ -2,7 +2,7 @@
 
 import unittest
 
-from astrbot_host.web_api import http_handler
+from digital_life_host.web_api import http_handler
 
 
 class PanelResponseTests(unittest.IsolatedAsyncioTestCase):

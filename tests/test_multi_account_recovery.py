@@ -7,7 +7,7 @@ from unittest.mock import patch
 from tests import astrbot_data_root  # noqa: F401
 from tests.multi_host_support import MultiFixture
 from tests.native_adapter_support import FakePlatform
-from companion_v2.execution.models import TaskError
+from digital_life_core.execution.models import TaskError
 
 
 class MultiAccountRecoveryTests(MultiFixture, unittest.IsolatedAsyncioTestCase):

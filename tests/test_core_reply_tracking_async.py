@@ -7,8 +7,8 @@ from types import SimpleNamespace as NS
 import unittest
 from unittest.mock import Mock, patch
 
-from astrbot_host.core_reply import CORE_REPLY_CONTEXT_EXTRA
-from astrbot_host.core_reply_tracking import (
+from digital_life_host.core_reply import CORE_REPLY_CONTEXT_EXTRA
+from digital_life_host.core_reply_tracking import (
     adopt_core_reply_tracking, finish_core_reply_tracking, mark_core_reply_inflight,
     prepare_core_reply_tracking,
 )
@@ -271,11 +271,11 @@ class CoreReplyTrackingAsyncTests(GroupFixture, unittest.IsolatedAsyncioTestCase
         from dataclasses import asdict
         from astrbot.core.message.components import Plain
         from astrbot.core.message.message_event_result import MessageChain
-        from astrbot_host.core_reply import prepare_core_reply_event
-        from astrbot_host.core_reply_segmentation import prepare_core_reply_segmentation
-        from companion_v2.conversation.segmentation import SegmentationPolicy
-        from companion_v2.conversation.segment_control import LLM_SEGMENT_MARKER
-        from companion_v2.foundation.outcome import Outcome
+        from digital_life_host.core_reply import prepare_core_reply_event
+        from digital_life_host.core_reply_segmentation import prepare_core_reply_segmentation
+        from digital_life_core.conversation.segmentation import SegmentationPolicy
+        from digital_life_core.conversation.segment_control import LLM_SEGMENT_MARKER
+        from digital_life_core.foundation.outcome import Outcome
 
         for index, body in enumerate((LLM_SEGMENT_MARKER, "第一条完整回复。第二条完整回复。")):
             event, prepared = await self.prepared_event("managed-qq-stream-" + str(index))
@@ -307,8 +307,8 @@ class CoreReplyTrackingAsyncTests(GroupFixture, unittest.IsolatedAsyncioTestCase
     async def test_cleanup_removed_text_does_not_create_a_final_or_stream_send_receipt(self):
         from astrbot.core.message.components import Plain
         from astrbot.core.message.message_event_result import MessageChain
-        from astrbot_host.core_reply import prepare_core_reply_event
-        from companion_v2.foundation.outcome import Outcome
+        from digital_life_host.core_reply import prepare_core_reply_event
+        from digital_life_core.foundation.outcome import Outcome
 
         for streaming in (False, True):
             event, prepared = await self.prepared_event("cleaned-empty-" + str(streaming))

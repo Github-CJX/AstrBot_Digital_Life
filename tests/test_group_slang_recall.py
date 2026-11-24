@@ -1,8 +1,8 @@
 from types import SimpleNamespace
 import unittest
 
-from companion_v2.foundation.refs import ScopeKind, ScopeRef, SubjectKind, SubjectRef
-from companion_v2.memory.group.slang import GroupSlang
+from digital_life_core.foundation.refs import ScopeKind, ScopeRef, SubjectKind, SubjectRef
+from digital_life_core.memory.group.slang import GroupSlang
 
 
 class GroupSlangRecallTests(unittest.IsolatedAsyncioTestCase):

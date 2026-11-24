@@ -4,8 +4,8 @@ from datetime import timedelta
 import json
 import unittest
 
-from companion_v2.agenda.models import Schedule
-from companion_v2.execution.models import encode
+from digital_life_core.agenda.models import Schedule
+from digital_life_core.execution.models import encode
 from tests.test_management_access import NOW
 from tests.test_role_state import StateFixture
 

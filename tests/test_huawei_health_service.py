@@ -6,9 +6,9 @@ from types import SimpleNamespace
 import unittest
 from unittest.mock import patch
 
-from astrbot_host.huawei_health.api import HuaweiHealthWebAPI
-from astrbot_host.huawei_health.service import HuaweiHealthService
-from astrbot_host.huawei_health.vendor import hw_credentials
+from digital_life_host.huawei_health.api import HuaweiHealthWebAPI
+from digital_life_host.huawei_health.service import HuaweiHealthService
+from digital_life_host.huawei_health.vendor import hw_credentials
 
 
 class HuaweiHealthApiContractTests(unittest.TestCase):

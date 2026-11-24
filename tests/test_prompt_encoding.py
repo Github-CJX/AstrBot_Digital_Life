@@ -1,7 +1,7 @@
 import hashlib
 import unittest
 
-from companion_v2.execution.models import digest, encode, encode_prompt
+from digital_life_core.execution.models import digest, encode, encode_prompt
 
 
 class PromptEncodingTests(unittest.TestCase):

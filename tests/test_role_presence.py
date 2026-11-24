@@ -7,12 +7,12 @@ import json
 import unittest
 from unittest.mock import patch
 
-from companion_v2.adapters.astrbot.presence import OneBotPresencePort
-from companion_v2.conversation.flow import ConversationPolicy
-from companion_v2.delivery.presence import PresenceCoordinator
-from companion_v2.execution.models import TaskError, encode, stamp
-from companion_v2.foundation.refs import AudienceRef
-from companion_v2.agenda.models import Schedule
+from digital_life_core.adapters.astrbot.presence import OneBotPresencePort
+from digital_life_core.conversation.flow import ConversationPolicy
+from digital_life_core.delivery.presence import PresenceCoordinator
+from digital_life_core.execution.models import TaskError, encode, stamp
+from digital_life_core.foundation.refs import AudienceRef
+from digital_life_core.agenda.models import Schedule
 from tests.native_adapter_support import NativeFixture, FakeReverseApi
 from tests.test_management_access import NOW
 from tests.test_role_state import StateFixture, calendar_data, state_data
@@ -75,7 +75,7 @@ class PresenceTests(StateFixture, unittest.IsolatedAsyncioTestCase):
         self.assertEqual([mode for _, mode in port.modes], ["online"])
 
     async def test_returned_native_reply_restores_online_after_coordinator_restart_once(self):
-        from companion_v2.conversation.native_turns import NativeConversationTurns
+        from digital_life_core.conversation.native_turns import NativeConversationTurns
         port = FakePresence()
         host, app, context, manager = self.setup_state(presence_port=port)
         self.configure(manager, enabled=True, online_status_enabled=True)

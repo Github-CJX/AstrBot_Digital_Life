@@ -2,11 +2,11 @@ import unittest
 from dataclasses import replace
 from types import SimpleNamespace
 
-from companion_v2.foundation.outcome import Outcome
-from companion_v2.foundation.refs import ScopeKind, SubjectKind, SubjectRef
+from digital_life_core.foundation.outcome import Outcome
+from digital_life_core.foundation.refs import ScopeKind, SubjectKind, SubjectRef
 from tests.test_management_access import INSTALLATION, NOW, SCOPE
 
-from astrbot_host.functional_commands import execute_functional_command, parse_functional_command
+from digital_life_host.functional_commands import execute_functional_command, parse_functional_command
 
 ROLE = SubjectRef(INSTALLATION, SubjectKind.BOT, "role-a")
 USER = SubjectRef(INSTALLATION, SubjectKind.HUMAN, "person-a")

@@ -42,7 +42,7 @@ def ledger_path() -> Path:
 
 REASON_LIST = (
     "（销号）配置层不承载数据：V2 的配置取值是标量"
-    "（companion_v2/configuration/models.py:15 Scalar = bool | int | float | str），"
+    "（digital_life_core/configuration/models.py:15 Scalar = bool | int | float | str），"
     "注册表 ValueKind 也只有 boolean/integer/text/probability/weight，无列表类型。"
     "参考素材按 C2-1 口径是角色资产（引用 + SHA-256 + 职责），归资产注册表，不落配置。"
 )

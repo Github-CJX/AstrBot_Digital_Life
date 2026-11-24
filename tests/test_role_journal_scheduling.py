@@ -4,8 +4,8 @@ import asyncio
 from datetime import datetime, time, timedelta, timezone
 import unittest
 
-from companion_v2.role_work.journal import JournalKind, JournalState
-from companion_v2.role_work.journal.scheduling import next_daily
+from digital_life_core.role_work.journal import JournalKind, JournalState
+from digital_life_core.role_work.journal.scheduling import next_daily
 from tests.test_management_access import NOW
 from tests.test_role_journal_triggers import JournalTriggerFixture
 from tests.test_role_tool_loop import answered

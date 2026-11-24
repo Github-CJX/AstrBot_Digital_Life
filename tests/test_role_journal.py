@@ -3,10 +3,10 @@ from datetime import timedelta
 import json
 import unittest
 
-from companion_v2.execution.models import TaskError, digest, encode
-from companion_v2.foundation.refs import ReferenceValidationError, VersionRef
-from companion_v2.role_work import RoleActivity, RoleActivityState
-from companion_v2.role_work.journal import (DreamRecall, JournalContext, JournalDerivatives, JournalDraft, JournalKey,
+from digital_life_core.execution.models import TaskError, digest, encode
+from digital_life_core.foundation.refs import ReferenceValidationError, VersionRef
+from digital_life_core.role_work import RoleActivity, RoleActivityState
+from digital_life_core.role_work.journal import (DreamRecall, JournalContext, JournalDerivatives, JournalDraft, JournalKey,
     JournalKind, JournalOrigin, JournalRef, JournalState, RoleJournalService)
 from tests.journal_support import JournalFixture
 from tests.test_management_access import NOW, ROLE, SCOPE

@@ -9,12 +9,12 @@ import unittest
 
 from PIL import Image
 
-from companion_v2.conversation.media.models import ImageDescriptor
-from companion_v2.device.adb import parse_ui_hierarchy
-from companion_v2.device.annotate import annotate_screen, image_size
-from companion_v2.device.prompt_image import OWNER, PhonePromptImage
-from companion_v2.execution.models import TaskError
-from companion_v2.foundation.refs import ScopeKind, ScopeRef, SourceRef, VersionRef
+from digital_life_core.conversation.media.models import ImageDescriptor
+from digital_life_core.device.adb import parse_ui_hierarchy
+from digital_life_core.device.annotate import annotate_screen, image_size
+from digital_life_core.device.prompt_image import OWNER, PhonePromptImage
+from digital_life_core.execution.models import TaskError
+from digital_life_core.foundation.refs import ScopeKind, ScopeRef, SourceRef, VersionRef
 from datetime import datetime, timezone
 
 XML = """<?xml version='1.0' encoding='UTF-8'?>

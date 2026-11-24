@@ -6,7 +6,7 @@ import unittest
 from types import SimpleNamespace as NS
 from zoneinfo import ZoneInfo
 
-from companion_v2.proactive.wake_events import WakeContactEvents
+from digital_life_core.proactive.wake_events import WakeContactEvents
 
 
 ZONE = ZoneInfo("Asia/Shanghai")

@@ -18,16 +18,16 @@ from tests.native_adapter_support import completion, final_text
 from tests.staging_bootstrap_support import wait_for_batch
 from tests.video_support import video_bytes
 from astrbot.core.message.components import At, Forward, Record, Video
-from astrbot_host.audio.loader import load_native_audio
-from astrbot_host.group_authority import GroupAuthority
-from astrbot_host.media import load_native_image
-from astrbot_host.media_components import group_components, private_components
-from astrbot_host.native import installed_native_types
-from astrbot_host.video.loader import load_native_video
-from companion_v2.adapters.astrbot.forwards import read_private_forwards
-from companion_v2.adapters.astrbot.group_forwards import read_group_forwards
-from companion_v2.adapters.astrbot.model_wire import tool_alias
-from companion_v2.execution.models import TaskContext, TaskError
+from digital_life_host.audio.loader import load_native_audio
+from digital_life_host.group_authority import GroupAuthority
+from digital_life_host.media import load_native_image
+from digital_life_host.media_components import group_components, private_components
+from digital_life_host.native import installed_native_types
+from digital_life_host.video.loader import load_native_video
+from digital_life_core.adapters.astrbot.forwards import read_private_forwards
+from digital_life_core.adapters.astrbot.group_forwards import read_group_forwards
+from digital_life_core.adapters.astrbot.model_wire import tool_alias
+from digital_life_core.execution.models import TaskContext, TaskError
 
 
 def media_part(kind, content):
@@ -270,7 +270,7 @@ class GroupAudioVideoTests(GroupMediaFixture, unittest.IsolatedAsyncioTestCase):
                     return await load_native_video(locator)
 
                 with patch.object(group, "video_loader", side_effect=decode), \
-                        patch("companion_v2.adapters.astrbot.group.MEDIA_PREPARE_TIMEOUT", 0.2 if mode == "timeout" else 20):
+                        patch("digital_life_core.adapters.astrbot.group.MEDIA_PREPARE_TIMEOUT", 0.2 if mode == "timeout" else 20):
                     pending = asyncio.create_task(self.controller.receive_claimed(event))
                     if mode == "stop":
                         try:
@@ -302,7 +302,7 @@ class GroupAudioVideoTests(GroupMediaFixture, unittest.IsolatedAsyncioTestCase):
         voice = captured.audios[0].descriptor.retained_bytes
         clip = captured.forwards[0].nodes[0].videos[0].descriptor.retained_bytes
         # Each source fits alone; their combination must fail before identity intake.
-        with patch("companion_v2.conversation.media.video.models.MAX_TURN_BYTES", max(voice, clip)):
+        with patch("digital_life_core.conversation.media.video.models.MAX_TURN_BYTES", max(voice, clip)):
             rejected = await self.controller.receive_claimed(event)
         self.assertEqual(rejected.failure.code, "host_group_media_limit")
         self.assertEqual(self.app.runtime.read_one("SELECT COUNT(*) FROM sources", ())[0], 0)

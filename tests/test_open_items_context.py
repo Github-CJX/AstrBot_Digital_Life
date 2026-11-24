@@ -4,14 +4,14 @@ import json
 from datetime import timedelta
 import unittest
 
-from companion_v2.agenda.models import AgendaTarget
-from companion_v2.agenda.service import AgendaService
-from companion_v2.conversation.open_items_context import (MAX_ITEMS, ConversationOpenItems, INSTRUCTION,
+from digital_life_core.agenda.models import AgendaTarget
+from digital_life_core.agenda.service import AgendaService
+from digital_life_core.conversation.open_items_context import (MAX_ITEMS, ConversationOpenItems, INSTRUCTION,
                                                           OpenItemsReader)
-from companion_v2.execution.models import Lane, TaskContext, TaskError
-from companion_v2.foundation.refs import (AudienceRef, OperationRef, ScopeKind, ScopeRef,
+from digital_life_core.execution.models import Lane, TaskContext, TaskError
+from digital_life_core.foundation.refs import (AudienceRef, OperationRef, ScopeKind, ScopeRef,
                                            SubjectKind, SubjectRef, VersionRef)
-from companion_v2.identity_policy.models import AuthorizationTier, RoleBinding
+from digital_life_core.identity_policy.models import AuthorizationTier, RoleBinding
 from tests.test_conversation_messages import MessageFixture
 from tests.test_management_access import INSTALLATION, NOW, SCOPE
 from tests.test_host_application import HostFixture
@@ -88,8 +88,8 @@ class OpenItemsContextTests(OpenItemsFixture, unittest.IsolatedAsyncioTestCase):
         self.add_item()
         async def edit_during_generation(envelope):
             self.change_item("item-a", changes={"body": "最新安排已经改变"})
-            from companion_v2.model_gateway.models import Amount, ProviderResponse
-            from companion_v2.conversation.foreground import ModelDraft
+            from digital_life_core.model_gateway.models import Amount, ProviderResponse
+            from digital_life_core.conversation.foreground import ModelDraft
             return ProviderResponse("generated", ModelDraft("沿用旧安排的回复", ()), Amount(15, 40), "usage")
         self.responses["primary"] = edit_during_generation
         batch = self.accept()
@@ -246,7 +246,7 @@ class OpenItemsContextTests(OpenItemsFixture, unittest.IsolatedAsyncioTestCase):
         self.assertEqual(snapshot["references"], [])
 
     async def test_recently_past_due_open_loop_is_marked_for_natural_post_event_care(self):
-        from companion_v2.agenda.models import Schedule
+        from digital_life_core.agenda.models import Schedule
         binding = self.identity.resolve_role(SCOPE, observed_at=self.clock.now()).unwrap()
         target = AgendaTarget(SCOPE, binding.role, self.important.subject)
         operation = OperationRef("create-due", "agenda", SCOPE, VersionRef("create-due", 1), "create-due")

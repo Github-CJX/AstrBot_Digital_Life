@@ -10,13 +10,13 @@ from types import SimpleNamespace as NS
 import unittest
 from unittest.mock import AsyncMock, patch
 
-from astrbot_host import group_model_api as group_model_api_module
-from astrbot_host.group_model_api import GroupModelWebAPI
-from companion_v2.decision import LayaDecisionService, LayaSettingsStore
-from companion_v2.decision.client import LayaClientError
-from companion_v2.foundation.outcome import Outcome
-from companion_v2.foundation.refs import ScopeKind, ScopeRef
-from companion_v2.storage.runtime import StorageRuntime
+from digital_life_host import group_model_api as group_model_api_module
+from digital_life_host.group_model_api import GroupModelWebAPI
+from digital_life_core.decision import LayaDecisionService, LayaSettingsStore
+from digital_life_core.decision.client import LayaClientError
+from digital_life_core.foundation.outcome import Outcome
+from digital_life_core.foundation.refs import ScopeKind, ScopeRef
+from digital_life_core.storage.runtime import StorageRuntime
 
 
 class GroupLayaAPITests(unittest.IsolatedAsyncioTestCase):
@@ -29,7 +29,7 @@ class GroupLayaAPITests(unittest.IsolatedAsyncioTestCase):
             self.assertEqual(routes["/group/model/laya"], ["GET"])
             self.assertEqual(routes["/group/model/laya/save"], ["POST"])
 
-            with patch("astrbot_host.group_model_api.request", NS(query={})):
+            with patch("digital_life_host.group_model_api.request", NS(query={})):
                 status = await api.laya_status()
                 logs = await api.laya_logs()
             self.assertEqual(status["status"], "ok")
@@ -37,7 +37,7 @@ class GroupLayaAPITests(unittest.IsolatedAsyncioTestCase):
 
             body = json.dumps({"revision": status["data"]["revision"],
                                "changes": {"followup_confidence_threshold": 40}}).encode("utf-8")
-            with patch("astrbot_host.group_model_api.request", NS(query={}, body=AsyncMock(return_value=body))):
+            with patch("digital_life_host.group_model_api.request", NS(query={}, body=AsyncMock(return_value=body))):
                 saved = await api.laya_save()
             self.assertEqual(saved["status"], "ok")
             self.assertEqual(saved["data"]["followup_confidence_threshold"], 40)
@@ -49,7 +49,7 @@ class GroupLayaAPITests(unittest.IsolatedAsyncioTestCase):
             api = GroupModelWebAPI(controller, "group", "role")
             api._prepare = AsyncMock(return_value=("viewer", NS(authorize=lambda _operator:
                 Outcome.failed("core_access_required", "administrator required")), "role"))
-            with patch("astrbot_host.group_model_api.request", NS(query={})):
+            with patch("digital_life_host.group_model_api.request", NS(query={})):
                 result = await api.laya_status()
             self.assertEqual(result["status"], "error")
             self.assertEqual(result["data"]["code"], "core_access_required")
@@ -92,7 +92,7 @@ class GroupLayaAPITests(unittest.IsolatedAsyncioTestCase):
                 svc_priv.set_trace(event_ref="core-reply:priv-only", source="conversation")
                 svc_priv._record(store.raw(), "ok", 11, decision=decision)
 
-                from companion_v2.storage.core_reply_telemetry_schema import STATEMENTS as TELEMETRY_STATEMENTS
+                from digital_life_core.storage.core_reply_telemetry_schema import STATEMENTS as TELEMETRY_STATEMENTS
 
                 with runtime.transaction() as connection:
                     for statement in TELEMETRY_STATEMENTS:
@@ -131,10 +131,10 @@ class GroupLayaAPITests(unittest.IsolatedAsyncioTestCase):
                         )
 
                 with patch.object(group_model_api_module, "LayaDecisionClient", RejectingClient):
-                    with patch("astrbot_host.group_model_api.request",
+                    with patch("digital_life_host.group_model_api.request",
                                NS(query={}, body=AsyncMock(return_value=b"{}"))):
                         test_res = await api.laya_test()
-                    with patch("astrbot_host.group_model_api.request",
+                    with patch("digital_life_host.group_model_api.request",
                                NS(query={}, body=AsyncMock(return_value=b'{"facts":{"message_kind":"text","user_text":"hi"}}'))):
                         decide_res = await api.laya_decide()
 
@@ -153,7 +153,7 @@ class GroupLayaAPITests(unittest.IsolatedAsyncioTestCase):
                 self.assertEqual(decide_res["data"]["reason"], "Laya HTTP 401 · invalid token <hidden>")
                 self.assertNotIn(secret_key, json.dumps(decide_res, ensure_ascii=False))
 
-                with patch("astrbot_host.group_model_api.request", NS(query={})):
+                with patch("digital_life_host.group_model_api.request", NS(query={})):
                     logs = await api.laya_logs()
                 self.assertEqual(logs["status"], "ok")
                 self.assertEqual(logs["data"]["available"], True)

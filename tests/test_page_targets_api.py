@@ -14,12 +14,12 @@ from tests.multi_host_support import MultiFixture, multi_config
 from astrbot.api.web import PluginRequest, bind_request_context
 from astrbot.dashboard.services.plugin_page_service import PluginPageService
 from starlette.requests import Request
-from astrbot_host.management_identity import dashboard_operator
-from astrbot_host.page_api import PREFIX
-from companion_v2.identity_policy.models import AuthorizationTier
-from companion_v2.identity_policy.object_access import ObjectAccessPolicy
-from companion_v2.memory.person.management import PersonAcquaintanceDirectory
-from companion_v2.relationships.group_network import GroupRelationshipStore, VERSION, metadata_key, route_owner_key
+from digital_life_host.management_identity import dashboard_operator
+from digital_life_host.page_api import PREFIX
+from digital_life_core.identity_policy.models import AuthorizationTier
+from digital_life_core.identity_policy.object_access import ObjectAccessPolicy
+from digital_life_core.memory.person.management import PersonAcquaintanceDirectory
+from digital_life_core.relationships.group_network import GroupRelationshipStore, VERSION, metadata_key, route_owner_key
 from tools.host_page_render import render_html
 
 
@@ -97,7 +97,7 @@ class SinglePageTests(PageRequests, unittest.IsolatedAsyncioTestCase):
         (await self.controller.initialize_profile()).unwrap()
         routes = {path: handler for path, handler, _, _ in self.native.registered_web_apis}
         directory = routes[PREFIX + "/acquaintance"]
-        with patch("astrbot_host.acquaintance_api.request", NS(username="admin", query={})), \
+        with patch("digital_life_host.acquaintance_api.request", NS(username="admin", query={})), \
                 patch.object(PersonAcquaintanceDirectory, "directory",
                              return_value={"persons": [], "counts": {"total": 0}}) as listing:
             response = await directory()
@@ -138,7 +138,7 @@ class SinglePageTests(PageRequests, unittest.IsolatedAsyncioTestCase):
         (await self.controller.initialize_profile()).unwrap()
         directory = next(handler for path, handler, _, _ in self.native.registered_web_apis
                          if path == PREFIX + "/acquaintance")
-        with patch("astrbot_host.acquaintance_api.request", NS(username="admin", query={})), \
+        with patch("digital_life_host.acquaintance_api.request", NS(username="admin", query={})), \
                 patch.object(self.controller.session_topology, "inventory", AsyncMock(return_value=[])) as inventory:
             response = await directory()
         self.assertEqual(response["status"], "ok", response)
@@ -179,8 +179,8 @@ class SinglePageTests(PageRequests, unittest.IsolatedAsyncioTestCase):
             connection.execute("INSERT INTO runtime_metadata(key, value) VALUES (?, ?)",
                                (metadata_key(owner), json.dumps(document)))
         routes = {path: handler for path, handler, _, _ in self.native.registered_web_apis}
-        directory = routes["/astrbot_plugin_private_companion/acquaintance"]
-        with patch("astrbot_host.acquaintance_api.request", NS(username="admin", query={})), \
+        directory = routes["/astrbot_plugin_digital_life/acquaintance"]
+        with patch("digital_life_host.acquaintance_api.request", NS(username="admin", query={})), \
                 patch.object(PersonAcquaintanceDirectory, "directory",
                              return_value={"persons": [], "counts": {"total": 0}}):
             response = await directory()
@@ -215,7 +215,7 @@ class SinglePageTests(PageRequests, unittest.IsolatedAsyncioTestCase):
     async def test_native_group_session_is_listed_without_importing_v2_permissions(self):
         (await self.controller.initialize_profile()).unwrap()
         routes = {path: handler for path, handler, _, _ in self.native.registered_web_apis}
-        directory = routes["/astrbot_plugin_private_companion/acquaintance"]
+        directory = routes["/astrbot_plugin_digital_life/acquaintance"]
         topology = self.controller.session_topology
         self.native.platform.client._wsr_api_clients = {"100": object()}
         umo = "qq-main:GroupMessage:450"
@@ -225,7 +225,7 @@ class SinglePageTests(PageRequests, unittest.IsolatedAsyncioTestCase):
         discovered_groups = [row for row in discovered if row["scope_kind"] == "group"]
         self.assertEqual(len(discovered_groups), 1)
         self.assertEqual(discovered_groups[0]["unified_msg_origin"], umo)
-        with patch("astrbot_host.acquaintance_api.request", NS(username="admin", query={})), \
+        with patch("digital_life_host.acquaintance_api.request", NS(username="admin", query={})), \
                 patch.object(PersonAcquaintanceDirectory, "directory",
                              return_value={"persons": [], "counts": {"total": 0}}):
             response = await directory()
@@ -250,9 +250,9 @@ class SinglePageTests(PageRequests, unittest.IsolatedAsyncioTestCase):
     async def test_native_group_directory_failure_is_reported_with_its_cause(self):
         (await self.controller.initialize_profile()).unwrap()
         routes = {path: handler for path, handler, _, _ in self.native.registered_web_apis}
-        directory = routes["/astrbot_plugin_private_companion/acquaintance"]
+        directory = routes["/astrbot_plugin_digital_life/acquaintance"]
         topology = self.controller.session_topology
-        with patch("astrbot_host.acquaintance_api.request", NS(username="admin", query={})), \
+        with patch("digital_life_host.acquaintance_api.request", NS(username="admin", query={})), \
                 patch.object(PersonAcquaintanceDirectory, "directory",
                              return_value={"persons": [], "counts": {"total": 0}}), \
                 patch.object(topology, "inventory", new=AsyncMock(
@@ -268,25 +268,25 @@ class SinglePageTests(PageRequests, unittest.IsolatedAsyncioTestCase):
         routes = {path: handler for path, handler, _, _ in self.native.registered_web_apis}
         status = routes[PREFIX + "/model"]
         configure = routes[PREFIX + "/model/configure"]
-        with patch("astrbot_host.model_api.request", NS(username="admin", query={})):
+        with patch("digital_life_host.model_api.request", NS(username="admin", query={})):
             response = await status()
         self.assertEqual(response["status"], "ok", response)
         self.assertTrue(response["data"]["tasks"])
         self.assertEqual(len(response["data"]["tasks"][0]["edit_token"]), 64)
-        with patch("astrbot_host.model_api.request", NS(username="api_key:synthetic", query={})):
+        with patch("digital_life_host.model_api.request", NS(username="api_key:synthetic", query={})):
             self.assertEqual((await status())["data"]["code"], "dashboard_identity_required")
 
         async def malformed():
             return b'{"kind":"conversation.reply","kind":"duplicate"}'
 
-        with patch("astrbot_host.model_api.request", NS(username="admin", query={}, body=malformed)):
+        with patch("digital_life_host.model_api.request", NS(username="admin", query={}, body=malformed)):
             self.assertEqual((await configure())["data"]["code"], "model_request_invalid")
         self.assertEqual(self.native.provider.client.state.calls, [])
 
     async def test_model_status_projection_runs_off_the_event_loop(self):
         (await self.controller.initialize_profile()).unwrap()
         import threading
-        import astrbot_host.model_api as model_api
+        import digital_life_host.model_api as model_api
         routes = {path: handler for path, handler, _, _ in self.native.registered_web_apis}
         status = routes[PREFIX + "/model"]
         main_thread = threading.get_ident()
@@ -298,7 +298,7 @@ class SinglePageTests(PageRequests, unittest.IsolatedAsyncioTestCase):
             return original(manager, *args, **kwargs)
 
         with patch.object(model_api.ModelManagement, "status", new=tracked), \
-                patch("astrbot_host.model_api.request", NS(username="admin", query={})):
+                patch("digital_life_host.model_api.request", NS(username="admin", query={})):
             response = await status()
         self.assertEqual(response["status"], "ok", response)
         self.assertTrue(workers)
@@ -307,7 +307,7 @@ class SinglePageTests(PageRequests, unittest.IsolatedAsyncioTestCase):
         (await self.controller.initialize_profile()).unwrap()
         before = self.controller.status()["session_state"]
         routes = {path: handler for path, handler, _, _ in self.native.registered_web_apis}
-        with patch("astrbot_host.setup_api.request", NS(username="admin", query={})):
+        with patch("digital_life_host.setup_api.request", NS(username="admin", query={})):
             progress = await routes[PREFIX + "/setup/status"]()
             choices = await routes[PREFIX + "/setup/targets"]()
         self.assertEqual(progress["status"], "ok", progress)
@@ -316,7 +316,7 @@ class SinglePageTests(PageRequests, unittest.IsolatedAsyncioTestCase):
         pinned = self.controller._read_intent()
         self.assertEqual(progress["data"]["binding"]["role_id"], pinned.persona.role.subject_id)
         self.assertEqual(set(choices["data"]), {"accounts", "personas", "targets", "directory"})
-        from astrbot_host.legacy_api import PREFIX as LEGACY_PREFIX
+        from digital_life_host.legacy_api import PREFIX as LEGACY_PREFIX
         self.assertTrue(any(role.get("legacy_api") == LEGACY_PREFIX
                             for target in choices["data"]["targets"] for role in target["roles"]))
         self.assertEqual(set(choices["data"]["directory"]), {"complete", "issues"})
@@ -397,7 +397,7 @@ class SinglePageTests(PageRequests, unittest.IsolatedAsyncioTestCase):
                     "get_login_info": {"user_id": 100, "nickname": "小伴"}}[action]
         api = self.native.platform.client._api._wsr_api
         api.call_action = AsyncMock(side_effect=metadata)
-        with patch("astrbot_host.acquaintance_api.request", NS(username="admin", query={})), \
+        with patch("digital_life_host.acquaintance_api.request", NS(username="admin", query={})), \
                 patch.object(PersonAcquaintanceDirectory, "directory",
                              return_value={"persons": [person], "counts": {"total": 1}}):
             response = await routes[PREFIX + "/acquaintance"]()
@@ -453,8 +453,8 @@ class SinglePageTests(PageRequests, unittest.IsolatedAsyncioTestCase):
 
 class MultiPageTests(PageRequests, MultiFixture, unittest.IsolatedAsyncioTestCase):
     async def test_group_remark_is_scoped_and_visible_in_both_directories(self):
-        from astrbot_host.acquaintance_api import AcquaintanceWebAPI, GROUP_REMARK_PATH
-        from astrbot_host.group_remarks import GroupRemarks
+        from digital_life_host.acquaintance_api import AcquaintanceWebAPI, GROUP_REMARK_PATH
+        from digital_life_host.group_remarks import GroupRemarks
 
         route = {"platform_id": "qq-main", "bot_id": "bot-a", "account_id": "100",
                  "group_id": "SYNTHETIC_GROUP_OPENID"}
@@ -469,7 +469,7 @@ class MultiPageTests(PageRequests, MultiFixture, unittest.IsolatedAsyncioTestCas
         async def save(remark, revision, username="admin"):
             body = json.dumps({**route, "remark": remark, "expected_revision": revision},
                               ensure_ascii=False).encode("utf-8")
-            with patch("astrbot_host.acquaintance_api.request", NS(
+            with patch("digital_life_host.acquaintance_api.request", NS(
                     username=username, query={}, body=AsyncMock(return_value=body))):
                 return await api.set_group_remark()
 
@@ -481,7 +481,7 @@ class MultiPageTests(PageRequests, MultiFixture, unittest.IsolatedAsyncioTestCas
         self.assertEqual((await save("旧窗口覆盖", 0))["data"]["code"],
                          "group_remark_revision_conflict")
 
-        with patch("astrbot_host.acquaintance_api.request", NS(username="admin", query={})), \
+        with patch("digital_life_host.acquaintance_api.request", NS(username="admin", query={})), \
                 patch.object(self.controller.session_topology, "inventory", AsyncMock(return_value=[])):
             directory = await api.directory()
         self.assertEqual(directory["status"], "ok", directory)
@@ -501,15 +501,15 @@ class MultiPageTests(PageRequests, MultiFixture, unittest.IsolatedAsyncioTestCas
         self.assertEqual(GroupRemarks(self.controller.runtime).apply([route])[0]["remark"], "")
 
     async def test_setup_targets_publish_migration_paths_before_runtime_starts(self):
-        from astrbot_host.role_paths import HOST_PREFIX, role_legacy_paths
-        from astrbot_host.setup_api import PREFIX as SETUP_PREFIX
+        from digital_life_host.role_paths import HOST_PREFIX, role_legacy_paths
+        from digital_life_host.setup_api import PREFIX as SETUP_PREFIX
 
         self.controller = self.make_controller(multi_config(group_targets=[dict(
             target_id="groups", platform_id="qq-main", account_id="100",
             bot_id="bot-a", group_id="300")]))
         self.controller.register_routes()
         routes = {path: handler for path, handler, _, _ in self.native.registered_web_apis}
-        with patch("astrbot_host.setup_api.request", NS(username="admin", query={})):
+        with patch("digital_life_host.setup_api.request", NS(username="admin", query={})):
             response = await routes[SETUP_PREFIX + "/targets"]()
         self.assertEqual(response["status"], "ok", response)
         targets = response["data"]["targets"]
@@ -530,7 +530,7 @@ class MultiPageTests(PageRequests, MultiFixture, unittest.IsolatedAsyncioTestCas
         self.assertEqual(self.controller.runtime, None)
 
     async def test_historical_group_for_removed_role_is_not_marked_configured(self):
-        from astrbot_host.acquaintance_api import _group_relationship_networks
+        from digital_life_host.acquaintance_api import _group_relationship_networks
 
         self.controller = self.make_controller(multi_config(group_targets=[dict(target_id="groups",
             platform_id="qq-main", account_id="100", bot_id="bot-a", group_id="*")]))
@@ -548,7 +548,7 @@ class MultiPageTests(PageRequests, MultiFixture, unittest.IsolatedAsyncioTestCas
     async def test_automatic_native_group_projection_includes_only_the_mapped_role(self):
         from dataclasses import replace
         from unittest.mock import AsyncMock
-        from astrbot_host.acquaintance_api import AcquaintanceWebAPI
+        from digital_life_host.acquaintance_api import AcquaintanceWebAPI
         self.controller = self.make_controller(multi_config(group_targets=[dict(target_id="groups",
             platform_id="qq-main", account_id="100", bot_id="bot-a", group_id="*")]))
         (await self.controller.initialize_profile()).unwrap()
@@ -557,8 +557,8 @@ class MultiPageTests(PageRequests, MultiFixture, unittest.IsolatedAsyncioTestCas
                    "account_id": "100", "bot_id": "bot-a", "group_id": "450",
                    "roles": [{"role_id": "role-a", "persona_ids": ["original"], "role_name": "original"}]}]
         with patch.object(self.controller.session_topology, "inventory", AsyncMock(return_value=native)), \
-                patch("astrbot_host.acquaintance_api.request", NS(username="admin", query={})), \
-                patch("astrbot_host.acquaintance_api.display_names", return_value=NS(
+                patch("digital_life_host.acquaintance_api.request", NS(username="admin", query={})), \
+                patch("digital_life_host.acquaintance_api.display_names", return_value=NS(
                     persons=AsyncMock(side_effect=lambda rows: rows), targets=AsyncMock(side_effect=lambda rows: rows))):
             result = await api.directory()
             self.assertEqual(result["status"], "ok", result)

@@ -12,7 +12,7 @@
 用法（建议先停宿主）：
 
     python tools/repair_role_alias_targets.py --db <companion-v2.sqlite3> \
-        --config <astrbot_plugin_private_companion_config.json>
+        --config <astrbot_plugin_digital_life_config.json>
     python tools/repair_role_alias_targets.py ... --apply
 """
 
@@ -29,7 +29,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 # 显示名规则必须和运行时代码一致，不能再抄一份后缀表。
-from astrbot_host.identity_derivation import role_display_name
+from digital_life_host.identity_derivation import role_display_name
 
 
 def load_roles(config_path: Path):
@@ -57,7 +57,7 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--db", type=Path, required=True, help="companion-v2.sqlite3")
     parser.add_argument("--config", type=Path, required=True,
-                        help="astrbot_plugin_private_companion_config.json")
+                        help="astrbot_plugin_digital_life_config.json")
     parser.add_argument("--apply", action="store_true", help="写入；缺省只打印计划")
     args = parser.parse_args()
     if not args.db.is_file() or not args.config.is_file():

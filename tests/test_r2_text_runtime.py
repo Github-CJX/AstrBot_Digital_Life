@@ -2,10 +2,10 @@
 
 修复前的事实链（本文件每条断言都对应其中一环）：
 
-* ``companion_v2/conversation/generation.py:485-499`` 无条件把
+* ``digital_life_core/conversation/generation.py:485-499`` 无条件把
   ``messages.tools.catalog_for_with_diagnostics(...)`` 的结果传给
   ``gateway.open_session(tools=...)``；
-* ``companion_v2/model_gateway/service.py:75-77`` 在“有目录 + 任一 provider 无
+* ``digital_life_core/model_gateway/service.py:75-77`` 在“有目录 + 任一 provider 无
   ``tools``”时抛 ``TaskError("model_capability_mismatch", ...)``，整条文本回复失败；
 * 私聊随后走 ``generation.py:500-505`` 的本地兜底，但 ``:645`` 使用了只在模型循环
   （``:529``/``:614``）里赋值的 ``current`` → ``UnboundLocalError``，用户收到的是沉默；
@@ -42,15 +42,15 @@ import json
 import unittest
 from unittest.mock import patch
 
-from companion_v2.adapters.astrbot.provider import REPLY_TASK_CAPABILITIES, host_capabilities
-from companion_v2.conversation.generation import MODEL_FAILURE_NOTICE
-from companion_v2.conversation.messages import REPLY_KIND
-from companion_v2.conversation.tool_loop import LocalRoleTools
-from companion_v2.execution.models import Lane, TaskResult, digest, encode
-from companion_v2.execution.runner import TaskRun
-from companion_v2.model_gateway.models import Amount, ModelDraft, ProviderResponse, ToolCall
-from companion_v2.model_gateway.routing import ModelRouter
-from companion_v2.model_gateway.service import LocalModelGateway
+from digital_life_core.adapters.astrbot.provider import REPLY_TASK_CAPABILITIES, host_capabilities
+from digital_life_core.conversation.generation import MODEL_FAILURE_NOTICE
+from digital_life_core.conversation.messages import REPLY_KIND
+from digital_life_core.conversation.tool_loop import LocalRoleTools
+from digital_life_core.execution.models import Lane, TaskResult, digest, encode
+from digital_life_core.execution.runner import TaskRun
+from digital_life_core.model_gateway.models import Amount, ModelDraft, ProviderResponse, ToolCall
+from digital_life_core.model_gateway.routing import ModelRouter
+from digital_life_core.model_gateway.service import LocalModelGateway
 from tests.test_conversation_messages import MessageFixture
 
 

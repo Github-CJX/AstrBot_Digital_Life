@@ -1,7 +1,7 @@
 from datetime import datetime, timedelta, timezone
 import unittest
 
-from companion_v2.proactive.sleep_context import SleepContext, from_health_source
+from digital_life_core.proactive.sleep_context import SleepContext, from_health_source
 
 
 NOW = datetime(2026, 10, 28, 7, 30, tzinfo=timezone.utc)

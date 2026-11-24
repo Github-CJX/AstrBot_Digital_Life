@@ -9,12 +9,12 @@ from dataclasses import replace
 from datetime import timedelta
 import unittest
 
-from companion_v2.configuration.models import ApplyMode, ConfigLayer
-from companion_v2.configuration.registry import FieldRegistry, ValueKind
-from companion_v2.execution.models import TaskContext, TaskError, digest, encode, stamp
-from companion_v2.foundation.refs import ScopeKind
-from companion_v2.identity_policy.group_audience import group_audience
-from companion_v2.memory.episode_settings import (DEFAULTS, GROUP, GUIDANCE, LIMITS, MAX_SOURCE_LINES,
+from digital_life_core.configuration.models import ApplyMode, ConfigLayer
+from digital_life_core.configuration.registry import FieldRegistry, ValueKind
+from digital_life_core.execution.models import TaskContext, TaskError, digest, encode, stamp
+from digital_life_core.foundation.refs import ScopeKind
+from digital_life_core.identity_policy.group_audience import group_audience
+from digital_life_core.memory.episode_settings import (DEFAULTS, GROUP, GUIDANCE, LIMITS, MAX_SOURCE_LINES,
                                                   MAX_SUMMARY_CHARS, OWNER, configuration_fields,
                                                   episode_material, episode_namespace, episode_settings,
                                                   recent_group_lines, settings_for)
@@ -24,7 +24,7 @@ from tests.test_management_access import NOW
 
 class EpisodeSettingsTests(unittest.TestCase):
     def test_episode_fields_live_in_the_memory_group_with_one_owner(self):
-        from companion_v2.memory.configuration import configuration_fields as memory_fields
+        from digital_life_core.memory.configuration import configuration_fields as memory_fields
         episode = configuration_fields()
         self.assertEqual([f.field_id for f in episode],
                          ["memory." + name for name in DEFAULTS])
@@ -132,8 +132,8 @@ class EpisodeMaterialTests(MessageFixture, unittest.TestCase):
             self.confirmed_reply(context, "群里的第 %d 条消息" % index, sequence=index + 1)
         self.assertIsNotNone(episode_material(self.runtime, context, self.manifest()))
         # The switch is a declared window setting, so it is honoured before any read.
-        from companion_v2.configuration.models import ConfigTarget
-        from companion_v2.memory.episode_settings import EpisodeConfigurationOwner
+        from digital_life_core.configuration.models import ConfigTarget
+        from digital_life_core.memory.episode_settings import EpisodeConfigurationOwner
         owner = EpisodeConfigurationOwner(self.runtime)
         target = ConfigTarget(context.scope.installation_id, ConfigLayer.WINDOW,
                               context.role_binding.role, context.scope)

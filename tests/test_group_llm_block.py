@@ -1,7 +1,7 @@
 import unittest
 from datetime import timedelta
 
-from companion_v2.conversation.group_llm_block import (
+from digital_life_core.conversation.group_llm_block import (
     GroupLLMBlock,
     group_block_key,
     minutes_since,

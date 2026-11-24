@@ -7,14 +7,14 @@ import sys
 from tempfile import TemporaryDirectory
 import unittest
 
-from companion_v2.adapters.astrbot.staging_config import (
+from digital_life_core.adapters.astrbot.staging_config import (
     MAX_CONFIG_BYTES, REBINDING_FIELDS, SCOPE_IDENTITY_KEYS, StagingConfiguration,
     StagingConfigurationError,
 )
-from companion_v2.conversation.segmentation import SegmentationPolicy
-from companion_v2.execution.models import SupervisorLimits, digest
-from companion_v2.model_gateway.budget import BudgetSoftPolicy
-from companion_v2.model_gateway.models import Amount, BudgetPolicy
+from digital_life_core.conversation.segmentation import SegmentationPolicy
+from digital_life_core.execution.models import SupervisorLimits, digest
+from digital_life_core.model_gateway.budget import BudgetSoftPolicy
+from digital_life_core.model_gateway.models import Amount, BudgetPolicy
 from tests.native_adapter_support import FakeHostContext
 from tests.staging_bootstrap_support import synthetic_configuration
 

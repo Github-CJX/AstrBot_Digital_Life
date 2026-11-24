@@ -4,7 +4,7 @@ from pathlib import Path
 from tempfile import TemporaryDirectory
 import unittest
 
-from companion_v2.foundation.isolation import scan_source_tree
+from digital_life_core.foundation.isolation import scan_source_tree
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -12,25 +12,25 @@ ROOT = Path(__file__).resolve().parents[1]
 
 class IsolationScannerTests(unittest.TestCase):
     def test_g0_core_tree_stays_isolated_behind_the_explicit_host_entrypoint(self) -> None:
-        report = scan_source_tree(ROOT / "companion_v2", package_name="companion_v2")
+        report = scan_source_tree(ROOT / "digital_life_core", package_name="digital_life_core")
 
         self.assertTrue(report.is_clean, report.render())
         self.assertTrue((ROOT / "metadata.yaml").is_file())
         self.assertTrue((ROOT / "main.py").is_file())
-        self.assertTrue((ROOT / "astrbot_host" / "controller.py").is_file())
+        self.assertTrue((ROOT / "digital_life_host" / "controller.py").is_file())
         self.assertEqual({path.name for path in ROOT.glob("*.py")}, {"main.py"})
         self.assertFalse((ROOT / "__init__.py").exists())
-        self.assertNotIn("import astrbot", (ROOT / "companion_v2" / "__init__.py").read_text(encoding="utf-8"))
+        self.assertNotIn("import astrbot", (ROOT / "digital_life_core" / "__init__.py").read_text(encoding="utf-8"))
 
     def test_rejects_host_v1_network_platform_and_legacy_data_access(self) -> None:
         with TemporaryDirectory(prefix="companion-v2-isolation-") as temporary:
             source_root = Path(temporary)
             (source_root / "bad.py").write_text(
                 "import astrbot\n"
-                "from astrbot_host.controller import AstrBotStagingController\n"
+                "from digital_life_host.controller import AstrBotStagingController\n"
                 "import requests\n"
                 "import subprocess\n"
-                "from astrbot_plugin_private_companion.main import CompanionPlugin\n"
+                "from astrbot_plugin_digital_life.main import CompanionPlugin\n"
                 "open('companions.json', 'r', encoding='utf-8')\n"
                 "subprocess.run(['hostname'])\n",
                 encoding="utf-8",
@@ -40,7 +40,7 @@ class IsolationScannerTests(unittest.TestCase):
             codes = {violation.code for violation in report.violations}
 
         self.assertIn("forbidden_import", codes)
-        self.assertTrue(any(item.detail == "astrbot_host.controller" for item in report.violations))
+        self.assertTrue(any(item.detail == "digital_life_host.controller" for item in report.violations))
         self.assertIn("forbidden_v1_runtime_import", codes)
         self.assertIn("forbidden_platform_or_network_call", codes)
         self.assertIn("legacy_data_access", codes)
@@ -63,7 +63,7 @@ class IsolationScannerTests(unittest.TestCase):
                 encoding="utf-8",
             )
 
-            report = scan_source_tree(source_root, package_name="companion_v2")
+            report = scan_source_tree(source_root, package_name="digital_life_core")
 
         self.assertEqual(
             [(item.relative_path, item.detail) for item in report.violations],
@@ -82,7 +82,7 @@ class IsolationScannerTests(unittest.TestCase):
                 encoding="utf-8",
             )
 
-            report = scan_source_tree(source_root, package_name="companion_v2.references")
+            report = scan_source_tree(source_root, package_name="digital_life_core.references")
 
         self.assertEqual(
             [(item.line, item.detail) for item in report.violations],
@@ -105,7 +105,7 @@ class IsolationScannerTests(unittest.TestCase):
                                                          encoding="utf-8")
             (source_root / "other.py").write_text(operations, encoding="utf-8")
 
-            report = scan_source_tree(source_root, package_name="companion_v2.storage")
+            report = scan_source_tree(source_root, package_name="digital_life_core.storage")
 
         self.assertEqual([(item.line, item.detail) for item in report.violations
                           if item.relative_path == "management.py"], [(9, "root.write_text")])
@@ -117,15 +117,15 @@ class IsolationScannerTests(unittest.TestCase):
             source_root.mkdir()
             (source_root / "configuration_migration.py").write_text(
                 "from importlib.resources import files\n"
-                "files('companion_v2.legacy').joinpath('configuration_rules.json').read_text(encoding='utf-8')\n"
-                "files('companion_v2.legacy').joinpath('other.json').read_text()\n"
+                "files('digital_life_core.legacy').joinpath('configuration_rules.json').read_text(encoding='utf-8')\n"
+                "files('digital_life_core.legacy').joinpath('other.json').read_text()\n"
                 "files('other_package').joinpath('configuration_rules.json').read_text()\n"
-                "files('companion_v2.legacy').joinpath(user_path).read_text()\n"
-                "files('companion_v2.legacy').joinpath('configuration_rules.json').write_text(payload)\n"
+                "files('digital_life_core.legacy').joinpath(user_path).read_text()\n"
+                "files('digital_life_core.legacy').joinpath('configuration_rules.json').write_text(payload)\n"
                 "user_path.read_text()\n",
                 encoding="utf-8",
             )
 
-            report = scan_source_tree(source_root, package_name="companion_v2.legacy")
+            report = scan_source_tree(source_root, package_name="digital_life_core.legacy")
 
         self.assertEqual([item.line for item in report.violations], [3, 4, 5, 6, 7])

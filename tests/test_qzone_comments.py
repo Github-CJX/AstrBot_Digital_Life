@@ -8,7 +8,7 @@
 import unittest
 from datetime import datetime, timedelta, timezone
 
-from companion_v2.qzone.comments import (
+from digital_life_core.qzone.comments import (
     AUTHOR_COOLDOWN, CommentRecord, author_key, author_post_key, author_post_recently_replied,
     comment_event, fingerprint, fuzzy_score, identifiers, is_self, leaks_internal, legacy_id,
     matches_recent_sent, normalized_text, note_sent, single_line, trim_records)

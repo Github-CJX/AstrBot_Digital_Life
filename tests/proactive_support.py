@@ -4,16 +4,16 @@ from dataclasses import replace
 from datetime import timedelta
 import json
 
-from companion_v2.configuration.registry import FieldRegistry
-from companion_v2.execution.models import TaskContext, digest
-from companion_v2.foundation.refs import AudienceRef, SourceRef, VersionRef
-from companion_v2.identity_policy.personas import ConversationRoute
-from companion_v2.model_gateway.routing import configuration_fields
-from companion_v2.proactive.configuration import GROUP, target_for
-from companion_v2.proactive.contact_models import ContactIntent
-from companion_v2.proactive.models import EvidenceSnapshot, Opportunity, Thought, ThoughtKind
-from companion_v2.proactive.service import contact_profile
-from companion_v2.sources.models import SourceRecord
+from digital_life_core.configuration.registry import FieldRegistry
+from digital_life_core.execution.models import TaskContext, digest
+from digital_life_core.foundation.refs import AudienceRef, SourceRef, VersionRef
+from digital_life_core.identity_policy.personas import ConversationRoute
+from digital_life_core.model_gateway.routing import configuration_fields
+from digital_life_core.proactive.configuration import GROUP, target_for
+from digital_life_core.proactive.contact_models import ContactIntent
+from digital_life_core.proactive.models import EvidenceSnapshot, Opportunity, Thought, ThoughtKind
+from digital_life_core.proactive.service import contact_profile
+from digital_life_core.sources.models import SourceRecord
 from tests.test_host_application import HostFixture
 from tests.test_management_access import NOW, SCOPE
 from tests.test_role_tool_loop import answered

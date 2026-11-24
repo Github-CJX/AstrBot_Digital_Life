@@ -14,20 +14,20 @@ from datetime import datetime, timedelta, timezone
 from types import SimpleNamespace
 from unittest import mock
 
-from astrbot_host.management_identity import dashboard_operator
-from companion_v2.conversation import style_context as style_context_module
-from companion_v2.conversation.native_turns import NativeConversationTurns
-from companion_v2.conversation.scope_family import scope_family_keys
-from companion_v2.conversation.style_context import MAX_POOL_SCAN
-from companion_v2.execution.models import (ResolvedIdentity, TaskContext, TaskError, digest,
+from digital_life_host.management_identity import dashboard_operator
+from digital_life_core.conversation import style_context as style_context_module
+from digital_life_core.conversation.native_turns import NativeConversationTurns
+from digital_life_core.conversation.scope_family import scope_family_keys
+from digital_life_core.conversation.style_context import MAX_POOL_SCAN
+from digital_life_core.execution.models import (ResolvedIdentity, TaskContext, TaskError, digest,
                                            stamp)
-from companion_v2.expression import configuration as configuration_module
-from companion_v2.expression import rule_details
-from companion_v2.expression.style_management import ExpressionStyleManagement
-from companion_v2.expression.window_scope import rule_scope_counts
-from companion_v2.foundation.refs import (AudienceRef, RoleOwnerRef, ScopeKind, ScopeRef,
+from digital_life_core.expression import configuration as configuration_module
+from digital_life_core.expression import rule_details
+from digital_life_core.expression.style_management import ExpressionStyleManagement
+from digital_life_core.expression.window_scope import rule_scope_counts
+from digital_life_core.foundation.refs import (AudienceRef, RoleOwnerRef, ScopeKind, ScopeRef,
                                           SubjectKind, SubjectRef)
-from companion_v2.identity_policy.models import AuthenticatedHostPrincipal, RoleBinding
+from digital_life_core.identity_policy.models import AuthenticatedHostPrincipal, RoleBinding
 from tests import test_expression_v1_pipeline as pipeline
 from tests.multi_host_support import MultiFixture, multi_config
 from tests.test_expression_v1_pipeline import RULE, ExpressionFixture

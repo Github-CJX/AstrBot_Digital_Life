@@ -4,13 +4,13 @@ from dataclasses import replace
 import json
 import unittest
 
-from companion_v2.conversation.flow import ConversationPolicy
-from companion_v2.conversation.messages import source_from_document
-from companion_v2.conversation.recalls import MessageRecall
-from companion_v2.execution.models import digest
-from companion_v2.foundation.refs import SourceRef, VersionRef
-from companion_v2.sources.dependencies import link
-from companion_v2.sources.models import SourceRecord
+from digital_life_core.conversation.flow import ConversationPolicy
+from digital_life_core.conversation.messages import source_from_document
+from digital_life_core.conversation.recalls import MessageRecall
+from digital_life_core.execution.models import digest
+from digital_life_core.foundation.refs import SourceRef, VersionRef
+from digital_life_core.sources.dependencies import link
+from digital_life_core.sources.models import SourceRecord
 from tests.test_host_application import HostFixture
 
 

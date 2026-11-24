@@ -4,12 +4,12 @@ from types import SimpleNamespace as NS
 import unittest
 from unittest.mock import Mock, patch
 
-from astrbot_host.core_reply_context import build_core_reply_prompt
-from astrbot_host.core_reply_mobile import phone_scene_snapshot
-from companion_v2.conversation.phone_context import (
+from digital_life_host.core_reply_context import build_core_reply_prompt
+from digital_life_host.core_reply_mobile import phone_scene_snapshot
+from digital_life_core.conversation.phone_context import (
     PHONE_CONTEXT_INSTRUCTION, SNAPSHOT_VERSION, project_phone_context,
 )
-from companion_v2.foundation.refs import ScopeKind
+from digital_life_core.foundation.refs import ScopeKind
 
 
 AT = datetime(2026, 11, 4, 9, 27, 0, tzinfo=timezone.utc)
@@ -113,7 +113,7 @@ class PhonePromptTests(unittest.TestCase):
 
     def test_phone_context_reaches_only_the_private_prompt(self):
         projection = project_phone_context(_mobile_snapshot(), observed_at=AT)
-        with patch("astrbot_host.core_reply_context.phone_scene_snapshot",
+        with patch("digital_life_host.core_reply_context.phone_scene_snapshot",
                    return_value=projection) as phone:
             prompt = build_core_reply_prompt(
                 self._application(), self._context(), NS(text="我在美团上看到一家店", event_id="phone"),
@@ -123,7 +123,7 @@ class PhonePromptTests(unittest.TestCase):
         self.assertIn(PHONE_CONTEXT_INSTRUCTION, prompt.perception_instructions)
         self.assertEqual(phone.call_count, 1)
 
-        with patch("astrbot_host.core_reply_context.phone_scene_snapshot",
+        with patch("digital_life_host.core_reply_context.phone_scene_snapshot",
                    return_value=projection) as phone:
             prompt = build_core_reply_prompt(
                 self._application(), self._context(ScopeKind.GROUP),
@@ -132,7 +132,7 @@ class PhonePromptTests(unittest.TestCase):
         self.assertFalse(phone.called)
 
     def test_empty_phone_source_adds_no_instruction(self):
-        with patch("astrbot_host.core_reply_context.phone_scene_snapshot", return_value=None):
+        with patch("digital_life_host.core_reply_context.phone_scene_snapshot", return_value=None):
             prompt = build_core_reply_prompt(
                 self._application(), self._context(), NS(text="在吗", event_id="phone-empty"), at=AT)
         self.assertNotIn("phone_context", json.loads(prompt.perception_context))
@@ -149,14 +149,14 @@ class PhoneHostAdapterTests(unittest.TestCase):
         actor = NS(principal=NS(native_account_id="user-1"))
         context = NS(scope=NS(kind=ScopeKind.PRIVATE), actor=actor,
                      role_binding=NS(role=NS()))
-        with patch("astrbot_host.core_reply_health._role_enabled", return_value=True), \
-             patch("astrbot_host.core_reply_health._consent_active", return_value=True):
+        with patch("digital_life_host.core_reply_health._role_enabled", return_value=True), \
+             patch("digital_life_host.core_reply_health._consent_active", return_value=True):
             result = phone_scene_snapshot(app, context, AT)
         self.assertEqual(result["app"], "美团")
         service.mobile_context.assert_called_once_with("user-1")
 
-        with patch("astrbot_host.core_reply_health._role_enabled", return_value=True), \
-             patch("astrbot_host.core_reply_health._consent_active", return_value=False):
+        with patch("digital_life_host.core_reply_health._role_enabled", return_value=True), \
+             patch("digital_life_host.core_reply_health._consent_active", return_value=False):
             self.assertIsNone(phone_scene_snapshot(app, context, AT))
 
         context.scope.kind = ScopeKind.GROUP

@@ -19,7 +19,7 @@
   catch { target.randomUUID = randomUUID; }
 })();
 window.CompanionProduct = (() => {
-  const HOST = "astrbot_plugin_private_companion", PREFIX = "/" + HOST + "/";
+  const HOST = "astrbot_plugin_digital_life", PREFIX = "/" + HOST + "/";
   const bundledExtensions = {content:"content", reality:"reality", together:"together", game:"game", live:"live", image:"image", screen:"companion.screen.native"};
   const e = value => String(value ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
   const labels = {connected:"已连接", installed:"已安装 · 未上报状态", missing:"未安装", disabled:"已停用",
@@ -650,10 +650,10 @@ window.CompanionProduct = (() => {
   }
   /* 桥的 endpoint 是**插件相对**路径：不带前导斜杠，也**不带插件目录名**。
    *
-   * 目录给的是绝对地址 `/astrbot_plugin_private_companion/host/status`，
+   * 目录给的是绝对地址 `/astrbot_plugin_digital_life/host/status`，
    * 交给桥之前要切掉 `PREFIX`，送出的才是 `host/status`。宿主拿插件名与
    * endpoint 拼成真实路由，所以带上目录名等于拼两次，直接 404：
-   *   /astrbot_plugin_private_companion/astrbot_plugin_private_companion/host/status
+   *   /astrbot_plugin_digital_life/astrbot_plugin_digital_life/host/status
    *
    * 这里曾经写成「只去掉前导斜杠、保留目录名」，注释还断言「两种宿主都成立」——
    * 那是没验证过的猜测。反证有三处：
@@ -1627,7 +1627,7 @@ window.CompanionProduct = (() => {
   function providerLinks(item) {
     if(item.capability_id === "content") return `<div class="dialog-actions"><button type="button" class="button small" data-go="manage" data-manage="output" data-output-target="creation">创作与作品</button></div>`;
     if(["reality","together","game","live"].includes(item.capability_id)) return `<div class="dialog-actions"><button type="button" class="button small" data-product-provider="${e(item.capability_id)}">设置与运行</button></div>`;
-    const bundled = item.owner === "companion_v2" || Boolean(bundledExtensions[item.capability_id]);
+    const bundled = item.owner === "digital_life_core" || Boolean(bundledExtensions[item.capability_id]);
     if(!bundled && !item.installed)return "";
     const pages=Array.isArray(item.pages)?item.pages.filter(page=>typeof page==="string"&&page.trim()):[];
     if(!pages.length&&["content","image"].includes(item.capability_id)) {

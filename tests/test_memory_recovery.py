@@ -5,16 +5,16 @@ import json
 import unittest
 from unittest.mock import patch
 
-from companion_v2.configuration.registry import FieldRegistry
-from companion_v2.execution.models import encode, stamp
-from companion_v2.foundation.outcome import Outcome
-from companion_v2.memory.management import MemoryManagement
-from companion_v2.memory.reflection import reflection_profile
-from companion_v2.memory.reflection_management import ReflectionManagement
-from companion_v2.memory import reflection_recovery
-from companion_v2.memory.reflection_output import OutputProblem, parse_output, redact_output
-from companion_v2.model_gateway.models import Amount, CapturedModelOutput, ProviderResponse
-from companion_v2.model_gateway.routing import configuration_fields
+from digital_life_core.configuration.registry import FieldRegistry
+from digital_life_core.execution.models import encode, stamp
+from digital_life_core.foundation.outcome import Outcome
+from digital_life_core.memory.management import MemoryManagement
+from digital_life_core.memory.reflection import reflection_profile
+from digital_life_core.memory.reflection_management import ReflectionManagement
+from digital_life_core.memory import reflection_recovery
+from digital_life_core.memory.reflection_output import OutputProblem, parse_output, redact_output
+from digital_life_core.model_gateway.models import Amount, CapturedModelOutput, ProviderResponse
+from digital_life_core.model_gateway.routing import configuration_fields
 from tests import test_memory_reflection as support
 from tests.test_host_application import HostFixture
 from tests.test_role_tool_loop import answered
@@ -311,7 +311,7 @@ class MemoryRecoveryTests(HostFixture, unittest.IsolatedAsyncioTestCase):
         app = host.application
         with patch.object(reflection_recovery, "consume", side_effect=RuntimeError("interrupted")):
             await app.memory_reflection.run(context, prepared["batch_id"])
-        from companion_v2.memory.codec import evidence
+        from digital_life_core.memory.codec import evidence
         manifest = json.loads(app.memory_reflection._row(context, prepared["batch_id"])["manifest_json"])
         source = evidence(manifest["evidence"][0]).source
         app.memory.writer.sources.revoke(source, expected_governance_revision=1, observed_at=self.clock.now()).unwrap()
@@ -368,7 +368,7 @@ class MemoryRecoveryTests(HostFixture, unittest.IsolatedAsyncioTestCase):
     async def test_pending_acceptance_and_duplicate_add_are_not_split(self):
         host, context, _ = await self.setup_manual(prepare=False)
         app, original = host.application, self.model_behavior
-        from companion_v2.memory.models import Proposal
+        from digital_life_core.memory.models import Proposal
         evidence = next(iter(app.memory.query._documents(context, "personal", "sources")[1].values()))["evidence"]
         pending = app.memory.writer.submit(context, Proposal("add", predicate="饮用偏好", object="不喝咖啡",
             representation="用户不喝咖啡。", evidence=(evidence,), defer_until_boundary=True), operation_key="pending-overlap").unwrap()
@@ -390,7 +390,7 @@ class MemoryRecoveryTests(HostFixture, unittest.IsolatedAsyncioTestCase):
         app = host.application
         with patch.object(reflection_recovery, "consume", side_effect=RuntimeError("interrupted")):
             await app.memory_reflection.run(context, prepared["batch_id"])
-        from companion_v2.memory.models import Proposal
+        from digital_life_core.memory.models import Proposal
         evidence = next(iter(app.memory.query._documents(context, "personal", "sources")[1].values()))["evidence"]
         app.memory.writer.submit(context, Proposal("add", predicate="另一事实", object="值", representation="另一事实。",
             evidence=(evidence,)), operation_key="concurrent-update").unwrap()
@@ -470,7 +470,7 @@ class ReflectionOutputParsingTests(unittest.TestCase):
 
     def test_one_soft_detail_word_does_not_discard_the_whole_proposal(self):
         """每日复盘曾整批 invalid_proposal：context_mode 写成了自由文本。"""
-        from companion_v2.memory.reflection_output import normalize_proposal
+        from digital_life_core.memory.reflection_output import normalize_proposal
 
         data = normalize_proposal({
             "operation": "add", "evidence_handles": ["s1"], "predicate": "照片话题互动方式",

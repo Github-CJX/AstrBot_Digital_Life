@@ -11,11 +11,11 @@ from tests import test_astrbot_staging_host as support
 from tests.native_adapter_support import FakeEvent, FakePlatform, FakeProvider, FakeReverseApi
 from tests.staging_bootstrap_support import wait_for_batch
 from tests.test_management_access import NOW
-from companion_v2.adapters.astrbot.staging import NativeAdapterTypes
-from companion_v2.execution.models import TaskContext, stamp
-from companion_v2.foundation.clock import DeterministicClock
-from companion_v2.memory import codec
-from astrbot_host.multi_controller import AstrBotMultiController
+from digital_life_core.adapters.astrbot.staging import NativeAdapterTypes
+from digital_life_core.execution.models import TaskContext, stamp
+from digital_life_core.foundation.clock import DeterministicClock
+from digital_life_core.memory import codec
+from digital_life_host.multi_controller import AstrBotMultiController
 
 
 def multi_config(**changes):

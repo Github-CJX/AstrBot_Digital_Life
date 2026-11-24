@@ -15,13 +15,13 @@ import unittest
 import wave
 from unittest.mock import AsyncMock, patch
 
-from astrbot_host.voice import NativeVoiceReply, singsing_config_origin, singsing_route_available
-from companion_v2.conversation.delivery import DeliveryEnvelope
-from companion_v2.conversation.media.models import ImageDescriptor, PromptImage, OWNER
-from companion_v2.conversation.voice_reply import VoiceReplyDelivery
-from companion_v2.delivery.media import ImageDeliveryEnvelope, payload_hash
-from companion_v2.execution.models import digest
-from companion_v2.foundation.refs import SourceRef, VersionRef
+from digital_life_host.voice import NativeVoiceReply, singsing_config_origin, singsing_route_available
+from digital_life_core.conversation.delivery import DeliveryEnvelope
+from digital_life_core.conversation.media.models import ImageDescriptor, PromptImage, OWNER
+from digital_life_core.conversation.voice_reply import VoiceReplyDelivery
+from digital_life_core.delivery.media import ImageDeliveryEnvelope, payload_hash
+from digital_life_core.execution.models import digest
+from digital_life_core.foundation.refs import SourceRef, VersionRef
 from tests.native_adapter_support import FakePlatform, NativeFixture
 from tests.test_management_access import NOW
 
@@ -222,7 +222,7 @@ class NativeVoiceProviderTests(unittest.IsolatedAsyncioTestCase):
                      get_using_tts_provider_async=provider_lookup)
         task = NS(scope=NS(kind=NS(value="group"), platform="test", session_id="group"))
         self.assertEqual(singsing_config_origin(event), original)
-        with patch("astrbot_host.voice.get_astrbot_temp_path", return_value=str(self.root)), \
+        with patch("digital_life_host.voice.get_astrbot_temp_path", return_value=str(self.root)), \
                 patch("astrbot.core.star.session_llm_manager.SessionServiceManager.is_tts_enabled_for_session",
                       new_callable=AsyncMock, return_value=True) as session_enabled:
             self.assertTrue(await singsing_route_available(context, isolated, "", config_umo=original))
@@ -255,8 +255,8 @@ class NativeVoiceProviderTests(unittest.IsolatedAsyncioTestCase):
                      get_using_tts_provider=lambda _: provider)
         task = NS(scope=NS(kind=NS(value="private"), platform="test", session_id="private"))
         voice = NativeVoiceReply(context)
-        with patch("astrbot_host.voice.get_astrbot_temp_path", return_value=str(self.root)), \
-                patch("astrbot_host.voice._find_mimo_voice_clone") as fallback, \
+        with patch("digital_life_host.voice.get_astrbot_temp_path", return_value=str(self.root)), \
+                patch("digital_life_host.voice._find_mimo_voice_clone") as fallback, \
                 patch("astrbot.core.star.session_llm_manager.SessionServiceManager.is_tts_enabled_for_session",
                       new_callable=AsyncMock, return_value=True) as session_enabled:
             self.assertFalse(await singsing_route_available(context, umo, ""))
@@ -303,7 +303,7 @@ class NativeVoiceProviderTests(unittest.IsolatedAsyncioTestCase):
                      get_provider_by_id=lambda identifier: provider if identifier == "tts-a" else None,
                      get_all_tts_providers=lambda: [provider])
         native = NativeVoiceReply(context)
-        with patch("astrbot_host.voice.get_astrbot_temp_path", return_value=str(self.root)):
+        with patch("digital_life_host.voice.get_astrbot_temp_path", return_value=str(self.root)):
             result = await native.render(task_context, " hello ")
             explicit = await native.render(task_context, "world", provider_id="tts-a")
             missing = await native.render(task_context, "no", provider_id="missing")
@@ -321,9 +321,9 @@ class NativeVoiceProviderTests(unittest.IsolatedAsyncioTestCase):
                      get_provider_by_id=lambda _: provider,
                      get_all_tts_providers=lambda: [])
         native = NativeVoiceReply(context)
-        with patch("astrbot_host.voice.get_astrbot_temp_path", return_value=str(self.root / "other")):
+        with patch("digital_life_host.voice.get_astrbot_temp_path", return_value=str(self.root / "other")):
             self.assertIsNone(await native.render(task_context, "hello"))
-        with patch("astrbot_host.voice.get_astrbot_temp_path", return_value=str(self.root)):
+        with patch("digital_life_host.voice.get_astrbot_temp_path", return_value=str(self.root)):
             self.assertIsNone(await native.render(task_context, "hello", provider_id="not-a-tts-provider"))
             async def slow(_):
                 await asyncio.sleep(0.1)
@@ -350,8 +350,8 @@ class NativeVoiceProviderTests(unittest.IsolatedAsyncioTestCase):
                      get_provider_by_id=lambda _: None,
                      get_all_tts_providers=lambda: [],
                      get_llm_tool_manager=lambda: manager)
-        with patch("astrbot_host.voice.get_astrbot_temp_path", return_value=str(self.root)), \
-                patch("astrbot_host.voice.get_astrbot_data_path", return_value=str(self.root)):
+        with patch("digital_life_host.voice.get_astrbot_temp_path", return_value=str(self.root)), \
+                patch("digital_life_host.voice.get_astrbot_data_path", return_value=str(self.root)):
             result = await NativeVoiceReply(context).render(task_context, "晚安")
         self.assertIsNotNone(result)
         self.assertEqual(base64.b64decode(result["data"]["file"].removeprefix("base64://")),
@@ -367,7 +367,7 @@ class NativeVoiceProviderTests(unittest.IsolatedAsyncioTestCase):
         provider = NS(get_audio=lambda _: str(self.audio))
         context = NS(get_using_tts_provider=lambda _: provider)
         task = NS(scope=NS(kind=NS(value="private"), platform="test", session_id="private"))
-        with patch("astrbot_host.voice.get_astrbot_temp_path", return_value=str(self.root)):
+        with patch("digital_life_host.voice.get_astrbot_temp_path", return_value=str(self.root)):
             result = await NativeVoiceReply(context).render(task, "晚安")
         audio = base64.b64decode(result["data"]["file"].removeprefix("base64://"))
         self.assertEqual(struct.unpack_from("<I", audio, 4)[0], len(audio) - 8)

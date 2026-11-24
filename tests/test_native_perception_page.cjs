@@ -38,8 +38,8 @@ function harness(windowKind="private") {
     CompanionProduct: {hosted:() => true, scopeKey:() => "role-1",
       selection:()=>({target_id:windowKind==="none"?null:"target-1",bot_id:"bot-1",role_id:"role-1"}),
       target:()=>windowKind==="none"?null:({target_id:"target-1",bot_id:windowKind==="other_bot"?"bot-2":"bot-1",scope_kind:windowKind==="group"?"group":"private"}),
-      windowRole:()=>({role_id:"role-1",perception_native_api:"/astrbot_plugin_private_companion/perception-native"}),
-      role:() => ({role_id:"role-1",perception_native_api:"/astrbot_plugin_private_companion/perception-native"}),
+      windowRole:()=>({role_id:"role-1",perception_native_api:"/astrbot_plugin_digital_life/perception-native"}),
+      role:() => ({role_id:"role-1",perception_native_api:"/astrbot_plugin_digital_life/perception-native"}),
       /* 页面取桥先问 bridgeNow()，没有再 await bridgeFor()。 */
       bridgeNow:() => window.AstrBotPluginPage,
       bridgeFor:() => ({then:resolve => resolve(window.AstrBotPluginPage)})},

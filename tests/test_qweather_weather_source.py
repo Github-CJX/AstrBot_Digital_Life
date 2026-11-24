@@ -11,12 +11,12 @@ from unittest.mock import patch
 from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PrivateKey
 from cryptography.hazmat.primitives import serialization
 
-from astrbot_host.qweather_credentials import QWeatherCredentials, credentials_from_environment
-from astrbot_host.qweather_weather import (TOTAL_TIMEOUT_SECONDS, QWeatherWeatherPort,
+from digital_life_host.qweather_credentials import QWeatherCredentials, credentials_from_environment
+from digital_life_host.qweather_weather import (TOTAL_TIMEOUT_SECONDS, QWeatherWeatherPort,
                                            configured_qweather_weather_port,
                                            normalize_qweather_now, weather_code_for)
-from astrbot_host.weather import OpenMeteoWeatherPort
-from companion_v2.agenda.planning_config import WeatherLocation
+from digital_life_host.weather import OpenMeteoWeatherPort
+from digital_life_core.agenda.planning_config import WeatherLocation
 
 
 LOCATION = WeatherLocation("角色所在城市", 31.23, 121.47)
@@ -184,7 +184,7 @@ class QWeatherWeatherPortTests(unittest.IsolatedAsyncioTestCase):
                 calls.append(("request", url, params, headers, allow_redirects))
                 return Reply()
 
-        with patch("astrbot_host.qweather_weather.aiohttp.ClientSession", Session):
+        with patch("digital_life_host.qweather_weather.aiohttp.ClientSession", Session):
             snapshot = await port.fetch(LOCATION)
         return snapshot, calls
 
@@ -259,8 +259,8 @@ class FetchBudgetTests(unittest.IsolatedAsyncioTestCase):
         port = QWeatherWeatherPort(QWeatherCredentials(
             api_host="example.xy.qweatherapi.com", api_key=API_KEY), now=lambda: NOW)
         location = WeatherLocation("角色所在地", None, None)
-        with patch("astrbot_host.qweather_weather.aiohttp.ClientSession", Session), patch(
-                "astrbot_host.qweather_weather.TOTAL_TIMEOUT_SECONDS", 0.2, create=True):
+        with patch("digital_life_host.qweather_weather.aiohttp.ClientSession", Session), patch(
+                "digital_life_host.qweather_weather.TOTAL_TIMEOUT_SECONDS", 0.2, create=True):
             with self.assertRaisesRegex(ValueError, "timed out"):
                 await port.fetch(location)
 
@@ -269,7 +269,7 @@ class FetchBudgetTests(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(completed, [0])
 
     def test_the_adapter_budget_fits_inside_the_callers_weather_window(self):
-        # companion_v2/agenda/weather_reading.py waits 6s for the whole weather read.
+        # digital_life_core/agenda/weather_reading.py waits 6s for the whole weather read.
         self.assertLess(TOTAL_TIMEOUT_SECONDS, 6)
 
 

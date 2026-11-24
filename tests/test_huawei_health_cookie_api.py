@@ -2,8 +2,8 @@
 
 import unittest
 
-from astrbot_host.huawei_health.api import HuaweiHealthWebAPI
-from astrbot_host.huawei_health.vendor.hw_auth import HuaweiAuthError
+from digital_life_host.huawei_health.api import HuaweiHealthWebAPI
+from digital_life_host.huawei_health.vendor.hw_auth import HuaweiAuthError
 
 
 class FakeService:

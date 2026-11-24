@@ -14,7 +14,7 @@ async def run_core(plugin_root, root, guard):
     from tests.native_adapter_support import FakeEvent, FakeProvider, FakeReverseApi, completion
     from tests.staging_bootstrap_support import wait_for_batch
     from tests.test_management_access import NOW
-    from companion_v2.adapters.astrbot.staging import NativeAdapterTypes
+    from digital_life_core.adapters.astrbot.staging import NativeAdapterTypes
 
     package = ModuleType("native_acceptance_core")
     package.__path__ = [str(plugin_root)]

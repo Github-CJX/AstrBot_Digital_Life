@@ -9,16 +9,16 @@ from unittest.mock import AsyncMock, Mock
 from tests import astrbot_data_root  # Isolate the SDK before importing the host.
 from astrbot.core.message.components import At, Image, Plain, Record, Reply
 from astrbot.core.message.message_event_result import MessageChain
-from astrbot_host.core_reply import (
+from digital_life_host.core_reply import (
     CORE_REPLY_CONTEXT_EXTRA, activate_core_reply_delivery_guard, prepare_core_reply_event,
 )
-from astrbot_host.core_reply_presentation import capture_core_reply_tool_names
-from astrbot_host.core_reply_segmentation import (
+from digital_life_host.core_reply_presentation import capture_core_reply_tool_names
+from digital_life_host.core_reply_segmentation import (
     prepare_core_reply_segmentation, prepare_core_reply_streaming_boundary,
 )
-from companion_v2.conversation.segmentation import SegmentationPolicy
-from companion_v2.execution.models import TaskError
-from companion_v2.foundation.outcome import Outcome
+from digital_life_core.conversation.segmentation import SegmentationPolicy
+from digital_life_core.execution.models import TaskError
+from digital_life_core.foundation.outcome import Outcome
 from tests.test_astrbot_core_reply import FakeEvent
 
 

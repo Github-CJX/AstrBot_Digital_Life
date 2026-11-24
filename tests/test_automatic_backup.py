@@ -11,11 +11,11 @@ from types import SimpleNamespace
 import unittest
 from unittest.mock import patch
 
-from astrbot_host.automatic_backup import AutomaticBackup
-from astrbot_host.backup_api import backup_operation_lock
-from astrbot_host.storage_api import storage_request_lock
-from companion_v2.storage.backup import InstallationBackup
-from companion_v2.storage.runtime import StorageRuntime
+from digital_life_host.automatic_backup import AutomaticBackup
+from digital_life_host.backup_api import backup_operation_lock
+from digital_life_host.storage_api import storage_request_lock
+from digital_life_core.storage.backup import InstallationBackup
+from digital_life_core.storage.runtime import StorageRuntime
 
 
 class AutomaticBackupTests(unittest.IsolatedAsyncioTestCase):
@@ -96,7 +96,7 @@ class AutomaticBackupTests(unittest.IsolatedAsyncioTestCase):
         self.advance(1)
         self.settings["retention_count"] = 1
         with patch.object(InstallationBackup, "_create", side_effect=OSError("test write failure")) as create:
-            with self.assertLogs("astrbot_host.automatic_backup", level="WARNING"):
+            with self.assertLogs("digital_life_host.automatic_backup", level="WARNING"):
                 await self.scheduler._tick()
                 await self.scheduler._tick()
             create.assert_called_once()
@@ -141,8 +141,8 @@ class AutomaticBackupTests(unittest.IsolatedAsyncioTestCase):
         old = self.backup.create(note="old").unwrap()
         self.settings["retention_count"] = 1
         self.advance(1)
-        with patch("companion_v2.storage.management._remove_tree", return_value=None):
-            with self.assertLogs("astrbot_host.automatic_backup", level="WARNING") as logs:
+        with patch("digital_life_core.storage.management._remove_tree", return_value=None):
+            with self.assertLogs("digital_life_host.automatic_backup", level="WARNING") as logs:
                 await self.scheduler._tick()
         self.assertTrue(any("failed_count=1" in line for line in logs.output))
         self.assertEqual(len(self.snapshots()), 2)

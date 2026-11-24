@@ -3,7 +3,7 @@ from tempfile import TemporaryDirectory
 from types import SimpleNamespace
 import unittest
 
-from companion_v2.proactive.search_settings import SearchSettingsError, SearchSettingsStore
+from digital_life_core.proactive.search_settings import SearchSettingsError, SearchSettingsStore
 
 
 class SearchSettingsTests(unittest.TestCase):
@@ -32,7 +32,7 @@ class SearchSettingsTests(unittest.TestCase):
         self.assertEqual(store.selected_provider_id(), provider_id)
 
     def test_model_search_projection_lists_only_verified_deepseek_providers(self):
-        from astrbot_host.model_api import ModelWebAPI
+        from digital_life_host.model_api import ModelWebAPI
 
         provider = SimpleNamespace(id="deepseek_main", provider_config={"api_base": "https://api.deepseek.com/v1"},
                                    get_current_key=lambda: "fixture-secret",

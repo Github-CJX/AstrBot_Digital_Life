@@ -8,12 +8,12 @@ import unittest
 
 from PIL import Image, ImageDraw
 
-from companion_v2.device.adb import AdbClient, UiElement
-from companion_v2.device.checkout import checkout_boundary, checkout_frame
-from companion_v2.device.decider import (
+from digital_life_core.device.adb import AdbClient, UiElement
+from digital_life_core.device.checkout import checkout_boundary, checkout_frame
+from digital_life_core.device.decider import (
     DecisionError, ModelPhoneDecider, decision_prompt, parse_decision,
 )
-from companion_v2.device.session import PhoneAction, PhoneObservation, PhoneSession
+from digital_life_core.device.session import PhoneAction, PhoneObservation, PhoneSession
 from tests.test_device_adb import ChangingAdb, FakeAdb
 
 
@@ -66,7 +66,7 @@ class ParseDecisionTests(unittest.TestCase):
 class PromptTests(unittest.TestCase):
     def test_prompt_carries_goal_and_visible_labels(self):
         client = AdbClient("adb.exe", serial="SER123", runner=FakeAdb())
-        observation = __import__("companion_v2.device.session", fromlist=["PhoneSession"]) \
+        observation = __import__("digital_life_core.device.session", fromlist=["PhoneSession"]) \
             .PhoneSession(client, goal="g").observe(0)
         text = decision_prompt("打开应用并签到", observation, ())
         self.assertIn("打开应用并签到", text)

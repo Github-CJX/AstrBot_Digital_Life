@@ -11,8 +11,8 @@ from time import monotonic
 import unittest
 from unittest.mock import patch
 
-from astrbot_host.qzone_client import QzoneHttpClient
-from companion_v2.execution.models import TaskError
+from digital_life_host.qzone_client import QzoneHttpClient
+from digital_life_core.execution.models import TaskError
 
 
 class HangingBot:
@@ -43,7 +43,7 @@ class QzoneCookieProbeBudgetTests(unittest.IsolatedAsyncioTestCase):
     async def test_hanging_onebot_returns_a_conclusion_within_the_page_timeout(self):
         client = QzoneHttpClient(bot_provider=lambda: HangingBot())
         started = monotonic()
-        with patch("astrbot_host.qzone_client.COOKIE_PROBE_BUDGET_SECONDS", 0.2):
+        with patch("digital_life_host.qzone_client.COOKIE_PROBE_BUDGET_SECONDS", 0.2):
             with self.assertRaises(TaskError) as caught:
                 await client.credential()
         elapsed = monotonic() - started

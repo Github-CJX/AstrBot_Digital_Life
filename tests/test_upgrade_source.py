@@ -8,11 +8,11 @@ from types import SimpleNamespace as NS
 import unittest
 from unittest.mock import AsyncMock, patch
 
-from astrbot_host.upgrade_source import (
+from digital_life_host.upgrade_source import (
     CONFIG_NAME, preserve_before_schema, preserved_configuration_path,
     usable_preserved_configuration_path,
 )
-from astrbot_host.legacy_config import read_v1_host_configuration
+from digital_life_host.legacy_config import read_v1_host_configuration
 
 
 class UpgradeSourceTests(unittest.TestCase):
@@ -29,7 +29,7 @@ class UpgradeSourceTests(unittest.TestCase):
             path.write_text('{"multi_host": {"enabled": false}}\n', encoding="utf-8")
             self.assertEqual(preserve_before_schema(config), saved)
             self.assertEqual(saved.read_bytes(), old)
-            runtime = data / "plugin_data" / "astrbot_plugin_private_companion" / "companion-7"
+            runtime = data / "plugin_data" / "astrbot_plugin_digital_life" / "companion-7"
             loaded, found, fingerprint = read_v1_host_configuration(runtime)
             self.assertEqual(found, saved)
             self.assertEqual(loaded["target_user_ids"], ["123"])
@@ -58,7 +58,7 @@ class UpgradeSourceTests(unittest.TestCase):
             }
             path.write_text(json.dumps(complete), encoding="utf-8")
             saved = preserve_before_schema(config)
-            source_pointer = json.loads((config / ".private-companion-upgrade" / "source.json")
+            source_pointer = json.loads((config / ".digital-life-upgrade" / "source.json")
                                         .read_text(encoding="utf-8"))
 
             defaulted = {
@@ -72,22 +72,22 @@ class UpgradeSourceTests(unittest.TestCase):
             path.write_text(json.dumps(defaulted), encoding="utf-8")
             self.assertEqual(preserve_before_schema(config), saved)
             self.assertEqual(
-                json.loads((config / ".private-companion-upgrade" / "source.json")
+                json.loads((config / ".digital-life-upgrade" / "source.json")
                            .read_text(encoding="utf-8")),
                 source_pointer,
             )
             loaded = json.loads(preserved_configuration_path(config).read_text(encoding="utf-8"))
             self.assertEqual(loaded, complete)
-            runtime = config / "plugin_data" / "astrbot_plugin_private_companion" / "companion-7"
+            runtime = config / "plugin_data" / "astrbot_plugin_digital_life" / "companion-7"
             # The reader must honor the retained source even when the rewritten
             # current file still looks like a legacy configuration.
-            with patch("astrbot_host.legacy_config._config_directories", return_value=(config,)):
+            with patch("digital_life_host.legacy_config._config_directories", return_value=(config,)):
                 decoded, selected, _ = read_v1_host_configuration(runtime)
             self.assertEqual(selected, saved)
             self.assertEqual(decoded, complete)
             # Keep the rejected later snapshot for diagnosis without pointing
             # the migration at it.
-            self.assertEqual(len(list((config / ".private-companion-upgrade").glob("*.json"))), 3)
+            self.assertEqual(len(list((config / ".digital-life-upgrade").glob("*.json"))), 3)
 
     def test_source_can_advance_when_it_retains_previous_populated_values(self):
         with TemporaryDirectory() as directory:
@@ -119,10 +119,10 @@ if __name__ == "__main__":
 
 class UpgradeReviewTests(unittest.IsolatedAsyncioTestCase):
     async def test_prepare_uses_the_reviewed_source_and_live_inventory(self):
-        from astrbot_host.upgrade_setup import UpgradeSetup
+        from digital_life_host.upgrade_setup import UpgradeSetup
         with TemporaryDirectory() as directory:
             data = Path(directory)
-            source = data / "plugin_data" / "astrbot_plugin_private_companion"
+            source = data / "plugin_data" / "astrbot_plugin_digital_life"
             source.mkdir(parents=True)
             (source / "companions.json").write_text("{}", encoding="utf-8")
             config = data / "config"
@@ -137,7 +137,7 @@ class UpgradeReviewTests(unittest.IsolatedAsyncioTestCase):
                 session_topology=NS(accounts=lambda: [{"platform_id": "qq", "account_id": "456", "bot_id": "test-bot"}]),
                 apply_bindings=AsyncMock(return_value={"saved": True, "started": False}))
             api = UpgradeSetup(controller)
-            with patch("astrbot_host.upgrade_setup.available_personas", AsyncMock(return_value=["test-persona"])):
+            with patch("digital_life_host.upgrade_setup.available_personas", AsyncMock(return_value=["test-persona"])):
                 plan, candidate = await api.plan()
                 self.assertTrue(plan["can_prepare"], plan)
                 self.assertEqual(candidate["multi_host"]["targets"][0]["participant_id"], "123")
@@ -145,7 +145,7 @@ class UpgradeReviewTests(unittest.IsolatedAsyncioTestCase):
                 self.assertIn("conversation.reply", candidate["multi_host"]["capabilities"])
                 self.assertIn("memory.read", candidate["multi_host"]["capabilities"])
                 self.assertIn("memory.reflect", candidate["multi_host"]["capabilities"])
-                from companion_v2.execution.models import TaskError
+                from digital_life_core.execution.models import TaskError
                 with self.assertRaises(TaskError):
                     await api.prepare("stale-review")
                 controller.apply_bindings.assert_not_awaited()
@@ -157,13 +157,13 @@ class UpgradeReviewTests(unittest.IsolatedAsyncioTestCase):
                 self.assertIsNone(candidate)
 
     async def test_shared_role_upgrade_confirms_the_actual_private_persona_once(self):
-        from astrbot_host.binding_store import read_binding
-        from astrbot_host.upgrade_setup import UpgradeSetup
-        from companion_v2.execution.models import TaskError
+        from digital_life_host.binding_store import read_binding
+        from digital_life_host.upgrade_setup import UpgradeSetup
+        from digital_life_core.execution.models import TaskError
 
         with TemporaryDirectory() as directory:
             data = Path(directory)
-            source = data / "plugin_data" / "astrbot_plugin_private_companion"
+            source = data / "plugin_data" / "astrbot_plugin_digital_life"
             source.mkdir(parents=True)
             (source / "companions.json").write_text("{}\n", encoding="utf-8")
             configuration = data / "config"
@@ -185,7 +185,7 @@ class UpgradeReviewTests(unittest.IsolatedAsyncioTestCase):
                 apply_bindings=AsyncMock(return_value={"started": True}),
                 confirm_binding=lambda: {"confirmed": True})
             api = UpgradeSetup(controller)
-            with patch("astrbot_host.upgrade_setup.available_personas",
+            with patch("digital_life_host.upgrade_setup.available_personas",
                        AsyncMock(return_value=["private-persona", "group-persona"])):
                 plan, candidate = await api.plan()
                 self.assertTrue(plan["can_prepare"])
@@ -205,7 +205,7 @@ class UpgradeReviewTests(unittest.IsolatedAsyncioTestCase):
 
 
 class UpgradeArchiveResilienceTests(unittest.TestCase):
-    """Damage inside ``.private-companion-upgrade`` must not stop the plugin loading.
+    """Damage inside ``.digital-life-upgrade`` must not stop the plugin loading.
 
     ``preserve_host_configuration`` runs at import time (``main.py``), so every
     raise from this module is an ``ImportError`` for the whole plugin — and
@@ -223,7 +223,7 @@ class UpgradeArchiveResilienceTests(unittest.TestCase):
         self.config.mkdir()
         self.live = self.config / CONFIG_NAME
         self.live.write_text(json.dumps(self.LEGACY), encoding="utf-8")
-        self.archive = self.config / ".private-companion-upgrade"
+        self.archive = self.config / ".digital-life-upgrade"
 
     def _pointer(self):
         return json.loads((self.archive / "source.json").read_text(encoding="utf-8"))
@@ -273,18 +273,18 @@ class UpgradeArchiveResilienceTests(unittest.TestCase):
         preserve_before_schema(self.config)
         (self.archive / "source.json").write_text('{"format": "x"', encoding="utf-8")
         self.live.write_text(json.dumps({"performance": {}, "storage": {}}), encoding="utf-8")
-        with self.assertLogs("astrbot_host.upgrade_source", level="WARNING") as logs:
+        with self.assertLogs("digital_life_host.upgrade_source", level="WARNING") as logs:
             self.assertIsNone(preserve_before_schema(self.config))
-        self.assertIn(".private-companion-upgrade", "\n".join(logs.output))
+        self.assertIn(".digital-life-upgrade", "\n".join(logs.output))
 
     def test_unreadable_archive_is_reported_not_swallowed(self):
         preserve_before_schema(self.config)
         (self.archive / "source.json").write_text('{"format": "x"', encoding="utf-8")
-        with self.assertLogs("astrbot_host.upgrade_source", level="WARNING") as logs:
+        with self.assertLogs("digital_life_host.upgrade_source", level="WARNING") as logs:
             self.assertIsNone(usable_preserved_configuration_path(self.config))
         report = "\n".join(logs.output)
         self.assertIn("JSONDecodeError", report)
-        self.assertIn(".private-companion-upgrade", report)
+        self.assertIn(".digital-life-upgrade", report)
 
     def test_healthy_archive_is_never_rewritten(self):
         saved = preserve_before_schema(self.config)
@@ -308,6 +308,6 @@ class UpgradeArchiveResilienceTests(unittest.TestCase):
         self.live.write_text(json.dumps(defaulted), encoding="utf-8")
         fingerprint = hashlib.sha256(self.live.read_bytes()).hexdigest()
         (self.archive / (fingerprint + ".json")).write_text("{}", encoding="utf-8")
-        with self.assertLogs("astrbot_host.upgrade_source", level="WARNING"):
+        with self.assertLogs("digital_life_host.upgrade_source", level="WARNING"):
             self.assertEqual(preserve_before_schema(self.config), saved)
         self.assertEqual(saved.read_bytes(), json.dumps(self.LEGACY).encode("utf-8"))

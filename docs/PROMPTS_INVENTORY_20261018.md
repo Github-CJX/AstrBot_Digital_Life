@@ -6,7 +6,7 @@
 
 - “提示词”指会进入模型请求的文本：system 指令、随材料附带的说明、工具描述、以及被当作材料注入的 JSON 里的指导语。用户可见的固定文案（拒绝回复、失败提示、唤醒提醒正文）也在末尾单列，因为它们容易被误认为提示词。
 - “注入前提”写的是代码里真实存在的开关或分支。查法：对常量名 grep 引用点，读拼接处的条件。
-- 通道顺序按生产实际执行顺序排；`execution_path=astrbot_core` 是本安装的实际回复链（`astrbot_host/core_reply_configuration.py:22`，运行库 `astrbot_host/core_reply_observations` 里同样记录）。
+- 通道顺序按生产实际执行顺序排；`execution_path=astrbot_core` 是本安装的实际回复链（`digital_life_host/core_reply_configuration.py:22`，运行库 `digital_life_host/core_reply_observations` 里同样记录）。
 
 ## 1. 组装通道
 
@@ -18,14 +18,14 @@ AstrBot 先用人格与历史构造请求，插件在 `main.py` 的 `on_llm_requ
 2. `inject_core_reply_prompt` → system 追加 V2 的**稳定段**（`core_reply.py:348-368`）；只追加 `stable=True` 的段。
 3. `inject_core_reply_tools` → 工具目录与工具说明（失败只降级，不影响回复）。
 4. `inject_core_reply_send_tool` → 发送工具。
-5. `inject_core_reply_perception_context` → user 追加一个临时 part：`<companion_v2_context>{…}</companion_v2_context>`（`core_reply_perception.py:173-289`）。
+5. `inject_core_reply_perception_context` → user 追加一个临时 part：`<digital_life_core_context>{…}</digital_life_core_context>`（`core_reply_perception.py:173-289`）。
 6. `on_agent_begin`：媒体呈现收尾 `finalize_core_reply_media_prompt`（`core_reply_media_prompt.py:33-60`）与语音朗读准备。
 
 人格本身由 AstrBot 构造，V2 不改写（`core_reply_configuration.py:27-28` 明确 `host_persona` 只读）。
 
 ### 1.2 V2 自有回复链（conversation.reply）
 
-V2 自己执行回复批次时，由 `EvidencePromptCompiler.compile`（`companion_v2/conversation/foreground.py:478-504`）产出基础指令，再在 `ConversationMessages._request`（`companion_v2/conversation/messages.py:328-689`）里按材料逐段追加；媒体转述、流式分段（`conversation/streaming_reply.py`）复用同一份请求快照。
+V2 自己执行回复批次时，由 `EvidencePromptCompiler.compile`（`digital_life_core/conversation/foreground.py:478-504`）产出基础指令，再在 `ConversationMessages._request`（`digital_life_core/conversation/messages.py:328-689`）里按材料逐段追加；媒体转述、流式分段（`conversation/streaming_reply.py`）复用同一份请求快照。
 
 ### 1.3 后台任务
 
@@ -39,26 +39,26 @@ V2 自己执行回复批次时，由 `EvidencePromptCompiler.compile`（`compani
 
 | 提示词 | 位置 | 作用 | 注入前提 |
 | --- | --- | --- | --- |
-| `BACKGROUND_INSTRUCTION` | `astrbot_host/core_reply_context.py:30` | 声明背景资料不是新发言/授权，身份沿用宿主人格 | 至少有一个背景段非空 |
-| `MEMORY_INSTRUCTION` | `astrbot_host/core_reply_context.py:32` | 私聊记忆的归属与不确定性 | 本轮有私聊记忆材料 |
-| `GROUP_INSTRUCTION` | `astrbot_host/core_reply_context.py:36` | 群聊发言者只代表本人、群记忆按账号归因 | 当前 scope 是群聊 |
-| `SENT_CONTINUATION_INSTRUCTION` | `astrbot_host/core_reply_context.py:47` | 把已发出的主动消息放回对话顺序；承接旧话头只能引用真实出现过的原话 | 私聊且存在已确认投递的主动消息 |
-| 表达偏好段 | `astrbot_host/core_reply_context.py:220-230` | 风格/日常表达偏好（`text_policy().instruction`） | 配置了 `style_prompt` 或开启日常表达 |
-| 对话附加提示 | `astrbot_host/core_reply_context.py:232-248` | 页面保存的 `conversation.reply.prompt` | 该字段非空 |
-| 角色档案 | `companion_v2/role_profile/task_reference.py` + `context.py:67` | 后台任务的角色参考；对话链不再注入 | 有角色档案且是后台任务 |
-| 相识资料 | `astrbot_host/core_reply_context.py:250` + `companion_v2/relationships/profile.py:118` | 当前对象的相处资料 | 有该对象的档案材料 |
-| 角色知识资料 | `astrbot_host/core_reply_context.py:253` + `companion_v2/conversation/messages.py:79` | 受控知识参考，不是事实证据 | 命中知识条目 |
-| 本窗口成员资料 | `astrbot_host/core_reply_context.py:255` + `companion_v2/knowledge/members.py:30` | 群成员线索 | 群聊且命中成员线索 |
-| 语音朗读指令 | `astrbot_host/core_reply.py:369-377` | 本轮语音回复的标签与朗读格式 | 本轮启用语音回复 |
-| 【陪伴感知与自然表达】策略 | `astrbot_host/core_reply_perception.py:13` | 感知不是清单、角色状态是自己的、被问模型时的口径、图片理解边界 | 每次核心请求（有 prepared 即注入，幂等去重） |
-| 呈现设置块 `<companion_reply_presentation>` | `astrbot_host/core_reply_media_prompt.py:52-60` | 语音标签与表情意图适用于本轮最终回复 | 启用语音或表情意图任一 |
-| 分段说明 | `astrbot_host/core_reply_segmentation.py:24`（群）/`:30`（私聊） | 用 `{{split_marker}}` 标气泡边界 | 开启模型分段、`policy.llm_controlled` 为真、且本轮**不是**流式 |
-| 工具使用规则 | `astrbot_host/core_reply_tools.py:34` | 陪伴工具的作用域、回执口径、证据句柄 | 本轮提供 V2 原生工具 |
-| 作品创建与续写规则 | `astrbot_host/core_reply_tools.py:504` + `companion_v2/conversation/content/authoring_workflow.py:24` | 只有明确要求写作才用创作工具 | 本轮工具目录含创作工具 |
+| `BACKGROUND_INSTRUCTION` | `digital_life_host/core_reply_context.py:30` | 声明背景资料不是新发言/授权，身份沿用宿主人格 | 至少有一个背景段非空 |
+| `MEMORY_INSTRUCTION` | `digital_life_host/core_reply_context.py:32` | 私聊记忆的归属与不确定性 | 本轮有私聊记忆材料 |
+| `GROUP_INSTRUCTION` | `digital_life_host/core_reply_context.py:36` | 群聊发言者只代表本人、群记忆按账号归因 | 当前 scope 是群聊 |
+| `SENT_CONTINUATION_INSTRUCTION` | `digital_life_host/core_reply_context.py:47` | 把已发出的主动消息放回对话顺序；承接旧话头只能引用真实出现过的原话 | 私聊且存在已确认投递的主动消息 |
+| 表达偏好段 | `digital_life_host/core_reply_context.py:220-230` | 风格/日常表达偏好（`text_policy().instruction`） | 配置了 `style_prompt` 或开启日常表达 |
+| 对话附加提示 | `digital_life_host/core_reply_context.py:232-248` | 页面保存的 `conversation.reply.prompt` | 该字段非空 |
+| 角色档案 | `digital_life_core/role_profile/task_reference.py` + `context.py:67` | 后台任务的角色参考；对话链不再注入 | 有角色档案且是后台任务 |
+| 相识资料 | `digital_life_host/core_reply_context.py:250` + `digital_life_core/relationships/profile.py:118` | 当前对象的相处资料 | 有该对象的档案材料 |
+| 角色知识资料 | `digital_life_host/core_reply_context.py:253` + `digital_life_core/conversation/messages.py:79` | 受控知识参考，不是事实证据 | 命中知识条目 |
+| 本窗口成员资料 | `digital_life_host/core_reply_context.py:255` + `digital_life_core/knowledge/members.py:30` | 群成员线索 | 群聊且命中成员线索 |
+| 语音朗读指令 | `digital_life_host/core_reply.py:369-377` | 本轮语音回复的标签与朗读格式 | 本轮启用语音回复 |
+| 【陪伴感知与自然表达】策略 | `digital_life_host/core_reply_perception.py:13` | 感知不是清单、角色状态是自己的、被问模型时的口径、图片理解边界 | 每次核心请求（有 prepared 即注入，幂等去重） |
+| 呈现设置块 `<companion_reply_presentation>` | `digital_life_host/core_reply_media_prompt.py:52-60` | 语音标签与表情意图适用于本轮最终回复 | 启用语音或表情意图任一 |
+| 分段说明 | `digital_life_host/core_reply_segmentation.py:24`（群）/`:30`（私聊） | 用 `{{split_marker}}` 标气泡边界 | 开启模型分段、`policy.llm_controlled` 为真、且本轮**不是**流式 |
+| 工具使用规则 | `digital_life_host/core_reply_tools.py:34` | 陪伴工具的作用域、回执口径、证据句柄 | 本轮提供 V2 原生工具 |
+| 作品创建与续写规则 | `digital_life_host/core_reply_tools.py:504` + `digital_life_core/conversation/content/authoring_workflow.py:24` | 只有明确要求写作才用创作工具 | 本轮工具目录含创作工具 |
 
 ## 3. 宿主核心回复链：user 上下文
 
-`<companion_v2_context>` 是临时 part，不写进历史（`core_reply_perception.py:278-289`），字段级前提如下：
+`<digital_life_core_context>` 是临时 part，不写进历史（`core_reply_perception.py:278-289`），字段级前提如下：
 
 | 字段 | 位置 | 内容与作用 | 注入前提 |
 | --- | --- | --- | --- |
@@ -86,24 +86,24 @@ V2 自己执行回复批次时，由 `EvidencePromptCompiler.compile`（`compani
 | 角色成长 | `core_reply_context.py:327` | `ROLE_GROWTH_INSTRUCTION`：技能与目标的定性进展 | 有成长材料 |
 | 角色自我提醒 | `core_reply_context.py:329` | `SELF_REVIEW_INSTRUCTION`：短期表达建议 | 有人工采纳的自评建议 |
 | 当前未完成事项 | `core_reply_context.py:331` | `OPEN_ITEMS_INSTRUCTION`：未完话头只在被提及时承接 | 有未完成事项且本轮相关 |
-| 角色当前状态 | `core_reply_context.py:334` + `companion_v2/role_work/state/service.py:24` | 角色自身精力/心情/周期等，第一人称归属 | 状态模拟开启且有材料 |
-| 群聊参与参考 | `core_reply_context.py:336-347` + `companion_v2/conversation/participation.py:41` | 是否接话的参与判断说明 | 群聊且群参与启用 |
+| 角色当前状态 | `core_reply_context.py:334` + `digital_life_core/role_work/state/service.py:24` | 角色自身精力/心情/周期等，第一人称归属 | 状态模拟开启且有材料 |
+| 群聊参与参考 | `core_reply_context.py:336-347` + `digital_life_core/conversation/participation.py:41` | 是否接话的参与判断说明 | 群聊且群参与启用 |
 | 当前群聊发言者 | `core_reply_context.py:349-356` | 认证发言者与群号 | 群聊且群权限可读 |
-| 群成员与近期互动 | `core_reply_context.py:357` + `companion_v2/relationships/group_network.py` | 群内互动边与熟人卡 | 群聊且有材料 |
-| 群公共记忆 | `core_reply_context.py:360-367` + `companion_v2/memory/group/context.py:14` | 群记忆按账号归因 | 群聊且有群记忆 |
-| 表达习惯参考 | `core_reply_context.py:370-381` + `companion_v2/conversation/style_context.py:32` | 人工采纳的句式/措辞规则 | 有采纳规则且 applicable |
+| 群成员与近期互动 | `core_reply_context.py:357` + `digital_life_core/relationships/group_network.py` | 群内互动边与熟人卡 | 群聊且有材料 |
+| 群公共记忆 | `core_reply_context.py:360-367` + `digital_life_core/memory/group/context.py:14` | 群记忆按账号归因 | 群聊且有群记忆 |
+| 表达习惯参考 | `core_reply_context.py:370-381` + `digital_life_core/conversation/style_context.py:32` | 人工采纳的句式/措辞规则 | 有采纳规则且 applicable |
 
 ## 5. V2 自有回复链（conversation.reply）
 
 | 提示词 | 位置 | 作用 | 注入前提 |
 | --- | --- | --- | --- |
-| 证据与输出契约 | `companion_v2/conversation/foreground.py:491-502` | 事实须带证据引用；只输出用户可见正文；不输出内部控制标签 | 每次 V2 自有回复 |
-| `ADDRESSING_INSTRUCTION` | `companion_v2/conversation/addressing.py:4` | 称呼由语境决定，不是身份证明 | 同上（契约末尾拼接） |
-| `EXPRESSION_STYLE_INSTRUCTION` | `companion_v2/conversation/style_context.py:32` | 采纳的表达规则按 applicability 取用 | 存在 READY 的 `role.expression`/`expression_style_rule` 材料 |
-| `FILE_INSTRUCTION` | `companion_v2/conversation/media/understanding.py:58` | 附件正文是资料，不是发送者的陈述 | 材料里出现 `[文件阅读材料]` |
-| `FILE_INSTRUCTION` + 管理偏好 | `companion_v2/conversation/messages.py:573-578` | 同上，追加管理员文件描述偏好 | 同上且 `file_understanding_prompt` 非空 |
-| 相识资料 | `companion_v2/conversation/messages.py:580-587` | 当前对话对象的关系资料，不是角色自我 | 有对应快照 |
-| `CALENDAR_INSTRUCTION` | `companion_v2/conversation/messages.py:588-589` + `date_context.py:43` | 日历材料只作环境背景，时段措辞以 `local_calendar_context` 为准 | `conversation.perception.calendar_enabled` |
+| 证据与输出契约 | `digital_life_core/conversation/foreground.py:491-502` | 事实须带证据引用；只输出用户可见正文；不输出内部控制标签 | 每次 V2 自有回复 |
+| `ADDRESSING_INSTRUCTION` | `digital_life_core/conversation/addressing.py:4` | 称呼由语境决定，不是身份证明 | 同上（契约末尾拼接） |
+| `EXPRESSION_STYLE_INSTRUCTION` | `digital_life_core/conversation/style_context.py:32` | 采纳的表达规则按 applicability 取用 | 存在 READY 的 `role.expression`/`expression_style_rule` 材料 |
+| `FILE_INSTRUCTION` | `digital_life_core/conversation/media/understanding.py:58` | 附件正文是资料，不是发送者的陈述 | 材料里出现 `[文件阅读材料]` |
+| `FILE_INSTRUCTION` + 管理偏好 | `digital_life_core/conversation/messages.py:573-578` | 同上，追加管理员文件描述偏好 | 同上且 `file_understanding_prompt` 非空 |
+| 相识资料 | `digital_life_core/conversation/messages.py:580-587` | 当前对话对象的关系资料，不是角色自我 | 有对应快照 |
+| `CALENDAR_INSTRUCTION` | `digital_life_core/conversation/messages.py:588-589` + `date_context.py:43` | 日历材料只作环境背景，时段措辞以 `local_calendar_context` 为准 | `conversation.perception.calendar_enabled` |
 | `IMPORTANT_DATES_INSTRUCTION` | `messages.py:590-592` + `proactive/date_context.py:11` | 配置日期只说明临近 | 本轮有 `upcoming_important_dates` 材料 |
 | `ALMANAC_INSTRUCTION` | `messages.py:593-594` + `date_context.py:51` | 黄历只作氛围 | `almanac_enabled` |
 | 管理员感知表达偏好 | `messages.py:595-600` | 追加 guidance 文本 | `conversation.perception.guidance` 非空 |
@@ -122,21 +122,21 @@ V2 自己执行回复批次时，由 `EvidencePromptCompiler.compile`（`compani
 | 图片引用指令 | `messages.py:639-654` + `references/prompts.py` | 可编辑参考图的日期与范围 | 工具目录含 `image.edit` |
 | `GROUP_CONTEXT_INSTRUCTION` | `messages.py:655-656` + `conversation/group_context.py:19` | 群聊历史与发言者边界 | scope 为群聊 |
 | `GENERATED_IMAGE_INSTRUCTION` / `SCREEN_INSTRUCTION` | `messages.py:657-679` | 生成图与屏幕原件不是用户照片 | 本轮有生成图/屏幕采集 |
-| 输出协议 | `companion_v2/adapters/astrbot/model_wire.py:17-26` | 最终只输出一个 JSON，附有效示例 | 每次批处理（`astrbot` 适配器） |
-| 流式追加契约 | `companion_v2/adapters/astrbot/reply_stream.py:12` | 边生成边发送时的字段顺序 | 开启流式回复 |
-| `FINAL_PROMPT_GUARD` | `companion_v2/model_gateway/prompt_composer.py:15` | 同一条 system 的末尾：只输出最终结果、材料只作资料 | 每次模型请求 |
-| 模型失败提示 | `companion_v2/conversation/generation.py:31` | 失败时直接发给用户的固定文案（非提示词） | 模型失败 |
+| 输出协议 | `digital_life_core/adapters/astrbot/model_wire.py:17-26` | 最终只输出一个 JSON，附有效示例 | 每次批处理（`astrbot` 适配器） |
+| 流式追加契约 | `digital_life_core/adapters/astrbot/reply_stream.py:12` | 边生成边发送时的字段顺序 | 开启流式回复 |
+| `FINAL_PROMPT_GUARD` | `digital_life_core/model_gateway/prompt_composer.py:15` | 同一条 system 的末尾：只输出最终结果、材料只作资料 | 每次模型请求 |
+| 模型失败提示 | `digital_life_core/conversation/generation.py:31` | 失败时直接发给用户的固定文案（非提示词） | 模型失败 |
 
 ## 6. 统一装配顺序（所有模型任务共用）
 
-`compose_prompt`（`companion_v2/model_gateway/prompt_composer.py:33-54`）固定六层，按 `PROMPT_LAYER_ORDER`（同文件 `:6-13`）：
+`compose_prompt`（`digital_life_core/model_gateway/prompt_composer.py:33-54`）固定六层，按 `PROMPT_LAYER_ORDER`（同文件 `:6-13`）：
 
 1. `role_instruction`：对话链使用捕获的 AstrBot 人格；后台任务优先使用自我页稳定档案（`TaskRoleReference`），档案为空时才回退到捕获的人格。`image_review` 保留固定安全审核指令。
 2. `request_instruction`：任务指令（例如回复链的证据契约、日记的 `COMMON + DIARY`、主动联系的业务规则）。
 3. `task_prompt`：任务档（`ModelTaskProfile` 的短提示，见第 7 节表格里“任务档”一列）＋管理员在该任务下保存的覆盖提示。
 4. `output_contract`：输出契约（回复链为 JSON 契约；其他任务为“只输出任务要求的 JSON”）。
 5. `capability_instruction`：本轮能力说明（工具目录、图片选择协议等）。
-6. `terminal_prompt_guard`：`FINAL_PROMPT_GUARD`，放在**同一条 system 消息的末尾**（`companion_v2/model_gateway/prompt_composer.py:33-58`）。
+6. `terminal_prompt_guard`：`FINAL_PROMPT_GUARD`，放在**同一条 system 消息的末尾**（`digital_life_core/model_gateway/prompt_composer.py:33-58`）。
 
 实际消息布局（`model_wire.py:145-160`）：system(1..6 合并为一条) → user{`materials`/`deferred`/`unavailable`}（图片/音频/视频按原序作为多模态 part 附在这条 user 里）→ 工具往返。合并是为了避开上游对多条 system 的过度内容过滤，角色、任务、契约与末尾约束的顺序不变。
 
@@ -148,7 +148,7 @@ V2 自己执行回复批次时，由 `EvidencePromptCompiler.compile`（`compani
 
 | 任务 kind | 车道 | 任务档位置 | 默认 task_prompt 摘要 | 触发前提 |
 | --- | --- | --- | --- | --- |
-| `conversation.reply` | foreground | `astrbot_host/multi_session.py:364`、`adapters/astrbot/staging.py:273` | 页面“对话附加提示”（`conversation.reply.prompt`） | AstrBot 核心链每次回复 |
+| `conversation.reply` | foreground | `digital_life_host/multi_session.py:364`、`adapters/astrbot/staging.py:273` | 页面“对话附加提示”（`conversation.reply.prompt`） | AstrBot 核心链每次回复 |
 | `conversation.poke_reply` | background | `conversation/pokes.py:28` | 依据角色身份回应戳一戳 | 开启戳一戳模型回复 |
 | `proactive.compose` | background | `proactive/service.py:67` | 保持人格，判断是否主动联系 | 主动联系机会开放 |
 | `proactive.judge` | background | `proactive/service.py:90` | 发送前人格自检 | 开启 LLM 人格判定 |
@@ -172,26 +172,26 @@ V2 自己执行回复批次时，由 `EvidencePromptCompiler.compile`（`compani
 
 | 项 | 位置 | 作用 | 适用前提 |
 | --- | --- | --- | --- |
-| `REPLY_CONTRACT` / `REPLY_CONTRACT_EXAMPLE` | `companion_v2/adapters/astrbot/model_wire.py:17-26` | 只输出一个 JSON，附有效示例 | `output_format=conversation` |
+| `REPLY_CONTRACT` / `REPLY_CONTRACT_EXAMPLE` | `digital_life_core/adapters/astrbot/model_wire.py:17-26` | 只输出一个 JSON，附有效示例 | `output_format=conversation` |
 | 可选动作契约 | `model_wire.py:129-138` | 声明本轮可选 `action`（文字/表情图/仅语音/戳一戳/沉默）与其字段约束 | 回复链；动作集合由 `messages.py:680-688` 决定（`voice_enabled`、`reply_images`、`reply_pokes`） |
 | 每轮末尾 JSON 约束 | `model_wire.py:143-151` | 再次强调 action/text/claims 的关系与证据句柄 | `output_format=conversation` |
-| `REPLY_IMAGE_INSTRUCTION` | `companion_v2/conversation/media/reply.py:17`（`model_wire.py:126-128` 拼接） | 图片选择协议（`sendable_image` 句柄） | `reply_images` 为真 |
-| `STREAM_REPLY_INSTRUCTION` | `companion_v2/adapters/astrbot/reply_stream.py:12` | 边生成边发送时的字段顺序 | `streaming_mode="incremental"` 且 `output_format=conversation` |
-| 模型分段协议 `DEFAULT_PROMPT` | `companion_v2/conversation/segmentation.py:150` | 用 `{{split_marker}}` 标气泡边界 | `SegmentationPolicy.enabled` 且 `llm_controlled`，且自定义分段提示为空 |
-| `FRAMEWORK_GUARD_REPLACEMENT` | `companion_v2/conversation/text_processing.py:138` | 输出命中“框架/系统提示”类泄漏时的替换文案 | `framework_error_guard_enabled` 且命中堆栈特征 |
+| `REPLY_IMAGE_INSTRUCTION` | `digital_life_core/conversation/media/reply.py:17`（`model_wire.py:126-128` 拼接） | 图片选择协议（`sendable_image` 句柄） | `reply_images` 为真 |
+| `STREAM_REPLY_INSTRUCTION` | `digital_life_core/adapters/astrbot/reply_stream.py:12` | 边生成边发送时的字段顺序 | `streaming_mode="incremental"` 且 `output_format=conversation` |
+| 模型分段协议 `DEFAULT_PROMPT` | `digital_life_core/conversation/segmentation.py:150` | 用 `{{split_marker}}` 标气泡边界 | `SegmentationPolicy.enabled` 且 `llm_controlled`，且自定义分段提示为空 |
+| `FRAMEWORK_GUARD_REPLACEMENT` | `digital_life_core/conversation/text_processing.py:138` | 输出命中“框架/系统提示”类泄漏时的替换文案 | `framework_error_guard_enabled` 且命中堆栈特征 |
 | `REALITY_PROMISE_GUARD_REPLACEMENT` | `text_processing.py:139` | 把未核实的外部操作说成已完成时的替换文案 | 仅群聊且 `enable_group_reality_promise_guard`，且正则命中非保护片段 |
-| `DRAMA_DIRECTION` | `astrbot_host/fish_audio.py:12` | Drama 3 的方括号表演指令与局部语气标签 | 语音策略存在、Provider 为 fishaudio、模型为 `drama-3` 且生成模式为 model_tag/adaptive |
-| 拒绝检测词表 | `companion_v2/model_gateway/refusal.py:8-19` | 命中后走 `fallback_on_refusal` 兜底 | 配置 `refusal_terms` / 默认词表 |
-| 替换规则 | `companion_v2/model_gateway/replacement_rules.py` | 按配置的时窗、来源对输出做定向替换 | 配置了 `replacement_rules` |
-| 表达复核 | `companion_v2/expression/review.py:27` | 学到的句式是否生硬/泄漏内部规则，必要时小幅改写 | `role.expression.review` 任务开启且本轮有采纳规则 |
-| `MODEL_FAILURE_NOTICE` | `companion_v2/conversation/generation.py:31` | 模型失败时直接发给用户的固定文案 | 模型失败 |
-| 陌生人拒绝文案 | `companion_v2/relationships/private_access.py:44` | 无对话权限时的固定回复 | 未授权对话 |
+| `DRAMA_DIRECTION` | `digital_life_host/fish_audio.py:12` | Drama 3 的方括号表演指令与局部语气标签 | 语音策略存在、Provider 为 fishaudio、模型为 `drama-3` 且生成模式为 model_tag/adaptive |
+| 拒绝检测词表 | `digital_life_core/model_gateway/refusal.py:8-19` | 命中后走 `fallback_on_refusal` 兜底 | 配置 `refusal_terms` / 默认词表 |
+| 替换规则 | `digital_life_core/model_gateway/replacement_rules.py` | 按配置的时窗、来源对输出做定向替换 | 配置了 `replacement_rules` |
+| 表达复核 | `digital_life_core/expression/review.py:27` | 学到的句式是否生硬/泄漏内部规则，必要时小幅改写 | `role.expression.review` 任务开启且本轮有采纳规则 |
+| `MODEL_FAILURE_NOTICE` | `digital_life_core/conversation/generation.py:31` | 模型失败时直接发给用户的固定文案 | 模型失败 |
+| 陌生人拒绝文案 | `digital_life_core/relationships/private_access.py:44` | 无对话权限时的固定回复 | 未授权对话 |
 
 ## 9. 主动联系（proactive.compose）
 
 ### 9.1 系统指令的拼接顺序
 
-`request_for` 把下列文本拼成**一个** instruction 字符串（`companion_v2/proactive/prompts.py:384-408`），顺序即下表：
+`request_for` 把下列文本拼成**一个** instruction 字符串（`digital_life_core/proactive/prompts.py:384-408`），顺序即下表：
 
 | 提示词 | 位置 | 作用 | 注入前提 |
 | --- | --- | --- | --- |
@@ -383,10 +383,10 @@ V2 自己执行回复批次时，由 `EvidencePromptCompiler.compile`（`compani
 
 | 名称 | 位置 | 作用 | 注入前提 |
 | --- | --- | --- | --- |
-| image 工具字段说明 | `astrbot_host/native_extensions/image_native/adapter.py:56` | 说明 `prompt`/`negative_prompt` 由模型写画面描述与负向词 | image 扩展启用且本轮工具目录开放生图 |
+| image 工具字段说明 | `digital_life_host/native_extensions/image_native/adapter.py:56` | 说明 `prompt`/`negative_prompt` 由模型写画面描述与负向词 | image 扩展启用且本轮工具目录开放生图 |
 | 生图提示词编排器 | `image_native/comfyui_prompts.py:164` | 把要求重写并拆分进 ComfyUI 工作流各文本槽 | 需 `comfyui` 后端且传入模型调用；**仓库内无调用方**，当前不注入 |
 | 工作流映射分析 prompt | `image_native/comfyui_service.py:133` | 推断哪些节点是动态文本/图片/尺寸 | `ComfyUIService.analyze` 路径，同样无调用方 |
-| 群图安全审核 `_INSTRUCTION`+`_RULES`+`_BOUNDARIES` | `companion_v2/conversation/media/review.py:68`、`:80` | 判定群聊成图能否公开，输出固定标签 | 群聊成图待发 + 审核模式非 off + 有视觉 Provider |
+| 群图安全审核 `_INSTRUCTION`+`_RULES`+`_BOUNDARIES` | `digital_life_core/conversation/media/review.py:68`、`:80` | 判定群聊成图能否公开，输出固定标签 | 群聊成图待发 + 审核模式非 off + 有视觉 Provider |
 | 群图审核补充规则 | `conversation/image_review/group_nsfw_image_review_custom_prompt` | 管理员补充规则 | 该字段非空 |
 
 图片没有“人格+风格+场景”拼好的固定常量：画面描述由对话模型写进工具参数，风格/质量由工作流固定槽保留。
@@ -433,7 +433,7 @@ V2 自己执行回复批次时，由 `EvidencePromptCompiler.compile`（`compani
 | 网页房间对话 system | `game/rooms_methods.py:469` | 只接当前发言、不声称外部发送 | 玩家在游戏网页房间发言 |
 | 你画我猜猜图 | `game/activity_methods.py:258` | 只按画面线索给一个答案 | 猜图房间 + 画布 + 视觉 Provider |
 | 海龟汤分类 | `game/activity_methods.py:308` | 判断是继续海龟汤还是转普通聊天 | 海龟汤房间内被调用 |
-| 海龟汤出题/校验/裁判 | `companion_v2/games/turtle_soup_ai.py:28`、`:57`、`:76`、`:100`、`:130` | 出题、自洽校验、提问判定、终局、玩家出题 | 对应回合 |
+| 海龟汤出题/校验/裁判 | `digital_life_core/games/turtle_soup_ai.py:28`、`:57`、`:76`、`:100`、`:130` | 出题、自洽校验、提问判定、终局、玩家出题 | 对应回合 |
 | 悔棋/再来一局 | `game/activity_methods.py:330`、`:405` | 决定是否接受并回一句 | 玩家点击对应按钮 |
 
 ### 12.5 现实（reality）
@@ -452,14 +452,14 @@ V2 自己执行回复批次时，由 `EvidencePromptCompiler.compile`（`compani
 
 | 名称 | 位置 | 作用 | 注入前提 |
 | --- | --- | --- | --- |
-| 人格标准化 | `astrbot_host/persona_workshop_api.py:922` | 把来源人格/问卷整理成可审核草稿 | 管理台请求且模型可用 |
+| 人格标准化 | `digital_life_host/persona_workshop_api.py:922` | 把来源人格/问卷整理成可审核草稿 | 管理台请求且模型可用 |
 | 场景试答 | `persona_workshop_api.py:946` | 生成贴合/差异/对照三种口吻 | 管理台请求且草稿已审核 |
 | 风格归纳 | `persona_workshop_api.py:958` | 由试答归纳对话风格规则 | 管理台请求 |
-| `CONVERSATION_GUIDANCE` | `companion_v2/qzone/topic_prompt.py:32` | 发布主题/场景目录与置信度口径 | 工具目录含 `qzone.post.publish`（扩展启用 + 授权 + 会话同意 + 凭据可用） |
+| `CONVERSATION_GUIDANCE` | `digital_life_core/qzone/topic_prompt.py:32` | 发布主题/场景目录与置信度口径 | 工具目录含 `qzone.post.publish`（扩展启用 + 授权 + 会话同意 + 凭据可用） |
 | 空间发布工具说明 | `qzone/capability.py:116` | 先定主题场景再写正文 | 同上 |
-| 分段 `NATIVE_PROMPT`/`PRIVATE_PROMPT` | `astrbot_host/core_reply_segmentation.py:24`、`:30` | 宿主回复的气泡边界协议 | 分段 `enabled`+`llm_controlled` 且非流式 |
-| 表情呈现意图 | `astrbot_host/core_reply_reaction_delivery.py:39`（正文 `expression/reply_intent.py:16`） | 要求附表情呈现意图标签 | `reaction_available` 为真 |
-| 呈现设置块 | `astrbot_host/core_reply_media_prompt.py:52` | 覆盖最终 system 的语音/表情格式 | 有语音策略或表情呈现 |
+| 分段 `NATIVE_PROMPT`/`PRIVATE_PROMPT` | `digital_life_host/core_reply_segmentation.py:24`、`:30` | 宿主回复的气泡边界协议 | 分段 `enabled`+`llm_controlled` 且非流式 |
+| 表情呈现意图 | `digital_life_host/core_reply_reaction_delivery.py:39`（正文 `expression/reply_intent.py:16`） | 要求附表情呈现意图标签 | `reaction_available` 为真 |
+| 呈现设置块 | `digital_life_host/core_reply_media_prompt.py:52` | 覆盖最终 system 的语音/表情格式 | 有语音策略或表情呈现 |
 
 ## 13. 可配置提示词字段
 
@@ -539,14 +539,14 @@ V2 自己执行回复批次时，由 `EvidencePromptCompiler.compile`（`compani
 | `SCREEN_INSTRUCTION` | `screen/pipeline.py:26` | 挂在 `ScreenProcessingRequest.instruction` 上；解读任务实际用 `screen/interpretation.py:67` 的 `PROMPT`，是否进入模型请求未确认 |
 | `dream_afterglow_mode` 分支 | `role_work/journal/prompts.py:70-76` | 默认值 `auto` 不等于轻/标准/明显，默认配置下该段永不注入 |
 | `role.journal.*` | `role_work/life/configuration.py:15` | 配置组实际是 `role.life.*`；按 `role.journal.*` 查字段会查不到 |
-| 人格工坊（数据层） | `companion_v2/persona_craft/` | 只有数据与校验、没有模型调用，因此没有提示词可盘 |
+| 人格工坊（数据层） | `digital_life_core/persona_craft/` | 只有数据与校验、没有模型调用，因此没有提示词可盘 |
 | 日记 `writing_date` | `role_work/journal/prompts.py:83` | 只给日期与时区，没有星期；日记若要点出星期仍需模型自己算（与 2.2.0 修好的主动消息同类风险） |
 | 周期阶段提示拼接 | `role_work/state/maintenance.py:596` | `cycle_enabled` 时把所有阶段提示一次拼入，而不是只取当前阶段，是否有意未确认 |
 | `expression/learning.py:130 INSTRUCTION` | `expression/learning.py:130` | 生产无引用（仅测试）；实际生效的是 `style_service.learning_instruction`（`PROMPT` + `FORM_INSTRUCTION` + `learning.mode_instruction`） |
 | `VIDEO_INSTRUCTION`（同名两份） | `conversation/media/understanding.py:64` | 无引用；真正注入的是 `media/video/narration.py:43` 的同名常量，易混 |
 | `media/video/models.py:26 INSTRUCTION` | `conversation/media/video/models.py:26` | 无引用，该模块只用于帧与预算校验 |
 | `SELF_REVIEW_INSTRUCTION` | `conversation/messages.py:57` | 只 import 未拼接：V2 自生成回复会带自评材料却没有对应指引，只有宿主背景段有 |
-| `SHARED_EXPERIENCE_MEMORY_PROMPT` | `astrbot_host/native_extensions/together/common.py:115` | 唯一入口 `record_shared_experiences` 硬编码为 False 且无配置项 → 条件恒假 |
+| `SHARED_EXPERIENCE_MEMORY_PROMPT` | `digital_life_host/native_extensions/together/common.py:115` | 唯一入口 `record_shared_experiences` 硬编码为 False 且无配置项 → 条件恒假 |
 | ComfyUI 两段生图提示 | `image_native/comfyui_prompts.py:164`、`comfyui_service.py:133` | `generate_image`/`analyze` 无调用方，永不注入 |
 | live 记忆/上下文兼容函数 | `live/model_methods.py:697`、`:811`、`media_methods.py:84,108` | 保留兼容名或无调用方，不注入 |
 | `qzone` 主题 `INSTRUCTION`/`request_for` | `qzone/topic_prompt.py:47`、`:64` | 无生产调用方，主题判定实际靠工具参数 + `CONVERSATION_GUIDANCE` |

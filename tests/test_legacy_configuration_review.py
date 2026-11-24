@@ -6,10 +6,10 @@ from types import SimpleNamespace as NS
 import unittest
 from unittest.mock import patch
 
-from companion_v2.execution.models import TaskError
-from companion_v2.foundation.outcome import Outcome
-from companion_v2.legacy.migration import ConfigIntent, SourceFinding
-from astrbot_host.legacy_configuration_review import configuration_rows, selected_intents, selection_id
+from digital_life_core.execution.models import TaskError
+from digital_life_core.foundation.outcome import Outcome
+from digital_life_core.legacy.migration import ConfigIntent, SourceFinding
+from digital_life_host.legacy_configuration_review import configuration_rows, selected_intents, selection_id
 from tests.proactive_support import ContactFixture
 from tests.test_legacy_extension_registry_configuration import RegistryHostMigrationTests
 
@@ -25,7 +25,7 @@ class ConfigurationQuestionnaireTests(ContactFixture, unittest.IsolatedAsyncioTe
         self.api._fingerprint = lambda root: "unchanged-source"
         self.api._mark_imported = lambda *args, **kwargs: True
         self.api._already_imported = lambda root: True
-        self.append_patch = patch("astrbot_host.legacy_contact_configuration.append_private_contact_plan",
+        self.append_patch = patch("digital_life_host.legacy_contact_configuration.append_private_contact_plan",
                                   side_effect=lambda controller, session, migration, plan, scope: plan)
         self.append_patch.start()
         self.addCleanup(self.append_patch.stop)

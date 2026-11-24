@@ -5,8 +5,8 @@ from pathlib import Path
 from tempfile import TemporaryDirectory
 import unittest
 
-from companion_v2.diagnostics.inbound import InboundNoReplyLedger
-from companion_v2.storage.runtime import StorageRuntime
+from digital_life_core.diagnostics.inbound import InboundNoReplyLedger
+from digital_life_core.storage.runtime import StorageRuntime
 from tests.test_management_access import INSTALLATION
 
 
@@ -30,7 +30,7 @@ class InboundNoReplyLedgerTests(unittest.TestCase):
         self.assertEqual(set(rows[0].keys()), {"event_ref", "origin_key", "channel", "reason_code", "observed_at", "code"})
 
     def test_suppressed_outcome_is_kept_for_diagnostics_without_a_log_line(self):
-        from companion_v2.diagnostics import inbound
+        from digital_life_core.diagnostics import inbound
 
         temporary = TemporaryDirectory(prefix="companion-v2-no-reply-suppressed-")
         self.addCleanup(temporary.cleanup)

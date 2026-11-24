@@ -26,8 +26,8 @@ from typing import Any
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
-from companion_v2.storage.runtime import StorageRuntime  # noqa: E402
-from companion_v2.storage.schema import SCHEMA_VERSION  # noqa: E402
+from digital_life_core.storage.runtime import StorageRuntime  # noqa: E402
+from digital_life_core.storage.schema import SCHEMA_VERSION  # noqa: E402
 
 
 DEFAULT_MAX_DATABASE_BYTES = 100 * 1024 * 1024
@@ -152,7 +152,7 @@ def _open_samples(database: Path, installation_id: str, samples: int) -> list[fl
 
 
 def _lock_facts() -> dict[str, Any]:
-    source = (ROOT / "companion_v2" / "storage" / "runtime.py").read_text(encoding="utf-8")
+    source = (ROOT / "digital_life_core" / "storage" / "runtime.py").read_text(encoding="utf-8")
     module = ast.parse(source)
     runtime_class = next(node for node in module.body if isinstance(node, ast.ClassDef) and node.name == "StorageRuntime")
     methods = {node.name: node for node in runtime_class.body if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef))}

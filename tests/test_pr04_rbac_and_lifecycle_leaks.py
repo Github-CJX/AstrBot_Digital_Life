@@ -18,42 +18,42 @@ from unittest.mock import AsyncMock, MagicMock, patch
 from tests import astrbot_data_root  # noqa: F401 - isolate ASTRBOT_ROOT before SDK imports
 
 from astrbot.api.web import PluginMultiDict
-from companion_v2.execution.models import TaskError
-from companion_v2.foundation.outcome import Outcome
-from companion_v2.identity_policy.models import AuthorizationTier
-from companion_v2.identity_policy.object_access import ObjectAccessPolicy
-from companion_v2.storage.runtime import StorageRuntime
+from digital_life_core.execution.models import TaskError
+from digital_life_core.foundation.outcome import Outcome
+from digital_life_core.identity_policy.models import AuthorizationTier
+from digital_life_core.identity_policy.object_access import ObjectAccessPolicy
+from digital_life_core.storage.runtime import StorageRuntime
 
-from astrbot_host.account_session_api import AccountSessionWebAPI
-from astrbot_host.backup_api import BackupWebAPI
-from astrbot_host.host_options_api import HostOptionsWebAPI
-from astrbot_host.huawei_health import service as huawei_service
-from astrbot_host.huawei_health.service import (
+from digital_life_host.account_session_api import AccountSessionWebAPI
+from digital_life_host.backup_api import BackupWebAPI
+from digital_life_host.host_options_api import HostOptionsWebAPI
+from digital_life_host.huawei_health import service as huawei_service
+from digital_life_host.huawei_health.service import (
     HuaweiHealthService,
     close_all_huawei_health_services,
 )
-from astrbot_host import laya_client
-from astrbot_host.log_api import LogWebAPI
-from astrbot_host.management_identity import (
+from digital_life_host import laya_client
+from digital_life_host.log_api import LogWebAPI
+from digital_life_host.management_identity import (
     dashboard_operator,
     require_controller_management_operator,
     require_management_operator,
 )
-from astrbot_host.multi_api import MultiHostWebAPI
-from astrbot_host.multi_controller import AstrBotMultiController
-from astrbot_host.native_extensions.live.bilibili_live import (
+from digital_life_host.multi_api import MultiHostWebAPI
+from digital_life_host.multi_controller import AstrBotMultiController
+from digital_life_host.native_extensions.live.bilibili_live import (
     BilibiliBlivedmClient,
     BilibiliOpenLiveClient,
 )
-from astrbot_host.native_extensions.live.model_methods import LiveModelMethods
-from astrbot_host.native_extensions.live.runtime import LiveRuntime
-from astrbot_host.native_extensions.live.subtitle_server import SubtitleServer
-from astrbot_host.private_debounce import PrivateDebounce
-from astrbot_host import service_balance_script
-from astrbot_host.setup_api import SetupWebAPI
-from astrbot_host.storage_api import StorageWebAPI
-from astrbot_host.web_api import StagingWebAPI, http_handler
-from astrbot_host.works_api import WorksWebAPI
+from digital_life_host.native_extensions.live.model_methods import LiveModelMethods
+from digital_life_host.native_extensions.live.runtime import LiveRuntime
+from digital_life_host.native_extensions.live.subtitle_server import SubtitleServer
+from digital_life_host.private_debounce import PrivateDebounce
+from digital_life_host import service_balance_script
+from digital_life_host.setup_api import SetupWebAPI
+from digital_life_host.storage_api import StorageWebAPI
+from digital_life_host.web_api import StagingWebAPI, http_handler
+from digital_life_host.works_api import WorksWebAPI
 
 
 NOW = datetime(2026, 11, 22, 12, 0, tzinfo=timezone.utc)
@@ -184,18 +184,18 @@ class ManagementAPIsRBACTests(unittest.IsolatedAsyncioTestCase):
         api = WorksWebAPI(controller)
         query = PluginMultiDict([("target_id", "t1"), ("role_id", "role-a")])
 
-        with patch("astrbot_host.works_api.request", _request_proxy("standard-user", query=query)):
+        with patch("digital_life_host.works_api.request", _request_proxy("standard-user", query=query)):
             denied = await api.list_works()
         self.assertEqual(denied["status"], "error")
         self.assertEqual(denied["data"]["code"], "core_access_required")
 
-        with patch("astrbot_host.works_api.request", _request_proxy("core-admin", query=query)), \
-             patch("astrbot_host.works_api.read_works", return_value={"works": []}):
+        with patch("digital_life_host.works_api.request", _request_proxy("core-admin", query=query)), \
+             patch("digital_life_host.works_api.read_works", return_value={"works": []}):
             allowed = await api.list_works()
         self.assertEqual(allowed["status"], "ok")
 
-        with patch("astrbot_host.works_api.request", _request_proxy("core-admin", query=query)), \
-             patch("astrbot_host.works_api.read_works", side_effect=sqlite3.OperationalError("locked")):
+        with patch("digital_life_host.works_api.request", _request_proxy("core-admin", query=query)), \
+             patch("digital_life_host.works_api.read_works", side_effect=sqlite3.OperationalError("locked")):
             db_err = await api.list_works()
         self.assertEqual(db_err["status"], "error")
         self.assertEqual(db_err["data"]["code"], "works_unavailable")
@@ -204,20 +204,20 @@ class ManagementAPIsRBACTests(unittest.IsolatedAsyncioTestCase):
         controller = self._controller()
         api = LogWebAPI(controller)
 
-        with patch("astrbot_host.log_api.request", _request_proxy("")):
+        with patch("digital_life_host.log_api.request", _request_proxy("")):
             anon = await api.read_logs()
         self.assertEqual(anon["data"]["code"], "dashboard_identity_required")
 
-        with patch("astrbot_host.log_api.request", _request_proxy("standard-user")):
+        with patch("digital_life_host.log_api.request", _request_proxy("standard-user")):
             denied = await api.read_logs()
         self.assertEqual(denied["data"]["code"], "core_access_required")
 
-        with patch("astrbot_host.log_api.request", _request_proxy("core-admin", query=PluginMultiDict([("limit", "bad")]))):
+        with patch("digital_life_host.log_api.request", _request_proxy("core-admin", query=PluginMultiDict([("limit", "bad")]))):
             bad_query = await api.read_logs()
         self.assertEqual(bad_query["status"], "error")
         self.assertEqual(bad_query["data"]["code"], "logs_query_invalid")
 
-        with patch("astrbot_host.log_api.request", _request_proxy("core-admin")):
+        with patch("digital_life_host.log_api.request", _request_proxy("core-admin")):
             ok = await api.read_logs()
         self.assertEqual(ok["status"], "ok")
         self.assertIn("records", ok["data"])
@@ -233,15 +233,15 @@ class ManagementAPIsRBACTests(unittest.IsolatedAsyncioTestCase):
         view = api._view()
         self.assertEqual(view["mode"], "multi")
 
-        with patch("astrbot_host.account_session_api.request", _request_proxy("standard-user")):
+        with patch("digital_life_host.account_session_api.request", _request_proxy("standard-user")):
             denied = await api.get()
         self.assertEqual(denied["data"]["code"], "core_access_required")
 
-        with patch("astrbot_host.account_session_api.request", _request_proxy("api_key:forged")):
+        with patch("digital_life_host.account_session_api.request", _request_proxy("api_key:forged")):
             forged = await api.get()
         self.assertEqual(forged["data"]["code"], "dashboard_identity_required")
 
-        with patch("astrbot_host.account_session_api.request", _request_proxy("core-admin")):
+        with patch("digital_life_host.account_session_api.request", _request_proxy("core-admin")):
             ok = await api.get()
         self.assertEqual(ok["status"], "ok")
 
@@ -254,7 +254,7 @@ class ManagementAPIsRBACTests(unittest.IsolatedAsyncioTestCase):
         )
         api = MultiHostWebAPI(controller)
 
-        with patch("astrbot_host.multi_api.request", _request_proxy("standard-user")):
+        with patch("digital_life_host.multi_api.request", _request_proxy("standard-user")):
             for response in (
                 await api.api_status(),
                 await api.api_performance(),
@@ -265,7 +265,7 @@ class ManagementAPIsRBACTests(unittest.IsolatedAsyncioTestCase):
 
         # _ensure_role_routes must not resurrect zombie routes once terminated.
         controller._terminated = True
-        api._ensure_role_routes([{"roles": [{"config_api": "/astrbot_plugin_private_companion/host/t/r/config"}]}])
+        api._ensure_role_routes([{"roles": [{"config_api": "/astrbot_plugin_digital_life/host/t/r/config"}]}])
         controller.unregister_routes.assert_not_called()
         controller.register_routes.assert_not_called()
 
@@ -312,17 +312,17 @@ class ManagementAPIsRBACTests(unittest.IsolatedAsyncioTestCase):
 
             query = {}
 
-        with patch("astrbot_host.web_api.request", MissingRequest()):
+        with patch("digital_life_host.web_api.request", MissingRequest()):
             for endpoint in endpoints:
                 response = await endpoint()
                 self.assertEqual(response["data"]["code"], "dashboard_identity_required", endpoint.__name__)
 
-        with patch("astrbot_host.web_api.request", _request_proxy("standard-user")):
+        with patch("digital_life_host.web_api.request", _request_proxy("standard-user")):
             for endpoint in endpoints:
                 response = await endpoint()
                 self.assertEqual(response["data"]["code"], "core_access_required", endpoint.__name__)
 
-        with patch("astrbot_host.web_api.request", _request_proxy("core-admin")):
+        with patch("digital_life_host.web_api.request", _request_proxy("core-admin")):
             self.assertEqual((await api.api_probe())["status"], "ok")
             self.assertEqual((await api.api_start())["status"], "ok")
             self.assertEqual((await api.api_stop())["status"], "ok")
@@ -331,26 +331,26 @@ class ManagementAPIsRBACTests(unittest.IsolatedAsyncioTestCase):
         controller = self._controller()
 
         backup_api = BackupWebAPI(controller)
-        with patch("astrbot_host.backup_api.request", _request_proxy("standard-user")):
+        with patch("digital_life_host.backup_api.request", _request_proxy("standard-user")):
             denied = await backup_api.listing()
         self.assertEqual(denied["data"]["code"], "core_access_required")
-        with patch("astrbot_host.backup_api.request", _request_proxy("core-admin")):
+        with patch("digital_life_host.backup_api.request", _request_proxy("core-admin")):
             allowed = await backup_api.listing()
         self.assertEqual(allowed["status"], "ok", allowed)
 
         storage_api = StorageWebAPI(controller)
-        with patch("astrbot_host.storage_api.request", _request_proxy("standard-user")):
+        with patch("digital_life_host.storage_api.request", _request_proxy("standard-user")):
             denied = await storage_api.status()
         self.assertEqual(denied["data"]["code"], "core_access_required")
-        with patch("astrbot_host.storage_api.request", _request_proxy("core-admin")):
+        with patch("digital_life_host.storage_api.request", _request_proxy("core-admin")):
             allowed = await storage_api.status()
         self.assertEqual(allowed["status"], "ok", allowed)
 
         host_options_api = HostOptionsWebAPI(controller)
-        with patch("astrbot_host.host_options_api.request", _request_proxy("standard-user")):
+        with patch("digital_life_host.host_options_api.request", _request_proxy("standard-user")):
             denied = await host_options_api.status()
         self.assertEqual(denied["data"]["code"], "core_access_required")
-        with patch("astrbot_host.host_options_api.request", _request_proxy("core-admin")):
+        with patch("digital_life_host.host_options_api.request", _request_proxy("core-admin")):
             allowed = await host_options_api.status()
         self.assertEqual(allowed["status"], "ok", allowed)
 
@@ -491,8 +491,8 @@ class LifecycleAndLeakFixTests(unittest.IsolatedAsyncioTestCase):
             async def start(self):
                 raise OSError("address in use")
 
-        with patch("astrbot_host.native_extensions.live.subtitle_server.web.AppRunner", FakeRunner), \
-             patch("astrbot_host.native_extensions.live.subtitle_server.web.TCPSite", FailingSite):
+        with patch("digital_life_host.native_extensions.live.subtitle_server.web.AppRunner", FakeRunner), \
+             patch("digital_life_host.native_extensions.live.subtitle_server.web.TCPSite", FailingSite):
             with self.assertRaises(OSError):
                 await server.start()
         self.assertEqual(cleanup_calls, [True])
@@ -553,8 +553,8 @@ class LifecycleAndLeakFixTests(unittest.IsolatedAsyncioTestCase):
             async def stop_and_close(self):
                 self.stopped = True
 
-        with patch("astrbot_host.native_extensions.live.bilibili_live.BlivedmWebClient", FakeBlivedmWebClient), \
-             patch("astrbot_host.native_extensions.live.bilibili_live.blivedm_message", object()):
+        with patch("digital_life_host.native_extensions.live.bilibili_live.BlivedmWebClient", FakeBlivedmWebClient), \
+             patch("digital_life_host.native_extensions.live.bilibili_live.blivedm_message", object()):
             client = BilibiliBlivedmClient(12345, AsyncMock())
             task = asyncio.create_task(client.run_forever())
             await asyncio.sleep(0.02)
@@ -632,8 +632,8 @@ class LifecycleAndLeakFixTests(unittest.IsolatedAsyncioTestCase):
         controller._failure = MagicMock()
         controller.TERMINATION_DRAIN_TIMEOUT_SECONDS = 0.05
 
-        with patch("astrbot_host.exchange_rate.close_exchange_rate_services", AsyncMock()), \
-             patch("astrbot_host.pricing_sources.close_pricing_catalog_services", AsyncMock()):
+        with patch("digital_life_host.exchange_rate.close_exchange_rate_services", AsyncMock()), \
+             patch("digital_life_host.pricing_sources.close_pricing_catalog_services", AsyncMock()):
             await controller.terminate()
 
             # Native extensions and SetupWebAPI must already be closed before terminate() returns!
@@ -694,7 +694,7 @@ class LifecycleAndLeakFixTests(unittest.IsolatedAsyncioTestCase):
             self.assertIsNone(setup._test_task)
 
         # Static hygiene: no duplicate keys in PROACTIVE_TEST_SUGGESTIONS or duplicate _configured_provider_id.
-        source = (Path(__file__).resolve().parents[1] / "astrbot_host" / "setup_api.py").read_text(encoding="utf-8")
+        source = (Path(__file__).resolve().parents[1] / "digital_life_host" / "setup_api.py").read_text(encoding="utf-8")
         tree = ast.parse(source)
         for node in tree.body:
             if isinstance(node, ast.Assign):
@@ -843,7 +843,7 @@ class LifecycleAndLeakFixTests(unittest.IsolatedAsyncioTestCase):
         plugin._private_debounce = None
 
         pkg = ENTRY.__package__
-        prefix = f"{pkg}.astrbot_host" if pkg else "astrbot_host"
+        prefix = f"{pkg}.digital_life_host" if pkg else "digital_life_host"
         with patch(f"{prefix}.huawei_health.service.close_all_huawei_health_services",
                    AsyncMock(side_effect=lambda: calls.append("huawei"))), \
              patch(f"{prefix}.laya_client.shutdown_laya_resources",

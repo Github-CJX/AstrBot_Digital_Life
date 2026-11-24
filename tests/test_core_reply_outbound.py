@@ -6,14 +6,14 @@ import unittest
 from astrbot.core.message.components import At, Image, Plain, Record, Reply
 from astrbot.core.message.message_event_result import MessageChain
 
-from astrbot_host.core_reply_outbound import prepare_core_reply_outbound_message
-from astrbot_host.core_reply_idempotency import remember_native_tool_message, should_drop_native_tool_response
-from companion_v2.adapters.astrbot.native import NativeConversationInput
+from digital_life_host.core_reply_outbound import prepare_core_reply_outbound_message
+from digital_life_host.core_reply_idempotency import remember_native_tool_message, should_drop_native_tool_response
+from digital_life_core.adapters.astrbot.native import NativeConversationInput
 
 
 class FakeEvent:
     def __init__(self, first_text_segment=0):
-        self.extra = {"_companion_v2_core_reply_context": {
+        self.extra = {"_digital_life_core_core_reply_context": {
             "outbound_first_text_segment": first_text_segment}}
 
     def get_extra(self, key, default=None):
@@ -31,7 +31,7 @@ def prepared(*, channel="group", event_id="7001", speaker="200", settings=None):
 class CoreReplyOutboundTests(unittest.TestCase):
     def test_native_tool_dedupe_keeps_new_outbound_quote_and_mention(self):
         event = FakeEvent()
-        state = event.extra["_companion_v2_core_reply_context"]
+        state = event.extra["_digital_life_core_core_reply_context"]
         state.update(prepared=prepared(settings={"reply_quote_enabled": True,
                                                  "reply_mention_speaker_enabled": True}),
                      send_unknown=0, send_failed=0)

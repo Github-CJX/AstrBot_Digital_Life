@@ -14,11 +14,11 @@ from tests.staging_bootstrap_support import database_contents, wait_for_batch
 from tests.test_conversation_images import image_bytes
 from tests.test_management_access import NOW
 from astrbot.core.message.components import Image, Plain
-from astrbot_host.controller import AstrBotStagingController
-from astrbot_host.media import load_native_image
-from companion_v2.adapters.astrbot.staging import NativeAdapterTypes
-from companion_v2.conversation.messages import event_from_document
-from companion_v2.execution.service import TaskSupervisor
+from digital_life_host.controller import AstrBotStagingController
+from digital_life_host.media import load_native_image
+from digital_life_core.adapters.astrbot.staging import NativeAdapterTypes
+from digital_life_core.conversation.messages import event_from_document
+from digital_life_core.execution.service import TaskSupervisor
 
 
 class PreviewRecoveryTests(unittest.IsolatedAsyncioTestCase):

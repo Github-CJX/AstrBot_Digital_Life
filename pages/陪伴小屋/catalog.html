@@ -188,7 +188,7 @@
         const pageRoot = new URL('.', location.href);
         const freshToken = entryUrl.searchParams.get('asset_token');
         if (entryUrl.origin !== pageRoot.origin
-            || !entryUrl.pathname.startsWith('/api/plugin/page/content/astrbot_plugin_private_companion/')
+            || !entryUrl.pathname.startsWith('/api/plugin/page/content/astrbot_plugin_digital_life/')
             || !freshToken) throw new Error('invalid page entry');
         const home = new URL('index.html', entryUrl);
         home.searchParams.set('asset_token', freshToken);

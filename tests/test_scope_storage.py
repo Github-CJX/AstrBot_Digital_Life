@@ -8,12 +8,12 @@ import sqlite3
 import unittest
 from unittest.mock import patch
 
-from companion_v2.agenda.models import AgendaTarget
-from companion_v2.agenda.service import AgendaService
-from companion_v2.identity_policy.models import AuthorizationTier
-from companion_v2.identity_policy.repository import PersistentIdentityDirectory
-from companion_v2.storage.runtime import StorageOpenError, StorageRuntime
-from companion_v2.storage.schema import (
+from digital_life_core.agenda.models import AgendaTarget
+from digital_life_core.agenda.service import AgendaService
+from digital_life_core.identity_policy.models import AuthorizationTier
+from digital_life_core.identity_policy.repository import PersistentIdentityDirectory
+from digital_life_core.storage.runtime import StorageOpenError, StorageRuntime
+from digital_life_core.storage.schema import (
     migration_count,
     MIGRATION_V4_TO_V5_ID, MIGRATION_V4_TO_V5_FINGERPRINT,
     MIGRATION_V5_TO_V6_ID, MIGRATION_V5_TO_V6_FINGERPRINT, SCHEMA_VERSION, SCHEMA_VERSION_V4, SCHEMA_VERSION_V5,
@@ -107,7 +107,7 @@ class ScopeStorageTests(unittest.TestCase):
         self.assertEqual(service.repository.memo("memo-old").revision, 9)
 
     def test_failure_after_rebuilding_tables_rolls_back_everything_and_retries(self):
-        with patch("companion_v2.storage.runtime.V6_INDEX_STATEMENTS", (*V6_INDEX_STATEMENTS, "INVALID SCOPE MIGRATION")):
+        with patch("digital_life_core.storage.runtime.V6_INDEX_STATEMENTS", (*V6_INDEX_STATEMENTS, "INVALID SCOPE MIGRATION")):
             with self.assertRaises(StorageOpenError):
                 self.open_runtime()
         self.assert_unchanged()

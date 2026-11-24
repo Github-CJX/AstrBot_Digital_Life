@@ -22,13 +22,13 @@ const page = fs.readFileSync(path.resolve(__dirname, PAGE + 'memory-settings-sec
 const flush = () => new Promise(resolve => setImmediate(resolve));
 const drains = async (times = 12) => { for (let index = 0; index < times; index += 1) await flush(); };
 const TOKEN = 'a'.repeat(64);
-const HOST = 'astrbot_plugin_private_companion';
+const HOST = 'astrbot_plugin_digital_life';
 const PREFIX = '/' + HOST + '/';
 const MEMORY_PATH = PREFIX + 'memory';
 const SETTINGS_ROUTE = 'memory/settings';
 const plain = value => JSON.parse(JSON.stringify(value));
 
-/* 记忆分区的注册表契约（短名）。**逐条照 companion_v2/memory/configuration.py 抄**：
+/* 记忆分区的注册表契约（短名）。**逐条照 digital_life_core/memory/configuration.py 抄**：
    下面这份 DEFAULTS 的键集合就是「后端注册了哪些字段」的断言基准，
    加字段时两边一起改。 */
 const DEFAULTS = {
@@ -186,7 +186,7 @@ const sectionButton = name => ({closest: selector =>
 test('every registry field has a label and a section home', async () => {
   /* 这一条防的是「凭印象写字段名」：写错的字段名不会报错，
      只会掉进末尾的兜底分组并显示成原始 id。字段清单从注册表抄在 DEFAULTS 里，
-     与 companion_v2/memory/configuration.py 一一对应。 */
+     与 digital_life_core/memory/configuration.py 一一对应。 */
   const pageSource = fs.readFileSync(path.resolve(__dirname, PAGE + 'memory-settings-section.js'), 'utf8');
   const sectionBlock = pageSource.slice(pageSource.indexOf('const sections = ['),
     pageSource.indexOf('let host = null'));

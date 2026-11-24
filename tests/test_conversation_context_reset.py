@@ -15,13 +15,13 @@ from tests.memory_support import MemoryFixture
 from tests.contact_schedule_support import ContactScheduleFixture
 from tests.test_main_no_reply import ENTRY
 from tests.staging_bootstrap_support import wait_for_batch
-from companion_v2.conversation.reset import ConversationWindow, batch_current, boundary, reset_window
-from companion_v2.execution.models import TaskContext, TaskError, stamp
-from companion_v2.memory import codec
-from companion_v2.memory.episodes import recent_dialogue_lines
-from companion_v2.memory.models import AtomRef, Proposal
-from companion_v2.memory.group.access import owner_key as group_owner
-from companion_v2.conversation.group_observation import MOOD_KIND, TOPIC_KIND
+from digital_life_core.conversation.reset import ConversationWindow, batch_current, boundary, reset_window
+from digital_life_core.execution.models import TaskContext, TaskError, stamp
+from digital_life_core.memory import codec
+from digital_life_core.memory.episodes import recent_dialogue_lines
+from digital_life_core.memory.models import AtomRef, Proposal
+from digital_life_core.memory.group.access import owner_key as group_owner
+from digital_life_core.conversation.group_observation import MOOD_KIND, TOPIC_KIND
 
 
 def remember_confirmed_reply(app, context, batch):
@@ -199,7 +199,7 @@ class NativeContextResetTests(MultiFixture, unittest.IsolatedAsyncioTestCase):
 
     async def test_third_party_native_commands_publish_the_marker_after_state_clear(self):
         from astrbot.builtin_stars.builtin_commands.commands import conversation as native
-        from astrbot_host.conversation_reset import install_native_reset_marker
+        from digital_life_host.conversation_reset import install_native_reset_marker
 
         reset_owner = native.ConversationCommands
         if not callable(getattr(reset_owner, "reset", None)):
@@ -368,8 +368,8 @@ class GroupWindowResetTests(GroupFixture, unittest.IsolatedAsyncioTestCase):
                                              ("conversation.group_observation.v1%",)), ())
 
     async def test_durable_group_statement_and_historical_proof_survive_reset(self):
-        from companion_v2.adapters.astrbot.model_wire import tool_alias
-        from companion_v2.execution.models import encode
+        from digital_life_core.adapters.astrbot.model_wire import tool_alias
+        from digital_life_core.execution.models import encode
         from tests.native_adapter_support import completion, final_text
 
         app = await self.start_host()
@@ -430,7 +430,7 @@ class TemporaryMemoryResetTests(MemoryFixture, unittest.IsolatedAsyncioTestCase)
 
 class BackgroundContextResetTests(ContactScheduleFixture, unittest.IsolatedAsyncioTestCase):
     async def test_long_term_reply_evidence_keeps_its_background_history_provenance(self):
-        from companion_v2.conversation.flow import ConversationPolicy
+        from digital_life_core.conversation.flow import ConversationPolicy
 
         host = await self.start(self.host(policy=ConversationPolicy(0, 0, 180, 0)))
         app = host.application

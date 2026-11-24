@@ -4,9 +4,9 @@ import json
 import unittest
 from unittest.mock import patch
 
-from companion_v2.adapters.astrbot.model_wire import tool_alias
-from companion_v2.conversation.segmentation import SegmentationPolicy, LLM_SEGMENT_MARKER as MARKER
-from companion_v2.model_gateway.models import Amount, ToolSpec
+from digital_life_core.adapters.astrbot.model_wire import tool_alias
+from digital_life_core.conversation.segmentation import SegmentationPolicy, LLM_SEGMENT_MARKER as MARKER
+from digital_life_core.model_gateway.models import Amount, ToolSpec
 from tests.native_adapter_support import final_text
 from tests.segmentation_stream_support import StreamingFixture, chunk, text_chunks, USAGE
 

@@ -18,19 +18,19 @@ from unittest.mock import AsyncMock, patch
 from tests import test_astrbot_staging_host as support
 from tests.multi_host_support import MultiFixture, multi_config
 from tests.native_adapter_support import FakeEvent, FakeProvider, FakeReverseApi
-from astrbot_host.controller import AstrBotStagingController
-from companion_v2.adapters.astrbot.staging import NativeAdapterTypes
-from companion_v2.configuration.management import DiaryAndRestManagement, ProactiveContactManagement
-from companion_v2.device.adb import AdbDevice
-from companion_v2.identity_policy.grants import PERSON_PERMISSION_GRANT_PREFIX
-from companion_v2.identity_policy.models import AuthorizationTier, GrantState
-from companion_v2.proactive.management import GRANT_PREFIX as PROACTIVE_GRANT_PREFIX
-from companion_v2.proactive.configuration import GROUP as CONTACT_GROUP
-from companion_v2.expression.configuration import read_settings as expression_read_settings
-from companion_v2.foundation.outcome import Outcome
-from companion_v2.role_work.growth.configuration import skill_settings
-from companion_v2.role_profile.configuration import FIELD_LIMITS
-from companion_v2.screen.configuration import (ScreenSettings, ScreenConfigurationOwner,
+from digital_life_host.controller import AstrBotStagingController
+from digital_life_core.adapters.astrbot.staging import NativeAdapterTypes
+from digital_life_core.configuration.management import DiaryAndRestManagement, ProactiveContactManagement
+from digital_life_core.device.adb import AdbDevice
+from digital_life_core.identity_policy.grants import PERSON_PERMISSION_GRANT_PREFIX
+from digital_life_core.identity_policy.models import AuthorizationTier, GrantState
+from digital_life_core.proactive.management import GRANT_PREFIX as PROACTIVE_GRANT_PREFIX
+from digital_life_core.proactive.configuration import GROUP as CONTACT_GROUP
+from digital_life_core.expression.configuration import read_settings as expression_read_settings
+from digital_life_core.foundation.outcome import Outcome
+from digital_life_core.role_work.growth.configuration import skill_settings
+from digital_life_core.role_profile.configuration import FIELD_LIMITS
+from digital_life_core.screen.configuration import (ScreenSettings, ScreenConfigurationOwner,
     configuration_fields as screen_configuration_fields, target_for as screen_target_for)
 from types import SimpleNamespace as NS
 
@@ -46,7 +46,7 @@ async def call(handler, body=None, *, username="config-admin", query=None):
     """Invoke one configuration handler with the host request patched in."""
     async def read():
         return json.dumps(body, ensure_ascii=False).encode("utf-8")
-    with patch("astrbot_host.configuration_api.request",
+    with patch("digital_life_host.configuration_api.request",
                NS(username=username, query=Query(query or {}), body=read)):
         return await handler()
 
@@ -88,8 +88,8 @@ class ConfigurationWebAPITests(MultiFixture, unittest.IsolatedAsyncioTestCase):
         try:
             read = await call(handlers[first], query={"sections": "device.phone"})
             token = read["data"]["sections"]["device.phone"]["edit_token"]
-            with patch("companion_v2.device.adb.discover_adb", return_value=Path("adb.exe")) as discover, \
-                    patch("companion_v2.device.adb.AdbClient") as client:
+            with patch("digital_life_core.device.adb.discover_adb", return_value=Path("adb.exe")) as discover, \
+                    patch("digital_life_core.device.adb.AdbClient") as client:
                 adb = client.return_value
                 adb.devices.return_value = (AdbDevice("USB123", "unauthorized"),
                                             AdbDevice("192.168.1.20:37123", "device", "Test_Phone"))
@@ -139,7 +139,7 @@ class ConfigurationWebAPITests(MultiFixture, unittest.IsolatedAsyncioTestCase):
         }]))
         self.native.kb_manager = NS()
         try:
-            with patch("astrbot_host.configuration_api.AstrBotKnowledgeSources", return_value=official):
+            with patch("digital_life_host.configuration_api.AstrBotKnowledgeSources", return_value=official):
                 status = (await call(handlers[first], query={"sections": "knowledge"}))["data"]["sections"]["knowledge"]
                 saved = await call(handlers[first + "/configure"], {
                     "section": "knowledge", "operation_key": "official-kb-selection",
@@ -156,7 +156,7 @@ class ConfigurationWebAPITests(MultiFixture, unittest.IsolatedAsyncioTestCase):
             self.assertEqual(status["knowledge_sources"][-1]["type"], "missing")
             self.assertEqual(status["knowledge_sources"][-1]["id"], "kb:missing")
             official.list_sources.side_effect = RuntimeError("catalogue unavailable")
-            with patch("astrbot_host.configuration_api.AstrBotKnowledgeSources", return_value=official):
+            with patch("digital_life_host.configuration_api.AstrBotKnowledgeSources", return_value=official):
                 unavailable = (await call(handlers[first], query={"sections": "knowledge"}))["data"]["sections"]["knowledge"]
             self.assertFalse(unavailable["knowledge_sources_available"])
             self.assertEqual([item["id"] for item in unavailable["knowledge_sources"]],
@@ -168,7 +168,7 @@ class ConfigurationWebAPITests(MultiFixture, unittest.IsolatedAsyncioTestCase):
         handlers, first, _ = await self.routes()
         try:
             status = (await call(handlers[first]))["data"]["sections"]
-            installation_route = "/astrbot_plugin_private_companion/config"
+            installation_route = "/astrbot_plugin_digital_life/config"
             installation_status = (await call(handlers[installation_route]))["data"]["sections"]
             self.assertEqual(set(installation_status), {"budget", "proactive.contact", "reaction",
                                                        "private_access_installation"})
@@ -179,7 +179,7 @@ class ConfigurationWebAPITests(MultiFixture, unittest.IsolatedAsyncioTestCase):
                                  "private_access", "private_access_installation", "quota", "reaction", "recall",
                                  "content.authoring",
                                  "expression.learning", "role.growth.skills",
-                                 # qzone 是真实配置分区（companion_v2/qzone/configuration.py:18
+                                 # qzone 是真实配置分区（digital_life_core/qzone/configuration.py:18
                                  # 的 GROUP = "qzone"）。它加入注册表时这份硬编码清单没跟上，
                                  # 于是 assertEqual 把"多了一个真分区"报成失败——这正是本会话
                                  # 反复出现的模式：新增能力却不更新按字面枚举的名单。
@@ -278,10 +278,10 @@ class ConfigurationWebAPITests(MultiFixture, unittest.IsolatedAsyncioTestCase):
             self.controller.unregister_routes()
 
     async def test_stranger_settings_save_to_installation_while_known_users_keep_role_settings(self):
-        from astrbot_host.stranger_notice import StrangerNotice
+        from digital_life_host.stranger_notice import StrangerNotice
 
         handlers, first, _ = await self.routes()
-        installation_route = "/astrbot_plugin_private_companion/config"
+        installation_route = "/astrbot_plugin_digital_life/config"
         try:
             role = (await call(handlers[first], query={"sections": "private_access"}))[
                 "data"]["sections"]["private_access"]
@@ -341,7 +341,7 @@ class ConfigurationWebAPITests(MultiFixture, unittest.IsolatedAsyncioTestCase):
 
         try:
             with patch.dict(api.sections, {"quota": RejectedSection, "image_review": BrokenSection}):
-                with self.assertLogs("astrbot_host.configuration_api", level="ERROR") as captured:
+                with self.assertLogs("digital_life_host.configuration_api", level="ERROR") as captured:
                     result = await call(handlers[first], query={"sections": "quota,image_review,person"})
                 single = await call(handlers[first], query={"sections": "quota"})
 
@@ -362,7 +362,7 @@ class ConfigurationWebAPITests(MultiFixture, unittest.IsolatedAsyncioTestCase):
 
     async def test_global_contact_and_role_learning_settings_use_distinct_targets(self):
         handlers, first, second = await self.routes()
-        global_route = "/astrbot_plugin_private_companion/config"
+        global_route = "/astrbot_plugin_digital_life/config"
         try:
             self.assertIn(global_route, handlers)
             status = await call(handlers[global_route], query={"sections": "proactive.contact"})
@@ -399,7 +399,7 @@ class ConfigurationWebAPITests(MultiFixture, unittest.IsolatedAsyncioTestCase):
                 "changes": {"window_hours": 96},
             })
             self.assertEqual(role_saved["status"], "ok", role_saved)
-            from companion_v2.expression.configuration import read_settings
+            from digital_life_core.expression.configuration import read_settings
             app = self.controller.session.application
             first_context = self.controller.authority.context("first", "role-a")
             another_role = self.controller.authority.context("second", "role-b")
@@ -413,7 +413,7 @@ class ConfigurationWebAPITests(MultiFixture, unittest.IsolatedAsyncioTestCase):
 
     async def test_reaction_retrieval_settings_are_shared_across_windows(self):
         handlers, first, second = await self.routes()
-        global_route = "/astrbot_plugin_private_companion/config"
+        global_route = "/astrbot_plugin_digital_life/config"
         try:
             denied = await call(handlers[first], query={"sections": "reaction"})
             self.assertEqual(denied["data"]["code"], "configuration_request_invalid")
@@ -471,8 +471,8 @@ class ConfigurationWebAPITests(MultiFixture, unittest.IsolatedAsyncioTestCase):
             self.assertEqual(other_review["settings"]["group_nsfw_image_review_mode"], "single")
             self.assertIsNone(other_review["provenance"]["group_nsfw_image_review_mode"]["layer"])
             self.assertFalse(other_review["provenance"]["group_nsfw_image_review_mode"]["explicit"])
-            from companion_v2.configuration.models import ConfigLayer, ConfigTarget
-            from companion_v2.conversation.media.review import GROUP as REVIEW_GROUP, configuration_fields as review_fields
+            from digital_life_core.configuration.models import ConfigLayer, ConfigTarget
+            from digital_life_core.conversation.media.review import GROUP as REVIEW_GROUP, configuration_fields as review_fields
             app = self.controller.session.application
             first_context = self.controller.authority.context("first", "role-a")
             second_context = self.controller.authority.context("second", "role-a")
@@ -504,7 +504,7 @@ class ConfigurationWebAPITests(MultiFixture, unittest.IsolatedAsyncioTestCase):
                 "changes": {"busy_reply_gate_enabled": True},
             })
             self.assertEqual(busy_saved["status"], "ok", busy_saved)
-            from companion_v2.conversation.busy_gate import SettingsReader
+            from digital_life_core.conversation.busy_gate import SettingsReader
             another_scope = replace(first_context.scope, native_scope_id="another-private-user",
                 conversation_id="another-conversation", session_id="another-session")
             same_role_window = replace(first_context,
@@ -532,12 +532,12 @@ class ConfigurationWebAPITests(MultiFixture, unittest.IsolatedAsyncioTestCase):
             self.controller.unregister_routes()
 
     async def test_budget_editor_saves_global_controls_and_disables_legacy_role_limits(self):
-        from companion_v2.configuration.models import ConfigLayer, ConfigTarget
-        from companion_v2.configuration.owners import SparseConfigurationOwner
-        from companion_v2.model_gateway.budget import GROUP, SOFT_FIELDS, effective_soft
+        from digital_life_core.configuration.models import ConfigLayer, ConfigTarget
+        from digital_life_core.configuration.owners import SparseConfigurationOwner
+        from digital_life_core.model_gateway.budget import GROUP, SOFT_FIELDS, effective_soft
 
         handlers, first, second = await self.routes()
-        global_route = "/astrbot_plugin_private_companion/config"
+        global_route = "/astrbot_plugin_digital_life/config"
         try:
             denied = await call(handlers[first], query={"sections": "budget"})
             self.assertEqual(denied["data"]["code"], "configuration_request_invalid")
@@ -628,7 +628,7 @@ class ConfigurationWebAPITests(MultiFixture, unittest.IsolatedAsyncioTestCase):
 
     async def test_the_contact_section_uses_one_window_daily_contact_quota(self):
         handlers, first, _ = await self.routes()
-        global_route = "/astrbot_plugin_private_companion/config"
+        global_route = "/astrbot_plugin_digital_life/config"
         try:
             contact = (await call(handlers[global_route], query={"sections": "proactive.contact"}))[
                 "data"]["sections"]["proactive.contact"]
@@ -674,17 +674,17 @@ class ConfigurationWebAPITests(MultiFixture, unittest.IsolatedAsyncioTestCase):
             self.controller.unregister_routes()
 
     async def test_contact_save_returns_receipt_without_reading_status(self):
-        from astrbot_host.configuration_api import ConfigurationWebAPI
+        from digital_life_host.configuration_api import ConfigurationWebAPI
 
         handlers, first, _ = await self.routes()
-        global_route = "/astrbot_plugin_private_companion/config"
+        global_route = "/astrbot_plugin_digital_life/config"
         try:
             initial = (await call(handlers[global_route], query={"sections": "proactive.contact"}))
             contact = initial["data"]["sections"]["proactive.contact"]
             body = {"section": "proactive.contact", "operation_key": "contact-save-isolated",
                     "edit_token": contact["edit_token"], "changes": {"interval_seconds": 1200}}
             with patch.object(ConfigurationWebAPI, "_status", new_callable=AsyncMock) as api_status, \
-                    patch("companion_v2.configuration.management.GroupEditor.status",
+                    patch("digital_life_core.configuration.management.GroupEditor.status",
                           side_effect=AssertionError("a write must not read its post-save status")) as editor_status:
                 saved = await call(handlers[global_route + "/configure"], body)
                 replayed = await call(handlers[global_route + "/configure"], body)
@@ -705,7 +705,7 @@ class ConfigurationWebAPITests(MultiFixture, unittest.IsolatedAsyncioTestCase):
 
     async def test_contact_global_switch_saves_without_changing_any_participant_grant(self):
         handlers, first, _ = await self.routes()
-        global_route = "/astrbot_plugin_private_companion/config"
+        global_route = "/astrbot_plugin_digital_life/config"
         try:
             identity = self.controller.session.application.tasks.identity
             contact = (await call(handlers[global_route], query={"sections": CONTACT_GROUP}))[
@@ -742,7 +742,7 @@ class ConfigurationWebAPITests(MultiFixture, unittest.IsolatedAsyncioTestCase):
         self.controller = self.make_controller(config)
         await self.start_host()
 
-        global_route = "/astrbot_plugin_private_companion/config"
+        global_route = "/astrbot_plugin_digital_life/config"
 
         def registered_paths():
             self.controller.register_routes()
@@ -788,7 +788,7 @@ class ConfigurationWebAPITests(MultiFixture, unittest.IsolatedAsyncioTestCase):
 
     async def test_contact_replayed_global_save_never_reauthorizes_a_revoked_participant(self):
         handlers, first, _ = await self.routes()
-        global_route = "/astrbot_plugin_private_companion/config"
+        global_route = "/astrbot_plugin_digital_life/config"
         try:
             app = self.controller.session.application
             context = self.controller.authority.context("first", "role-a")
@@ -824,7 +824,7 @@ class ConfigurationWebAPITests(MultiFixture, unittest.IsolatedAsyncioTestCase):
 
     async def test_contact_switch_does_not_override_an_explicit_person_revocation(self):
         handlers, first, _ = await self.routes()
-        global_route = "/astrbot_plugin_private_companion/config"
+        global_route = "/astrbot_plugin_digital_life/config"
         try:
             contact = (await call(handlers[global_route], query={"sections": CONTACT_GROUP}))[
                 "data"]["sections"][CONTACT_GROUP]
@@ -924,7 +924,7 @@ class ConfigurationWebAPITests(MultiFixture, unittest.IsolatedAsyncioTestCase):
 
     async def test_window_and_role_configuration_editors_use_runtime_targets(self):
         handlers, first, _ = await self.routes()
-        global_route = "/astrbot_plugin_private_companion/config"
+        global_route = "/astrbot_plugin_digital_life/config"
         try:
             screen = (await call(handlers[first], query={"sections": "screen"}))[
                 "data"]["sections"]["screen"]
@@ -1079,7 +1079,7 @@ class ConfigurationWebAPITests(MultiFixture, unittest.IsolatedAsyncioTestCase):
 
     async def test_invalid_requests_and_unknown_fields_are_refused(self):
         handlers, first, _ = await self.routes()
-        global_route = "/astrbot_plugin_private_companion/config"
+        global_route = "/astrbot_plugin_digital_life/config"
         try:
             status = (await call(handlers[global_route]))["data"]["sections"]
             token = status["reaction"]["edit_token"]
@@ -1125,8 +1125,8 @@ class SingleHostConfigurationTests(unittest.IsolatedAsyncioTestCase):
         (await controller.authorize_delivery()).unwrap()
         controller.register_routes()
         routes = {route for route, _, _, _ in native.registered_web_apis}
-        self.assertIn("/astrbot_plugin_private_companion/config", routes)
-        self.assertIn("/astrbot_plugin_private_companion/config/configure", routes)
+        self.assertIn("/astrbot_plugin_digital_life/config", routes)
+        self.assertIn("/astrbot_plugin_digital_life/config/configure", routes)
         controller.unregister_routes()
         self.assertEqual(native.registered_web_apis, [])
 

@@ -3,12 +3,12 @@ from datetime import timedelta
 import json
 import unittest
 
-from companion_v2.execution.models import digest
-from companion_v2.foundation.refs import SourceRef, VersionRef
-from companion_v2.memory.models import AtomRef, Proposal
-from companion_v2.memory.writer import MemoryWriter
-from companion_v2.sources.dependencies import link
-from companion_v2.sources.models import SourceRecord
+from digital_life_core.execution.models import digest
+from digital_life_core.foundation.refs import SourceRef, VersionRef
+from digital_life_core.memory.models import AtomRef, Proposal
+from digital_life_core.memory.writer import MemoryWriter
+from digital_life_core.sources.dependencies import link
+from digital_life_core.sources.models import SourceRecord
 from tests.memory_support import MemoryFixture
 from tests.test_management_access import NOW
 
@@ -49,7 +49,7 @@ class MemoryWriterTests(MemoryFixture, unittest.IsolatedAsyncioTestCase):
     def test_source_withdrawal_invalidates_fact_and_dependent_role_material(self):
         item = self.proposed()
         ref = self.remember(item)
-        from companion_v2.memory.codec import source
+        from digital_life_core.memory.codec import source
         fact_source = source(self.memory.read(self.context, ref).unwrap()["source"])
         derived = SourceRef("role-impression", "role", self.context.scope, VersionRef("impression", 1), NOW)
         self.memory.sources.publish(SourceRecord(derived, self.context.audience, digest("印象"), "印象"), observed_at=NOW).unwrap()

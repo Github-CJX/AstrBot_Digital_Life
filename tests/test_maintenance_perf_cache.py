@@ -19,17 +19,17 @@ from unittest.mock import AsyncMock, patch
 from starlette.requests import Request
 
 from astrbot.api.web import PluginMultiDict, PluginRequest, bind_request_context
-import astrbot_host.model_api as model_api
-from astrbot_host.model_api import PREFIX
-from companion_v2.diagnostics.inbound import InboundNoReplyLedger
-from companion_v2.execution.models import digest, encode
-from companion_v2.foundation.refs import ScopeKind
-from companion_v2.identity_policy.models import AuthorizationTier
-from companion_v2.identity_policy.object_access import ObjectAccessPolicy
-from companion_v2.identity_policy.personas import ConversationRoute, PersonaBinding, PersonaSelector, SelectorKind
-from companion_v2.model_gateway.budget import RELEASE_RECEIPT_PREFIX
-from companion_v2.model_gateway.core_observations import record_observation
-from companion_v2.model_gateway.maintenance_cache import (
+import digital_life_host.model_api as model_api
+from digital_life_host.model_api import PREFIX
+from digital_life_core.diagnostics.inbound import InboundNoReplyLedger
+from digital_life_core.execution.models import digest, encode
+from digital_life_core.foundation.refs import ScopeKind
+from digital_life_core.identity_policy.models import AuthorizationTier
+from digital_life_core.identity_policy.object_access import ObjectAccessPolicy
+from digital_life_core.identity_policy.personas import ConversationRoute, PersonaBinding, PersonaSelector, SelectorKind
+from digital_life_core.model_gateway.budget import RELEASE_RECEIPT_PREFIX
+from digital_life_core.model_gateway.core_observations import record_observation
+from digital_life_core.model_gateway.maintenance_cache import (
     DAY_CACHE_MAX_ENTRIES,
     LEGACY_CACHE_MAX_ENTRIES,
     SNAPSHOT_CACHE_MAX_ENTRIES,
@@ -37,9 +37,9 @@ from companion_v2.model_gateway.maintenance_cache import (
     maintenance_cache_stats,
     runtime_maintenance_cache,
 )
-from companion_v2.model_gateway.management import ModelManagement, _legacy_matched_calls_cte
-from companion_v2.model_gateway.pricing import PricingSettingsStore
-from companion_v2.storage.runtime import StorageOpenError
+from digital_life_core.model_gateway.management import ModelManagement, _legacy_matched_calls_cte
+from digital_life_core.model_gateway.pricing import PricingSettingsStore
+from digital_life_core.storage.runtime import StorageOpenError
 from tests import test_astrbot_staging_host as support
 from tests.test_host_application import HostFixture
 
@@ -482,7 +482,7 @@ class MaintenancePerfCacheTests(HostFixture, unittest.IsolatedAsyncioTestCase):
 
         def assert_priced(total, expected_calls):
             actual = self.manager.maintenance(self.core).unwrap()
-            with patch("companion_v2.model_gateway.management.runtime_maintenance_cache", return_value=None):
+            with patch("digital_life_core.model_gateway.management.runtime_maintenance_cache", return_value=None):
                 uncached = self.manager.maintenance(self.core).unwrap()
             self.assertEqual(actual, uncached)
             core = actual["usage_sources"]["astrbot_core"]
@@ -618,7 +618,7 @@ class MaintenancePerfCacheTests(HostFixture, unittest.IsolatedAsyncioTestCase):
         clear_maintenance_cache(self.app.runtime)
         cached_now = self.manager.maintenance(self.core).unwrap()
         # Compare against direct uncached computation (cache bypassed via None runtime cache).
-        with patch("companion_v2.model_gateway.management.runtime_maintenance_cache", return_value=None):
+        with patch("digital_life_core.model_gateway.management.runtime_maintenance_cache", return_value=None):
             direct_now = self.manager.maintenance(self.core).unwrap()
         self.assertEqual(cached_now, direct_now)
         self.assertEqual(cached_now["usage_sources"]["astrbot_core"]["coverage"]["turns"], 2)
@@ -627,7 +627,7 @@ class MaintenancePerfCacheTests(HostFixture, unittest.IsolatedAsyncioTestCase):
         self.clock.set(future_dt + timedelta(minutes=1))
         after_future = self.manager.maintenance(self.core).unwrap()
         self.assertEqual(after_future["usage_sources"]["astrbot_core"]["coverage"]["turns"], 3)
-        with patch("companion_v2.model_gateway.management.runtime_maintenance_cache", return_value=None):
+        with patch("digital_life_core.model_gateway.management.runtime_maintenance_cache", return_value=None):
             direct_after = self.manager.maintenance(self.core).unwrap()
         self.assertEqual(after_future, direct_after)
 
@@ -710,7 +710,7 @@ class MaintenancePerfCacheTests(HostFixture, unittest.IsolatedAsyncioTestCase):
 
         workers = [threading.Thread(target=poll_worker) for _ in range(3)]
         with patch(
-            "companion_v2.model_gateway.maintenance_cache.read_legacy_watermark",
+            "digital_life_core.model_gateway.maintenance_cache.read_legacy_watermark",
             side_effect=AssertionError("cross-thread warm poll must not fall back to rich watermark"),
         ):
             for worker in workers:
@@ -1100,7 +1100,7 @@ class MaintenancePerfCacheTests(HostFixture, unittest.IsolatedAsyncioTestCase):
         clear_maintenance_cache(self.app.runtime)
 
         # Simulate periodic scheduler heartbeat writing to an unrelated table MID-BUILD!
-        from companion_v2.model_gateway import maintenance_cache as mc_mod
+        from digital_life_core.model_gateway import maintenance_cache as mc_mod
         orig_fold = mc_mod._fold_core_observations
         injected = {"done": False}
 
@@ -1130,7 +1130,7 @@ class MaintenancePerfCacheTests(HostFixture, unittest.IsolatedAsyncioTestCase):
         # Because promote_snapshot_token verified rich_watermark right after read_snapshot closed,
         # the VERY NEXT warm call must hit the O(1) fast path without reading legacy watermark!
         with patch(
-            "companion_v2.model_gateway.maintenance_cache.read_legacy_watermark",
+            "digital_life_core.model_gateway.maintenance_cache.read_legacy_watermark",
             side_effect=AssertionError("promoted warm call must hit O(1) fast path"),
         ):
             warm = self.manager.maintenance(self.core).unwrap()
@@ -1225,8 +1225,8 @@ class ModelAPIResilienceTests(unittest.IsolatedAsyncioTestCase):
             return {"together": {"available": True, "totals": {"tokens": 12}}}
 
         main = {"available": True, "totals": {"tokens": 42}, "counted_in_private_companion_budget": False}
-        with patch("astrbot_host.model_api.read_token_sources", side_effect=fake_read_token_sources), \
-                patch("astrbot_host.model_api.read_astrbot_token_usage", new=AsyncMock(return_value=main)):
+        with patch("digital_life_host.model_api.read_token_sources", side_effect=fake_read_token_sources), \
+                patch("digital_life_host.model_api.read_astrbot_token_usage", new=AsyncMock(return_value=main)):
             response = await self._call(PREFIX + "/maintenance")
 
         self.assertEqual(response["status"], "ok", response)

@@ -8,12 +8,12 @@ import unittest
 from unittest.mock import patch
 from zoneinfo import ZoneInfo
 
-from companion_v2.conversation.foreground import PromptMaterial
-from companion_v2.conversation.media.output_settings import DEFAULTS as IMAGE_OUTPUT_DEFAULTS
-from companion_v2.conversation.messages import event_from_document
-from companion_v2.conversation.participation import ACTION as PARTICIPATION_ACTION
-from companion_v2.execution.models import TaskContext, TaskError
-from companion_v2.expression.style_management import ExpressionStyleManagement
+from digital_life_core.conversation.foreground import PromptMaterial
+from digital_life_core.conversation.media.output_settings import DEFAULTS as IMAGE_OUTPUT_DEFAULTS
+from digital_life_core.conversation.messages import event_from_document
+from digital_life_core.conversation.participation import ACTION as PARTICIPATION_ACTION
+from digital_life_core.execution.models import TaskContext, TaskError
+from digital_life_core.expression.style_management import ExpressionStyleManagement
 from tests.group_host_support import GroupFixture, group_config
 from tests.native_adapter_support import completion, final_text
 from tests.staging_bootstrap_support import wait_for_batch
@@ -67,7 +67,7 @@ class ModelContextContinuationTests(ModelFixture, unittest.IsolatedAsyncioTestCa
                 PromptMaterial("conversation", "current_source", "private changed material"),)))),
         )
         for field, request in changes:
-            with self.subTest(field=field), self.assertLogs("companion_v2.model_gateway.service", "WARNING") as logs:
+            with self.subTest(field=field), self.assertLogs("digital_life_core.model_gateway.service", "WARNING") as logs:
                 with self.assertRaises(TaskError) as caught:
                     await session.generate(request)
                 self.assertEqual(caught.exception.code, "model_context_mismatch")
@@ -110,7 +110,7 @@ class DerivedMaterialContinuationTests(ToolLoopFixture, unittest.IsolatedAsyncio
             return answered()
 
         self.responses["primary"] = respond
-        with patch("companion_v2.conversation.media.output_settings.effective_settings",
+        with patch("digital_life_core.conversation.media.output_settings.effective_settings",
                    side_effect=lambda *_: dict(values)):
             await self.generate()
         original, continued = (envelope.original for _, envelope in self.called)

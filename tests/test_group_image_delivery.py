@@ -8,11 +8,11 @@ from types import SimpleNamespace as NS
 import unittest
 from unittest.mock import patch
 
-from companion_v2.adapters.astrbot.model_wire import tool_alias
-from companion_v2.conversation.media.reply import OWNER
-from companion_v2.delivery.media import ImageDeliveryEnvelope
-from companion_v2.execution.models import TaskError, digest, encode
-from companion_v2.foundation.refs import AudienceRef
+from digital_life_core.adapters.astrbot.model_wire import tool_alias
+from digital_life_core.conversation.media.reply import OWNER
+from digital_life_core.delivery.media import ImageDeliveryEnvelope
+from digital_life_core.execution.models import TaskError, digest, encode
+from digital_life_core.foundation.refs import AudienceRef
 from tests.animation_support import animation_bytes
 from tests.forward_support import node_raw
 from tests.group_image_delivery_support import GroupImageDeliveryFixture
@@ -152,7 +152,7 @@ class GroupImageDeliveryTests(GroupImageDeliveryFixture, unittest.IsolatedAsynci
         a, first = await self.receive_parts([sdk_image()], target="group-a")
         b, _ = await self.receive_parts([Plain("另一个群")], target="group-b")
         images = self.request(a, first).images
-        from companion_v2.delivery.media import payload_hash
+        from digital_life_core.delivery.media import payload_hash
         values = dict(part_id="part", operation_id="operation", sequence=1, text="原图",
                       payload_hash=payload_hash("原图", images), sender=self.controller.session.sender_binding, images=images)
         for context in (b, replace(a, audience=AudienceRef(a.scope, (a.actor.subject,)))):
@@ -164,7 +164,7 @@ class GroupImageDeliveryTests(GroupImageDeliveryFixture, unittest.IsolatedAsynci
         _, first = await self.receive_parts([sdk_image()])
         identifier = self.sent_original(first)
         b, quoted = await self.receive_parts([Reply(id=identifier)], sender="201")
-        with patch("companion_v2.conversation.group_history.MAX_ANCESTORS", 1):
+        with patch("digital_life_core.conversation.group_history.MAX_ANCESTORS", 1):
             with self.assertRaises(TaskError) as caught:
                 self.request(b, quoted)
         self.assertEqual(caught.exception.code, "group_history_budget")

@@ -20,8 +20,8 @@ from types import SimpleNamespace
 import unittest
 from unittest.mock import patch
 
-from companion_v2.conversation.media import image_narration as image_module
-from companion_v2.conversation.media.image_narration import (
+from digital_life_core.conversation.media import image_narration as image_module
+from digital_life_core.conversation.media.image_narration import (
     IMAGE_NARRATION_BUDGET_SECONDS,
     IMAGE_NARRATION_PROVIDER_TIMEOUT_SECONDS,
     IMAGE_NARRATION_WAIT_SECONDS,
@@ -29,10 +29,10 @@ from companion_v2.conversation.media.image_narration import (
     image_narration_layers,
     image_narration_profile,
 )
-from companion_v2.conversation.media.models import OWNER as IMAGE_OWNER
-from companion_v2.conversation.media.understanding import DEFAULTS as UNDERSTANDING_DEFAULTS
-from companion_v2.conversation.media.video import narration as video_module
-from companion_v2.conversation.media.video.narration import (
+from digital_life_core.conversation.media.models import OWNER as IMAGE_OWNER
+from digital_life_core.conversation.media.understanding import DEFAULTS as UNDERSTANDING_DEFAULTS
+from digital_life_core.conversation.media.video import narration as video_module
+from digital_life_core.conversation.media.video.narration import (
     VIDEO_NARRATION_BUDGET_SECONDS,
     VIDEO_NARRATION_PROVIDER_TIMEOUT_SECONDS,
     VIDEO_NARRATION_WAIT_SECONDS,
@@ -40,12 +40,12 @@ from companion_v2.conversation.media.video.narration import (
     video_narration_layers,
     video_narration_profile,
 )
-from companion_v2.conversation.foreground import PromptMaterial
-from companion_v2.conversation.reply_settings import IMAGE_NARRATION_DEFAULTS
-from companion_v2.execution.models import TaskError, TaskResult
-from companion_v2.execution.runner import ExactTaskRunner
-from companion_v2.foundation.outcome import Outcome
-from companion_v2.foundation.refs import SourceRef, VersionRef
+from digital_life_core.conversation.foreground import PromptMaterial
+from digital_life_core.conversation.reply_settings import IMAGE_NARRATION_DEFAULTS
+from digital_life_core.execution.models import TaskError, TaskResult
+from digital_life_core.execution.runner import ExactTaskRunner
+from digital_life_core.foundation.outcome import Outcome
+from digital_life_core.foundation.refs import SourceRef, VersionRef
 from tests.test_execution import ExecutionFixture
 from tests.test_management_access import NOW, SCOPE
 
@@ -201,7 +201,7 @@ class _NarrationFixture(ExecutionFixture):
 class ImageNarrationRoundTests(_NarrationFixture, unittest.IsolatedAsyncioTestCase):
     wait_seconds = IMAGE_NARRATION_WAIT_SECONDS
     kind = "conversation.image_narration"
-    logger_name = "companion_v2.conversation.media.image_narration"
+    logger_name = "digital_life_core.conversation.media.image_narration"
 
     def setUp(self):
         # The fake gateway cuts the round where a real one does: at the profile
@@ -293,7 +293,7 @@ class ImageNarrationRoundTests(_NarrationFixture, unittest.IsolatedAsyncioTestCa
 class VideoNarrationRoundTests(_NarrationFixture, unittest.IsolatedAsyncioTestCase):
     wait_seconds = VIDEO_NARRATION_WAIT_SECONDS
     kind = "conversation.video_narration"
-    logger_name = "companion_v2.conversation.media.video.narration"
+    logger_name = "digital_life_core.conversation.media.video.narration"
 
     def setUp(self):
         # Same rule as the image sidecar: the cut point is the profile default.

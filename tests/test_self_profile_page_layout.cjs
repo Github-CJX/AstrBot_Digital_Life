@@ -388,7 +388,7 @@ test("workbench-page.js 运行时：journal 模式下长事实字段渲染为可
     dispatchEvent() {},
     CompanionProduct: {
       hosted: () => true,
-      role: () => ({role_id: "role-a", reply_api: "/astrbot_plugin_private_companion/reply"}),
+      role: () => ({role_id: "role-a", reply_api: "/astrbot_plugin_digital_life/reply"}),
       roleTarget: () => ({bot_id: "bot-a", scope_kind: "private"}),
       identity: () => ({installation_id: "inst", operator_id: "admin"}),
       scopeKey: () => "scope-a",

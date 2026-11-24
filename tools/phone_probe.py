@@ -24,7 +24,7 @@ ROOT = Path(__file__).resolve().parents[1]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
-from companion_v2.device.adb import ADB_KEYBOARD_IME, AdbClient, AdbError, discover_adb  # noqa: E402
+from digital_life_core.device.adb import ADB_KEYBOARD_IME, AdbClient, AdbError, discover_adb  # noqa: E402
 
 
 def _client(arguments):

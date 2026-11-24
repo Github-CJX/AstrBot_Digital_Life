@@ -150,7 +150,7 @@
   let acquaintanceDirectory = null;
   const accountApi = "accounts";
   const TOPOLOGY_SESSION_PAGE_SIZE = 5;
-  const TOPOLOGY_PIN_STORAGE_KEY = "astrbot_plugin_private_companion.topology.pinned_sessions";
+  const TOPOLOGY_PIN_STORAGE_KEY = "astrbot_plugin_digital_life.topology.pinned_sessions";
   /* One stable colour per AstrBot account keeps two account chains legible. */
   const TOPOLOGY_ACCOUNT_COLORS = Object.freeze([
     "#5964d8", "#2f9488", "#c8792f", "#a45bb7", "#c05462", "#3d84c7", "#7b9438",
@@ -164,7 +164,7 @@
         const parsed = JSON.parse(saved);
         if (Array.isArray(parsed)) return new Set(parsed.filter(value => typeof value === "string" && value));
       }
-      const legacy = window.localStorage.getItem("astrbot_plugin_private_companion.topology.pinned_session");
+      const legacy = window.localStorage.getItem("astrbot_plugin_digital_life.topology.pinned_session");
       const migrated = new Set(legacy ? [legacy] : []);
       if (migrated.size) writePinnedTopologySessions(migrated);
       return migrated;
@@ -175,7 +175,7 @@
     try {
       if (values.size) window.localStorage.setItem(TOPOLOGY_PIN_STORAGE_KEY, JSON.stringify([...values]));
       else window.localStorage.removeItem(TOPOLOGY_PIN_STORAGE_KEY);
-      window.localStorage.removeItem("astrbot_plugin_private_companion.topology.pinned_session");
+      window.localStorage.removeItem("astrbot_plugin_digital_life.topology.pinned_session");
       return true;
     } catch { return false; }
   }

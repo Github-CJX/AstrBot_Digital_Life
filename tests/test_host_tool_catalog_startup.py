@@ -6,14 +6,14 @@ from unittest.mock import patch
 # Import the fixture before the SDK to keep AstrBot's database in a temporary root.
 from tests.multi_host_support import MultiFixture
 from tests.test_qzone_extension import FakeTransport
-from companion_v2.model_gateway.models import MAX_TOOL_CATALOG
-from companion_v2.qzone.capability import tool_descriptors
+from digital_life_core.model_gateway.models import MAX_TOOL_CATALOG
+from digital_life_core.qzone.capability import tool_descriptors
 
 
 class HostToolCatalogStartupTests(MultiFixture, unittest.IsolatedAsyncioTestCase):
     async def test_saved_profile_survives_repeated_cold_starts_with_the_complete_catalog(self):
         transport = FakeTransport()
-        with patch("astrbot_host.multi_controller.build_qzone_transport", return_value=transport):
+        with patch("digital_life_host.multi_controller.build_qzone_transport", return_value=transport):
             initialized = await self.controller.initialize_profile()
             self.assertTrue(initialized.is_success, initialized.failure)
             saved_root = self.controller.runtime.data_root

@@ -6,8 +6,8 @@ from pathlib import Path
 import unittest
 
 from tests import test_astrbot_image_host as image_host
-from astrbot_host.controller import AstrBotStagingController
-from companion_v2.conversation.media.reply import OWNER
+from digital_life_host.controller import AstrBotStagingController
+from digital_life_core.conversation.media.reply import OWNER
 from tests.image_delivery_support import attach_originals
 from tests.staging_bootstrap_support import wait_for_batch
 from tests.test_management_access import NOW

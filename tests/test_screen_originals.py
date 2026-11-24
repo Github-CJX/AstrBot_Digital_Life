@@ -4,15 +4,15 @@ from datetime import timedelta
 import base64
 import unittest
 
-from companion_v2.foundation.refs import ReferenceValidationError
+from digital_life_core.foundation.refs import ReferenceValidationError
 
-from companion_v2.capabilities import CapabilityAuthorizationState
-from companion_v2.foundation.refs import AssetRef, AudienceRef, SourceRef, VersionRef
-from companion_v2.screen import (
+from digital_life_core.capabilities import CapabilityAuthorizationState
+from digital_life_core.foundation.refs import AssetRef, AudienceRef, SourceRef, VersionRef
+from digital_life_core.screen import (
     SCREEN_EXTENSION, SCREEN_READ, ClockQuality, ScreenCapture, ScreenCaptureRef,
     ScreenCoverage, ScreenImage, ScreenMediaKind, ScreenOriginalStore, ScreenRepository,
 )
-from companion_v2.sources import SourceRepository
+from digital_life_core.sources import SourceRepository
 
 from tests.g6_support import G6Fixture, NOW
 

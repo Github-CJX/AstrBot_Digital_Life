@@ -17,11 +17,11 @@ from unittest.mock import patch
 
 from PIL import Image
 
-from companion_v2.conversation.media.generated import ALBUM_MAX_LIMIT, GeneratedAlbumImage, GeneratedImages
-from companion_v2.conversation.media.models import ImageDescriptor
-from companion_v2.execution.models import TaskError
-from companion_v2.foundation.refs import ScopeKind, ScopeRef, SubjectKind, SubjectRef
-from companion_v2.references.management import (
+from digital_life_core.conversation.media.generated import ALBUM_MAX_LIMIT, GeneratedAlbumImage, GeneratedImages
+from digital_life_core.conversation.media.models import ImageDescriptor
+from digital_life_core.execution.models import TaskError
+from digital_life_core.foundation.refs import ScopeKind, ScopeRef, SubjectKind, SubjectRef
+from digital_life_core.references.management import (
     ALBUM_LIMIT,
     ALBUM_THUMBNAIL_DIRNAME,
     ALBUM_THUMBNAIL_SIZE,
@@ -29,7 +29,7 @@ from companion_v2.references.management import (
     _clear_album_thumbnail_memory_cache,
     _prune_thumbnail_disk_cache,
 )
-from companion_v2.storage.generated_album import album_filename
+from digital_life_core.storage.generated_album import album_filename
 
 
 def _make_image(color: str, *, fmt: str = "PNG", size: tuple[int, int] = (48, 32)) -> bytes:
@@ -82,11 +82,11 @@ def _outcome_response_stub(result, *, message=""):
 def _import_image_material_api():
     """Import ImageMaterialsWebAPI with a minimal astrbot.api.web shim when SDK is absent."""
     try:
-        from astrbot_host.image_material_api import ImageMaterialsWebAPI
-        from astrbot_host import web_api as _real_web_api  # noqa: F401
+        from digital_life_host.image_material_api import ImageMaterialsWebAPI
+        from digital_life_host import web_api as _real_web_api  # noqa: F401
         return ImageMaterialsWebAPI, None
     except ModuleNotFoundError:
-        keys = ("astrbot", "astrbot.api", "astrbot.api.web", "astrbot_host.web_api", "astrbot_host.image_material_api")
+        keys = ("astrbot", "astrbot.api", "astrbot.api.web", "digital_life_host.web_api", "digital_life_host.image_material_api")
         saved = {name: sys.modules.get(name) for name in keys}
         astrbot_mod = types.ModuleType("astrbot")
         astrbot_mod.__path__ = []
@@ -96,14 +96,14 @@ def _import_image_material_api():
         web_mod.request = SimpleNamespace(username="", query=_MultiQuery())
         astrbot_mod.api = api_mod
         api_mod.web = web_mod
-        web_api_stub = types.ModuleType("astrbot_host.web_api")
+        web_api_stub = types.ModuleType("digital_life_host.web_api")
         web_api_stub.outcome_response = _outcome_response_stub
         sys.modules["astrbot"] = astrbot_mod
         sys.modules["astrbot.api"] = api_mod
         sys.modules["astrbot.api.web"] = web_mod
-        sys.modules["astrbot_host.web_api"] = web_api_stub
-        sys.modules.pop("astrbot_host.image_material_api", None)
-        from astrbot_host.image_material_api import ImageMaterialsWebAPI
+        sys.modules["digital_life_host.web_api"] = web_api_stub
+        sys.modules.pop("digital_life_host.image_material_api", None)
+        from digital_life_host.image_material_api import ImageMaterialsWebAPI
         return ImageMaterialsWebAPI, saved
 
 
@@ -130,10 +130,10 @@ class GeneratedAlbumLimitTests(unittest.TestCase):
     def test_album_count_counts_active_legacy_and_native_rows_excluding_hidden_and_revoked(self):
         import json
         import sqlite3
-        from companion_v2.conversation.native_tool_results import PREFIX as NATIVE_PREFIX
-        from companion_v2.execution.models import digest, encode
-        from companion_v2.foundation.refs import SourceRef, VersionRef
-        from companion_v2.storage.runtime import StorageRuntime
+        from digital_life_core.conversation.native_tool_results import PREFIX as NATIVE_PREFIX
+        from digital_life_core.execution.models import digest, encode
+        from digital_life_core.foundation.refs import SourceRef, VersionRef
+        from digital_life_core.storage.runtime import StorageRuntime
 
         with tempfile.TemporaryDirectory(prefix="companion-v2-album-count-") as temporary:
             runtime = StorageRuntime.open(data_root=Path(temporary), installation_id="inst-1")
@@ -320,10 +320,10 @@ class GeneratedAlbumLimitTests(unittest.TestCase):
     def test_album_count_reads_production_native_source_object_without_result_source_json(self):
         import json
         import sqlite3
-        from companion_v2.conversation.native_tool_results import PREFIX as NATIVE_PREFIX
-        from companion_v2.execution.models import encode
-        from companion_v2.foundation.refs import SourceRef, VersionRef
-        from companion_v2.storage.runtime import StorageRuntime
+        from digital_life_core.conversation.native_tool_results import PREFIX as NATIVE_PREFIX
+        from digital_life_core.execution.models import encode
+        from digital_life_core.foundation.refs import SourceRef, VersionRef
+        from digital_life_core.storage.runtime import StorageRuntime
 
         with tempfile.TemporaryDirectory(prefix="companion-v2-album-count-prod-") as temporary:
             runtime = StorageRuntime.open(data_root=Path(temporary), installation_id="inst-1")
@@ -650,14 +650,14 @@ class ImageMaterialsWebAPIRouteTests(unittest.IsolatedAsyncioTestCase):
 
                 # Routes expose GET /album and GET /album/image.
                 route_map = {path: methods for path, _, methods, _ in api.routes()}
-                self.assertEqual(route_map["/astrbot_plugin_private_companion/image-materials/album"], ["GET"])
-                self.assertEqual(route_map["/astrbot_plugin_private_companion/image-materials/album/image"], ["GET"])
+                self.assertEqual(route_map["/astrbot_plugin_digital_life/image-materials/album"], ["GET"])
+                self.assertEqual(route_map["/astrbot_plugin_digital_life/image-materials/album/image"], ["GET"])
 
                 def authorize_material_access(username, session, runtime, context, at):
                     return SimpleNamespace(), context, at, fake_manager
 
                 # 1. Valid limit query parameter reaches manager.album.
-                with patch("astrbot_host.image_material_api.request",
+                with patch("digital_life_host.image_material_api.request",
                            SimpleNamespace(username="admin", query=_MultiQuery([("limit", "48")]))), \
                      patch.object(api, "_authorize_material_access", side_effect=authorize_material_access):
                     res = await api.album()
@@ -667,21 +667,21 @@ class ImageMaterialsWebAPIRouteTests(unittest.IsolatedAsyncioTestCase):
 
                 # 2. Out-of-range or non-numeric limit is rejected cleanly.
                 for bad_limit in ("0", "61", "abc", "-5", "9" * 6000):
-                    with patch("astrbot_host.image_material_api.request",
+                    with patch("digital_life_host.image_material_api.request",
                                SimpleNamespace(username="admin", query=_MultiQuery([("limit", bad_limit)]))):
                         bad_res = await api.album()
                     self.assertEqual(bad_res["status"], "error")
                     self.assertEqual(bad_res["data"]["code"], "generated_album_limit_invalid")
 
                 # 3. Unknown query keys on /album are rejected.
-                with patch("astrbot_host.image_material_api.request",
+                with patch("digital_life_host.image_material_api.request",
                            SimpleNamespace(username="admin", query=_MultiQuery([("extra", "1")]))):
                     extra_res = await api.album()
                 self.assertEqual(extra_res["status"], "error")
                 self.assertEqual(extra_res["data"]["code"], "image_material_request_invalid")
 
                 # 4. GET /album/image returns full original payload with filename.
-                with patch("astrbot_host.image_material_api.request",
+                with patch("digital_life_host.image_material_api.request",
                            SimpleNamespace(username="admin", query=_MultiQuery([("image_id", item.image_id)]))), \
                      patch.object(api, "_authorize_material_access", side_effect=authorize_material_access):
                     full_res = await api.album_image()
@@ -692,21 +692,21 @@ class ImageMaterialsWebAPIRouteTests(unittest.IsolatedAsyncioTestCase):
                 self.assertRegex(full_res["data"]["filename"], r"^20261012-040506-generate-[0-9a-f]{12}\.png$")
 
                 # 5. Missing image_id returns generated_image_missing; missing query param returns invalid.
-                with patch("astrbot_host.image_material_api.request",
+                with patch("digital_life_host.image_material_api.request",
                            SimpleNamespace(username="admin", query=_MultiQuery([("image_id", "generated-image:404:0")]))), \
                      patch.object(api, "_authorize_material_access", side_effect=authorize_material_access):
                     missing_res = await api.album_image()
                 self.assertEqual(missing_res["status"], "error")
                 self.assertEqual(missing_res["data"]["code"], "generated_image_missing")
 
-                with patch("astrbot_host.image_material_api.request",
+                with patch("digital_life_host.image_material_api.request",
                            SimpleNamespace(username="admin", query=_MultiQuery([]))):
                     no_param = await api.album_image()
                 self.assertEqual(no_param["status"], "error")
                 self.assertEqual(no_param["data"]["code"], "image_material_request_invalid")
 
                 # 6. Unauthenticated request is rejected before manager is called.
-                with patch("astrbot_host.image_material_api.request",
+                with patch("digital_life_host.image_material_api.request",
                            SimpleNamespace(username="", query=_MultiQuery([("image_id", item.image_id)]))):
                     unauth = await api.album_image()
                 self.assertEqual(unauth["status"], "error")
@@ -725,14 +725,14 @@ class DailyOutfitAlbumIntegrationTests(unittest.TestCase):
     def test_daily_outfit_photos_merge_into_album_pagination_total_full_image_export_hide_and_auth(self):
         import json
         import zipfile
-        from companion_v2.references.daily_outfit import (
+        from digital_life_core.references.daily_outfit import (
             DAILY_OUTFIT_ACTION,
             PREFIX as OUTFIT_PREFIX,
             DailyOutfitPhotos,
             daily_outfit_image_id,
         )
-        from companion_v2.storage.image_payloads import store_image
-        from companion_v2.storage.runtime import StorageRuntime
+        from digital_life_core.storage.image_payloads import store_image
+        from digital_life_core.storage.runtime import StorageRuntime
 
         with tempfile.TemporaryDirectory(prefix="companion-v2-daily-outfit-album-") as temporary:
             data_root = Path(temporary)
@@ -936,12 +936,12 @@ class DailyOutfitAlbumIntegrationTests(unittest.TestCase):
 
     def test_daily_outfit_index_range_scan_and_zero_read_amplification_on_next_pages(self):
         import json
-        from companion_v2.references.daily_outfit import (
+        from digital_life_core.references.daily_outfit import (
             PREFIX as OUTFIT_PREFIX,
             daily_outfit_image_id,
         )
-        from companion_v2.storage.image_payloads import store_image
-        from companion_v2.storage.runtime import StorageRuntime
+        from digital_life_core.storage.image_payloads import store_image
+        from digital_life_core.storage.runtime import StorageRuntime
 
         with tempfile.TemporaryDirectory(prefix="companion-v2-outfit-perf-") as temporary:
             data_root = Path(temporary)

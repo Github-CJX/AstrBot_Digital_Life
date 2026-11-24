@@ -9,15 +9,15 @@ from types import SimpleNamespace as NS
 import unittest
 from unittest.mock import patch
 
-from companion_v2.adapters.astrbot.model_wire import build_wire, tool_alias
-from companion_v2.conversation.delivery import DeliveryReceipt, LocalSender
-from companion_v2.conversation.flow import ConversationPolicy
-from companion_v2.conversation.media.reply import OWNER
-from companion_v2.delivery.media import ImageDeliveryEnvelope
-from companion_v2.execution.models import TaskError, digest
-from companion_v2.identity_policy.personas import RuntimeIdentity
-from companion_v2.model_gateway.models import ModelEnvelope
-from companion_v2.sources.dependencies import key
+from digital_life_core.adapters.astrbot.model_wire import build_wire, tool_alias
+from digital_life_core.conversation.delivery import DeliveryReceipt, LocalSender
+from digital_life_core.conversation.flow import ConversationPolicy
+from digital_life_core.conversation.media.reply import OWNER
+from digital_life_core.delivery.media import ImageDeliveryEnvelope
+from digital_life_core.execution.models import TaskError, digest
+from digital_life_core.identity_policy.personas import RuntimeIdentity
+from digital_life_core.model_gateway.models import ModelEnvelope
+from digital_life_core.sources.dependencies import key
 from tests.animation_support import animation_bytes
 from tests.forward_support import ForwardFixture, node_raw, quoted_forward_raw
 from tests.image_delivery_support import (attach_originals, image_reply, offered_images,
@@ -221,7 +221,7 @@ class ConversationImageDeliveryTests(ForwardFixture, unittest.IsolatedAsyncioTes
         await self.until(lambda: host.application.flow.row(batch)["reason"] == "part_spacing")
         self.assertEqual([p["type"] for p in self.sends()[0]["message"]], ["text"])
         new = await self.restart(host)
-        with patch("astrbot_host.media.inspect_image", side_effect=AssertionError("no decode on send or recovery")):
+        with patch("digital_life_host.media.inspect_image", side_effect=AssertionError("no decode on send or recovery")):
             self.advance(new.application, 3)
             self.assertEqual((await self.done(new.application, batch))["state"], "complete")
         self.assertEqual(len(self.native.provider.client.state.calls), 1)

@@ -7,7 +7,7 @@ import sys
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
-from companion_v2.adapters.astrbot.staging_config import MAX_CONFIG_BYTES, StagingConfiguration, StagingConfigurationError
+from digital_life_core.adapters.astrbot.staging_config import MAX_CONFIG_BYTES, StagingConfiguration, StagingConfigurationError
 
 
 def main():

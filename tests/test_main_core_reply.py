@@ -7,11 +7,11 @@ from types import SimpleNamespace as NS
 import unittest
 from unittest.mock import AsyncMock, Mock, patch
 
-from companion_v2.execution.models import TaskError
-from companion_v2.foundation.outcome import Outcome
-from companion_v2.conversation.private_debounce import Policy
-from astrbot_host.group_debounce import GroupDebounce
-from companion_v2.conversation.voice_reply import VoiceReplyPolicy
+from digital_life_core.execution.models import TaskError
+from digital_life_core.foundation.outcome import Outcome
+from digital_life_core.conversation.private_debounce import Policy
+from digital_life_host.group_debounce import GroupDebounce
+from digital_life_core.conversation.voice_reply import VoiceReplyPolicy
 from tests.test_main_no_reply import ENTRY
 
 
@@ -624,7 +624,7 @@ class MainCoreReplyTests(unittest.IsolatedAsyncioTestCase):
             event, target, group_admission=group_admission)
         self.assertTrue(event.is_wake)
         self.assertTrue(event.is_at_or_wake_command)
-        state = event.get_extra("_companion_v2_core_reply_context")
+        state = event.get_extra("_digital_life_core_core_reply_context")
         self.assertEqual(state["prepared"]["channel"], "group")
 
     async def test_group_text_burst_runs_one_candidate_on_latest_event(self):
@@ -688,7 +688,7 @@ class MainCoreReplyTests(unittest.IsolatedAsyncioTestCase):
         await plugin._group_debounce.close()
 
     async def test_slow_directory_observation_does_not_delay_intake_or_model_response(self):
-        from astrbot_host.session_topology import SessionTopology
+        from digital_life_host.session_topology import SessionTopology
 
         temporary = TemporaryDirectory(prefix="companion-main-directory-")
         self.addCleanup(temporary.cleanup)

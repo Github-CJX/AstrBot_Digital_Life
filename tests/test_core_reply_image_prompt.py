@@ -10,15 +10,15 @@ from tests import astrbot_data_root
 from astrbot.core.agent.message import Message, TextPart, dump_messages_with_checkpoints
 from astrbot.core.provider.entities import ProviderRequest
 
-from astrbot_host.core_reply import CORE_REPLY_CONTEXT_EXTRA
-from astrbot_host.core_reply_image_prompt import (core_image_tool_contract, core_image_tools,
+from digital_life_host.core_reply import CORE_REPLY_CONTEXT_EXTRA
+from digital_life_host.core_reply_image_prompt import (core_image_tool_contract, core_image_tools,
                                                   inject_core_image_prompt)
-from astrbot_host.core_reply_perception import inject_core_reply_perception_context
-from astrbot_host.core_reply_tools import native_tool_name
-from astrbot_host.native_extensions.host_events import prepare_native_host_request
-from companion_v2.conversation.media.output_settings import DEFAULTS
-from companion_v2.execution.models import TaskError
-from companion_v2.foundation.refs import ScopeKind, SubjectKind
+from digital_life_host.core_reply_perception import inject_core_reply_perception_context
+from digital_life_host.core_reply_tools import native_tool_name
+from digital_life_host.native_extensions.host_events import prepare_native_host_request
+from digital_life_core.conversation.media.output_settings import DEFAULTS
+from digital_life_core.execution.models import TaskError
+from digital_life_core.foundation.refs import ScopeKind, SubjectKind
 
 
 class CoreReplyImagePromptTests(unittest.IsolatedAsyncioTestCase):
@@ -52,20 +52,20 @@ class CoreReplyImagePromptTests(unittest.IsolatedAsyncioTestCase):
 
     def payload(self):
         part = next(part for part in self.request.extra_user_content_parts
-                    if part.text.startswith("<companion_v2_context>"))
-        return json.loads(part.text.removeprefix("<companion_v2_context>\n")
-                          .removesuffix("\n</companion_v2_context>"))
+                    if part.text.startswith("<digital_life_core_context>"))
+        return json.loads(part.text.removeprefix("<digital_life_core_context>\n")
+                          .removesuffix("\n</digital_life_core_context>"))
 
     def test_disabled_modes_hide_only_image_tools_in_the_request(self):
         for values in ({**DEFAULTS, "allow_user_requests": False}, {**DEFAULTS, "trigger_mode": "off"}):
-            with patch("astrbot_host.core_reply_image_prompt.effective_settings", return_value=values):
+            with patch("digital_life_host.core_reply_image_prompt.effective_settings", return_value=values):
                 offered, preferences = core_image_tools(self.session, self.offered)
             self.assertEqual([item.spec.action for item in offered], ["memory.query"])
             self.assertIsNone(preferences)
         self.assertEqual(len(self.offered), 3)
 
     def test_without_image_tools_no_preferences_or_references_are_read(self):
-        with patch("astrbot_host.core_reply_image_prompt.effective_settings") as settings:
+        with patch("digital_life_host.core_reply_image_prompt.effective_settings") as settings:
             offered, values = core_image_tools(self.session, self.offered[:1])
         self.assertEqual(offered, self.offered[:1])
         self.assertIsNone(values)
@@ -78,8 +78,8 @@ class CoreReplyImagePromptTests(unittest.IsolatedAsyncioTestCase):
                 "enabled": True, "operation_routes": {"generate": ["nai"], "edit": []}},
                 "nai": {"available": True, "prompt_format": "nai"}}))
         values = {**DEFAULTS, "prompt_format": "natural", "style": "realistic"}
-        with patch("astrbot_host.core_reply_image_prompt.effective_settings", return_value=values), \
-                patch("astrbot_host.model_route_material._image_configuration", create=True,
+        with patch("digital_life_host.core_reply_image_prompt.effective_settings", return_value=values), \
+                patch("digital_life_host.model_route_material._image_configuration", create=True,
                       return_value=self.application.native_tool_port.image_extension_api().output_configuration()):
             offered, preferences = core_image_tools(self.session, self.offered)
         self.inject(offered=offered, values=preferences)
@@ -90,8 +90,8 @@ class CoreReplyImagePromptTests(unittest.IsolatedAsyncioTestCase):
 
     def test_missing_nai_configuration_reader_preserves_existing_image_tools(self):
         values = {**DEFAULTS, "prompt_format": "natural"}
-        with patch("astrbot_host.core_reply_image_prompt.effective_settings", return_value=values), \
-                patch("astrbot_host.model_route_material._image_configuration", None, create=True):
+        with patch("digital_life_host.core_reply_image_prompt.effective_settings", return_value=values), \
+                patch("digital_life_host.model_route_material._image_configuration", None, create=True):
             offered, preferences = core_image_tools(self.session, self.offered)
         self.assertEqual(offered, self.offered)
         self.assertEqual(preferences, values)
@@ -103,7 +103,7 @@ class CoreReplyImagePromptTests(unittest.IsolatedAsyncioTestCase):
                      prepared=self.prepared, state=self.state)
 
         group_off = {**DEFAULTS, "group_enabled": False}
-        with patch("astrbot_host.core_reply_image_prompt.effective_settings", return_value=group_off):
+        with patch("digital_life_host.core_reply_image_prompt.effective_settings", return_value=group_off):
             offered, preferences = core_image_tools(session, self.offered)
         self.assertEqual([item.spec.action for item in offered], ["memory.query"])
         self.assertIsNone(preferences)
@@ -111,13 +111,13 @@ class CoreReplyImagePromptTests(unittest.IsolatedAsyncioTestCase):
         self.application.runtime = Mock()
         self.application.runtime.read_one.return_value = None
         core_only = {**DEFAULTS, "request_permission": "core_only"}
-        with patch("astrbot_host.core_reply_image_prompt.effective_settings", return_value=core_only):
+        with patch("digital_life_host.core_reply_image_prompt.effective_settings", return_value=core_only):
             offered, preferences = core_image_tools(session, self.offered)
         self.assertEqual([item.spec.action for item in offered], ["memory.query"])
         self.assertIsNone(preferences)
 
         self.application.runtime.read_one.return_value = {"tier": "core"}
-        with patch("astrbot_host.core_reply_image_prompt.effective_settings", return_value=core_only):
+        with patch("digital_life_host.core_reply_image_prompt.effective_settings", return_value=core_only):
             offered, preferences = core_image_tools(session, self.offered)
         self.assertEqual([item.spec.action for item in offered],
                          ["memory.query", "image.generate", "image.edit"])
@@ -127,7 +127,7 @@ class CoreReplyImagePromptTests(unittest.IsolatedAsyncioTestCase):
         values = {**DEFAULTS, "trigger_mode": "rules"}
         self.prepared["native_input"] = NS(text="今天天气不错",
                                            at=self.prepared["native_input"].at)
-        with patch("astrbot_host.core_reply_image_prompt.effective_settings", return_value=values):
+        with patch("digital_life_host.core_reply_image_prompt.effective_settings", return_value=values):
             offered, preferences = core_image_tools(self.session, self.offered)
         self.assertEqual([item.spec.action for item in offered],
                          ["memory.query", "image.generate", "image.edit"])
@@ -139,7 +139,7 @@ class CoreReplyImagePromptTests(unittest.IsolatedAsyncioTestCase):
 
         self.prepared["native_input"] = NS(text="帮我改一下", at=self.prepared["native_input"].at,
                                            images=(object(),))
-        with patch("astrbot_host.core_reply_image_prompt.effective_settings", return_value=values):
+        with patch("digital_life_host.core_reply_image_prompt.effective_settings", return_value=values):
             offered, preferences = core_image_tools(self.session, self.offered)
         self.assertEqual([item.spec.action for item in offered],
                          ["memory.query", "image.generate", "image.edit"])
@@ -154,7 +154,7 @@ class CoreReplyImagePromptTests(unittest.IsolatedAsyncioTestCase):
         values = {**DEFAULTS, "trigger_mode": "tool"}
         self.prepared["native_input"] = NS(text="今天天气不错",
                                            at=self.prepared["native_input"].at)
-        with patch("astrbot_host.core_reply_image_prompt.effective_settings", return_value=values):
+        with patch("digital_life_host.core_reply_image_prompt.effective_settings", return_value=values):
             offered, preferences = core_image_tools(self.session, self.offered)
         self.assertEqual([item.spec.action for item in offered],
                          ["memory.query", "image.generate", "image.edit"])
@@ -165,8 +165,8 @@ class CoreReplyImagePromptTests(unittest.IsolatedAsyncioTestCase):
         self.state["functional_command"] = NS(intent="image_generate")
         self.prepared["native_input"] = NS(text="今天天气不错",
                                            at=self.prepared["native_input"].at)
-        with patch("astrbot_host.core_reply_image_prompt.effective_settings", return_value=values), \
-                patch("astrbot_host.core_reply_image_prompt.is_rule_image_request",
+        with patch("digital_life_host.core_reply_image_prompt.effective_settings", return_value=values), \
+                patch("digital_life_host.core_reply_image_prompt.is_rule_image_request",
                       return_value=False) as detector:
             offered, preferences = core_image_tools(self.session, self.offered)
         self.assertEqual([item.spec.action for item in offered],
@@ -176,7 +176,7 @@ class CoreReplyImagePromptTests(unittest.IsolatedAsyncioTestCase):
 
     def test_rules_mode_keeps_image_tools_for_a_clear_request(self):
         values = {**DEFAULTS, "trigger_mode": "rules"}
-        with patch("astrbot_host.core_reply_image_prompt.effective_settings", return_value=values):
+        with patch("digital_life_host.core_reply_image_prompt.effective_settings", return_value=values):
             offered, preferences = core_image_tools(self.session, self.offered)
         self.assertEqual([item.spec.action for item in offered],
                          ["memory.query", "image.generate", "image.edit"])
@@ -186,7 +186,7 @@ class CoreReplyImagePromptTests(unittest.IsolatedAsyncioTestCase):
         self.assertNotIn("已命中图片请求规则", self.request.system_prompt)
 
     def test_unavailable_image_preferences_preserve_other_tools(self):
-        with patch("astrbot_host.core_reply_image_prompt.effective_settings", side_effect=TaskError("unavailable", "settings unavailable")):
+        with patch("digital_life_host.core_reply_image_prompt.effective_settings", side_effect=TaskError("unavailable", "settings unavailable")):
             offered, values = core_image_tools(self.session, self.offered)
         self.assertEqual([item.spec.action for item in offered], ["memory.query"])
         self.assertIsNone(values)
@@ -216,7 +216,7 @@ class CoreReplyImagePromptTests(unittest.IsolatedAsyncioTestCase):
         self.assertIn("不要重复发色、眼睛、脸型、发饰", prompt)
 
     def test_turn_attachment_hint_keeps_reference_indices_and_identity_together(self):
-        from companion_v2.adapters.astrbot.native import NativeImageLocator
+        from digital_life_core.adapters.astrbot.native import NativeImageLocator
         self.session.image_locators = (NativeImageLocator(0, "https://multimedia.nt.qq.com.cn/image"),)
         self.prepared["native_input"] = NS(text="我要看这个，你的版本",
                                            at=self.prepared["native_input"].at)

@@ -4,9 +4,9 @@ from contextlib import closing
 import sqlite3
 import unittest
 
-from companion_v2.storage.runtime import StorageRuntime, StorageOpenError
-from companion_v2.storage.schema import SCHEMA_VERSION, SCHEMA_VERSION_V23
-from companion_v2.storage.state_schema import STATE_STATEMENTS, STATE_TABLES
+from digital_life_core.storage.runtime import StorageRuntime, StorageOpenError
+from digital_life_core.storage.schema import SCHEMA_VERSION, SCHEMA_VERSION_V23
+from digital_life_core.storage.state_schema import STATE_STATEMENTS, STATE_TABLES
 from tests.execution_support import remove_v24
 from tests.test_management_access import ManagementFixture
 

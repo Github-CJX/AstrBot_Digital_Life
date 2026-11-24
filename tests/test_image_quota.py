@@ -6,16 +6,16 @@ from types import SimpleNamespace
 import json
 import unittest
 
-from companion_v2.configuration.models import ConfigLayer, ConfigTarget
-from companion_v2.configuration.registry import FieldRegistry
-from companion_v2.conversation.media.quota import (GROUP, PERCEPTION_TIMEZONE_FIELD, QUOTA_FIELDS,
+from digital_life_core.configuration.models import ConfigLayer, ConfigTarget
+from digital_life_core.configuration.registry import FieldRegistry
+from digital_life_core.conversation.media.quota import (GROUP, PERCEPTION_TIMEZONE_FIELD, QUOTA_FIELDS,
                                                    ImageQuotaConfigurationOwner, ImageQuotaGate,
                                                    configuration_fields)
-from companion_v2.conversation.media.output_settings import (GROUP as IMAGE_OUTPUT_GROUP,
+from digital_life_core.conversation.media.output_settings import (GROUP as IMAGE_OUTPUT_GROUP,
     ImageOutputConfigurationOwner, configuration_fields as output_configuration_fields)
-from companion_v2.execution.models import TaskError, stamp
-from companion_v2.foundation.refs import ScopeKind
-from companion_v2.storage.runtime import StorageRuntime
+from digital_life_core.execution.models import TaskError, stamp
+from digital_life_core.foundation.refs import ScopeKind
+from digital_life_core.storage.runtime import StorageRuntime
 from tests.test_conversation_messages import MessageFixture
 from tests.test_management_access import INSTALLATION, NOW, SCOPE
 
@@ -176,7 +176,7 @@ class ImageQuotaTests(MessageFixture):
         today and the allowance is spent, while UTC+8 starts at 16:00Z so the same
         attempt is yesterday and nothing is counted.
         """
-        from companion_v2.conversation.perception_settings import (PerceptionConfigurationOwner,
+        from digital_life_core.conversation.perception_settings import (PerceptionConfigurationOwner,
             configuration_fields as perception_fields, target_for as perception_target_for)
         fields = perception_fields()
         owner = PerceptionConfigurationOwner(self.runtime)
@@ -231,7 +231,7 @@ class ImageQuotaTests(MessageFixture):
         self.set_output(request_permission="core_only")
         gate = self.messages.image_quota
         with self.assertRaises(TaskError) as caught, \
-                self.assertLogs("companion_v2.conversation.media.quota", level="INFO") as logs:
+                self.assertLogs("digital_life_core.conversation.media.quota", level="INFO") as logs:
             gate.admit(self.parent(), NOW)
         self.assertEqual(caught.exception.code, "image_requests_core_only")
         # A real dispatch attempt is the one place worth an INFO notice.

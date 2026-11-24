@@ -7,11 +7,11 @@ from types import SimpleNamespace as NS
 import unittest
 from unittest.mock import Mock, patch
 
-from astrbot_host.group_debounce import GroupDebounce, group_plain_text, replace_group_plain_text
-from companion_v2.conversation.group_admission import GroupReplyAdmission
-from companion_v2.conversation.native_participation import native_participation_turn
-from companion_v2.conversation.private_debounce import Policy
-from companion_v2.execution.models import stamp
+from digital_life_host.group_debounce import GroupDebounce, group_plain_text, replace_group_plain_text
+from digital_life_core.conversation.group_admission import GroupReplyAdmission
+from digital_life_core.conversation.native_participation import native_participation_turn
+from digital_life_core.conversation.private_debounce import Policy
+from digital_life_core.execution.models import stamp
 
 
 def group_event(text, message_id="1", *, sender="200", kind="Plain"):
@@ -145,17 +145,17 @@ class GroupCandidateDebounceTests(unittest.TestCase):
         native_input = NS(at=at, instruction="", text="小星\n帮我看看",
                           event_id="latest", merged_event_ids=("first",), images=())
         patches = (
-            patch("companion_v2.conversation.native_participation.group_participation_settings",
+            patch("digital_life_core.conversation.native_participation.group_participation_settings",
                   return_value={"group_context_max_age_hours": 12, "enable_group_repeat_follow": False}),
-            patch("companion_v2.conversation.native_participation.owner_key", return_value="group-a"),
-            patch("companion_v2.conversation.native_participation.group_hints", return_value=""),
-            patch("companion_v2.conversation.native_participation.observe",
+            patch("digital_life_core.conversation.native_participation.owner_key", return_value="group-a"),
+            patch("digital_life_core.conversation.native_participation.group_hints", return_value=""),
+            patch("digital_life_core.conversation.native_participation.observe",
                   return_value={"facts": {"mood": {}}}),
-            patch("companion_v2.conversation.native_participation.observation_instruction", return_value=""),
-            patch("companion_v2.conversation.native_participation._speech_record", return_value={}),
-            patch("companion_v2.conversation.native_participation.interjection_state",
+            patch("digital_life_core.conversation.native_participation.observation_instruction", return_value=""),
+            patch("digital_life_core.conversation.native_participation._speech_record", return_value={}),
+            patch("digital_life_core.conversation.native_participation.interjection_state",
                   return_value={"enabled": False, "initiative": False}),
-            patch("companion_v2.conversation.native_participation.interjection_instruction", return_value=""))
+            patch("digital_life_core.conversation.native_participation.interjection_instruction", return_value=""))
         entered = [item.__enter__() for item in patches]
         try:
             turn = native_participation_turn(participation, context, native_input, {})

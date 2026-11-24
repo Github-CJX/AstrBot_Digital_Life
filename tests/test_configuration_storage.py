@@ -7,8 +7,8 @@ from tempfile import TemporaryDirectory
 import unittest
 from unittest.mock import patch
 
-from companion_v2.storage.runtime import StorageOpenError, StorageRuntime
-from companion_v2.storage.schema import (
+from digital_life_core.storage.runtime import StorageOpenError, StorageRuntime
+from digital_life_core.storage.schema import (
     MIGRATION_V1_TO_V2_FINGERPRINT, MIGRATION_V1_TO_V2_ID,
     MIGRATION_V2_TO_V3_FINGERPRINT, MIGRATION_V2_TO_V3_ID,
     SCHEMA_VERSION, SCHEMA_VERSION_V1, SCHEMA_VERSION_V2,
@@ -70,7 +70,7 @@ class ConfigurationStorageTests(unittest.TestCase):
             "SELECT * FROM schema_migrations ORDER BY migration_id", ())), migrations)
 
     def test_failed_v3_upgrade_rolls_back_schema_version_and_record(self):
-        with patch("companion_v2.storage.runtime.V3_MIGRATION_STATEMENTS", (*V3_MIGRATION_STATEMENTS[:4], "INVALID DDL")):
+        with patch("digital_life_core.storage.runtime.V3_MIGRATION_STATEMENTS", (*V3_MIGRATION_STATEMENTS[:4], "INVALID DDL")):
             with self.assertRaises(StorageOpenError):
                 self.open_runtime()
         self.assert_v2_unchanged()

@@ -3,9 +3,9 @@
 import unittest
 from types import SimpleNamespace
 
-from astrbot_host.core_reply import CORE_REPLY_CONTEXT_EXTRA
-from astrbot_host.core_reply_perception import inject_core_reply_perception_context
-from companion_v2.host.role_attention import RoleAttention
+from digital_life_host.core_reply import CORE_REPLY_CONTEXT_EXTRA
+from digital_life_host.core_reply_perception import inject_core_reply_perception_context
+from digital_life_core.host.role_attention import RoleAttention
 from tests.test_role_awareness import GROUP, PRIVATE, context
 
 

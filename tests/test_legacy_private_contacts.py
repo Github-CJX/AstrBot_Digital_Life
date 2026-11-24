@@ -6,11 +6,11 @@ from tempfile import TemporaryDirectory
 from types import SimpleNamespace as NS
 import unittest
 
-from astrbot_host.legacy_api import LegacyMigrationWebAPI
-from companion_v2.legacy.migration import LegacyMigration
-from companion_v2.legacy.private_contacts import private_contacts
-from companion_v2.memory.person.legacy_import import contact_plan, import_contacts
-from companion_v2.memory.person.management import PersonAcquaintanceDirectory
+from digital_life_host.legacy_api import LegacyMigrationWebAPI
+from digital_life_core.legacy.migration import LegacyMigration
+from digital_life_core.legacy.private_contacts import private_contacts
+from digital_life_core.memory.person.legacy_import import contact_plan, import_contacts
+from digital_life_core.memory.person.management import PersonAcquaintanceDirectory
 from tests.multi_host_support import MultiFixture
 
 
@@ -82,8 +82,8 @@ class PrivateContactMigrationTests(MultiFixture, unittest.IsolatedAsyncioTestCas
         app = await self.start_host()
         context = self.controller.session.authority.context("first", "role-a")
         app.messages.acquaintance.record_platform_names(context, nickname="当前昵称")
-        from companion_v2.execution.models import encode
-        from companion_v2.memory.person.access import owner_key, card_id
+        from digital_life_core.execution.models import encode
+        from digital_life_core.memory.person.access import owner_key, card_id
         with app.runtime.transaction() as connection:
             identifier = card_id(owner_key(context))
             row = connection.execute("SELECT document_json FROM memory_views WHERE view_id = ?", (identifier,)).fetchone()

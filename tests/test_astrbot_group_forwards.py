@@ -11,13 +11,13 @@ from unittest.mock import AsyncMock, patch
 from types import SimpleNamespace as NS
 
 from astrbot.core.message.components import Forward
-from astrbot_host.audio.loader import load_native_audio
-from astrbot_host.media import load_native_image
-from astrbot_host.video.loader import load_native_video
-from astrbot_host.group_authority import GroupAuthority
-from companion_v2.adapters.astrbot.forwards import read_private_forwards
-from companion_v2.adapters.astrbot.group_forwards import read_group_forwards
-from companion_v2.conversation.forwards.models import MAX_NODES
+from digital_life_host.audio.loader import load_native_audio
+from digital_life_host.media import load_native_image
+from digital_life_host.video.loader import load_native_video
+from digital_life_host.group_authority import GroupAuthority
+from digital_life_core.adapters.astrbot.forwards import read_private_forwards
+from digital_life_core.adapters.astrbot.group_forwards import read_group_forwards
+from digital_life_core.conversation.forwards.models import MAX_NODES
 from tests.forward_support import node_raw
 from tests.group_media_support import GroupMediaFixture, group_raw
 from tests.audio_support import audio_bytes
@@ -27,10 +27,10 @@ from tests.staging_bootstrap_support import wait_for_batch
 from tests.video_support import video_bytes
 from tests.video_support import FakeVideo
 from tests.native_adapter_support import completion, final_text
-from companion_v2.adapters.astrbot.model_wire import tool_alias
+from digital_life_core.adapters.astrbot.model_wire import tool_alias
 from astrbot.api.message_components import Plain
-from companion_v2.conversation.forwards.service import forward_reference, node_reference
-from companion_v2.execution.models import TaskContext, TaskError
+from digital_life_core.conversation.forwards.service import forward_reference, node_reference
+from digital_life_core.execution.models import TaskContext, TaskError
 
 
 def text_content(content):
@@ -169,8 +169,8 @@ class AstrBotGroupForwardTests(GroupMediaFixture, unittest.IsolatedAsyncioTestCa
         before = self.request(first_context, first_batch)
         calls = len(self.history_calls), len(self.native.provider.client.state.calls)
         await self.restart_host()
-        with patch("astrbot_host.video.loader.load_native_video", side_effect=AssertionError("recovery cannot decode")), \
-                patch("astrbot_host.audio.loader.load_native_audio", side_effect=AssertionError("recovery cannot decode")):
+        with patch("digital_life_host.video.loader.load_native_video", side_effect=AssertionError("recovery cannot decode")), \
+                patch("digital_life_host.audio.loader.load_native_audio", side_effect=AssertionError("recovery cannot decode")):
             restored = self.request(first_context, first_batch)
         self.assertEqual((restored.audios, restored.videos, restored.images), (before.audios, before.videos, before.images))
         self.assertEqual((len(self.history_calls), len(self.native.provider.client.state.calls)), calls)
@@ -398,7 +398,7 @@ class AstrBotGroupForwardTests(GroupMediaFixture, unittest.IsolatedAsyncioTestCa
         nodes = [node_raw("超出节点上限", sender="999", images=(image_bytes(),))
                  for _ in range(MAX_NODES + 1)]
         self.store_group_forward("1201", nodes=nodes)
-        with patch("companion_v2.adapters.astrbot.group_forwards.capture_forward_cards",
+        with patch("digital_life_core.adapters.astrbot.group_forwards.capture_forward_cards",
                    new=AsyncMock(side_effect=AssertionError("over-budget nodes must fail before image loading"))) as capture:
             result = await self.controller.receive_claimed(self.forward_event())
 

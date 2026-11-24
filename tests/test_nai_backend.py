@@ -6,10 +6,10 @@ from types import SimpleNamespace as NS
 import unittest
 from unittest.mock import AsyncMock, Mock, patch
 
-from astrbot_host.native_extensions.image_native.extension import ImageExtensionAPI
-from astrbot_host.native_extensions.image_native.nai_backend import NAIImageBackend
-from astrbot_host.native_extensions.image_native.output_routing import OutputRoutingBackend
-from astrbot_host.native_extensions.image_native.types import ImageInvocation, NativeImageError, ReferenceImage
+from digital_life_host.native_extensions.image_native.extension import ImageExtensionAPI
+from digital_life_host.native_extensions.image_native.nai_backend import NAIImageBackend
+from digital_life_host.native_extensions.image_native.output_routing import OutputRoutingBackend
+from digital_life_host.native_extensions.image_native.types import ImageInvocation, NativeImageError, ReferenceImage
 from tests.test_conversation_images import image_bytes
 
 
@@ -159,7 +159,7 @@ class NAIBackendTests(unittest.IsolatedAsyncioTestCase):
             {"enabled": True, "backend": "auto", "sd_webui": {"base_url": "http://example.test"},
              "operation_routes": {"generate": ["nai", "sd_webui"], "edit": []}},
             self.root / "routes", context=self.context)
-        with patch("astrbot_host.native_extensions.image_native.output_routing.NativeTransportBackend") as local:
+        with patch("digital_life_host.native_extensions.image_native.output_routing.NativeTransportBackend") as local:
             local.return_value.operations = ("generate",)
             local.return_value.execute = AsyncMock()
             result = await router.execute(self.invocation(envelope={
@@ -198,7 +198,7 @@ class NAIBackendTests(unittest.IsolatedAsyncioTestCase):
             {"enabled": True, "backend": "auto", "sd_webui": {"base_url": "http://example.test"},
              "operation_routes": {"generate": ["nai", "sd_webui"], "edit": []}},
             self.root / "routes", context=self.context)
-        with patch("astrbot_host.native_extensions.image_native.output_routing.NativeTransportBackend") as local:
+        with patch("digital_life_host.native_extensions.image_native.output_routing.NativeTransportBackend") as local:
             local.return_value.operations = ("generate",)
             local.return_value.execute = AsyncMock()
             with self.assertRaisesRegex(NativeImageError, "nai_generation_timed_out"):
@@ -213,7 +213,7 @@ class NAIBackendTests(unittest.IsolatedAsyncioTestCase):
             {"enabled": True, "backend": "auto", "sd_webui": {"base_url": "http://example.test"},
              "operation_routes": {"generate": ["nai", "sd_webui"], "edit": []}},
             self.root / "routes", context=self.context)
-        with patch("astrbot_host.native_extensions.image_native.output_routing.NativeTransportBackend") as local:
+        with patch("digital_life_host.native_extensions.image_native.output_routing.NativeTransportBackend") as local:
             local.return_value.operations = ("generate",)
             local.return_value.execute = AsyncMock(return_value="fallback")
             self.assertEqual(await router.execute(self.invocation(), (), self.dispatch), "fallback")
@@ -227,7 +227,7 @@ class NAIBackendTests(unittest.IsolatedAsyncioTestCase):
         router = OutputRoutingBackend(
             {"enabled": True, "backend": "nai", "operation_routes": {"generate": ["nai", "sd_webui"], "edit": []}},
             self.root / "routes", context=self.context)
-        with patch("astrbot_host.native_extensions.image_native.output_routing.NativeTransportBackend") as local:
+        with patch("digital_life_host.native_extensions.image_native.output_routing.NativeTransportBackend") as local:
             local.return_value.operations = ("generate",)
             local.return_value.execute = AsyncMock()
             with self.assertRaises(NativeImageError) as caught:
@@ -255,7 +255,7 @@ class NAIBackendTests(unittest.IsolatedAsyncioTestCase):
             "operation_routes": {"generate": ["nai"], "edit": ["nai"]},
         })
         self.assertEqual(saved["settings"]["operation_routes"]["generate"], ["nai"])
-        self.assertEqual(api.companion_v2_native().owner.backend.operations, ("generate", "edit"))
+        self.assertEqual(api.digital_life_core_native().owner.backend.operations, ("generate", "edit"))
         self.assertTrue(saved["nai"]["available"])
         self.assertNotIn("nai", saved["settings"])
         self.assertNotIn("must-not-be-projected", (self.root / "image.json").read_text())

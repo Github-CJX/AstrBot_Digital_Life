@@ -7,11 +7,11 @@ import unittest
 from pathlib import Path
 from unittest.mock import patch
 
-from companion_v2.device.adb import (
+from digital_life_core.device.adb import (
     ADB_KEYBOARD_IME, AdbClient, AdbError, ImeTextInput, UiElement, discover_adb, parse_devices,
     parse_ui_hierarchy, select_elements, take_ime_restore_error,
 )
-from companion_v2.device.session import PhoneAction, PhoneSession, parse_action
+from digital_life_core.device.session import PhoneAction, PhoneSession, parse_action
 
 PNG = b"\x89PNG\r\n\x1a\n" + b"\x00" * 32
 HIERARCHY = """<?xml version='1.0' encoding='UTF-8' standalone='yes' ?>
@@ -360,7 +360,7 @@ class ImeScheduler:
 
 
 def reset_ime_state():
-    from companion_v2.device import adb as module
+    from digital_life_core.device import adb as module
 
     with module._IME_RESTORE_LOCK:
         for timer in module._IME_RESTORE_TIMERS.values():
@@ -448,7 +448,7 @@ class ImeTextInputTests(unittest.TestCase):
 class UnicodeTypingTests(unittest.TestCase):
     def setUp(self):
         reset_ime_state()
-        self.patcher = patch("companion_v2.device.adb._default_scheduler",
+        self.patcher = patch("digital_life_core.device.adb._default_scheduler",
                              lambda delay, fire: None)
         self.patcher.start()
         self.addCleanup(self.patcher.stop)

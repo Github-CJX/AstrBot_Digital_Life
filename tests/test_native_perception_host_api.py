@@ -13,15 +13,15 @@ from tests import test_astrbot_staging_host as support
 from astrbot.api.web import PluginRequest, bind_request_context
 from starlette.requests import Request
 
-from astrbot_host.native_perception_api import NativePerceptionWebAPI, PREFIX
-from astrbot_host.management_identity import dashboard_operator
-from companion_v2.foundation.refs import ScopeKind
-from companion_v2.role_work.state.management import StateManagement
-from companion_v2.configuration.models import ConfigLayer, ConfigTarget
-from companion_v2.conversation.perception_settings import (PerceptionConfigurationOwner,
+from digital_life_host.native_perception_api import NativePerceptionWebAPI, PREFIX
+from digital_life_host.management_identity import dashboard_operator
+from digital_life_core.foundation.refs import ScopeKind
+from digital_life_core.role_work.state.management import StateManagement
+from digital_life_core.configuration.models import ConfigLayer, ConfigTarget
+from digital_life_core.conversation.perception_settings import (PerceptionConfigurationOwner,
     configuration_fields as perception_fields, role_target_for, target_for as perception_window_target)
-from companion_v2.relationships import anniversaries
-from companion_v2.role_profile.configuration import (
+from digital_life_core.relationships import anniversaries
+from digital_life_core.role_profile.configuration import (
     GROUP as ROLE_PROFILE_GROUP,
     RoleProfileConfigurationOwner,
     configuration_fields as role_profile_fields,
@@ -215,12 +215,12 @@ class NativePerceptionAPITests(unittest.IsolatedAsyncioTestCase):
         with patch.object(events, "maintain_role", side_effect=RuntimeError("refresh unavailable")) as maintain:
             with patch.object(events, "role_materials", return_value={"state": "ready",
                 "checked_at": support.NOW.isoformat(), "failure": None, "items": [item]}) as reader:
-                with patch("astrbot_host.native_perception_api.read_proactive_contact_traces",
+                with patch("digital_life_host.native_perception_api.read_proactive_contact_traces",
                            return_value={"items": [trace], "count": 1, "total_count": 4,
                                          "contexts_read": 1}) as trace_reader:
-                    with patch("astrbot_host.native_perception_api.ContactManagement.status",
+                    with patch("digital_life_host.native_perception_api.ContactManagement.status",
                                side_effect=AssertionError("global materials must not require private settings")):
-                        with patch("astrbot_host.native_perception_api.logger.exception") as log_error:
+                        with patch("digital_life_host.native_perception_api.logger.exception") as log_error:
                             response = await self.call(route=PREFIX + "/materials",
                                 query=b"day=2026-10-07&timezone=Asia%2FShanghai")
 
@@ -247,7 +247,7 @@ class NativePerceptionAPITests(unittest.IsolatedAsyncioTestCase):
         events = self.controller.session.application.contact_schedule.news_events
         with patch.object(events, "maintain_role"):
             with patch.object(events, "role_materials", side_effect=RuntimeError("synthetic failure")):
-                with patch("astrbot_host.native_perception_api.logger.exception") as log_error:
+                with patch("digital_life_host.native_perception_api.logger.exception") as log_error:
                     response = await self.call(route=PREFIX + "/materials")
 
         self.assertEqual(response["data"]["code"], "material_pool_unavailable")
@@ -255,7 +255,7 @@ class NativePerceptionAPITests(unittest.IsolatedAsyncioTestCase):
 
     async def test_material_pool_schedules_role_news_warmup_on_running_event_loop(self):
         import asyncio
-        from companion_v2.proactive.external_materials import parse_news_response
+        from digital_life_core.proactive.external_materials import parse_news_response
 
         (await self.controller.initialize_profile()).unwrap()
         events = self.controller.session.application.contact_schedule.news_events
@@ -282,7 +282,7 @@ class NativePerceptionAPITests(unittest.IsolatedAsyncioTestCase):
         loop = asyncio.get_running_loop()
         with (patch.object(events, "_source", return_value=port),
               patch.object(events, "_source_enabled", return_value=True),
-              patch("astrbot_host.native_perception_api.logger.exception") as log_error):
+              patch("digital_life_host.native_perception_api.logger.exception") as log_error):
             first = await self.call(route=PREFIX + "/materials")
             self.assertEqual(first["status"], "ok", first)
             log_error.assert_not_called()

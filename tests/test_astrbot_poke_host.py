@@ -6,10 +6,10 @@ from tempfile import TemporaryDirectory
 from types import SimpleNamespace as NS
 import unittest
 
-from astrbot_host.controller import AstrBotStagingController
-from companion_v2.adapters.astrbot.staging import NativeAdapterTypes
-from companion_v2.conversation.pokes import PokePolicy
-from companion_v2.foundation.clock import DeterministicClock
+from digital_life_host.controller import AstrBotStagingController
+from digital_life_core.adapters.astrbot.staging import NativeAdapterTypes
+from digital_life_core.conversation.pokes import PokePolicy
+from digital_life_core.foundation.clock import DeterministicClock
 from tests.group_host_support import GroupFixture, group_config
 from tests.native_adapter_support import FakeEvent, FakeProvider, FakeReverseApi, completion, final_text
 from tests.recall_host_support import recall_notice, sdk_environment
@@ -174,7 +174,7 @@ class MultiHostPokeTests(GroupFixture, unittest.IsolatedAsyncioTestCase):
         text = "\n".join(captured.output)
         self.assertNotIn("model_request_already_started", text)
         pokes_logs = [record.getMessage() for record in captured.records
-                      if record.name == "companion_v2.conversation.pokes"]
+                      if record.name == "digital_life_core.conversation.pokes"]
         self.assertTrue(pokes_logs, "the poke owner must record the failed attempt")
         self.assertTrue(any("code=model_usage_unknown" in item for item in pokes_logs), pokes_logs)
         # The pre-existing fallback warning finally fires, with the true code.

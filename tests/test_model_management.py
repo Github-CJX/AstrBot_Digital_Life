@@ -6,16 +6,16 @@ from dataclasses import asdict, replace
 from datetime import timedelta
 from types import MappingProxyType
 
-from companion_v2.configuration.models import ConfigLayer, ConfigTarget
-from companion_v2.configuration.registry import FieldRegistry
-from companion_v2.conversation.media.context_caption import context_caption_profile
-from companion_v2.conversation.media.image_narration import image_narration_profile
-from companion_v2.diagnostics.inbound import InboundNoReplyLedger
-from companion_v2.execution.models import TaskError, digest, encode
-from companion_v2.model_gateway.management import ModelManagement
-from companion_v2.model_gateway.failures import ModelFailure
-from companion_v2.model_gateway.response_diagnostics import ResponseDiagnostics, ResponseTextSummary
-from companion_v2.model_gateway.routing import configuration_fields
+from digital_life_core.configuration.models import ConfigLayer, ConfigTarget
+from digital_life_core.configuration.registry import FieldRegistry
+from digital_life_core.conversation.media.context_caption import context_caption_profile
+from digital_life_core.conversation.media.image_narration import image_narration_profile
+from digital_life_core.diagnostics.inbound import InboundNoReplyLedger
+from digital_life_core.execution.models import TaskError, digest, encode
+from digital_life_core.model_gateway.management import ModelManagement
+from digital_life_core.model_gateway.failures import ModelFailure
+from digital_life_core.model_gateway.response_diagnostics import ResponseDiagnostics, ResponseTextSummary
+from digital_life_core.model_gateway.routing import configuration_fields
 from tests.test_host_application import HostFixture
 
 
@@ -175,7 +175,7 @@ class ModelManagementTests(HostFixture, unittest.IsolatedAsyncioTestCase):
         self.assertIsNone(active["stages"]["model_ms"])
 
     async def test_reply_efficiency_projects_laya_calls_separately(self):
-        from companion_v2.execution.models import encode
+        from digital_life_core.execution.models import encode
 
         batch = self.app.runtime.read_one("SELECT batch_id FROM conversation_batches LIMIT 1", ())
         observed_at = self.app.now().isoformat()

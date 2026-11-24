@@ -7,13 +7,13 @@ from tempfile import TemporaryDirectory
 from types import SimpleNamespace as NS
 import unittest
 
-from astrbot_host.legacy_api import LegacyMigrationWebAPI
-from companion_v2.identity_policy.legacy_import import authorization_plan, import_authorizations
-from companion_v2.identity_policy.models import AuthorizationTier
-from companion_v2.identity_policy.object_access import ObjectAccessPolicy
-from companion_v2.identity_policy.repository import PersistentIdentityDirectory
-from companion_v2.legacy.migration import LegacyMigration
-from companion_v2.legacy.private_contacts import private_contacts
+from digital_life_host.legacy_api import LegacyMigrationWebAPI
+from digital_life_core.identity_policy.legacy_import import authorization_plan, import_authorizations
+from digital_life_core.identity_policy.models import AuthorizationTier
+from digital_life_core.identity_policy.object_access import ObjectAccessPolicy
+from digital_life_core.identity_policy.repository import PersistentIdentityDirectory
+from digital_life_core.legacy.migration import LegacyMigration
+from digital_life_core.legacy.private_contacts import private_contacts
 from tests.multi_host_support import MultiFixture
 from tests.test_legacy_private_contacts import old_user
 

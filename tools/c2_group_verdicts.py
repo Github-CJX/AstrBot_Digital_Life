@@ -25,16 +25,16 @@ RETIRED = "not-migrated-by-design"
 
 # v1_key -> (verdict, landing). The landing names the V2 carrier.
 ROWS: dict[str, tuple[str, str]] = {
-    # --- C2-1: the reference group (companion_v2/references/configuration.py) ---
+    # --- C2-1: the reference group (digital_life_core/references/configuration.py) ---
     "photo_action_config.enable_photo_reference_image": (
         RENAMED, "photo.reference.enabled（按角色）；参考素材改为登记条目而非配置路径，"
-                 "见 companion_v2/references/。"),
+                 "见 digital_life_core/references/。"),
     "photo_action_config.enable_daily_outfit_photo": (
         RENAMED, "photo.reference.daily_outfit_enabled（按角色）。与参考图总闸分开："
                  "同意使用参考图不等于同意每天出穿搭图。"),
     "photo_action_config.daily_outfit_rotation_days": (
         RENAMED, "photo.reference.daily_outfit_rotation_days（按角色，1–365，默认 14）。"),
-    # --- C2-2: the wardrobe group (companion_v2/references/wardrobe.py) ---
+    # --- C2-2: the wardrobe group (digital_life_core/references/wardrobe.py) ---
     "wardrobe_config.enable_wardrobe": (
         RENAMED, "wardrobe.enabled（按角色）。关闭后既不进提示词，也不接受新的识图入库；"
                  "已保存条目保留。"),
@@ -52,8 +52,8 @@ ROWS: dict[str, tuple[str, str]] = {
     # --- the two rows the plan itself settles elsewhere ---
     "wardrobe_config.wardrobe_items": (
         RETIRED, "（销号）条目是数据不是配置：V2 配置取值只有标量"
-                 "（companion_v2/configuration/models.py:15），衣物条目落存储表 "
-                 "wardrobe_items/reference_assets（companion_v2/storage/reference_asset_schema.py），"
+                 "（digital_life_core/configuration/models.py:15），衣物条目落存储表 "
+                 "wardrobe_items/reference_assets（digital_life_core/storage/reference_asset_schema.py），"
                  "配置只留开关与上限。"),
     "wardrobe_config.WARDROBE_VISION_PROVIDER_ID": (
         RETIRED, "（销号）属「提供方凭据/指派」类，按既定取向不进 V2 配置文本；"
@@ -83,8 +83,8 @@ def verify_fields() -> list[str]:
     """Return the named carriers that no longer exist in the registry."""
     if str(ROOT) not in sys.path:
         sys.path.insert(0, str(ROOT))
-    from companion_v2.references.configuration import configuration_fields as reference_fields
-    from companion_v2.references.wardrobe import configuration_fields as wardrobe_fields
+    from digital_life_core.references.configuration import configuration_fields as reference_fields
+    from digital_life_core.references.wardrobe import configuration_fields as wardrobe_fields
     registered = {field.field_id for field in (*reference_fields(), *wardrobe_fields())}
     return [name for name in NAMED_FIELDS if name not in registered]
 

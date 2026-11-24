@@ -7,14 +7,14 @@ from types import SimpleNamespace as NS
 import unittest
 from unittest.mock import patch
 
-from companion_v2.adapters.astrbot.model_wire import build_wire, tool_alias
-from companion_v2.conversation.media.animation import AnimationDescriptor, PromptAnimation
-from companion_v2.conversation.media.codec import image_descriptor
-from companion_v2.conversation.media.models import PromptImage
-from companion_v2.execution.models import TaskError, encode
-from companion_v2.identity_policy.personas import RuntimeIdentity
-from companion_v2.model_gateway.models import ModelEnvelope
-from companion_v2.sources.dependencies import key
+from digital_life_core.adapters.astrbot.model_wire import build_wire, tool_alias
+from digital_life_core.conversation.media.animation import AnimationDescriptor, PromptAnimation
+from digital_life_core.conversation.media.codec import image_descriptor
+from digital_life_core.conversation.media.models import PromptImage
+from digital_life_core.execution.models import TaskError, encode
+from digital_life_core.identity_policy.personas import RuntimeIdentity
+from digital_life_core.model_gateway.models import ModelEnvelope
+from digital_life_core.sources.dependencies import key
 from tests.animation_support import animation_bytes
 from tests.test_conversation_images import ImageFixture, FakeImage
 from tests.test_conversation_quotes import QuoteFixture, quote_raw
@@ -158,7 +158,7 @@ class ConversationAnimationTests(ImageFixture, unittest.IsolatedAsyncioTestCase)
             role_port=self.bridge.ports, providers=(self.native_model.local_provider(),), sender=self.native_sender.local_sender(),
             runtime_identity=RuntimeIdentity("companion", "runtime-2", "astrbot", "host"))
         await self.start(new, 1, 1)
-        with patch("astrbot_host.animation.inspect_animation", side_effect=AssertionError("do not decode again")):
+        with patch("digital_life_host.animation.inspect_animation", side_effect=AssertionError("do not decode again")):
             self.assertEqual(self.request(new.application, batch).images, before.images)
             self.assertEqual(new.receive(captured).unwrap(), batch)
 

@@ -2,8 +2,8 @@
 
 import unittest
 
-from companion_v2.conversation.relay_policy import RelayRequest
-from companion_v2.conversation.relay import plan_relay
+from digital_life_core.conversation.relay_policy import RelayRequest
+from digital_life_core.conversation.relay import plan_relay
 
 
 SETTINGS = {"enabled": True, "require_confirm": True, "max_text_chars": 500,

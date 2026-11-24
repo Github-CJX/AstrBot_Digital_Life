@@ -7,16 +7,16 @@ from tempfile import TemporaryDirectory
 from types import SimpleNamespace as NS
 import unittest
 
-from companion_v2.configuration.models import ConfigLayer
-from companion_v2.configuration.registry import FieldRegistry
-from companion_v2.conversation.content import authoring_service, cover_assets
-from companion_v2.conversation.content.authoring_tasks import authoring_profiles
-from companion_v2.legacy.content_configuration import convert_content_configuration
-from companion_v2.legacy.memory_configuration import convert_memory_configuration
-from companion_v2.legacy.migration import LegacyMigration, MigrationState
-from companion_v2.memory.configuration import MemorySettings, configuration_fields as memory_fields
-from companion_v2.memory.reflection import reflection_profile
-from companion_v2.model_gateway.routing import configuration_fields as model_fields
+from digital_life_core.configuration.models import ConfigLayer
+from digital_life_core.configuration.registry import FieldRegistry
+from digital_life_core.conversation.content import authoring_service, cover_assets
+from digital_life_core.conversation.content.authoring_tasks import authoring_profiles
+from digital_life_core.legacy.content_configuration import convert_content_configuration
+from digital_life_core.legacy.memory_configuration import convert_memory_configuration
+from digital_life_core.legacy.migration import LegacyMigration, MigrationState
+from digital_life_core.memory.configuration import MemorySettings, configuration_fields as memory_fields
+from digital_life_core.memory.reflection import reflection_profile
+from digital_life_core.model_gateway.routing import configuration_fields as model_fields
 from tests.proactive_support import ContactFixture
 
 
@@ -125,7 +125,7 @@ class RegistryConversionTests(unittest.TestCase):
 
 class RegistryHostMigrationTests(ContactFixture, unittest.IsolatedAsyncioTestCase):
     async def asyncSetUp(self):
-        from astrbot_host.legacy_api import LegacyMigrationWebAPI
+        from digital_life_host.legacy_api import LegacyMigrationWebAPI
         self.profiles += authoring_profiles("primary", draft_tokens=100)
         self.profiles += (reflection_profile("primary", max_output_tokens=100),)
         self.registry = FieldRegistry(version="extension-host-test", fields=model_fields(self.profiles))

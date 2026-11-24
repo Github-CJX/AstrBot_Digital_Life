@@ -9,9 +9,9 @@ from unittest.mock import AsyncMock, Mock
 import wave
 
 from tests import astrbot_data_root  # Isolate the SDK before importing the host.
-from astrbot_host.native_extensions.settings import ExtensionSettings
-from astrbot_host.native_extensions.together.runtime import TogetherRuntime
-from companion_v2.together.models import NativeRoomBinding, RoomSession
+from digital_life_host.native_extensions.settings import ExtensionSettings
+from digital_life_host.native_extensions.together.runtime import TogetherRuntime
+from digital_life_core.together.models import NativeRoomBinding, RoomSession
 
 
 class TogetherSpeechTests(unittest.IsolatedAsyncioTestCase):

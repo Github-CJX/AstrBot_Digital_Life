@@ -6,10 +6,10 @@ from unittest.mock import AsyncMock, Mock, patch
 
 from tests import test_astrbot_staging_host as sdk_environment
 from astrbot.api.web import PluginMultiDict
-from astrbot_host.acquaintance_api import AcquaintanceWebAPI
-from astrbot_host.multi_api import MultiHostWebAPI
-from companion_v2.foundation.outcome import Outcome
-from companion_v2.execution.models import TaskError
+from digital_life_host.acquaintance_api import AcquaintanceWebAPI
+from digital_life_host.multi_api import MultiHostWebAPI
+from digital_life_core.foundation.outcome import Outcome
+from digital_life_core.execution.models import TaskError
 
 
 class MultiQueryTests(unittest.IsolatedAsyncioTestCase):
@@ -29,7 +29,7 @@ class MultiQueryTests(unittest.IsolatedAsyncioTestCase):
                         authorize_delivery=AsyncMock(return_value=Outcome.success({})))
         api = MultiHostWebAPI(controller)
         request = NS(username="demo-admin", query=PluginMultiDict([]))
-        with patch("astrbot_host.multi_api.request", request):
+        with patch("digital_life_host.multi_api.request", request):
             self.assertEqual((await api.control("probe")())["status"], "ok")
             controller.probe.assert_awaited_once_with()
             request.query = PluginMultiDict([("target_id", "first")])
@@ -51,7 +51,7 @@ class MultiQueryTests(unittest.IsolatedAsyncioTestCase):
         controller = NS(preview=Mock(return_value=Outcome.success({})), batches=Mock(return_value=Outcome.success({})))
         api = MultiHostWebAPI(controller)
         request = NS(username="demo-admin", query=None)
-        with patch("astrbot_host.multi_api.request", request):
+        with patch("digital_life_host.multi_api.request", request):
             for handler, method, pairs, arguments in (
                 (api.api_preview, controller.preview, [("target_id", "first"), ("batch_id", "original")], ("first", "original")),
                 (api.api_batches, controller.batches, [("target_id", "first")], ("first",)),

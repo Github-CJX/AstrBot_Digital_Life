@@ -4,9 +4,9 @@ from types import SimpleNamespace
 
 import pytest
 
-from companion_v2.foundation.refs import SubjectKind
-from companion_v2.system_prompts import catalog, configuration
-from companion_v2.system_prompts.context import SystemPromptContext
+from digital_life_core.foundation.refs import SubjectKind
+from digital_life_core.system_prompts import catalog, configuration
+from digital_life_core.system_prompts.context import SystemPromptContext
 
 
 def test_catalog_has_bounded_defaults_for_every_editable_block():
@@ -46,7 +46,7 @@ def test_context_returns_only_non_default_overrides(monkeypatch):
         f"system.prompts.{key}": SimpleNamespace(value=value) for key, value in values.items()
     })
     prompts = SystemPromptContext(runtime=SimpleNamespace(configuration_store=object()))
-    monkeypatch.setattr("companion_v2.system_prompts.context.target_for", lambda context: object())
+    monkeypatch.setattr("digital_life_core.system_prompts.context.target_for", lambda context: object())
     monkeypatch.setattr(prompts.owner, "read", lambda target, fields: snapshot)
     assert prompts.overrides(context) == {
         "voice_drama": "自定义 Drama 规则",
@@ -56,8 +56,8 @@ def test_context_returns_only_non_default_overrides(monkeypatch):
 
 
 def test_voice_rules_override_keeps_the_runtime_limits():
-    from companion_v2.conversation.voice_reply import VoiceReplyPolicy
-    from astrbot_host.core_reply_voice import voice_prompt_instruction
+    from digital_life_core.conversation.voice_reply import VoiceReplyPolicy
+    from digital_life_host.core_reply_voice import voice_prompt_instruction
 
     policy = VoiceReplyPolicy(generation_mode="model_tag", trigger_mode="always",
                               max_speech_chars=240)
@@ -74,7 +74,7 @@ def test_voice_rules_override_keeps_the_runtime_limits():
 
 
 def test_tts_provider_direction_uses_the_role_override():
-    from astrbot_host.fish_audio import _direction_for
+    from digital_life_host.fish_audio import _direction_for
 
     policy = SimpleNamespace(direction_mode="fishaudio")
     assert _direction_for(policy, "fishaudio_tts_api", "drama-3",

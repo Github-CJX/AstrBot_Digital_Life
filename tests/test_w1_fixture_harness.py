@@ -6,7 +6,7 @@ result.  A fixture whose required behaviour does not exist yet is registered as
 BLOCKED with the reason instead of being quietly dropped or faked: the S6 rule
 is that a fixture which has not run may not be counted as passing.
 
-Reference: astrbot_plugin_private_companion/docs/S6_REALITY_TOGETHER_JOINT_ACCEPTANCE_V0.md §6
+Reference: astrbot_plugin_digital_life/docs/S6_REALITY_TOGETHER_JOINT_ACCEPTANCE_V0.md §6
 """
 from __future__ import annotations
 
@@ -21,8 +21,8 @@ from types import SimpleNamespace
 import unittest
 from unittest import mock
 
-from companion_v2.capabilities.native import parse_manifest, parse_result
-from companion_v2.execution.models import SideEffect
+from digital_life_core.capabilities.native import parse_manifest, parse_result
+from digital_life_core.execution.models import SideEffect
 
 
 PLUGIN_ROOT = Path(__file__).resolve().parents[2]

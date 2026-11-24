@@ -2,7 +2,7 @@
 import sqlite3
 import unittest
 
-from companion_v2.storage.runtime import (
+from digital_life_core.storage.runtime import (
     FORWARD_COMPATIBLE_SCHEMA_VERSIONS, StorageOpenError, _validate_table_shapes,
 )
 

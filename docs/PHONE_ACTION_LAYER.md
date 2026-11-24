@@ -12,7 +12,7 @@
 ## 分层
 
 ```
-companion_v2/device/
+digital_life_core/device/
   adb.py         传输：发现 adb、连接/配对、截图、UI 树、tap/type/key/launch、输入法，全部有界
   annotate.py    感知：网格 + 可点节点框 + 序号，生成模型看的截图
   prompt_image.py 把设备截图作为提示图（不是会话证据）

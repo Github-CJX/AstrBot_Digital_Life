@@ -1,0 +1,11 @@
+{
+  "output": "/mnt/data/m1_release",
+  "packages": 1,
+  "archives": [
+    {
+      "name": "astrbot_plugin_digital_life-0.1.0.zip",
+      "sha256": "d5db762a613a5580d90b1e90c1eb3aa84b747e377bbeffd894169e14b013d34a",
+      "bytes": 13434703
+    }
+  ]
+}

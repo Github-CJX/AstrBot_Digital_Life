@@ -1,12 +1,12 @@
 import unittest
 
-from companion_v2.conversation.addressing import (
+from digital_life_core.conversation.addressing import (
     ADDRESSING_INSTRUCTION,
     ADDRESSING_REFLECTION_INSTRUCTION,
 )
-from companion_v2.conversation.foreground import EvidencePromptCompiler, ForegroundContextAssembler
-from companion_v2.conversation.group_context import INSTRUCTION as GROUP_INSTRUCTION
-from companion_v2.memory.prompts import REFLECTION_INSTRUCTION
+from digital_life_core.conversation.foreground import EvidencePromptCompiler, ForegroundContextAssembler
+from digital_life_core.conversation.group_context import INSTRUCTION as GROUP_INSTRUCTION
+from digital_life_core.memory.prompts import REFLECTION_INSTRUCTION
 
 from tests.test_foreground_conversation import (
     event,
@@ -15,8 +15,8 @@ from tests.test_foreground_conversation import (
     reference,
     role_binding,
 )
-from companion_v2.sources.repositories import SourceRepository
-from companion_v2.storage.runtime import StorageRuntime
+from digital_life_core.sources.repositories import SourceRepository
+from digital_life_core.storage.runtime import StorageRuntime
 from tempfile import TemporaryDirectory
 from pathlib import Path
 

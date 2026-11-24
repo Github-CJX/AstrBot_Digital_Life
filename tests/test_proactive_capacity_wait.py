@@ -10,8 +10,8 @@ import json
 import unittest
 from unittest.mock import patch
 
-from companion_v2.execution.models import ClaimResult
-from companion_v2.foundation.outcome import Outcome
+from digital_life_core.execution.models import ClaimResult
+from digital_life_core.foundation.outcome import Outcome
 from tests.proactive_support import ContactFixture
 
 
@@ -51,7 +51,7 @@ class ProactiveCapacityWaitTests(ContactFixture, unittest.IsolatedAsyncioTestCas
         app = await self.enabled()
         self.full_lane(app)
 
-        with patch("companion_v2.proactive.service.CONTACT_SLOT_WAIT_SECONDS", 0.3):
+        with patch("digital_life_core.proactive.service.CONTACT_SLOT_WAIT_SECONDS", 0.3):
             result = await self.contact(app, self.opportunity("lane-stays-busy"),
                                         administrator_test=True)
 

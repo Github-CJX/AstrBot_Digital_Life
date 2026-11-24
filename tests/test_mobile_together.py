@@ -14,30 +14,30 @@ from types import SimpleNamespace
 import unittest
 from unittest.mock import AsyncMock, patch
 
-from astrbot_host.integration_registry import UnifiedCompanionExtensionAPI
-from astrbot_host.mobile_together import MobileTogetherBridge
-from companion_v2.execution.models import TaskError
-from companion_v2.foundation.outcome import Outcome
-from companion_v2.foundation.refs import ScopeKind, ScopeRef
-from companion_v2.sources.models import GovernanceState
-from companion_v2.storage.runtime import StorageRuntime
-from companion_v2.together.mobile.origin import MOBILE_ROOM_CALL
-from companion_v2.together.provider import NativeTogetherProvider
+from digital_life_host.integration_registry import UnifiedCompanionExtensionAPI
+from digital_life_host.mobile_together import MobileTogetherBridge
+from digital_life_core.execution.models import TaskError
+from digital_life_core.foundation.outcome import Outcome
+from digital_life_core.foundation.refs import ScopeKind, ScopeRef
+from digital_life_core.sources.models import GovernanceState
+from digital_life_core.storage.runtime import StorageRuntime
+from digital_life_core.together.mobile.origin import MOBILE_ROOM_CALL
+from digital_life_core.together.provider import NativeTogetherProvider
 
 
 def _load_mobile_gateway_module():
     try:
-        from astrbot_host.native_extensions.reality import mobile_gateway
+        from digital_life_host.native_extensions.reality import mobile_gateway
         return mobile_gateway
     except ModuleNotFoundError as exc:
         if exc.name != "astrbot":
             raise
         astrbot_mod = types.ModuleType("astrbot")
         api_mod = types.ModuleType("astrbot.api")
-        api_mod.logger = logging.getLogger("astrbot_host.native_extensions.reality.mobile_gateway")
+        api_mod.logger = logging.getLogger("digital_life_host.native_extensions.reality.mobile_gateway")
         astrbot_mod.api = api_mod
         with patch.dict(sys.modules, {"astrbot": astrbot_mod, "astrbot.api": api_mod}):
-            return importlib.import_module("astrbot_host.native_extensions.reality.mobile_gateway")
+            return importlib.import_module("digital_life_host.native_extensions.reality.mobile_gateway")
 
 
 class MobileTogetherBridgeTests(unittest.IsolatedAsyncioTestCase):
@@ -116,13 +116,13 @@ class MobileTogetherBridgeTests(unittest.IsolatedAsyncioTestCase):
         self.session_users = {"valid-session-token-123456": "12345", "other-session-token-123456": "99999"}
         self.apis = {
             "reality": SimpleNamespace(
-                companion_v2_mobile_session_user=lambda token: {
+                digital_life_core_mobile_session_user=lambda token: {
                     "schema": "companion.mobile-session.v1",
                     "user_id": self.session_users.get(token, ""),
                 }),
-            "together": SimpleNamespace(companion_v2_status=lambda: {
+            "together": SimpleNamespace(digital_life_core_status=lambda: {
                 "schema": "companion.provider-status.v1",
-                "plugin_id": "astrbot_plugin_private_companion.together",
+                "plugin_id": "astrbot_plugin_digital_life.together",
                 "enabled": True,
                 "runtime_ready": False,
             }),
@@ -153,17 +153,17 @@ class MobileTogetherBridgeTests(unittest.IsolatedAsyncioTestCase):
         self.assertTrue(all(context is self.context for _, context in self.admissions))
 
     def test_disabled_room_service_is_distinct_from_missing_create_consent(self):
-        self.apis['together'].companion_v2_status = lambda: {
+        self.apis['together'].digital_life_core_status = lambda: {
             'schema': 'companion.provider-status.v1',
-            'plugin_id': 'astrbot_plugin_private_companion.together',
+            'plugin_id': 'astrbot_plugin_digital_life.together',
             'enabled': False, 'runtime_ready': False}
         disabled = self.bridge.status('valid-session-token-123456')
         self.assertFalse(disabled['enabled'])
         self.assertFalse(disabled['ready'])
         self.assertEqual(disabled['reason'], 'mobile_together_disabled')
-        self.apis['together'].companion_v2_status = lambda: {
+        self.apis['together'].digital_life_core_status = lambda: {
             'schema': 'companion.provider-status.v1',
-            'plugin_id': 'astrbot_plugin_private_companion.together',
+            'plugin_id': 'astrbot_plugin_digital_life.together',
             'enabled': True, 'runtime_ready': True}
         self.allowed.remove('together.room.create')
         denied = self.bridge.status('valid-session-token-123456')
@@ -412,13 +412,13 @@ class MobileTogetherBridgeTests(unittest.IsolatedAsyncioTestCase):
         api = object.__new__(UnifiedCompanionExtensionAPI)
         api._mobile_together = self.bridge
 
-        await api.companion_v2_mobile_together_create(
+        await api.digital_life_core_mobile_together_create(
             "valid-session-token-123456", "req-create-gw", "call", via_mobile_gateway=True)
-        await api.companion_v2_mobile_together_invite(
+        await api.digital_life_core_mobile_together_invite(
             "valid-session-token-123456", "req-invite-gw", 300, via_mobile_gateway=True)
-        await api.companion_v2_mobile_together_join(
+        await api.digital_life_core_mobile_together_join(
             "valid-session-token-123456", "req-join-gw", "inv-1", via_mobile_gateway=True)
-        await api.companion_v2_mobile_together_create(
+        await api.digital_life_core_mobile_together_create(
             "valid-session-token-123456", "req-create-direct", "call")
 
         self.assertEqual(observed_markers, [
@@ -625,15 +625,15 @@ class MobileTogetherGatewayEndToEndTests(unittest.IsolatedAsyncioTestCase):
         self.registry = ProviderRegistry()
         self.apis = {
             "reality": SimpleNamespace(
-                companion_v2_mobile_session_user=lambda token: {
+                digital_life_core_mobile_session_user=lambda token: {
                     "schema": "companion.mobile-session.v1",
                     "user_id": "12345" if token == self.session_token else "",
                 }
             ),
             "together": SimpleNamespace(
-                companion_v2_status=lambda: {
+                digital_life_core_status=lambda: {
                     "schema": "companion.provider-status.v1",
-                    "plugin_id": "astrbot_plugin_private_companion.together",
+                    "plugin_id": "astrbot_plugin_digital_life.together",
                     "enabled": True,
                     "runtime_ready": True,
                 }
@@ -710,7 +710,7 @@ class MobileTogetherGatewayEndToEndTests(unittest.IsolatedAsyncioTestCase):
                 self.assertFalse(MOBILE_ROOM_CALL.get())
 
         # Sanity check: a non-gateway invocation still expects public access and fails without public_base_url.
-        direct = await self.host_api.companion_v2_mobile_together_create(
+        direct = await self.host_api.digital_life_core_mobile_together_create(
             self.session_token, "direct-non-gateway-1", "watch", via_mobile_gateway=False)
         self.assertEqual(direct["state"], "failed")
         self.assertEqual(direct["code"], "together_public_access_unavailable")
@@ -769,9 +769,9 @@ class MobileTogetherGatewayEndToEndTests(unittest.IsolatedAsyncioTestCase):
 
     async def test_mobile_invite_and_join_exceptions_and_unknown_state_log_and_preserve_codes(self):
         cases = (
-            ("invite", self.gateway.mobile_invite_room, "companion_v2_mobile_together_invite",
+            ("invite", self.gateway.mobile_invite_room, "digital_life_core_mobile_together_invite",
              {"request_id": "inv-err-1"}, "together.room.invite"),
-            ("join", self.gateway.mobile_join_room, "companion_v2_mobile_together_join",
+            ("join", self.gateway.mobile_join_room, "digital_life_core_mobile_together_join",
              {"request_id": "join-err-1", "invitation_id": "inv-1", "client": "android_native"},
              "together.room.join"),
         )

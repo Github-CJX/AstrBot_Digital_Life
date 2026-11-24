@@ -11,23 +11,23 @@ from types import SimpleNamespace
 import unittest
 from unittest.mock import AsyncMock, patch
 
-from astrbot_host.news import (DEFAULT_AI_NEWS_FEED_LABEL, DEFAULT_AI_NEWS_FEED_URL, AstrBotWebSearchNewsPort,
+from digital_life_host.news import (DEFAULT_AI_NEWS_FEED_LABEL, DEFAULT_AI_NEWS_FEED_URL, AstrBotWebSearchNewsPort,
                                DeepSeekSearchNewsPort, NewsJsonPort, NewsRssPort, configured_news_port,
                                WebSearchNewsPort, configured_search_port, deepseek_api_key)
-from astrbot_host.news_parsing import parse_rss_news
-from companion_v2.proactive.external_materials import parse_news_response
-from companion_v2.proactive.news_events import SOURCE_OWNER
-from companion_v2.proactive.news_sources import NewsFetchError
-from companion_v2.proactive.diagnostic_models import DiagnosticSourceError
-from companion_v2.proactive.inspirations import SNAPSHOT_KEY
-from companion_v2.conversation.messages import source_from_document
-from companion_v2.conversation.reply_management import ReplyManagement
-from companion_v2.conversation.segment_control import LLM_SEGMENT_MARKER
-from companion_v2.conversation.text_processing import TEXT_DEFAULTS
-from companion_v2.execution.models import TaskError, encode
-from companion_v2.proactive.material_pool import read_shared_material_pool
-from companion_v2.storage.runtime import StorageOpenError, StorageRuntime
-from companion_v2.storage.schema import SCHEMA_VERSION, SCHEMA_VERSION_V37, V37_SCHEMA_STATEMENTS
+from digital_life_host.news_parsing import parse_rss_news
+from digital_life_core.proactive.external_materials import parse_news_response
+from digital_life_core.proactive.news_events import SOURCE_OWNER
+from digital_life_core.proactive.news_sources import NewsFetchError
+from digital_life_core.proactive.diagnostic_models import DiagnosticSourceError
+from digital_life_core.proactive.inspirations import SNAPSHOT_KEY
+from digital_life_core.conversation.messages import source_from_document
+from digital_life_core.conversation.reply_management import ReplyManagement
+from digital_life_core.conversation.segment_control import LLM_SEGMENT_MARKER
+from digital_life_core.conversation.text_processing import TEXT_DEFAULTS
+from digital_life_core.execution.models import TaskError, encode
+from digital_life_core.proactive.material_pool import read_shared_material_pool
+from digital_life_core.storage.runtime import StorageOpenError, StorageRuntime
+from digital_life_core.storage.schema import SCHEMA_VERSION, SCHEMA_VERSION_V37, V37_SCHEMA_STATEMENTS
 from tests.contact_schedule_support import ContactScheduleFixture
 from tests.test_role_tool_loop import answered
 
@@ -98,7 +98,7 @@ class NewsContactTests(ContactScheduleFixture, unittest.IsolatedAsyncioTestCase)
             "proactive_hour_activity_curve": ",".join("0.05" if hour == 5 else "1.00" for hour in range(24))}).unwrap()
         events = app.contact_schedule.news_events
 
-        with patch("companion_v2.proactive.rhythm.sample", return_value=0.5) as draw:
+        with patch("digital_life_core.proactive.rhythm.sample", return_value=0.5) as draw:
             for seconds in (60, 1, 14, 15):
                 self.advance(app, seconds)
                 app.contact_schedule.advance()
@@ -829,7 +829,7 @@ class NewsContactTests(ContactScheduleFixture, unittest.IsolatedAsyncioTestCase)
 class NewsAdapterTests(unittest.TestCase):
     def test_feed_projection_accepts_an_article_without_optional_category(self):
         from types import SimpleNamespace
-        from companion_v2.proactive.news_events import NewsContactEvents
+        from digital_life_core.proactive.news_events import NewsContactEvents
 
         article = SimpleNamespace(title="有日期的资讯", summary="公开摘要", source="示例媒体",
             url="https://news.example/story", published_at=datetime(2026, 10, 1, tzinfo=timezone.utc))
@@ -934,7 +934,7 @@ class DeepSeekNewsAdapterTests(unittest.IsolatedAsyncioTestCase):
         calls = []
         port = DeepSeekSearchNewsPort(api_key="fixture-secret", query="词" * 150,
                                       result_count=80)
-        with patch("astrbot_host.news.aiohttp.ClientSession",
+        with patch("digital_life_host.news.aiohttp.ClientSession",
                    side_effect=self.session_factory(responses, calls)):
             batch = await port.fetch()
             article = await port.fetch_article("https://news.example/story?utm_source=feed")
@@ -956,7 +956,7 @@ class DeepSeekNewsAdapterTests(unittest.IsolatedAsyncioTestCase):
         calls = []
         port = DeepSeekSearchNewsPort(api_key="fixture-secret", query="检索词",
                                       search_url="https://api.deepseek.com/tools/search")
-        with patch("astrbot_host.news.aiohttp.ClientSession",
+        with patch("digital_life_host.news.aiohttp.ClientSession",
                    side_effect=self.session_factory(responses, calls)):
             await port.fetch()
         self.assertEqual(calls[0][0], "https://api.deepseek.com/v1/tools/search")
@@ -964,7 +964,7 @@ class DeepSeekNewsAdapterTests(unittest.IsolatedAsyncioTestCase):
     async def test_fetch_rejects_local_and_credentialed_urls_without_network_access(self):
         calls = []
         port = DeepSeekSearchNewsPort(api_key="fixture-secret", query="检索词")
-        with patch("astrbot_host.news.aiohttp.ClientSession",
+        with patch("digital_life_host.news.aiohttp.ClientSession",
                    side_effect=self.session_factory([], calls)):
             for url in ("http://127.0.0.1/private", "https://user:pass@news.example/story",
                         "http://localhost/story", "https://example.internal/story"):
@@ -977,7 +977,7 @@ class DeepSeekNewsAdapterTests(unittest.IsolatedAsyncioTestCase):
             "source": "示例媒体", "summary": "旧端点摘要", "published_at": "2026-10-17T03:00:00Z"}]}]
         calls = []
         port = WebSearchNewsPort(url="https://search.example/api", query="科技", result_count=1)
-        with patch("astrbot_host.news.aiohttp.ClientSession",
+        with patch("digital_life_host.news.aiohttp.ClientSession",
                    side_effect=self.session_factory(responses, calls)):
             batch = await port.fetch()
         self.assertEqual(batch.items[0].title, "旧端点结果")
@@ -994,13 +994,13 @@ class DeepSeekNewsAdapterTests(unittest.IsolatedAsyncioTestCase):
             router = configured_news_port({"news": {"source_kind": "host"}}, context=context)
             port = router.for_settings({"news_source_kind": "search", "web_exploration_interests": "科技"})
             self.assertIsInstance(port, DeepSeekSearchNewsPort)
-            from astrbot_host.semantic_models import NativeSlangSearch, configured_slang_search_port
+            from digital_life_host.semantic_models import NativeSlangSearch, configured_slang_search_port
             slang_port = configured_slang_search_port(context)
             self.assertIsInstance(slang_port, NativeSlangSearch)
             calls = []
             responses = [{"status": "succeeded", "results": [{"title": "群词参考", "url": "https://news.example/term",
                 "site_name": "参考站", "snippet": "外部释义"}]}]
-            with patch("astrbot_host.news.aiohttp.ClientSession",
+            with patch("digital_life_host.news.aiohttp.ClientSession",
                        side_effect=self.session_factory(responses, calls)):
                 results = await slang_port.search("群内词", 3)
             self.assertEqual(results[0]["title"], "群词参考")
@@ -1036,7 +1036,7 @@ class DeepSeekNewsAdapterTests(unittest.IsolatedAsyncioTestCase):
                                       deepseek_provider_resolver=lambda: "deepseek_b")
         bound = router.for_settings({"news_source_kind": "search", "web_exploration_interests": "科技"})
         self.assertEqual(bound.api_key, "provider-b-secret")
-        from astrbot_host.semantic_models import configured_slang_search_port
+        from digital_life_host.semantic_models import configured_slang_search_port
         slang = configured_slang_search_port(context, deepseek_provider_resolver=lambda: "deepseek_b")
         self.assertIsNotNone(slang)
         self.assertEqual(slang.deepseek_provider_resolver(), "deepseek_b")

@@ -4,7 +4,7 @@ from pathlib import Path
 from tempfile import TemporaryDirectory
 import unittest
 
-from companion_v2.storage.semantic import SemanticStore
+from digital_life_core.storage.semantic import SemanticStore
 
 
 class SemanticStoreTests(unittest.TestCase):

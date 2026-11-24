@@ -10,10 +10,10 @@ from unittest.mock import patch
 from cryptography.hazmat.primitives import serialization
 from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PrivateKey
 
-from astrbot_host.qweather_alerts import QWeatherAlertPort, configured_qweather_alert_port
-from astrbot_host.qweather_credentials import QWeatherCredentials
-from companion_v2.agenda.planning_config import WeatherLocation
-from companion_v2.proactive.weather_alerts import active_official_alerts, normalize_qweather_alerts
+from digital_life_host.qweather_alerts import QWeatherAlertPort, configured_qweather_alert_port
+from digital_life_host.qweather_credentials import QWeatherCredentials
+from digital_life_core.agenda.planning_config import WeatherLocation
+from digital_life_core.proactive.weather_alerts import active_official_alerts, normalize_qweather_alerts
 
 
 NOW = datetime(2026, 9, 26, 3, 0, tzinfo=timezone.utc)
@@ -140,7 +140,7 @@ class QWeatherPortTests(unittest.IsolatedAsyncioTestCase):
                 calls.append((url, params, headers, allow_redirects, self.assert_options))
                 return Reply()
 
-        with patch("astrbot_host.qweather_alerts.aiohttp.ClientSession", Session):
+        with patch("digital_life_host.qweather_alerts.aiohttp.ClientSession", Session):
             observation = await self.port.fetch(LOCATION)
         url, params, headers, redirects, options = calls[0]
         self.assertEqual(url, "https://example.xy.qweatherapi.com/weatheralert/v1/current/31.23/121.47")
@@ -200,7 +200,7 @@ class QWeatherPortTests(unittest.IsolatedAsyncioTestCase):
                 calls.append((url, params))
                 return self.pending.pop(0)
 
-        with patch("astrbot_host.qweather_alerts.aiohttp.ClientSession", Session):
+        with patch("digital_life_host.qweather_alerts.aiohttp.ClientSession", Session):
             observation = await self.port.fetch(location)
 
         self.assertEqual(calls[0][1]["location"], "角色所在地")
@@ -251,7 +251,7 @@ class QWeatherPortTests(unittest.IsolatedAsyncioTestCase):
         api_key = "0123456789abcdef0123456789abcdef"
         port = QWeatherAlertPort(QWeatherCredentials(api_host="example.xy.qweatherapi.com",
             api_key=api_key), now=lambda: NOW)
-        with patch("astrbot_host.qweather_alerts.aiohttp.ClientSession", Session):
+        with patch("digital_life_host.qweather_alerts.aiohttp.ClientSession", Session):
             observation = await port.fetch(LOCATION)
         url, params, headers, redirects, options = calls[0]
         self.assertEqual(url, "https://example.xy.qweatherapi.com/weatheralert/v1/current/31.23/121.47")

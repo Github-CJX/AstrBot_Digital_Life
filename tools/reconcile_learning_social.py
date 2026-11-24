@@ -16,12 +16,12 @@ from types import SimpleNamespace
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
-from companion_v2.execution.models import digest
-from companion_v2.foundation.refs import ScopeKind
-from companion_v2.knowledge.catalog import KnowledgeCatalog
-from companion_v2.legacy.data_migration import build_data_plan, map_legacy_worldbook
-from companion_v2.storage.runtime import StorageRuntime
-from companion_v2.storage.schema import SCHEMA_VERSION
+from digital_life_core.execution.models import digest
+from digital_life_core.foundation.refs import ScopeKind
+from digital_life_core.knowledge.catalog import KnowledgeCatalog
+from digital_life_core.legacy.data_migration import build_data_plan, map_legacy_worldbook
+from digital_life_core.storage.runtime import StorageRuntime
+from digital_life_core.storage.schema import SCHEMA_VERSION
 
 
 class ReadOnlyStore:
@@ -36,8 +36,8 @@ class ReadOnlyStore:
 
 
 def project(args, runtime, installation_id):
-    from astrbot_host.legacy_api import LegacyMigrationWebAPI
-    from astrbot_host.multi_settings import MultiHostSettings
+    from digital_life_host.legacy_api import LegacyMigrationWebAPI
+    from digital_life_host.multi_settings import MultiHostSettings
 
     settings = MultiHostSettings.parse(json.loads(args.config.read_text(encoding="utf-8-sig")))
     mappings = [p for p in settings.personas if p.role_id == args.role_id]

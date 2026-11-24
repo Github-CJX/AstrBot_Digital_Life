@@ -7,7 +7,7 @@ import sys
 from pathlib import Path
 import unittest
 
-from astrbot_host.native_extensions.reality.mihome_arc4_compat import (
+from digital_life_host.native_extensions.reality.mihome_arc4_compat import (
     _fallback_module,
     ensure_arc4_compat,
 )
@@ -41,7 +41,7 @@ class Arc4FallbackTests(unittest.TestCase):
         script = (
             "import sys\n"
             f"sys.path.insert(0, {str(ROOT)!r})\n"
-            "from astrbot_host.native_extensions.reality.mihome_arc4_compat import ensure_arc4_compat\n"
+            "from digital_life_host.native_extensions.reality.mihome_arc4_compat import ensure_arc4_compat\n"
             "assert ensure_arc4_compat(force_fallback=True) == 'forced'\n"
             "from Crypto.Cipher import ARC4\n"
             "assert ARC4.new(b'Key').encrypt(b'Plaintext').hex() == 'bbf316e8d940af0ad3'\n"

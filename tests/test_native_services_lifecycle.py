@@ -9,11 +9,11 @@ import unittest
 from unittest.mock import AsyncMock, Mock
 
 from tests import test_astrbot_staging_host as host_support
-from astrbot_host.native_extensions import NativeExtensionRegistry
-from astrbot_host.native_extensions.builtins import create_bundled_extensions, MANAGED_EXTENSIONS
-from companion_v2.capabilities import CapabilityRepository
-from companion_v2.execution.models import TaskError
-from companion_v2.storage.runtime import StorageRuntime
+from digital_life_host.native_extensions import NativeExtensionRegistry
+from digital_life_host.native_extensions.builtins import create_bundled_extensions, MANAGED_EXTENSIONS
+from digital_life_core.capabilities import CapabilityRepository
+from digital_life_core.execution.models import TaskError
+from digital_life_core.storage.runtime import StorageRuntime
 from tests.test_management_access import NOW
 
 
@@ -91,7 +91,7 @@ class NativeServiceLifecycleTests(unittest.IsolatedAsyncioTestCase):
                 raise AssertionError('legacy companion execution must not be read')
         self.context.get_all_stars = lambda: [LegacyStar(name) for name in
             ('content', 'image', 'screen', 'reality', 'together', 'game', 'live_stream')]
-        from astrbot_host.native_extensions.discovery import discover
+        from digital_life_host.native_extensions.discovery import discover
         entries, issues = discover(self.context, excluded_extensions=MANAGED_EXTENSIONS)
         self.assertEqual(entries, {})
         self.assertEqual(issues, ())

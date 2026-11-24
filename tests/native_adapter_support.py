@@ -5,16 +5,16 @@ from dataclasses import replace
 import json
 from types import SimpleNamespace as NS
 
-from companion_v2.adapters.astrbot.native import HostAccount, HostPersona, NativePrivateBridge, persona_instruction
-from companion_v2.adapters.astrbot.onebot import OneBotPrivateSender
-from companion_v2.adapters.astrbot.provider import AstrBotTextProvider, UsageTariff
-from companion_v2.conversation.flow import ConversationPolicy
-from companion_v2.conversation.foreground import PromptMaterial, PromptRequest, SealedForegroundContext
-from companion_v2.conversation.models import InboundConversationEvent
-from companion_v2.execution.models import ProviderBinding, TaskContext, digest
-from companion_v2.foundation.refs import SourceRef, VersionRef
-from companion_v2.identity_policy.models import AuthenticatedHostPrincipal
-from companion_v2.model_gateway.models import Amount, BudgetPolicy, ModelEnvelope
+from digital_life_core.adapters.astrbot.native import HostAccount, HostPersona, NativePrivateBridge, persona_instruction
+from digital_life_core.adapters.astrbot.onebot import OneBotPrivateSender
+from digital_life_core.adapters.astrbot.provider import AstrBotTextProvider, UsageTariff
+from digital_life_core.conversation.flow import ConversationPolicy
+from digital_life_core.conversation.foreground import PromptMaterial, PromptRequest, SealedForegroundContext
+from digital_life_core.conversation.models import InboundConversationEvent
+from digital_life_core.execution.models import ProviderBinding, TaskContext, digest
+from digital_life_core.foundation.refs import SourceRef, VersionRef
+from digital_life_core.identity_policy.models import AuthenticatedHostPrincipal
+from digital_life_core.model_gateway.models import Amount, BudgetPolicy, ModelEnvelope
 from tests.test_host_application import HostFixture
 from tests.test_management_access import INSTALLATION, NOW, ROLE
 

@@ -20,8 +20,8 @@ from unittest.mock import AsyncMock, patch
 import wave
 
 from tests import astrbot_data_root  # noqa: F401
-from companion_v2.adapters.astrbot.native import event_account_id, native_user_subject_id, supported_platform_name
-from astrbot_host.binding import event_identity
+from digital_life_core.adapters.astrbot.native import event_account_id, native_user_subject_id, supported_platform_name
+from digital_life_host.binding import event_identity
 
 SOURCE = os.environ.get("WECHAT_NATIVE_SOURCE")
 
@@ -147,13 +147,13 @@ class WeChatNativeTests(unittest.IsolatedAsyncioTestCase):
     async def controller(self, adapter, *, observe=None, root=None, extra_adapters=(),
                          role_id="role-w", voice_config=None):
         from astrbot.core.message.components import Image, Record, Reply
-        from astrbot_host.audio.loader import load_native_audio
-        from astrbot_host.media import load_native_image
-        from astrbot_host.media_components import group_components, private_components
-        from astrbot_host.multi_controller import AstrBotMultiController
-        from astrbot_host.quotes import load_native_group_quote, load_native_quote
-        from companion_v2.adapters.astrbot.staging import NativeAdapterTypes
-        from companion_v2.foundation.clock import DeterministicClock
+        from digital_life_host.audio.loader import load_native_audio
+        from digital_life_host.media import load_native_image
+        from digital_life_host.media_components import group_components, private_components
+        from digital_life_host.multi_controller import AstrBotMultiController
+        from digital_life_host.quotes import load_native_group_quote, load_native_quote
+        from digital_life_core.adapters.astrbot.staging import NativeAdapterTypes
+        from digital_life_core.foundation.clock import DeterministicClock
         from tests.multi_host_support import MultiNativeContext, multi_config
         from tests.native_adapter_support import FakeProvider, FakeReverseApi
         from tests.test_management_access import NOW
@@ -197,7 +197,7 @@ class WeChatNativeTests(unittest.IsolatedAsyncioTestCase):
     async def test_startup_without_native_session_does_not_fabricate_a_route(self):
         adapter = await self.adapter()
         controller = await self.controller(adapter)
-        from companion_v2.execution.models import TaskError
+        from digital_life_core.execution.models import TaskError
         with self.assertRaises(TaskError) as failure:
             await controller.session.synchronize(controller.settings.target("wx"))
         self.assertEqual(failure.exception.code, "host_native_session_unavailable")
@@ -293,12 +293,12 @@ class WeChatNativeTests(unittest.IsolatedAsyncioTestCase):
     async def test_background_sender_uses_public_session_entry_for_text_images_and_voice(self):
         from astrbot.api.event import MessageChain
         from astrbot.api.message_components import Plain, Image, Record
-        from companion_v2.adapters.astrbot.platform_sender import AstrBotPlatformSender
+        from digital_life_core.adapters.astrbot.platform_sender import AstrBotPlatformSender
         adapter = await self.adapter()
         path = self.root / "synthetic.wav"
         path.write_bytes(self.wav)
         sender = AstrBotPlatformSender(NS(), binding=NS(), version="4.29.4", reverse_api_type=None, authorize=lambda: None)
-        from companion_v2.foundation.refs import ScopeKind
+        from digital_life_core.foundation.refs import ScopeKind
         for thread in ("peer/x", "room@chatroom"):
             group = thread.endswith("@chatroom")
             native_session = self.event_module.session_id("a", thread, "real-user" if group else None)
@@ -361,7 +361,7 @@ class WeChatNativeTests(unittest.IsolatedAsyncioTestCase):
     async def test_opaque_quote_and_mention_stay_on_original_event(self):
         from astrbot.api.event import MessageChain
         from astrbot.api.message_components import Plain, At, Reply
-        from astrbot_host.core_reply_outbound import prepare_core_reply_outbound_message
+        from digital_life_host.core_reply_outbound import prepare_core_reply_outbound_message
         from tests.test_core_reply_outbound import prepared
         adapter = await self.adapter()
         event = self.event(adapter, thread="room@chatroom", identifier="opaque-message")
@@ -383,9 +383,9 @@ class WeChatNativeTests(unittest.IsolatedAsyncioTestCase):
         self.assertIn("real-user", self.submissions[-1]["mentions"]["userIds"])
 
     async def test_complete_sender_checks_policy_and_does_not_retry_unknown(self):
-        from companion_v2.adapters.astrbot.platform_sender import AstrBotPlatformSender
-        from companion_v2.delivery.models import DeliveryEnvelope
-        from companion_v2.execution.models import ProviderBinding, digest
+        from digital_life_core.adapters.astrbot.platform_sender import AstrBotPlatformSender
+        from digital_life_core.delivery.models import DeliveryEnvelope
+        from digital_life_core.execution.models import ProviderBinding, digest
         adapter = await self.adapter()
         event = self.event(adapter)
         controller = await self.controller(adapter, observe=event)
@@ -405,7 +405,7 @@ class WeChatNativeTests(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(self.submissions[-1]["threadId"], "peer/x")
         count = len(self.submissions)
         def denied_by_policy():
-            from companion_v2.execution.models import TaskError
+            from digital_life_core.execution.models import TaskError
             raise TaskError("synthetic_policy_denial", "synthetic do-not-disturb")
         denied = await sender.send(envelope(denied_by_policy))
         self.assertEqual(denied.status, "not_sent")
@@ -443,7 +443,7 @@ class WeChatNativeTests(unittest.IsolatedAsyncioTestCase):
 
     async def test_core_hooks_keep_native_generation_and_original_guarded_sender(self):
         from tests.test_main_no_reply import ENTRY
-        from companion_v2.foundation.outcome import Outcome
+        from digital_life_core.foundation.outcome import Outcome
         from unittest.mock import Mock
         from astrbot.api.event import MessageChain
         from astrbot.api.message_components import Plain
@@ -480,7 +480,7 @@ class WeChatNativeTests(unittest.IsolatedAsyncioTestCase):
     async def test_native_face_fallback_preserves_other_media(self):
         from astrbot.api.event import MessageChain
         from astrbot.api.message_components import Face, Plain, Image
-        from astrbot_host.core_reply_media_delivery import native_wire_message
+        from digital_life_host.core_reply_media_delivery import native_wire_message
         event = self.event(await self.adapter())
         message = MessageChain([Plain("hello"), Face(id=14), Image.fromBytes(self.png)])
         result = await native_wire_message(event, message)
@@ -504,8 +504,8 @@ class WeChatNativeTests(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(self.submissions, [])
 
     async def test_game_context_matches_exact_native_room_and_poke_is_not_offered(self):
-        from astrbot_host.native_extensions.game.native_context import _room_route, _scope_matches
-        from astrbot_host.core_reply_tools import CoreReplyToolSession
+        from digital_life_host.native_extensions.game.native_context import _room_route, _scope_matches
+        from digital_life_host.core_reply_tools import CoreReplyToolSession
         adapter = await self.adapter()
         event = self.event(adapter)
         controller = await self.controller(adapter, observe=event)
@@ -529,10 +529,10 @@ class WeChatNativeTests(unittest.IsolatedAsyncioTestCase):
         import base64
         from astrbot.api.event import MessageChain
         from astrbot.api.message_components import Plain, Reply
-        from astrbot_host.core_reply import prepare_core_reply_event, activate_core_reply_delivery_guard
-        from astrbot_host.core_reply_voice import prepare_core_reply_voice_message
-        from companion_v2.conversation.voice_reply import VoiceReplyPolicy
-        from companion_v2.foundation.outcome import Outcome
+        from digital_life_host.core_reply import prepare_core_reply_event, activate_core_reply_delivery_guard
+        from digital_life_host.core_reply_voice import prepare_core_reply_voice_message
+        from digital_life_core.conversation.voice_reply import VoiceReplyPolicy
+        from digital_life_core.foundation.outcome import Outcome
         adapter = await self.adapter()
         for thread in ("peer/x", "room@chatroom"):
             with self.subTest(thread=thread):
@@ -564,7 +564,7 @@ class WeChatNativeTests(unittest.IsolatedAsyncioTestCase):
 
 
     async def test_live_adapter_event_remains_original_after_event_module_reimport(self):
-        from companion_v2.adapters.astrbot.wechat_native import event_session
+        from digital_life_core.adapters.astrbot.wechat_native import event_session
         module_name = self.event_module.__name__
         spec = importlib.util.spec_from_file_location(module_name, self.event_module.__file__)
         refreshed = importlib.util.module_from_spec(spec)
@@ -600,9 +600,9 @@ class WeChatNativeTests(unittest.IsolatedAsyncioTestCase):
         import base64
         from astrbot.api.event import MessageChain
         from astrbot.api.message_components import Plain
-        from astrbot_host.core_reply_voice import prepare_core_reply_voice_message
-        from companion_v2.conversation.reply_settings import voice_policy
-        from companion_v2.foundation.outcome import Outcome
+        from digital_life_host.core_reply_voice import prepare_core_reply_voice_message
+        from digital_life_core.conversation.reply_settings import voice_policy
+        from digital_life_core.foundation.outcome import Outcome
         adapter = await self.adapter()
         event = self.event(adapter)
         controller = await self.controller(adapter, observe=event,

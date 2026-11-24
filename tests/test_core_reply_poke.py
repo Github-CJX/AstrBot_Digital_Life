@@ -3,9 +3,9 @@
 from types import SimpleNamespace as NS
 import unittest
 
-from astrbot_host.core_reply import prepare_core_reply_event
-from astrbot_host.core_reply_tools import inject_core_reply_tools
-from companion_v2.execution.models import require
+from digital_life_host.core_reply import prepare_core_reply_event
+from digital_life_host.core_reply_tools import inject_core_reply_tools
+from digital_life_core.execution.models import require
 from tests.group_host_support import GroupFixture
 from tests.multi_host_support import MultiFixture
 from tests.test_core_reply_owner_tools import NativeOwnerCalls

@@ -7,7 +7,7 @@ from pathlib import Path
 from tempfile import TemporaryDirectory
 import unittest
 
-from companion_v2.legacy.data_migration import build_data_plan
+from digital_life_core.legacy.data_migration import build_data_plan
 
 
 class LegacyPrimaryProfileSourceTests(unittest.TestCase):

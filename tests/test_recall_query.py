@@ -2,7 +2,7 @@
 
 import unittest
 
-from astrbot_host.core_reply_perception import _asks_recalled_messages
+from digital_life_host.core_reply_perception import _asks_recalled_messages
 
 
 class RecallQueryDetectionTests(unittest.TestCase):

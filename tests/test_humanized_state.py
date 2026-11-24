@@ -13,15 +13,15 @@ from dataclasses import replace
 from datetime import date, datetime, timedelta, timezone
 import unittest
 
-from companion_v2.configuration.models import ConfigLayer
-from companion_v2.configuration.registry import FieldRegistry, ValueKind
-from companion_v2.conversation.state_context import ConversationStateContext
-from companion_v2.execution.models import TaskError
-from companion_v2.identity_policy.personas import ConversationRoute
-from companion_v2.role_work.state import configuration as state_configuration
-from companion_v2.role_work.state import humanized
-from companion_v2.role_work.state.maintenance import PROMPT, _expression_preferences
-from companion_v2.role_work.state.ownership import role_schedule_key
+from digital_life_core.configuration.models import ConfigLayer
+from digital_life_core.configuration.registry import FieldRegistry, ValueKind
+from digital_life_core.conversation.state_context import ConversationStateContext
+from digital_life_core.execution.models import TaskError
+from digital_life_core.identity_policy.personas import ConversationRoute
+from digital_life_core.role_work.state import configuration as state_configuration
+from digital_life_core.role_work.state import humanized
+from digital_life_core.role_work.state.maintenance import PROMPT, _expression_preferences
+from digital_life_core.role_work.state.ownership import role_schedule_key
 from tests.test_management_access import NOW, SCOPE
 from tests.test_role_state import StateFixture, state_data
 
@@ -191,7 +191,7 @@ class HumanizedStateHostTests(StateFixture, unittest.IsolatedAsyncioTestCase):
 
     def replies(self):
         """Foreground replies only: a maintenance round is a background trigger."""
-        from companion_v2.conversation.foreground import BackgroundPromptTrigger
+        from digital_life_core.conversation.foreground import BackgroundPromptTrigger
         return [envelope for envelope in self.called
                 if not isinstance(envelope.original.event, BackgroundPromptTrigger)]
 

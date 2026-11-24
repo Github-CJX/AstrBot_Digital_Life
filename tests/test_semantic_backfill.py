@@ -4,9 +4,9 @@ import threading
 import unittest
 from types import SimpleNamespace
 
-from companion_v2.execution.models import TaskError
-from companion_v2.memory.semantic import MemorySemanticRecall
-from companion_v2.memory.sent_sources import ConfirmedReplySources, OWNER
+from digital_life_core.execution.models import TaskError
+from digital_life_core.memory.semantic import MemorySemanticRecall
+from digital_life_core.memory.sent_sources import ConfirmedReplySources, OWNER
 
 
 class FakeAccess:

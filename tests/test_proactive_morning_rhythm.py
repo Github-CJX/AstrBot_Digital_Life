@@ -4,12 +4,12 @@ from datetime import datetime, timedelta
 import unittest
 from zoneinfo import ZoneInfo
 
-from companion_v2.proactive.morning_rhythm import (
+from digital_life_core.proactive.morning_rhythm import (
     DEFAULT_WAKE_MINUTES, MORNING_INSTRUCTION, NUDGE_INSTRUCTION, MorningContact,
     RoutineSample, estimate, morning_anchor_recommendation, morning_plan,
     predict_wake_window, rhythm_adjustment, role_wake_at,
 )
-from companion_v2.proactive.rhythm import ContactRhythm
+from digital_life_core.proactive.rhythm import ContactRhythm
 from types import SimpleNamespace as NS
 
 

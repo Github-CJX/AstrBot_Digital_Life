@@ -9,7 +9,7 @@ dropped V2's reply path (voice, segmentation, Laya). A face now becomes a bounde
 from types import SimpleNamespace as NS
 import unittest
 
-from companion_v2.adapters.astrbot.group import NativeGroupBridge
+from digital_life_core.adapters.astrbot.group import NativeGroupBridge
 
 
 def mapping_event(*segments, native=()):

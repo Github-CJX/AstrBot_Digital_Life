@@ -31,16 +31,16 @@ async def probe(args):
     from astrbot.core.provider.entities import ProviderRequest
     from astrbot.core.provider.sources.openai_source import ProviderOpenAIOfficial
     from astrbot.core.provider.sources.fishaudio_tts_api_source import ProviderFishAudioTTSAPI
-    from astrbot_host.core_reply import CORE_REPLY_CONTEXT_EXTRA
-    from astrbot_host.core_reply_context import BACKGROUND_INSTRUCTION
-    from astrbot_host.core_reply_media_prompt import finalize_core_reply_media_prompt
-    from astrbot_host.core_reply_voice_authoring import bind_core_voice_authoring, restore_core_voice_authoring
-    from astrbot_host.core_reply_reaction_delivery import observe_core_reaction_response
-    from astrbot_host.multi_settings import MultiHostSettings
-    from astrbot_host.voice import NativeVoiceReply
-    from companion_v2.conversation.voice_reply import separate_spoken, speech_chunks
-    from companion_v2.expression.reply_intent import authored_reply_decision, extract_reply_intent
-    from companion_v2.foundation.refs import ScopeKind
+    from digital_life_host.core_reply import CORE_REPLY_CONTEXT_EXTRA
+    from digital_life_host.core_reply_context import BACKGROUND_INSTRUCTION
+    from digital_life_host.core_reply_media_prompt import finalize_core_reply_media_prompt
+    from digital_life_host.core_reply_voice_authoring import bind_core_voice_authoring, restore_core_voice_authoring
+    from digital_life_host.core_reply_reaction_delivery import observe_core_reaction_response
+    from digital_life_host.multi_settings import MultiHostSettings
+    from digital_life_host.voice import NativeVoiceReply
+    from digital_life_core.conversation.voice_reply import separate_spoken, speech_chunks
+    from digital_life_core.expression.reply_intent import authored_reply_decision, extract_reply_intent
+    from digital_life_core.foundation.refs import ScopeKind
 
     logger.setLevel("WARNING")
     cfg = read_json(args.host_config)

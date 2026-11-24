@@ -12,25 +12,25 @@ import unittest
 from unittest.mock import AsyncMock, patch
 
 from astrbot.core.agent.message import AudioURLPart, ImageURLPart, TextPart
-from companion_v2.adapters.astrbot.provider import AstrBotTextProvider, UsageTariff
-from companion_v2.adapters.astrbot.provider_catalog import attach_native_video
-from companion_v2.configuration.models import ConfigurationError
-from companion_v2.conversation.media.understanding import DEFAULTS, settings as parse_understanding_settings
-from companion_v2.conversation.media.video.narration import KIND as VIDEO_KIND, NativeVideoNarrationService
-from companion_v2.execution.models import ProviderBinding, TaskError
-from companion_v2.foundation.refs import ScopeKind, ScopeRef
-from companion_v2.model_gateway.models import LocalProvider, ModelTaskProfile, ProviderResponse, Amount, Lane, provider_supports_task
-from companion_v2.model_gateway.replacement_rules import validate_targets
+from digital_life_core.adapters.astrbot.provider import AstrBotTextProvider, UsageTariff
+from digital_life_core.adapters.astrbot.provider_catalog import attach_native_video
+from digital_life_core.configuration.models import ConfigurationError
+from digital_life_core.conversation.media.understanding import DEFAULTS, settings as parse_understanding_settings
+from digital_life_core.conversation.media.video.narration import KIND as VIDEO_KIND, NativeVideoNarrationService
+from digital_life_core.execution.models import ProviderBinding, TaskError
+from digital_life_core.foundation.refs import ScopeKind, ScopeRef
+from digital_life_core.model_gateway.models import LocalProvider, ModelTaskProfile, ProviderResponse, Amount, Lane, provider_supports_task
+from digital_life_core.model_gateway.replacement_rules import validate_targets
 
-from astrbot_host.core_reply_perception import (
+from digital_life_host.core_reply_perception import (
     event_has_video,
     extract_video_question,
     video_placeholder_paths,
     video_placeholders,
     video_request_state,
 )
-from astrbot_host.core_reply_video_sources import key_from_context, remember, reset as reset_video_sources, video_positions
-from astrbot_host.video.cache import (
+from digital_life_host.core_reply_video_sources import key_from_context, remember, reset as reset_video_sources, video_positions
+from digital_life_host.video.cache import (
     CachedCompressedVideo,
     CompressCache,
     VisionCache,
@@ -38,7 +38,7 @@ from astrbot_host.video.cache import (
     build_compress_cache_key,
     build_vision_cache_key,
 )
-from astrbot_host.video.compressor import (
+from digital_life_host.video.compressor import (
     classify,
     compress_video,
     probe_duration,
@@ -46,19 +46,19 @@ from astrbot_host.video.compressor import (
     sniff_video_container,
     video_capabilities_status,
 )
-from astrbot_host.video.container import inspect_container
-from astrbot_host.video.decoder import _ffmpeg_binary
-from astrbot_host.video.fusion import VideoFusionService
-from astrbot_host.video.limits import QueueTimeout, SingleFlight, SlotLimiter
-from astrbot_host.video.loader import fetch_placeholder_ref_video_bytes
-from astrbot_host.video.openai_compat_video import (
+from digital_life_host.video.container import inspect_container
+from digital_life_host.video.decoder import _ffmpeg_binary
+from digital_life_host.video.fusion import VideoFusionService
+from digital_life_host.video.limits import QueueTimeout, SingleFlight, SlotLimiter
+from digital_life_host.video.loader import fetch_placeholder_ref_video_bytes
+from digital_life_host.video.openai_compat_video import (
     extract_openai_video_text,
     genai_lacks_video_modality,
     is_openai_compat_video_provider,
     relay_video_with_openai_compat,
     sanitize_video_error,
 )
-from astrbot_host.video.core_understanding import select_native_video_routes, summarize_original_video
+from digital_life_host.video.core_understanding import select_native_video_routes, summarize_original_video
 from tests.test_main_no_reply import ENTRY
 from tests.video_support import video_bytes
 
@@ -219,7 +219,7 @@ class OpenAICompatVideoRelayTests(unittest.IsolatedAsyncioTestCase):
         app = NS(router=router)
         event = NS(unified_msg_origin="qq:private:200", get_extra=lambda _k: None)
 
-        with patch("astrbot_host.video.core_understanding.ProviderGoogleGenAI", FakeGenAI):
+        with patch("digital_life_host.video.core_understanding.ProviderGoogleGenAI", FakeGenAI):
             routes = select_native_video_routes(app, host, object(), event, None)
         selected_ids = [p.provider_config["id"] for p, _m in routes]
         self.assertNotIn("sta1n", selected_ids)
@@ -268,7 +268,7 @@ class LocalProviderAndNarrationSeparationTests(unittest.TestCase):
             supports_video_relay=True,
         )
         rules = [{"id": "r1", "provider_id": "almoons", "keywords": ["视频"]}]
-        from companion_v2.model_gateway.replacement_rules import checked_rules
+        from digital_life_core.model_gateway.replacement_rules import checked_rules
         import json
 
         parsed = checked_rules(json.dumps(rules, ensure_ascii=False))
@@ -439,7 +439,7 @@ class LimitsCacheCompressorTests(unittest.IsolatedAsyncioTestCase):
 
     def test_valid_mp4_ftyp_fast_path_skips_subprocesses(self):
         valid_mp4 = b"\x00\x00\x00\x1cftypisom\x00\x00\x02\x00isomiso2" + b"\x00" * 64
-        with patch("astrbot_host.video.compressor._run_subprocess", side_effect=AssertionError("must not spawn subprocess")):
+        with patch("digital_life_host.video.compressor._run_subprocess", side_effect=AssertionError("must not spawn subprocess")):
             res = compress_video(valid_mp4, suffix=".mp4", target_bytes=1024 * 1024)
         self.assertFalse(res.compressed)
         self.assertEqual(res.mime_type, "video/mp4")
@@ -477,8 +477,8 @@ class LimitsCacheCompressorTests(unittest.IsolatedAsyncioTestCase):
                 return 0, b"", b""
 
             with (
-                patch("astrbot_host.video.compressor.resolve_ffmpeg_tools", return_value=("ffmpeg", "ffprobe")),
-                patch("astrbot_host.video.compressor._run_subprocess", side_effect=fake_subproc),
+                patch("digital_life_host.video.compressor.resolve_ffmpeg_tools", return_value=("ffmpeg", "ffprobe")),
+                patch("digital_life_host.video.compressor._run_subprocess", side_effect=fake_subproc),
             ):
                 res = compress_video(payload, suffix=".mp4", target_bytes=10 * 1024 * 1024)
             self.assertTrue(res.compressed)
@@ -488,7 +488,7 @@ class LimitsCacheCompressorTests(unittest.IsolatedAsyncioTestCase):
 
         # 2) QuickTime (.mov) or non-MP4 codec inside .mp4 must also transcode, and missing ffmpeg fails loudly
         with (
-            patch("astrbot_host.video.compressor.resolve_ffmpeg_tools", return_value=(None, None)),
+            patch("digital_life_host.video.compressor.resolve_ffmpeg_tools", return_value=(None, None)),
             self.assertRaises(TaskError) as missing_ff,
         ):
             compress_video(fake_mp4_ebml, suffix=".mp4", target_bytes=10 * 1024 * 1024)
@@ -517,8 +517,8 @@ class LimitsCacheCompressorTests(unittest.IsolatedAsyncioTestCase):
             fusion = VideoFusionService(compress_cache=CompressCache(tmp, max_bytes=2 * 1024 * 1024))
             self.addCleanup(fusion.close)
             with (
-                patch("astrbot_host.video.compressor.resolve_ffmpeg_tools", return_value=("ffmpeg", "ffprobe")),
-                patch("astrbot_host.video.compressor._run_subprocess", side_effect=fake_subproc),
+                patch("digital_life_host.video.compressor.resolve_ffmpeg_tools", return_value=("ffmpeg", "ffprobe")),
+                patch("digital_life_host.video.compressor._run_subprocess", side_effect=fake_subproc),
             ):
                 outcome = await fusion.analyze_video(
                     fake_mp4_ebml,
@@ -625,7 +625,7 @@ class CoreFusionPerceptionPipelineTests(unittest.IsolatedAsyncioTestCase):
             ]
         )
         ext_event = NS(get_extra=lambda _k: {"prepared": {"context": context, "event_ref": "ext-1"}})
-        with patch(f"{pkg}astrbot_host.video.loader.fetch_placeholder_ref_video_bytes", AsyncMock()) as dl:
+        with patch(f"{pkg}digital_life_host.video.loader.fetch_placeholder_ref_video_bytes", AsyncMock()) as dl:
             await plugin._attach_core_reply_current_videos(ext_event, ext_req)
         dl.assert_not_awaited()
 
@@ -641,10 +641,10 @@ class CoreFusionPerceptionPipelineTests(unittest.IsolatedAsyncioTestCase):
         fake_provider = NS(provider_config={"id": "almoons", "type": "openai_chat_completion"})
         clip = video_bytes()
         with (
-            patch(f"{pkg}astrbot_host.video.loader.fetch_placeholder_ref_video_bytes", AsyncMock(return_value=clip)) as dl,
-            patch(f"{pkg}astrbot_host.video.core_understanding.select_native_video_routes", return_value=((fake_provider, "gpt-4o"),)),
-            patch(f"{pkg}astrbot_host.video.core_understanding.summarize_original_video", AsyncMock(return_value="拿了一把雨伞")) as sum_fn,
-            patch(f"{pkg}astrbot_host.video.container.inspect_container", return_value=NS(duration_ms=1000)),
+            patch(f"{pkg}digital_life_host.video.loader.fetch_placeholder_ref_video_bytes", AsyncMock(return_value=clip)) as dl,
+            patch(f"{pkg}digital_life_host.video.core_understanding.select_native_video_routes", return_value=((fake_provider, "gpt-4o"),)),
+            patch(f"{pkg}digital_life_host.video.core_understanding.summarize_original_video", AsyncMock(return_value="拿了一把雨伞")) as sum_fn,
+            patch(f"{pkg}digital_life_host.video.container.inspect_container", return_value=NS(duration_ms=1000)),
         ):
             await plugin._attach_core_reply_current_videos(ev, req)
         self.assertEqual(dl.await_count, 2)
@@ -784,8 +784,8 @@ class SingleFlightTimeoutAndAuditRegressionTests(unittest.IsolatedAsyncioTestCas
         flights = VisionFlights()
         cache = VisionCache()
         with (
-            patch("astrbot_host.video.core_understanding.inspect_container"),
-            patch("astrbot_host.video.core_understanding.relay_video_with_openai_compat", side_effect=fake_relay),
+            patch("digital_life_host.video.core_understanding.inspect_container"),
+            patch("digital_life_host.video.core_understanding.relay_video_with_openai_compat", side_effect=fake_relay),
         ):
             short_fut = asyncio.create_task(
                 summarize_original_video(
@@ -812,8 +812,8 @@ class SingleFlightTimeoutAndAuditRegressionTests(unittest.IsolatedAsyncioTestCas
         flights2 = VisionFlights()
         cache2 = VisionCache()
         with (
-            patch("astrbot_host.video.core_understanding.inspect_container"),
-            patch("astrbot_host.video.core_understanding.relay_video_with_openai_compat", side_effect=fake_relay),
+            patch("digital_life_host.video.core_understanding.inspect_container"),
+            patch("digital_life_host.video.core_understanding.relay_video_with_openai_compat", side_effect=fake_relay),
         ):
             long_fut = asyncio.create_task(
                 summarize_original_video(
@@ -836,7 +836,7 @@ class SingleFlightTimeoutAndAuditRegressionTests(unittest.IsolatedAsyncioTestCas
 
     async def test_post_openai_json_enforces_total_wall_clock_on_slow_drip_response(self):
         import httpx
-        from astrbot_host.video.openai_compat_video import RelayRouteInfo, _post_openai_json
+        from digital_life_host.video.openai_compat_video import RelayRouteInfo, _post_openai_json
 
         # Warm httpx SSL context once outside the timed window so first-call CA load
         # does not skew the sub-second slow-drip wall-clock assertion on Windows.
@@ -957,9 +957,9 @@ class SingleFlightTimeoutAndAuditRegressionTests(unittest.IsolatedAsyncioTestCas
             fusion = VideoFusionService(compress_cache=CompressCache(tmp, max_bytes=2 * 1024 * 1024))
             self.addCleanup(fusion.close)
             with (
-                patch("astrbot_host.video.compressor.resolve_ffmpeg_tools", return_value=("ffmpeg", "ffprobe")),
-                patch("astrbot_host.video.compressor._run_subprocess", side_effect=fake_subproc),
-                patch("astrbot_host.video.fusion.asyncio.to_thread", side_effect=spy_to_thread),
+                patch("digital_life_host.video.compressor.resolve_ffmpeg_tools", return_value=("ffmpeg", "ffprobe")),
+                patch("digital_life_host.video.compressor._run_subprocess", side_effect=fake_subproc),
+                patch("digital_life_host.video.fusion.asyncio.to_thread", side_effect=spy_to_thread),
             ):
                 await fusion.prepare_video(clip, suffix=".mp4", settings={"video_understanding_target_mb": 10})
         self.assertIn("_sha256_hex", offloaded)
@@ -982,9 +982,9 @@ class SingleFlightTimeoutAndAuditRegressionTests(unittest.IsolatedAsyncioTestCas
             client=NS(base_url="https://api.example/v1", chat=NS(completions=QuickCompletions())),
         )
         with (
-            patch("astrbot_host.video.core_understanding.inspect_container"),
-            patch("astrbot_host.video.core_understanding.asyncio.to_thread", side_effect=spy_relay_thread),
-            patch("astrbot_host.video.openai_compat_video.asyncio.to_thread", side_effect=spy_relay_thread),
+            patch("digital_life_host.video.core_understanding.inspect_container"),
+            patch("digital_life_host.video.core_understanding.asyncio.to_thread", side_effect=spy_relay_thread),
+            patch("digital_life_host.video.openai_compat_video.asyncio.to_thread", side_effect=spy_relay_thread),
         ):
             text = await summarize_original_video(
                 valid_out_mp4, provider, "gpt-4o", {}, vision_cache=VisionCache(), vision_flights=VisionFlights()
@@ -994,8 +994,8 @@ class SingleFlightTimeoutAndAuditRegressionTests(unittest.IsolatedAsyncioTestCas
         self.assertIn("_encode_video_data_uri", relay_offloaded)
 
     async def test_single_fetch_and_single_read_use_80mb_budget_directly_with_one_arg_fallback(self):
-        from astrbot_host.video.fusion import MAX_CORE_VIDEO_DOWNLOAD_BYTES
-        from companion_v2.adapters.astrbot.native import NativeVideoLocator
+        from digital_life_host.video.fusion import MAX_CORE_VIDEO_DOWNLOAD_BYTES
+        from digital_life_core.adapters.astrbot.native import NativeVideoLocator
 
         plugin = ENTRY.PrivateCompanionV2StagingPlugin.__new__(ENTRY.PrivateCompanionV2StagingPlugin)
         context = _video_context(ScopeKind.PRIVATE)
@@ -1019,9 +1019,9 @@ class SingleFlightTimeoutAndAuditRegressionTests(unittest.IsolatedAsyncioTestCas
         ev = NS(get_extra=lambda _k: {"prepared": {"context": context, "event_ref": "single-read"}})
         fake_provider = NS(provider_config={"id": "almoons", "type": "openai_chat_completion"})
         with (
-            patch(f"{pkg}astrbot_host.video.loader.read_host_resolved_video_bytes", side_effect=strict_read),
-            patch(f"{pkg}astrbot_host.video.core_understanding.select_native_video_routes", return_value=((fake_provider, "gpt-4o"),)),
-            patch(f"{pkg}astrbot_host.video.core_understanding.summarize_original_video", AsyncMock(return_value="大视频摘要")),
+            patch(f"{pkg}digital_life_host.video.loader.read_host_resolved_video_bytes", side_effect=strict_read),
+            patch(f"{pkg}digital_life_host.video.core_understanding.select_native_video_routes", return_value=((fake_provider, "gpt-4o"),)),
+            patch(f"{pkg}digital_life_host.video.core_understanding.summarize_original_video", AsyncMock(return_value="大视频摘要")),
         ):
             await plugin._attach_core_reply_current_videos(ev, req)
         self.assertEqual(seen_limits, [MAX_CORE_VIDEO_DOWNLOAD_BYTES])
@@ -1035,9 +1035,9 @@ class SingleFlightTimeoutAndAuditRegressionTests(unittest.IsolatedAsyncioTestCas
 
         req2 = NS(extra_user_content_parts=[TextPart(text="[Video Attachment: name stub.mp4, path C:\\host\\temp\\stub.mp4]")])
         with (
-            patch(f"{pkg}astrbot_host.video.loader.read_host_resolved_video_bytes", side_effect=one_arg_stub),
-            patch(f"{pkg}astrbot_host.video.core_understanding.select_native_video_routes", return_value=((fake_provider, "gpt-4o"),)),
-            patch(f"{pkg}astrbot_host.video.core_understanding.summarize_original_video", AsyncMock(return_value="桩函数摘要")),
+            patch(f"{pkg}digital_life_host.video.loader.read_host_resolved_video_bytes", side_effect=one_arg_stub),
+            patch(f"{pkg}digital_life_host.video.core_understanding.select_native_video_routes", return_value=((fake_provider, "gpt-4o"),)),
+            patch(f"{pkg}digital_life_host.video.core_understanding.summarize_original_video", AsyncMock(return_value="桩函数摘要")),
         ):
             await plugin._attach_core_reply_current_videos(ev, req2)
         self.assertEqual(one_arg_calls, ["C:\\host\\temp\\stub.mp4"])
@@ -1054,7 +1054,7 @@ class SingleFlightTimeoutAndAuditRegressionTests(unittest.IsolatedAsyncioTestCas
             actor=NS(subject=NS(subject_id="human-1")),
             role_binding=NS(role=NS(subject_id="role-a")),
         )
-        plugin_sources = __import__(f"{pkg}astrbot_host.core_reply_video_sources", fromlist=["*"])
+        plugin_sources = __import__(f"{pkg}digital_life_host.core_reply_video_sources", fromlist=["*"])
         plugin_sources.reset()
         self.addCleanup(plugin_sources.reset)
         gkey = plugin_sources.key_from_context(group_ctx)
@@ -1067,15 +1067,15 @@ class SingleFlightTimeoutAndAuditRegressionTests(unittest.IsolatedAsyncioTestCas
         )
         g_req = NS(extra_user_content_parts=[])
         with (
-            patch(f"{pkg}astrbot_host.video.loader.fetch_native_video_bytes", side_effect=strict_fetch),
-            patch(f"{pkg}astrbot_host.video.core_understanding.select_native_video_routes", return_value=((fake_provider, "gpt-4o"),)),
-            patch(f"{pkg}astrbot_host.video.core_understanding.summarize_original_video", AsyncMock(return_value="群大视频")),
+            patch(f"{pkg}digital_life_host.video.loader.fetch_native_video_bytes", side_effect=strict_fetch),
+            patch(f"{pkg}digital_life_host.video.core_understanding.select_native_video_routes", return_value=((fake_provider, "gpt-4o"),)),
+            patch(f"{pkg}digital_life_host.video.core_understanding.summarize_original_video", AsyncMock(return_value="群大视频")),
         ):
             await plugin._attach_core_reply_videos({"context": group_ctx}, g_req, event=NS(get_extra=lambda _k: None))
         self.assertEqual(fetch_limits, [("https://cdn.example/big.mp4", MAX_CORE_VIDEO_DOWNLOAD_BYTES)])
 
     async def test_frame_budget_eviction_never_leaves_extracted_frames_placeholder_or_orphan_captions(self):
-        from companion_v2.conversation.media.models import MAX_TURN_FRAMES
+        from digital_life_core.conversation.media.models import MAX_TURN_FRAMES
 
         plugin = ENTRY.PrivateCompanionV2StagingPlugin.__new__(ENTRY.PrivateCompanionV2StagingPlugin)
         context = _video_context(ScopeKind.PRIVATE)
@@ -1107,10 +1107,10 @@ class SingleFlightTimeoutAndAuditRegressionTests(unittest.IsolatedAsyncioTestCas
         )
         ev = NS(get_extra=lambda _k: {"prepared": {"context": context, "event_ref": "evict-1"}})
         with (
-            patch(f"{pkg}astrbot_host.video.loader.read_host_resolved_video_bytes", AsyncMock(return_value=clip)),
-            patch(f"{pkg}astrbot_host.video.core_understanding.select_native_video_routes", return_value=()),
-            patch(f"{pkg}astrbot_host.video.container.inspect_container", return_value=NS(duration_ms=1000)),
-            patch(f"{pkg}astrbot_host.video.loader.decode_video", AsyncMock(return_value=fake_video)),
+            patch(f"{pkg}digital_life_host.video.loader.read_host_resolved_video_bytes", AsyncMock(return_value=clip)),
+            patch(f"{pkg}digital_life_host.video.core_understanding.select_native_video_routes", return_value=()),
+            patch(f"{pkg}digital_life_host.video.container.inspect_container", return_value=NS(duration_ms=1000)),
+            patch(f"{pkg}digital_life_host.video.loader.decode_video", AsyncMock(return_value=fake_video)),
         ):
             await plugin._attach_core_reply_current_videos(ev, req)
 
@@ -1157,9 +1157,9 @@ class SingleFlightTimeoutAndAuditRegressionTests(unittest.IsolatedAsyncioTestCas
             return 1, b"", b"encode failed"
 
         with (
-            patch("astrbot_host.video.compressor.resolve_ffmpeg_tools", return_value=("ffmpeg", "ffprobe")),
-            patch("astrbot_host.video.compressor._run_subprocess", side_effect=fake_subproc),
-            patch("astrbot_host.video.compressor.time.monotonic", side_effect=fake_monotonic),
+            patch("digital_life_host.video.compressor.resolve_ffmpeg_tools", return_value=("ffmpeg", "ffprobe")),
+            patch("digital_life_host.video.compressor._run_subprocess", side_effect=fake_subproc),
+            patch("digital_life_host.video.compressor.time.monotonic", side_effect=fake_monotonic),
             self.assertRaises(TaskError) as caught,
         ):
             compress_video(fake_mkv, suffix=".mp4", target_bytes=1024 * 1024, timeout=1.0)

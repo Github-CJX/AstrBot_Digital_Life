@@ -8,15 +8,15 @@ import unittest
 from astrbot.core.agent.tool import FunctionTool, ToolSet
 from astrbot.core.provider.sources.openai_source import ProviderOpenAIOfficial
 
-from companion_v2.adapters.astrbot.provider import AstrBotTextProvider, UsageTariff, provider_fingerprint
-from companion_v2.configuration.registry import FieldRegistry
-from companion_v2.conversation.flow import ConversationPolicy
-from companion_v2.conversation.reply_management import ReplyManagement
-from companion_v2.conversation.segmentation import LLM_SEGMENT_MARKER, SegmentationPolicy
-from companion_v2.execution.models import ProviderBinding
-from companion_v2.model_gateway.models import Amount, BudgetPolicy
-from companion_v2.model_gateway.routing import configuration_fields
-from companion_v2.adapters.astrbot.model_wire import tool_alias
+from digital_life_core.adapters.astrbot.provider import AstrBotTextProvider, UsageTariff, provider_fingerprint
+from digital_life_core.configuration.registry import FieldRegistry
+from digital_life_core.conversation.flow import ConversationPolicy
+from digital_life_core.conversation.reply_management import ReplyManagement
+from digital_life_core.conversation.segmentation import LLM_SEGMENT_MARKER, SegmentationPolicy
+from digital_life_core.execution.models import ProviderBinding
+from digital_life_core.model_gateway.models import Amount, BudgetPolicy
+from digital_life_core.model_gateway.routing import configuration_fields
+from digital_life_core.adapters.astrbot.model_wire import tool_alias
 from tests.native_adapter_support import FakeEvent, final_text
 from tests.segmentation_stream_support import StreamingFixture, chunk, native_provider, text_chunks, USAGE
 

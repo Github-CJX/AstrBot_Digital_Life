@@ -365,12 +365,12 @@ test("Issue #2b: memory-page 事实流不轮询，整理视图静默轮询无变
   let overviewData = { local: { reflections: { total: 1, by_state: { running: 1 } } }, linkage: { state: "not_owner" } };
 
   const bridge = {
-    ready: async () => ({ pluginName: "astrbot_plugin_private_companion" }),
+    ready: async () => ({ pluginName: "astrbot_plugin_digital_life" }),
     apiGet: async (route, query) => {
       if (route === "page/ownership") return { owner: "self", reason: "owner_module_absent", display_name: "" };
       if (route === "page/targets") return {
         installation_id: "inst", operator_id: "op",
-        targets: [{ target_id: "t-1", scope_kind: "private", roles: [{ role_id: "r-1", memory_api: "/astrbot_plugin_private_companion/memory" }] }],
+        targets: [{ target_id: "t-1", scope_kind: "private", roles: [{ role_id: "r-1", memory_api: "/astrbot_plugin_digital_life/memory" }] }],
       };
       if (route === "memory") return { status: "ok", data: { items: [{ atom_id: "a-1", revision: 1, state: "active", representation: "事实一" }], next_cursor: null } };
       if (route === "memory/reflections") {
@@ -467,9 +467,9 @@ test("Issue #2c: state-page 后台轮询静默执行且忽略易变 observed_at 
   let nextTimerId = 1, observedSeq = 1, healthText = "手腕暖和灵活，没什么酸沉不舒服的地方";
   let lucideCalls = 0, htmlWrites = 0, htmlValue = "";
 
-  const targets = [{ target_id: "t-1", bot_id: "bot-1", scope_kind: "private", roles: [{ role_id: "r-1", state_api: "/astrbot_plugin_private_companion/state/t-1" }] }];
+  const targets = [{ target_id: "t-1", bot_id: "bot-1", scope_kind: "private", roles: [{ role_id: "r-1", state_api: "/astrbot_plugin_digital_life/state/t-1" }] }];
   const bridge = {
-    ready: async () => ({ pluginName: "astrbot_plugin_private_companion" }),
+    ready: async () => ({ pluginName: "astrbot_plugin_digital_life" }),
     apiGet: async () => ({
       status: "ok",
       data: {
@@ -683,7 +683,7 @@ test("Issue #2e: maintenance-page 45s 后台轮询静默对比快照，仅 gener
 
   const window = {
     CompanionProduct: {
-      role: () => ({ model_api: "/astrbot_plugin_private_companion/model", config_api: "/astrbot_plugin_private_companion/config", role_id: "role-a" }),
+      role: () => ({ model_api: "/astrbot_plugin_digital_life/model", config_api: "/astrbot_plugin_digital_life/config", role_id: "role-a" }),
       bridgeNow: () => bridge,
     },
     lucide: { createIcons() { lucideCalls += 1; } },
@@ -778,7 +778,7 @@ test("Issue #2f: maintenance-page 轻量结构指纹零 JSON.stringify，且 45s
 
   const window = {
     CompanionProduct: {
-      role: () => ({ model_api: "/astrbot_plugin_private_companion/model", config_api: "/astrbot_plugin_private_companion/config", role_id: "role-a" }),
+      role: () => ({ model_api: "/astrbot_plugin_digital_life/model", config_api: "/astrbot_plugin_digital_life/config", role_id: "role-a" }),
       bridgeNow: () => bridge,
     },
     lucide: { createIcons() { lucideCalls += 1; } },

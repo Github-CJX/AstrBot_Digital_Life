@@ -5,8 +5,8 @@ from types import SimpleNamespace as NS
 import unittest
 from unittest.mock import patch
 
-from astrbot_host.multi_api import PREFIX
-from companion_v2.execution.models import digest
+from digital_life_host.multi_api import PREFIX
+from digital_life_core.execution.models import digest
 from tests.group_host_support import GroupFixture, Query
 from tests.multi_host_support import multi_config
 
@@ -26,7 +26,7 @@ class WildcardGroupReplyTests(GroupFixture, unittest.IsolatedAsyncioTestCase):
         async def call(handler, group_id, body=None):
             async def read_body():
                 return json.dumps(body, ensure_ascii=False).encode("utf-8")
-            with patch("astrbot_host.group_reply_api.request", NS(
+            with patch("digital_life_host.group_reply_api.request", NS(
                     username="admin", query=Query(), body=read_body)):
                 return await handler(group_id=group_id)
 

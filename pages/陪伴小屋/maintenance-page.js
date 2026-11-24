@@ -1,6 +1,6 @@
 "use strict";
 window.CompanionMaintenancePage = (() => {
-  const PREFIX = "/astrbot_plugin_private_companion";
+  const PREFIX = "/astrbot_plugin_digital_life";
   const MEMORY_SAMPLE_INTERVAL_MS = 10000;
   const MEMORY_SAMPLE_DURATION_MS = 180000;
   const MEMORY_SAMPLE_LIMIT = 19;
@@ -1193,7 +1193,7 @@ window.CompanionMaintenancePage = (() => {
       risk: "停用后仍会提供本地时间和历史消息各自的时间。"},
   ];
   const SYSTEM_PROMPT_LIMIT = 8000;
-  const PLUGIN_PREFIX = "/astrbot_plugin_private_companion";
+  const PLUGIN_PREFIX = "/astrbot_plugin_digital_life";
   const CONFIG_PREFIX = PLUGIN_PREFIX + "/config";
   const SYSTEM_PROMPT_OPERATION = "maintenance-system-prompt";
 
@@ -1223,7 +1223,7 @@ window.CompanionMaintenancePage = (() => {
   }
 
   function configPath() {
-    return configEndpoint().slice("/astrbot_plugin_private_companion".length);
+    return configEndpoint().slice("/astrbot_plugin_digital_life".length);
   }
 
   async function configRequest(method, suffix = "", body = null, query = null) {

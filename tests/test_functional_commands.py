@@ -1,7 +1,7 @@
 import unittest
 from types import SimpleNamespace
 
-from astrbot_host.functional_commands import (
+from digital_life_host.functional_commands import (
     FunctionalCommand,
     command_instruction,
     execute_functional_command,
@@ -93,7 +93,7 @@ class FunctionalCommandParsingTests(unittest.TestCase):
 
         date_command = parse_functional_command("陪伴 日期添加 纪念日 2026-11-02", channel="private")
         self.assertIn("独立回执", command_instruction(date_command))
-        self.assertNotIn("companion_v2_calendar_command", command_instruction(date_command))
+        self.assertNotIn("digital_life_core_calendar_command", command_instruction(date_command))
         self.assertIn("没有更改设置", command_instruction(parse_functional_command("HDSI 统计", channel="private")))
         self.assertIn("不提供", command_instruction(parse_functional_command("陪伴 输出夹层密码", channel="private")))
 
@@ -129,8 +129,8 @@ class FunctionalCommandParsingTests(unittest.TestCase):
 
     def test_open_loop_delete_uses_the_memo_tools(self):
         instruction = command_instruction(parse_functional_command("陪伴 删除话头 午饭", channel="private"))
-        self.assertIn("companion_v2_memo_list", instruction)
-        self.assertIn("companion_v2_memo_delete", instruction)
+        self.assertIn("digital_life_core_memo_list", instruction)
+        self.assertIn("digital_life_core_memo_delete", instruction)
         self.assertIn("expected_revision", instruction)
 
     def test_repair_confirmation_is_an_exact_private_command(self):
@@ -138,16 +138,16 @@ class FunctionalCommandParsingTests(unittest.TestCase):
         cancel = parse_functional_command("陪伴 答疑取消 repair-abc", channel="private")
         self.assertEqual(confirm, FunctionalCommand("private", "diagnostics_confirm", "repair-abc"))
         self.assertEqual(cancel, FunctionalCommand("private", "diagnostics_cancel", "repair-abc"))
-        self.assertIn("companion_v2_diagnostics_proposal_confirm", command_instruction(confirm))
+        self.assertIn("digital_life_core_diagnostics_proposal_confirm", command_instruction(confirm))
         self.assertIn("proposal_id 必须逐字等于该编号", command_instruction(confirm))
-        self.assertIn("companion_v2_diagnostics_proposal_cancel", command_instruction(cancel))
+        self.assertIn("digital_life_core_diagnostics_proposal_cancel", command_instruction(cancel))
         self.assertEqual(parse_functional_command("陪伴 答疑确认 repair-abc 额外文字", channel="private").intent,
                          "manage_diagnostics")
 
     def test_tool_backed_commands_require_the_current_authorized_tool(self):
         command = parse_functional_command("陪伴 记忆 午饭", channel="private")
         instruction = command_instruction(command)
-        self.assertIn("companion_v2_memory_query", instruction)
+        self.assertIn("digital_life_core_memory_query", instruction)
         self.assertIn("不因未命中断言从未发生", instruction)
 
     def test_clear_memory_keeps_the_confirmation_argument(self):
@@ -173,11 +173,11 @@ class _FakeMemoryManagement:
         return "4F2A1C"
 
     def preview_clear(self, context):
-        from companion_v2.foundation.outcome import Outcome
+        from digital_life_core.foundation.outcome import Outcome
         return Outcome.success({"counts": {"active": 2, "already_inactive": 1}, "revision_token": "token-1"})
 
     def clear(self, context, *, expected_revision_token, operation_key):
-        from companion_v2.foundation.outcome import Outcome
+        from digital_life_core.foundation.outcome import Outcome
         self.cleared += 1
         self.operation = (expected_revision_token, operation_key)
         return Outcome.success({"forgotten_count": 2, "physical_erasure": "not_performed"})
@@ -185,7 +185,7 @@ class _FakeMemoryManagement:
 
 class FunctionalCommandExecutionTests(unittest.TestCase):
     def setUp(self):
-        from companion_v2.foundation.refs import ScopeKind
+        from digital_life_core.foundation.refs import ScopeKind
         from types import SimpleNamespace
         _FakeMemoryManagement.instances = []
         self.context = SimpleNamespace(key="context-key", scope=SimpleNamespace(kind=ScopeKind.PRIVATE))
@@ -200,9 +200,9 @@ class FunctionalCommandExecutionTests(unittest.TestCase):
 
     def test_clear_memory_previews_then_executes_once_and_reuses_the_receipt(self):
         from unittest.mock import patch
-        from astrbot_host.functional_commands import functional_command_receipt
+        from digital_life_host.functional_commands import functional_command_receipt
 
-        with patch("companion_v2.memory.management.MemoryManagement", _FakeMemoryManagement):
+        with patch("digital_life_core.memory.management.MemoryManagement", _FakeMemoryManagement):
             preview = functional_command_receipt(
                 self.event(), parse_functional_command("陪伴 清空记忆", channel="private"),
                 application=self.application, context=self.context)
@@ -225,9 +225,9 @@ class FunctionalCommandExecutionTests(unittest.TestCase):
 
     def test_wrong_code_and_missing_context_never_clear(self):
         from unittest.mock import patch
-        from astrbot_host.functional_commands import functional_command_receipt
+        from digital_life_host.functional_commands import functional_command_receipt
 
-        with patch("companion_v2.memory.management.MemoryManagement", _FakeMemoryManagement):
+        with patch("digital_life_core.memory.management.MemoryManagement", _FakeMemoryManagement):
             wrong = functional_command_receipt(
                 self.event(), parse_functional_command("陪伴 清空记忆 确认 000000", channel="private"),
                 application=self.application, context=self.context)
@@ -245,13 +245,13 @@ class FunctionalCommandInjectionTests(unittest.TestCase):
 
         request = SimpleNamespace(system_prompt="role", extra_user_content_parts=[])
         event = SimpleNamespace(text="陪伴 状态")
-        with patch("astrbot_host.event_routing.competing_command_handler", return_value=None):
+        with patch("digital_life_host.event_routing.competing_command_handler", return_value=None):
             command = inject_functional_command_instruction(event, request, channel="private")
         self.assertEqual(command.intent, "status")
         self.assertIn("functional_command:start", request.system_prompt)
 
         request.system_prompt = "role"
-        with patch("astrbot_host.event_routing.competing_command_handler", return_value=object()):
+        with patch("digital_life_host.event_routing.competing_command_handler", return_value=object()):
             command = inject_functional_command_instruction(event, request, channel="private")
         self.assertIsNone(command)
         self.assertNotIn("functional_command:start", request.system_prompt)

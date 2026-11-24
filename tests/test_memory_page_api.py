@@ -7,8 +7,8 @@ import inspect
 import json
 import unittest
 
-from astrbot_host.integration_registry import UnifiedCompanionExtensionAPI
-from astrbot_host.memory_page_api import (
+from digital_life_host.integration_registry import UnifiedCompanionExtensionAPI
+from digital_life_host.memory_page_api import (
     MEMORY_PAGE_API_FAMILY,
     MEMORY_PAGE_API_VERSION,
     MEMORY_PAGE_CAPABILITIES,
@@ -28,7 +28,7 @@ class MemoryPageAPITests(unittest.IsolatedAsyncioTestCase):
             "plugin_id", "instance_generation", "api_family", "api_version",
             "supported_task_versions", "capabilities", "lifecycle_state",
             "degraded_reasons"))
-        self.assertEqual(descriptor["plugin_id"], "astrbot_plugin_private_companion")
+        self.assertEqual(descriptor["plugin_id"], "astrbot_plugin_digital_life")
         self.assertRegex(descriptor["instance_generation"], r"^[0-9a-f]{32}$")
         self.assertEqual(descriptor["api_family"], MEMORY_PAGE_API_FAMILY)
         self.assertEqual(descriptor["api_version"], MEMORY_PAGE_API_VERSION)
@@ -47,7 +47,7 @@ class MemoryPageAPITests(unittest.IsolatedAsyncioTestCase):
             "available_dates", "features", "coordination", "day", "snapshot_id",
             "snapshot_sha256"))
         self.assertEqual(snapshot["version"], MEMORY_PAGE_SNAPSHOT_VERSION)
-        self.assertEqual(snapshot["source_plugin_id"], "astrbot_plugin_private_companion")
+        self.assertEqual(snapshot["source_plugin_id"], "astrbot_plugin_digital_life")
         self.assertEqual(snapshot["instance_generation"], self.adapter.instance_generation)
         self.assertEqual(snapshot["selected_date"], "2026-10-28")
         self.assertEqual(snapshot["available_dates"], ["2026-10-28"])
@@ -105,7 +105,7 @@ class _FakeRuntime:
 
 class MemoryPageSnapshotDataTests(unittest.IsolatedAsyncioTestCase):
     def test_anchor_date_and_clock_follow_the_schedule_timezone(self):
-        from astrbot_host.memory_page_api import _calendar_plans, _record_date
+        from digital_life_host.memory_page_api import _calendar_plans, _record_date
         record = {"kind": "role_plan", "state": "accepted", "title": "夜读",
                   "detail": "读两页就睡。",
                   "schedule": {"anchor": "2026-10-27T16:30:00+00:00",
@@ -115,7 +115,7 @@ class MemoryPageSnapshotDataTests(unittest.IsolatedAsyncioTestCase):
         self.assertEqual([item["time"] for item in plans["2026-10-28"]], ["00:30"])
 
     def test_weekly_plan_lands_on_its_weekday_and_moved_exception(self):
-        from astrbot_host.memory_page_api import _calendar_plans
+        from digital_life_host.memory_page_api import _calendar_plans
         record = {
             "kind": "role_plan", "state": "accepted", "title": "周会",
             "detail": "复盘一周。", "duration_minutes": 60,

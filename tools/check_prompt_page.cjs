@@ -11,11 +11,11 @@ async function run({output, bridgePath, python, sourceRoot}) {
   const root = sourceRoot || path.resolve(__dirname, ".."), pageRoot = path.join(root, "pages/陪伴小屋");
   await fs.mkdir(output, {recursive: true});
   const templates = spawnSync(python, ["-X", "utf8", "-c",
-    "from dataclasses import asdict; import json; from companion_v2.proactive.service import contact_profile; from companion_v2.model_gateway.management import PROMPT_LAYERS; print(json.dumps({'profile':asdict(contact_profile('synthetic')), 'layers':PROMPT_LAYERS},ensure_ascii=False))"],
+    "from dataclasses import asdict; import json; from digital_life_core.proactive.service import contact_profile; from digital_life_core.model_gateway.management import PROMPT_LAYERS; print(json.dumps({'profile':asdict(contact_profile('synthetic')), 'layers':PROMPT_LAYERS},ensure_ascii=False))"],
     {cwd: root, encoding: "utf8"});
   assert.equal(templates.status, 0, templates.stderr);
   const {profile, layers} = JSON.parse(templates.stdout);
-  const sdk = await fs.readFile(bridgePath, "utf8"), HOST = "astrbot_plugin_private_companion";
+  const sdk = await fs.readFile(bridgePath, "utf8"), HOST = "astrbot_plugin_digital_life";
   const model = "host/targets/qa/roles/qa/model", calls = [], writes = [], errors = [], checks = [];
   const edits = new Map(), inheritedNews = "保留原人格，分享一个亮点与具体感想。", token = () => String(revision).padStart(64, "0");
   let revision = 1, conflict = false;

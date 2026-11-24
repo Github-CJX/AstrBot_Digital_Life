@@ -6,9 +6,9 @@ import unittest
 from unittest.mock import patch
 
 from tests.multi_host_support import MultiFixture
-from astrbot_host.config_port_api import ConfigPortWebAPI
-from companion_v2.configuration.portability import SCHEMA
-from companion_v2.execution.models import TaskError
+from digital_life_host.config_port_api import ConfigPortWebAPI
+from digital_life_core.configuration.portability import SCHEMA
+from digital_life_core.execution.models import TaskError
 
 
 class Query(dict):
@@ -19,7 +19,7 @@ class Query(dict):
 async def call(handler, *, body=None, query=None):
     async def read():
         return json.dumps(body).encode("utf-8")
-    with patch("astrbot_host.config_port_api.request",
+    with patch("digital_life_host.config_port_api.request",
                NS(username="config-admin", query=Query(query or {}), body=read)):
         return await handler()
 

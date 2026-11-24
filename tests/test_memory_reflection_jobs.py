@@ -7,13 +7,13 @@ import json
 import unittest
 from unittest.mock import patch
 
-from companion_v2.execution.models import ClaimResult, Lane, TaskClaim, TaskResult, TaskSpec, digest, encode, stamp
-from companion_v2.execution.models import TaskError
-from companion_v2.foundation.outcome import Outcome
-from companion_v2.configuration.registry import FieldRegistry
-from companion_v2.memory.reflection import reflection_profile
-from companion_v2.memory.reflection_management import ReflectionManagement
-from companion_v2.model_gateway.routing import configuration_fields
+from digital_life_core.execution.models import ClaimResult, Lane, TaskClaim, TaskResult, TaskSpec, digest, encode, stamp
+from digital_life_core.execution.models import TaskError
+from digital_life_core.foundation.outcome import Outcome
+from digital_life_core.configuration.registry import FieldRegistry
+from digital_life_core.memory.reflection import reflection_profile
+from digital_life_core.memory.reflection_management import ReflectionManagement
+from digital_life_core.model_gateway.routing import configuration_fields
 from tests.test_host_application import HostFixture
 from tests import test_memory_selection_host as selection
 from tests.test_role_tool_loop import answered
@@ -196,7 +196,7 @@ class MemoryReflectionJobsTests(HostFixture, unittest.IsolatedAsyncioTestCase):
     async def test_durable_output_finishes_without_a_second_provider_call(self):
         host, context, prepared = await self.setup_reflection()
         app = host.application
-        from companion_v2.memory import reflection_recovery
+        from digital_life_core.memory import reflection_recovery
         with patch.object(reflection_recovery, "consume", side_effect=RuntimeError("interrupted parser")):
             await app.memory_reflection.run(context, prepared["batch_id"])
         self.assertEqual(self.row(app, prepared["batch_id"])["state"], "received")

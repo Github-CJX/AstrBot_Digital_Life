@@ -24,9 +24,9 @@ def run():
         from tests.native_adapter_support import FakeProvider, completion, final_text
         from tests.staging_bootstrap_support import wait_for_batch
         from tests.test_management_access import NOW
-        from astrbot_host.native import installed_native_types
-        from companion_v2.execution.models import TaskContext
-        from companion_v2.foundation.clock import DeterministicClock
+        from digital_life_host.native import installed_native_types
+        from digital_life_core.execution.models import TaskContext
+        from digital_life_core.foundation.clock import DeterministicClock
         from aiocqhttp import Event
         from aiocqhttp.api_impl import WebSocketReverseApi, ResultStore
         from astrbot.api.message_components import Plain
@@ -143,7 +143,7 @@ def run():
             finally:
                 await plugin.terminate()
             assert plugin.staging._terminated and plugin.staging.runtime is None and not native.registered_web_apis
-            assert not any(name == "companion_v2" or name.startswith("companion_v2.") for name in sys.modules)
+            assert not any(name == "digital_life_core" or name.startswith("digital_life_core.") for name in sys.modules)
             print("PASS: main.py group voice/video entry, original SILK and MP4, STT recovery, cross-member metadata history, local WS ACKs, termination and route cleanup; no real model or QQ traffic.")
 
         asyncio.run(verify())

@@ -68,7 +68,7 @@ function harness() {
   const window = {
     CompanionProduct: {
       hosted: () => true,
-      role: () => ({model_api: '/astrbot_plugin_private_companion/model'}),
+      role: () => ({model_api: '/astrbot_plugin_digital_life/model'}),
       identity: () => ({installation_id: 'inst', operator_id: 'operator'}),
       /* 页面取桥先问 bridgeNow()，没有再 await bridgeFor()。
          这里两者都给，保持同步路径不被打断。 */
@@ -136,7 +136,7 @@ function harness() {
 
 test('embedded migration models read and save through the explicit destination endpoint', async () => {
   const h = harness(), node = h.root();
-  const endpoint = '/astrbot_plugin_private_companion/host/targets/import/roles/destination/model';
+  const endpoint = '/astrbot_plugin_digital_life/host/targets/import/roles/destination/model';
   h.page.mount(node, {endpoint});
   assert.equal(h.requests[0].route, 'host/targets/import/roles/destination/model');
   h.requests[0].resolve(status());
@@ -156,7 +156,7 @@ test('embedded migration models read and save through the explicit destination e
 });
 
 test('an invalid explicit migration model endpoint cannot fall back to another role', () => {
-  for (const endpoint of ['', '/other-plugin/model', '/astrbot_plugin_private_companion/model?role=other']) {
+  for (const endpoint of ['', '/other-plugin/model', '/astrbot_plugin_digital_life/model?role=other']) {
     const h = harness(), node = h.root();
     h.page.mount(node, {endpoint});
     assert.equal(h.requests.length, 0);
@@ -1706,7 +1706,7 @@ test('group Laya reads global settings and offers a visible same-role conversati
   h.product.targets = () => [group, privateTarget];
   h.product.targetLabel = target => target.scope_kind === 'group' ? '群聊 测试群' : '私聊 测试用户';
   h.product.choose = (targetId, roleId) => chosen.push([targetId, roleId]);
-  h.page.mount(node, {endpoint: '/astrbot_plugin_private_companion/host/targets/group/roles/role/model'});
+  h.page.mount(node, {endpoint: '/astrbot_plugin_digital_life/host/targets/group/roles/role/model'});
   h.requests[0].resolve({...status(), scope_kind: 'group'});
   await flush();
   node.click('[data-model-tab]', {modelTab: 'laya'});
@@ -2177,7 +2177,7 @@ test('未选窗口时只编辑角色默认，不读取或保存窗口层', async
 
 test('群窗口模型覆盖使用本群接口，角色模型服务使用同角色完整入口', async () => {
   const h = harness(), node = h.root();
-  const base = '/astrbot_plugin_private_companion/host/targets/';
+  const base = '/astrbot_plugin_digital_life/host/targets/';
   h.product.selection = () => ({bot_id: 'bot-a', role_id: 'role-a', target_id: 'group-a'});
   h.product.role = () => ({role_id: 'role-a', model_api: base + 'group-a/roles/role-a/model'});
   h.product.roleTarget = () => ({scope_kind: 'private', roles: [{role_id: 'role-a', model_api: base + 'private-a/roles/role-a/model'}]});
@@ -3129,7 +3129,7 @@ test('main panel Laya logs default to all sources, switch to current, and show s
 
 test('group Laya page shows scoped group logs without scope switcher when available', async () => {
   const h = harness(), node = h.root();
-  h.page.mount(node, {endpoint: '/astrbot_plugin_private_companion/host/targets/group/roles/role/model'});
+  h.page.mount(node, {endpoint: '/astrbot_plugin_digital_life/host/targets/group/roles/role/model'});
   h.requests[0].resolve({...status(), scope_kind: 'group'});
   await flush();
   node.click('[data-model-tab]', {modelTab: 'laya'});
@@ -3370,7 +3370,7 @@ test('inspector drawer replaces cockpit checkboxes with inline restore buttons, 
   const win = {
     CompanionProduct: {
       hosted: () => true,
-      role: () => ({model_api: '/astrbot_plugin_private_companion/model'}),
+      role: () => ({model_api: '/astrbot_plugin_digital_life/model'}),
       identity: () => ({installation_id: 'inst', operator_id: 'operator'}),
       bridgeNow: () => win.AstrBotPluginPage,
       bridgeFor: () => Promise.resolve(win.AstrBotPluginPage),

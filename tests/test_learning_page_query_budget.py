@@ -19,15 +19,15 @@ from pathlib import Path
 from tempfile import TemporaryDirectory
 from types import SimpleNamespace
 
-from astrbot_host.management_identity import dashboard_operator
-from companion_v2.conversation.native_observations import inbound_event
-from companion_v2.execution.models import TaskError, digest, encode, stamp
-from companion_v2.expression import rule_details, style_rotation
-from companion_v2.expression.style_management import ExpressionStyleManagement
-from companion_v2.foundation.refs import (RoleOwnerRef, ScopeKind, ScopeRef, SubjectKind,
+from digital_life_host.management_identity import dashboard_operator
+from digital_life_core.conversation.native_observations import inbound_event
+from digital_life_core.execution.models import TaskError, digest, encode, stamp
+from digital_life_core.expression import rule_details, style_rotation
+from digital_life_core.expression.style_management import ExpressionStyleManagement
+from digital_life_core.foundation.refs import (RoleOwnerRef, ScopeKind, ScopeRef, SubjectKind,
                                           SubjectRef)
-from companion_v2.role_work.journal.self_review_management import SelfReviewManagement
-from companion_v2.storage.runtime import StorageRuntime
+from digital_life_core.role_work.journal.self_review_management import SelfReviewManagement
+from digital_life_core.storage.runtime import StorageRuntime
 from tests.group_host_support import GroupFixture
 
 

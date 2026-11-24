@@ -11,7 +11,7 @@ async function run({browser, outputDir, bridgePath}) {
   const preview = root;
   await fs.mkdir(outputDir, {recursive:true});
   const sdk = await fs.readFile(bridgePath,"utf8");
-  const HOST = "astrbot_plugin_private_companion";
+  const HOST = "astrbot_plugin_digital_life";
   const A = "host/targets/first/roles/role-a/memory";
   const B = "host/targets/second/roles/role-b/memory";
   const C = "host/targets/first/roles/role-c/memory";
@@ -54,8 +54,8 @@ async function run({browser, outputDir, bridgePath}) {
     if (endpoint === "integration/manifest") {
       assert.equal(action,"api:get");
       assert.deepEqual(params,{});
-      return ok({product:{id:"private_companion.v2",version:"2.0.0"},discovery:"available",
-        extensions:[{capability_id:"image",extension_id:"image",owner:"companion_v2",integration_state:"connected",assembled:true,enabled:true,runtime_ready:true}],
+      return ok({product:{id:"digital_life.v2",version:"2.0.0"},discovery:"available",
+        extensions:[{capability_id:"image",extension_id:"image",owner:"digital_life_core",integration_state:"connected",assembled:true,enabled:true,runtime_ready:true}],
         providers:[],
         summary:{core_count:1,extension_count:1,extension_ready_count:1,provider_count:0,connected_count:1}});
     }

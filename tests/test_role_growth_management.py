@@ -4,11 +4,11 @@ from dataclasses import replace
 from datetime import timedelta
 from concurrent.futures import ThreadPoolExecutor
 
-from companion_v2.foundation.refs import RoleOwnerRef
-from companion_v2.identity_policy.models import AuthorizationTier
-from companion_v2.role_work.growth import GrowthKind, PersistentRoleGrowthLedger, RoleGrowthManagement, RoleGrowthRecord
-from companion_v2.identity_policy.object_access import ObjectAccessPolicy
-from astrbot_host.management_identity import dashboard_operator
+from digital_life_core.foundation.refs import RoleOwnerRef
+from digital_life_core.identity_policy.models import AuthorizationTier
+from digital_life_core.role_work.growth import GrowthKind, PersistentRoleGrowthLedger, RoleGrowthManagement, RoleGrowthRecord
+from digital_life_core.identity_policy.object_access import ObjectAccessPolicy
+from digital_life_host.management_identity import dashboard_operator
 from tests.test_conversation_messages import MessageFixture
 from tests.test_management_access import NOW, SCOPE
 

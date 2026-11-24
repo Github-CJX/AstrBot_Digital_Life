@@ -17,13 +17,13 @@
 
 ## 注册和注销
 
-在 AstrBot 已加载陪伴插件后，从 `context.get_all_stars()` 找到 `root_dir_name` 或 `name` 为 `astrbot_plugin_private_companion` 的启用项，读取它的 `star_cls.extension_api`。推荐在第三方插件的 `initialize()` 或 AstrBot 完成加载的生命周期钩子中注册。若陪伴插件随后重载，需重新取得新实例的 API 并注册。
+在 AstrBot 已加载陪伴插件后，从 `context.get_all_stars()` 找到 `root_dir_name` 或 `name` 为 `astrbot_plugin_digital_life` 的启用项，读取它的 `star_cls.extension_api`。推荐在第三方插件的 `initialize()` 或 AstrBot 完成加载的生命周期钩子中注册。若陪伴插件随后重载，需重新取得新实例的 API 并注册。
 
 ```python
 async def connect_memory(self):
     for star in self.context.get_all_stars():
         if (getattr(star, "activated", False)
-                and "astrbot_plugin_private_companion" in (
+                and "astrbot_plugin_digital_life" in (
                     getattr(star, "root_dir_name", ""), getattr(star, "name", ""))):
             api = getattr(getattr(star, "star_cls", None), "extension_api", None)
             if getattr(api, "memory_provider_api_version", None) != "companion.external-memory.v1":
@@ -81,7 +81,7 @@ async def read_memory(self, request):
 | 字段 | 含义 |
 | --- | --- |
 | `schema` | `companion.external-memory.v1` |
-| `source_plugin` | `astrbot_plugin_private_companion` |
+| `source_plugin` | `astrbot_plugin_digital_life` |
 | `purpose` | 自动召回为 `recall`，统计为 `summary` |
 | `context.scope` | 完整会话身份：安装、平台、Bot、账号、原生会话、会话类型和窗口 |
 | `context.role` / `role_binding_revision` | 当前角色身份与绑定修订 |

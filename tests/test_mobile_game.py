@@ -12,10 +12,10 @@ from unittest.mock import AsyncMock, Mock, patch
 from tests import test_mobile_together as together_support
 # Establish the temporary SDK import root before importing the actual gateway.
 from tests import test_astrbot_staging_host as host_support
-from astrbot_host.mobile_game import GAME_KINDS, MobileGameBridge
-from astrbot_host.native_extensions.reality import mobile_gateway
-from astrbot_host.native_extensions.reality.mobile_gateway import MobileGatewayMixin
-from companion_v2.execution.models import TaskError
+from digital_life_host.mobile_game import GAME_KINDS, MobileGameBridge
+from digital_life_host.native_extensions.reality import mobile_gateway
+from digital_life_host.native_extensions.reality.mobile_gateway import MobileGatewayMixin
+from digital_life_core.execution.models import TaskError
 
 
 TOKEN = "valid-session-token-123456"
@@ -216,8 +216,8 @@ class MobileGatewayStatusTests(unittest.IsolatedAsyncioTestCase):
             self.together_tokens.append((token, via_mobile_gateway))
             return self.together_status
 
-        self.gateway = Gateway(SimpleNamespace(companion_v2_mobile_game_status=game_status,
-            companion_v2_mobile_together_status=together_status))
+        self.gateway = Gateway(SimpleNamespace(digital_life_core_mobile_game_status=game_status,
+            digital_life_core_mobile_together_status=together_status))
 
     async def test_status_uses_session_token_and_only_authorized_modes_and_games(self):
         body = await self.gateway._mobile_status_response({"user_id": "12345"}, session_token=TOKEN)
@@ -256,8 +256,8 @@ class MobileGatewayStatusTests(unittest.IsolatedAsyncioTestCase):
     async def test_pair_response_skips_optional_capability_discovery(self):
         game = AsyncMock(side_effect=AssertionError("pair must not wait for game discovery"))
         together = AsyncMock(side_effect=AssertionError("pair must not wait for room discovery"))
-        self.gateway.api = SimpleNamespace(companion_v2_mobile_game_status=game,
-            companion_v2_mobile_together_status=together)
+        self.gateway.api = SimpleNamespace(digital_life_core_mobile_game_status=game,
+            digital_life_core_mobile_together_status=together)
 
         body = await self.gateway._mobile_status_response(
             {"user_id": "12345"}, session_token=TOKEN, discover_capabilities=False)
@@ -282,8 +282,8 @@ class MobileGatewayStatusTests(unittest.IsolatedAsyncioTestCase):
             await asyncio.sleep(0.1)
             return self.together_status
 
-        self.gateway.api = SimpleNamespace(companion_v2_mobile_game_status=slow_game,
-            companion_v2_mobile_together_status=slow_together)
+        self.gateway.api = SimpleNamespace(digital_life_core_mobile_game_status=slow_game,
+            digital_life_core_mobile_together_status=slow_together)
         with patch.object(mobile_gateway, "MOBILE_STATUS_DISCOVERY_TIMEOUT_SECONDS", 0.01):
             body = await self.gateway._mobile_status_response(
                 {"user_id": "12345"}, session_token=TOKEN)

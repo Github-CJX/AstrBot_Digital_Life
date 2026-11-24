@@ -15,18 +15,18 @@ from astrbot.core.message.components import Plain, Record
 from astrbot.core.message.message_event_result import MessageChain
 from astrbot.core.provider.entities import LLMResponse, ProviderRequest, TokenUsage
 
-from astrbot_host.core_reply import CORE_REPLY_CONTEXT_EXTRA, activate_core_reply_delivery_guard, prepare_core_reply_event
-from astrbot_host.core_reply_native_send import SendMessageToUserTool
-from astrbot_host.core_reply_media_prompt import finalize_core_reply_media_prompt
-from astrbot_host.core_reply_segmentation import prepare_core_reply_segmentation
-from astrbot_host.core_reply_voice import observe_core_voice_response, prepare_core_reply_voice_message
-from astrbot_host.core_reply_voice_authoring import bind_core_voice_authoring, restore_core_voice_authoring
-from companion_v2.conversation.voice_reply import VoiceReplyPolicy
-from companion_v2.conversation.segmentation import SegmentationPolicy
-from companion_v2.conversation.segment_control import LLM_SEGMENT_MARKER as MARKER
-from companion_v2.foundation.outcome import Outcome
+from digital_life_host.core_reply import CORE_REPLY_CONTEXT_EXTRA, activate_core_reply_delivery_guard, prepare_core_reply_event
+from digital_life_host.core_reply_native_send import SendMessageToUserTool
+from digital_life_host.core_reply_media_prompt import finalize_core_reply_media_prompt
+from digital_life_host.core_reply_segmentation import prepare_core_reply_segmentation
+from digital_life_host.core_reply_voice import observe_core_voice_response, prepare_core_reply_voice_message
+from digital_life_host.core_reply_voice_authoring import bind_core_voice_authoring, restore_core_voice_authoring
+from digital_life_core.conversation.voice_reply import VoiceReplyPolicy
+from digital_life_core.conversation.segmentation import SegmentationPolicy
+from digital_life_core.conversation.segment_control import LLM_SEGMENT_MARKER as MARKER
+from digital_life_core.foundation.outcome import Outcome
 from tests.test_core_reply_voice import FakeEvent
-from astrbot_host.fish_audio import DRAMA_DIRECTION
+from digital_life_host.fish_audio import DRAMA_DIRECTION
 
 
 class Provider:

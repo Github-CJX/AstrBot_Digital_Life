@@ -12,8 +12,8 @@ from types import ModuleType, SimpleNamespace as NS
 import unittest
 from unittest.mock import patch
 
-from astrbot_host.qzone_transport import COOKIE_FILE_NAME, build_qzone_transport
-from companion_v2.qzone.capability import CAPABILITIES as QZONE_CAPABILITIES
+from digital_life_host.qzone_transport import COOKIE_FILE_NAME, build_qzone_transport
+from digital_life_core.qzone.capability import CAPABILITIES as QZONE_CAPABILITIES
 from tests.test_host_application import HostFixture
 
 
@@ -54,12 +54,12 @@ def _import_multi_controller():
         if os.environ.get("ASTRBOT_ROOT") is None:
             _astrbot_import_root = TemporaryDirectory(prefix="companion-v2-qzone-reload-import-")
             os.environ["ASTRBOT_ROOT"] = _astrbot_import_root.name
-        import astrbot_host.multi_controller as module
+        import digital_life_host.multi_controller as module
         return module
     finder = _OptionalHostFinder()
     sys.meta_path.append(finder)
     try:
-        import astrbot_host.multi_controller as module
+        import digital_life_host.multi_controller as module
         return module
     finally:
         if finder in sys.meta_path:

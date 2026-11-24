@@ -3,7 +3,7 @@
 
 Verifies that:
 1. Every visible leaf key in `_conf_schema.json` is exposed by
-   `astrbot_host.search_catalog.build_search_catalog()` without leaking
+   `digital_life_host.search_catalog.build_search_catalog()` without leaking
    non-boolean config values.
 2. Every visible leaf key across all four native extension schemas
    (`game`, `live`, `reality`, `together`) is exposed.
@@ -27,7 +27,7 @@ REPO_ROOT = Path(__file__).resolve().parents[1]
 if str(REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(REPO_ROOT))
 
-from astrbot_host.search_catalog import (  # noqa: E402
+from digital_life_host.search_catalog import (  # noqa: E402
     CONF_SCHEMA_PATH,
     NATIVE_EXTENSIONS_ROOT,
     build_search_catalog,

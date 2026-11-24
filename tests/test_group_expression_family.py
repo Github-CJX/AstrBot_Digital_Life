@@ -12,24 +12,24 @@ material_hash, summary, state, created_at, decided_at) and
 dimension, observation, proposal, applicability_json, confidence,
 evidence_json, state, created_at, decided_at, decided_by, decision_key,
 ordinal). Keep both column lists in step with
-``companion_v2/storage/expression_style_schema.py``.
+``digital_life_core/storage/expression_style_schema.py``.
 """
 
 import json
 import unittest
 from datetime import timedelta
 
-from astrbot_host.management_identity import dashboard_operator
-from companion_v2.conversation.scope_family import group_identity_scope, scope_family_keys
-from companion_v2.conversation.style_context import MAX_POOL_SCAN
-from companion_v2.execution.models import TaskContext, digest, encode, stamp
-from companion_v2.expression import rule_details, style_rotation
-from companion_v2.expression.configuration import read_settings
-from companion_v2.expression.sharing import build_pack
-from companion_v2.expression.style_evidence import sample_document
-from companion_v2.expression.style_management import ExpressionStyleManagement
-from companion_v2.expression.window_scope import rule_scope_counts
-from companion_v2.foundation.refs import RoleOwnerRef, SubjectKind, SubjectRef
+from digital_life_host.management_identity import dashboard_operator
+from digital_life_core.conversation.scope_family import group_identity_scope, scope_family_keys
+from digital_life_core.conversation.style_context import MAX_POOL_SCAN
+from digital_life_core.execution.models import TaskContext, digest, encode, stamp
+from digital_life_core.expression import rule_details, style_rotation
+from digital_life_core.expression.configuration import read_settings
+from digital_life_core.expression.sharing import build_pack
+from digital_life_core.expression.style_evidence import sample_document
+from digital_life_core.expression.style_management import ExpressionStyleManagement
+from digital_life_core.expression.window_scope import rule_scope_counts
+from digital_life_core.foundation.refs import RoleOwnerRef, SubjectKind, SubjectRef
 from tests.group_host_support import GroupFixture
 from tests.staging_bootstrap_support import wait_for_batch
 

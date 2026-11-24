@@ -13,7 +13,7 @@ import sqlite3
 from tempfile import TemporaryDirectory
 import unittest
 
-from astrbot_host.profile_residency import profile_residency
+from digital_life_host.profile_residency import profile_residency
 
 TARGET = ("qq-main", "100", "200")
 

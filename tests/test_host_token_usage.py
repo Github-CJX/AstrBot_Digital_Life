@@ -12,7 +12,7 @@ from tests import test_astrbot_staging_host as _sdk
 from sqlalchemy import event
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
 from astrbot.core.db.po import ProviderStat
-from astrbot_host.host_token_usage import read_astrbot_token_usage
+from digital_life_host.host_token_usage import read_astrbot_token_usage
 
 
 NOW = datetime(2026, 10, 15, 12, tzinfo=timezone(timedelta(hours=8)))
@@ -157,7 +157,7 @@ class HostTokenUsageTests(unittest.IsolatedAsyncioTestCase):
         after = before + timedelta(minutes=1)
         await self.insert(created_at=after.replace(tzinfo=None))
 
-        with patch("astrbot_host.host_token_usage.datetime") as clock:
+        with patch("digital_life_host.host_token_usage.datetime") as clock:
             clock.now.side_effect = [before, after, before]
             first = await read_astrbot_token_usage(self.controller)
             second = await read_astrbot_token_usage(self.controller)

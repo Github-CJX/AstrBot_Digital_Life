@@ -2,8 +2,8 @@ import unittest
 from types import SimpleNamespace
 from unittest.mock import patch
 
-from astrbot_host.memory_linkage import V2_PLUGIN_ID, read_external_memory_summary
-from companion_v2.foundation.refs import ScopeKind
+from digital_life_host.memory_linkage import V2_PLUGIN_ID, read_external_memory_summary
+from digital_life_core.foundation.refs import ScopeKind
 
 
 class SummaryBridge:
@@ -50,7 +50,7 @@ class ExternalMemorySummaryTests(unittest.IsolatedAsyncioTestCase):
         scope = SimpleNamespace(kind=ScopeKind.PRIVATE, native_scope_id="user-1", platform="qq", bot_id="bot-1", session_id="user-1")
         context = SimpleNamespace(scope=scope)
 
-        with patch("astrbot_host.memory_linkage.read_memory_owner", return_value=owner):
+        with patch("digital_life_host.memory_linkage.read_memory_owner", return_value=owner):
             result = await read_external_memory_summary(controller, context)
 
         self.assertEqual(result["state"], "ready")
@@ -71,7 +71,7 @@ class ExternalMemorySummaryTests(unittest.IsolatedAsyncioTestCase):
         controller, owner, _ = self.controller(bridge)
         scope = SimpleNamespace(kind=ScopeKind.PRIVATE, native_scope_id="real-user", platform="wx-main",
                                 bot_id="bot-w", session_id="adapter-owned-private-session")
-        with patch("astrbot_host.memory_linkage.read_memory_owner", return_value=owner):
+        with patch("digital_life_host.memory_linkage.read_memory_owner", return_value=owner):
             result = await read_external_memory_summary(controller, SimpleNamespace(scope=scope))
         self.assertEqual(result["state"], "ready")
         identity = bridge.calls[1][2]
@@ -86,7 +86,7 @@ class ExternalMemorySummaryTests(unittest.IsolatedAsyncioTestCase):
         context = SimpleNamespace(scope=SimpleNamespace(kind=ScopeKind.PRIVATE, native_scope_id="user-1",
                                                         platform="qq", bot_id="bot-1"))
 
-        with patch("astrbot_host.memory_linkage.read_memory_owner", return_value=owner):
+        with patch("digital_life_host.memory_linkage.read_memory_owner", return_value=owner):
             result = await read_external_memory_summary(controller, context)
 
         self.assertEqual(result["state"], "not_owner")
@@ -98,7 +98,7 @@ class ExternalMemorySummaryTests(unittest.IsolatedAsyncioTestCase):
         context = SimpleNamespace(scope=SimpleNamespace(kind=ScopeKind.GROUP, native_scope_id="group-1",
                                                         platform="qq", bot_id="bot-1"))
 
-        with patch("astrbot_host.memory_linkage.read_memory_owner", return_value=owner):
+        with patch("digital_life_host.memory_linkage.read_memory_owner", return_value=owner):
             result = await read_external_memory_summary(controller, context)
 
         self.assertEqual(result["state"], "unsupported_scope")

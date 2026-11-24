@@ -3,7 +3,7 @@ from __future__ import annotations
 from datetime import datetime, timedelta, timezone
 import unittest
 
-from companion_v2.foundation.refs import (
+from digital_life_core.foundation.refs import (
     AssetRef,
     AttemptRef,
     AudienceRef,

@@ -17,8 +17,8 @@ from tests.astrbot_data_root import ASTRBOT_ROOT, assert_sdk_database_isolated
 from tests.multi_host_support import MultiNativeContext, multi_config
 from tests.native_adapter_support import FakeEvent, FakeProvider, FakeReverseApi
 from tests.test_management_access import NOW
-from companion_v2.adapters.astrbot.staging import NativeAdapterTypes
-from companion_v2.foundation.clock import DeterministicClock
+from digital_life_core.adapters.astrbot.staging import NativeAdapterTypes
+from digital_life_core.foundation.clock import DeterministicClock
 from astrbot.api.web import PluginRequest, bind_request_context
 from starlette.requests import Request
 from astrbot.core import db_helper
@@ -64,7 +64,7 @@ async def run():
             routes = {path: handler for path, handler, _, _ in native.registered_web_apis}
             paths = [role["life_api"] for target in controller.web_api.target_inventory() for role in target["roles"]]
             assert len(paths) == 4 and all(path in routes and path + "/command" in routes for path in paths)
-            weather_path = "/astrbot_plugin_private_companion/host-options/weather"
+            weather_path = "/astrbot_plugin_digital_life/host-options/weather"
             weather_routes = [item for item in native.registered_web_apis if item[0] == weather_path]
             assert len(weather_routes) == 2 and {method for item in weather_routes for method in item[2]} == {"GET", "POST"}
 

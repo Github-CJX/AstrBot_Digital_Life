@@ -7,11 +7,11 @@ from types import SimpleNamespace as NS
 import unittest
 from unittest.mock import patch
 
-from companion_v2.delivery.service import DeliveryRequest
-from companion_v2.execution.models import TaskError, require
-from companion_v2.proactive.configuration import target_for
-from companion_v2.relationships.account_link_delivery import PrivateAccountDelivery, PREFIX, CONTACT_PREFIX, weighted_order
-from companion_v2.relationships.account_links import PrivateAccountLinks, member_for, member_key
+from digital_life_core.delivery.service import DeliveryRequest
+from digital_life_core.execution.models import TaskError, require
+from digital_life_core.proactive.configuration import target_for
+from digital_life_core.relationships.account_link_delivery import PrivateAccountDelivery, PREFIX, CONTACT_PREFIX, weighted_order
+from digital_life_core.relationships.account_links import PrivateAccountLinks, member_for, member_key
 from tests.proactive_support import ContactFixture
 from tests import test_proactive_contacts as contacts_support
 from tests.test_role_tool_loop import answered
@@ -38,7 +38,7 @@ class AccountLinkDeliveryTests(ContactFixture, unittest.IsolatedAsyncioTestCase)
         app = await self.ready()
         for context in (self.a, self.b):
             self.settings(app, {"max_contacts_24h": 0}, target=target_for(context)).unwrap()
-        from companion_v2.relationships.account_link_settings import seed_values
+        from digital_life_core.relationships.account_link_settings import seed_values
         links = PrivateAccountLinks(self.runtime)
         links.configure(self.a, (self.a, self.b), persona_id="persona", expected_revision=links.read()["revision"],
             share_context=False, operation_key="share-zero-quota", operator_id="admin", at=self.clock.now(),
@@ -118,7 +118,7 @@ class AccountLinkDeliveryTests(ContactFixture, unittest.IsolatedAsyncioTestCase)
         task = (await self.linked_diagnostic(app)).unwrap().task
         await self.delivery_state(app, task.task_id, "delivered")
         self.assertEqual([envelope.context.key for envelope in self.sent], [self.b.key])
-        from astrbot_host.setup_api import SetupWebAPI
+        from digital_life_host.setup_api import SetupWebAPI
         destinations = SetupWebAPI._diagnostic_delivery_targets(NS(application=app), self.a, task.task_id)
         self.assertEqual(destinations, [{"platform_id": self.b.scope.platform,
             "account_id": self.b.scope.account_id, "participant_id": self.b.scope.native_scope_id,
@@ -264,7 +264,7 @@ class AccountLinkDeliveryTests(ContactFixture, unittest.IsolatedAsyncioTestCase)
     async def test_shared_contact_enabled_does_not_override_local_disabled(self):
         app = await self.ready()
         self.settings(app, {"enabled": False}, target=target_for(self.b)).unwrap()
-        from companion_v2.relationships.account_link_settings import seed_values
+        from digital_life_core.relationships.account_link_settings import seed_values
         links = PrivateAccountLinks(self.runtime)
         links.configure(self.a, (self.a,self.b), persona_id="persona", expected_revision=links.read()["revision"],
             share_context=False, operation_key="share-contact", operator_id="admin", at=self.clock.now(),
@@ -303,7 +303,7 @@ class AccountLinkDeliveryTests(ContactFixture, unittest.IsolatedAsyncioTestCase)
         self.assertEqual([e.context.key for e in self.sent], [self.b.key, self.b.key])
 
     async def test_aggregate_history_includes_confirmed_outbox_with_original_owner(self):
-        from companion_v2.relationships.account_link_history import history
+        from digital_life_core.relationships.account_link_history import history
         app = await self.ready()
         task = (await self.contact(app)).unwrap().task
         await self.delivery_state(app, task.task_id, "delivered")
@@ -316,7 +316,7 @@ class AccountLinkDeliveryTests(ContactFixture, unittest.IsolatedAsyncioTestCase)
         self.assertTrue(rows[0]["text"])
 
     async def test_late_target_receipt_reconciles_unknown_without_cross_resend(self):
-        from companion_v2.relationships.account_link_delivery import PrivateAccountDelivery
+        from digital_life_core.relationships.account_link_delivery import PrivateAccountDelivery
         app = await self.ready()
         async def send(envelope):
             return self.receipt(envelope, "unknown")

@@ -7,27 +7,27 @@ from pathlib import Path
 from tempfile import TemporaryDirectory
 import unittest
 
-from companion_v2.configuration.models import ConfigurationError
-from companion_v2.foundation.refs import AudienceRef, ScopeKind, ScopeRef, SubjectKind, SubjectRef
-from companion_v2.knowledge.catalog import CatalogKnowledgeProvider, EntryDocument, KnowledgeCatalog, MemberEntry, SourceBinding
-from companion_v2.knowledge.configuration import KnowledgeSettings, read_settings
-from companion_v2.knowledge.context import (
+from digital_life_core.configuration.models import ConfigurationError
+from digital_life_core.foundation.refs import AudienceRef, ScopeKind, ScopeRef, SubjectKind, SubjectRef
+from digital_life_core.knowledge.catalog import CatalogKnowledgeProvider, EntryDocument, KnowledgeCatalog, MemberEntry, SourceBinding
+from digital_life_core.knowledge.configuration import KnowledgeSettings, read_settings
+from digital_life_core.knowledge.context import (
     MEMBER_CLUE_INSTRUCTION,
     MEMBER_CLUE_PURPOSE,
     KnowledgeContext,
     knowledge_context,
 )
-from companion_v2.knowledge.importer import (
+from digital_life_core.knowledge.importer import (
     ImportPlan,
     ImportStatus,
     KnowledgeFormat,
     KnowledgeImporter,
     KnowledgeSourceSpec,
 )
-from companion_v2.knowledge.members import DECLARED_ACCOUNT, MENTIONED_NAME, select_member_clues
-from companion_v2.knowledge.retrieval import KnowledgeCandidate, KnowledgeRetriever, query_for_context
-from companion_v2.sources.repositories import SourceRepository
-from companion_v2.storage.runtime import StorageRuntime
+from digital_life_core.knowledge.members import DECLARED_ACCOUNT, MENTIONED_NAME, select_member_clues
+from digital_life_core.knowledge.retrieval import KnowledgeCandidate, KnowledgeRetriever, query_for_context
+from digital_life_core.sources.repositories import SourceRepository
+from digital_life_core.storage.runtime import StorageRuntime
 from tests.test_conversation_messages import MessageFixture
 from tests.test_management_access import INSTALLATION, NOW, SCOPE
 

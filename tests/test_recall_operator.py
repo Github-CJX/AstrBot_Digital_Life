@@ -12,7 +12,7 @@ from __future__ import annotations
 from types import SimpleNamespace
 import unittest
 
-from companion_v2.conversation.recalls import MessageRecall
+from digital_life_core.conversation.recalls import MessageRecall
 from tests.test_host_application import HostFixture
 
 

@@ -7,13 +7,13 @@ import json
 import unittest
 from unittest.mock import patch
 
-from companion_v2.conversation.state_context import ConversationStateContext
-from companion_v2.execution.models import TaskContext, TaskError, TaskSpec, digest, encode
-from companion_v2.foundation.refs import AudienceRef
-from companion_v2.identity_policy.personas import ConversationRoute
-from companion_v2.identity_policy.private_domain import source_ref
-from companion_v2.role_work.state.management import StateManagement
-from companion_v2.role_work.state.maintenance import KIND
+from digital_life_core.conversation.state_context import ConversationStateContext
+from digital_life_core.execution.models import TaskContext, TaskError, TaskSpec, digest, encode
+from digital_life_core.foundation.refs import AudienceRef
+from digital_life_core.identity_policy.personas import ConversationRoute
+from digital_life_core.identity_policy.private_domain import source_ref
+from digital_life_core.role_work.state.management import StateManagement
+from digital_life_core.role_work.state.maintenance import KIND
 from tests.test_management_access import SCOPE
 from tests.test_role_cycle import assertion
 from tests.test_role_state import StateFixture, state_data

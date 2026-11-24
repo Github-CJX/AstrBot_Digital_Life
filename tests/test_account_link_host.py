@@ -8,13 +8,13 @@ from unittest.mock import patch
 
 from tests.multi_host_support import MultiFixture
 from tests.test_person_authorization import _Query, _body
-from astrbot_host.acquaintance_api import AcquaintanceWebAPI
-from astrbot_host.account_link_api import AccountLinkWebAPI
-from companion_v2.execution.models import require
-from companion_v2.identity_policy.repository import PersistentIdentityDirectory
-from companion_v2.memory.codec import source
-from companion_v2.relationships.account_links import PrivateAccountLinks
-from companion_v2.relationships.account_link_context import linked_context
+from digital_life_host.acquaintance_api import AcquaintanceWebAPI
+from digital_life_host.account_link_api import AccountLinkWebAPI
+from digital_life_core.execution.models import require
+from digital_life_core.identity_policy.repository import PersistentIdentityDirectory
+from digital_life_core.memory.codec import source
+from digital_life_core.relationships.account_links import PrivateAccountLinks
+from digital_life_core.relationships.account_link_context import linked_context
 
 
 class AccountLinkHostTests(MultiFixture, unittest.IsolatedAsyncioTestCase):
@@ -47,7 +47,7 @@ class AccountLinkHostTests(MultiFixture, unittest.IsolatedAsyncioTestCase):
         person = self.person(self.a)
         query = "&".join(key + "=" + value for key, value in
                         {"subject_id": person["subject_id"], **person["route"]}.items()) if body is None else ""
-        with patch("astrbot_host.acquaintance_api.request", NS(username=username, query=_Query(query),
+        with patch("digital_life_host.acquaintance_api.request", NS(username=username, query=_Query(query),
                    body=_body(json.dumps(body or {}).encode()))):
             return await getattr(self.api, method)()
 
@@ -72,7 +72,7 @@ class AccountLinkHostTests(MultiFixture, unittest.IsolatedAsyncioTestCase):
         self.assertIsNone(result["data"]["group"])
 
     async def test_weighted_random_policy_api_roundtrip(self):
-        from companion_v2.relationships.account_links import member_for
+        from digital_life_core.relationships.account_links import member_for
         weights = [{"member": member_for(self.a), "weight": 3}, {"member": member_for(self.b), "weight": 1}]
         result = await self.request("save", body=self.command(
             proactive={"mode": "random", "preferred": None, "weights": weights}))
@@ -84,7 +84,7 @@ class AccountLinkHostTests(MultiFixture, unittest.IsolatedAsyncioTestCase):
                          {self.a.actor.subject.subject_id: 3, self.b.actor.subject.subject_id: 1})
 
     async def test_weighted_random_policy_api_rejects_forged_route(self):
-        from companion_v2.relationships.account_links import member_for
+        from digital_life_core.relationships.account_links import member_for
         forged = {**member_for(self.b), "account_id": "another-bot-account"}
         result = await self.request("save", body=self.command(proactive={"mode": "random", "preferred": None,
             "weights": [{"member": member_for(self.a), "weight": 1}, {"member": forged, "weight": 5}]}))
@@ -188,13 +188,13 @@ class AccountLinkHostTests(MultiFixture, unittest.IsolatedAsyncioTestCase):
         self.assertEqual(self.shared(), "")
 
     async def operator(self):
-        from astrbot_host.management_identity import dashboard_operator
+        from digital_life_host.management_identity import dashboard_operator
         return dashboard_operator(self.controller.runtime, "sharing-test-admin", at=self.clock.now())
 
     async def test_shared_profile_is_editable_from_either_account_and_locals_survive(self):
-        from companion_v2.relationships.profile import target_for, GROUP
-        from companion_v2.configuration.owners import SparseConfigurationOwner
-        from companion_v2.relationships.account_link_settings import seed_values
+        from digital_life_core.relationships.profile import target_for, GROUP
+        from digital_life_core.configuration.owners import SparseConfigurationOwner
+        from digital_life_core.relationships.account_link_settings import seed_values
         owner = self.app.configuration._owners["relationship.profile.settings"]
         fields = self.app.configuration.registry.group(GROUP)
         a, b = target_for(self.a), target_for(self.b)
@@ -218,10 +218,10 @@ class AccountLinkHostTests(MultiFixture, unittest.IsolatedAsyncioTestCase):
         self.assertEqual(owner.read(b, fields).fields[GROUP + ".default_nickname"].value, "LOCAL-B")
 
     async def test_shared_reply_edits_invalidate_other_accounts_open_editor(self):
-        from companion_v2.conversation.reply_settings import target_for
-        from companion_v2.conversation.reply_settings import GROUP, OWNER
-        from companion_v2.foundation.refs import OperationRef, VersionRef
-        from astrbot_host.management_identity import dashboard_operator
+        from digital_life_core.conversation.reply_settings import target_for
+        from digital_life_core.conversation.reply_settings import GROUP, OWNER
+        from digital_life_core.foundation.refs import OperationRef, VersionRef
+        from digital_life_host.management_identity import dashboard_operator
         operator = dashboard_operator(self.controller.runtime, "sharing-admin", at=self.clock.now())
         key = GROUP + ".style_prompt"
         command = self.command(sharing={"profile": [], "reply": [key], "contact": []}, seed=self.person(self.a))
@@ -249,7 +249,7 @@ class AccountLinkHostTests(MultiFixture, unittest.IsolatedAsyncioTestCase):
         self.assertEqual(stale.failure.code, "configuration_revision_conflict")
 
     async def test_linked_history_keeps_original_owners_and_can_show_old_records(self):
-        from companion_v2.relationships.account_link_history import history
+        from digital_life_core.relationships.account_link_history import history
         await self.link()
         result = history(self.app, self.a, at=self.clock.now())
         self.assertEqual({r["scope"]["platform"] for r in result["records"]}, {self.a.scope.platform, self.b.scope.platform})
@@ -258,8 +258,8 @@ class AccountLinkHostTests(MultiFixture, unittest.IsolatedAsyncioTestCase):
         self.assertTrue(all(r["subject_id"] in (self.a.actor.subject.subject_id, self.b.actor.subject.subject_id) for r in result["records"]))
 
     async def test_identity_requires_confirmation_and_does_not_mutate_original_grants(self):
-        from companion_v2.identity_policy.object_access import ObjectAccessPolicy
-        from companion_v2.relationships.account_link_identity import CONFIRMATION
+        from digital_life_core.identity_policy.object_access import ObjectAccessPolicy
+        from digital_life_core.relationships.account_link_identity import CONFIRMATION
         command = self.command(identity={"enabled": True}, seed=self.person(self.a))
         bad = await self.request("save", body=command)
         self.assertEqual(bad["status"], "error", bad)
@@ -269,7 +269,7 @@ class AccountLinkHostTests(MultiFixture, unittest.IsolatedAsyncioTestCase):
         result = await self.request("save", body=command)
         self.assertEqual(result["status"], "ok", result)
         self.assertEqual(PersistentIdentityDirectory(self.controller.runtime).revision, before)
-        from astrbot_host.management_identity import dashboard_operator
+        from digital_life_host.management_identity import dashboard_operator
         operator = dashboard_operator(self.controller.runtime, "shared-permission-admin", at=self.clock.now())
         management = self.api.api._management()
         status = require(management.status(operator, self.b.actor.subject.subject_id,

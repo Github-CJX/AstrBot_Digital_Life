@@ -8,20 +8,20 @@ import time
 import unittest
 from unittest.mock import patch
 
-from companion_v2.adapters.astrbot.application import AstrBotCompanionHost
-from companion_v2.configuration.registry import FieldRegistry
-from companion_v2.conversation.delivery import DeliveryReceipt, LocalSender
-from companion_v2.conversation.flow import ConversationPolicy
-from companion_v2.conversation.messages import REPLY_KIND
-from companion_v2.conversation.segmentation import SegmentationPolicy
-from companion_v2.conversation.reply_settings import configuration_fields as reply_configuration_fields
-from companion_v2.execution.models import Lane, ProviderBinding, SupervisorLimits, TaskContext, TaskError, digest
-from companion_v2.foundation.clock import DeterministicClock
-from companion_v2.foundation.outcome import Outcome
-from companion_v2.foundation.refs import AudienceRef, SubjectKind, SubjectRef
-from companion_v2.identity_policy.personas import ConversationRoute, PersonaBinding, PersonaSelector, RuntimeIdentity, SelectorKind
-from companion_v2.model_gateway.models import Amount, BudgetPolicy, LocalProvider, ModelTaskProfile
-from companion_v2.model_gateway.routing import configuration_fields
+from digital_life_core.adapters.astrbot.application import AstrBotCompanionHost
+from digital_life_core.configuration.registry import FieldRegistry
+from digital_life_core.conversation.delivery import DeliveryReceipt, LocalSender
+from digital_life_core.conversation.flow import ConversationPolicy
+from digital_life_core.conversation.messages import REPLY_KIND
+from digital_life_core.conversation.segmentation import SegmentationPolicy
+from digital_life_core.conversation.reply_settings import configuration_fields as reply_configuration_fields
+from digital_life_core.execution.models import Lane, ProviderBinding, SupervisorLimits, TaskContext, TaskError, digest
+from digital_life_core.foundation.clock import DeterministicClock
+from digital_life_core.foundation.outcome import Outcome
+from digital_life_core.foundation.refs import AudienceRef, SubjectKind, SubjectRef
+from digital_life_core.identity_policy.personas import ConversationRoute, PersonaBinding, PersonaSelector, RuntimeIdentity, SelectorKind
+from digital_life_core.model_gateway.models import Amount, BudgetPolicy, LocalProvider, ModelTaskProfile
+from digital_life_core.model_gateway.routing import configuration_fields
 from tests.test_management_access import INSTALLATION, ManagementFixture, NOW, SCOPE
 from tests.test_role_tool_loop import answered, call, requested
 

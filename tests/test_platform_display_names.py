@@ -5,7 +5,7 @@ from types import SimpleNamespace as NS
 import unittest
 from unittest.mock import AsyncMock, patch
 
-from astrbot_host.display_names import PlatformDisplayNames, event_person_names
+from digital_life_host.display_names import PlatformDisplayNames, event_person_names
 
 
 class EventPersonNameTests(unittest.TestCase):
@@ -127,7 +127,7 @@ class PlatformDisplayNameTests(unittest.IsolatedAsyncioTestCase):
             await asyncio.sleep(0.1)
 
         self.api.call_action = AsyncMock(side_effect=slow)
-        with patch("astrbot_host.display_names.LOOKUP_TIMEOUT", 0.01):
+        with patch("digital_life_host.display_names.LOOKUP_TIMEOUT", 0.01):
             self.assertEqual(await self.names.lookup("qq-main", "100", "private", "200"), "")
         before = self.api.call_action.await_count
         self.assertEqual(await self.names.lookup("qq-main", "100", "private", "200"), "")

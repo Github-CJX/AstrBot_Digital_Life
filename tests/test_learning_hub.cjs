@@ -7,7 +7,7 @@ const vm = require("node:vm");
 
 const ROOT = path.join(__dirname, "..");
 const PAGE = path.join(ROOT, "pages", "陪伴小屋");
-const HOST = "astrbot_plugin_private_companion";
+const HOST = "astrbot_plugin_digital_life";
 const {assertStylesheetBundled} = require("./page-styles.cjs");
 
 test("学习工作台按导航加载每个真实数据模块", () => {

@@ -6,16 +6,16 @@ import unittest
 from dataclasses import replace
 from types import SimpleNamespace
 
-from companion_v2.conversation.reply_management import ReplyManagement
-from companion_v2.conversation.reply_settings import (FORWARD_DEFAULTS, GROUP, GROUP_AIR_DEFAULTS,
+from digital_life_core.conversation.reply_management import ReplyManagement
+from digital_life_core.conversation.reply_settings import (FORWARD_DEFAULTS, GROUP, GROUP_AIR_DEFAULTS,
     OWNER, ROLE_PROMPT_FIELDS, validate as validate_reply_settings)
-from companion_v2.conversation.segmentation import LLM_SEGMENT_MARKER
-from companion_v2.conversation.text_processing import TEXT_DEFAULTS
-from companion_v2.model_gateway.response_diagnostics import ResponseDiagnostics, ResponseTextSummary
-from companion_v2.execution.models import encode
-from companion_v2.configuration.models import ConfigLayer, ConfigTarget, ConfigurationError
-from companion_v2.foundation.refs import OperationRef, ScopeKind, VersionRef
-from companion_v2.conversation.media.understanding import SCOPE_PERMISSION_FIELDS, media_scope_enabled
+from digital_life_core.conversation.segmentation import LLM_SEGMENT_MARKER
+from digital_life_core.conversation.text_processing import TEXT_DEFAULTS
+from digital_life_core.model_gateway.response_diagnostics import ResponseDiagnostics, ResponseTextSummary
+from digital_life_core.execution.models import encode
+from digital_life_core.configuration.models import ConfigLayer, ConfigTarget, ConfigurationError
+from digital_life_core.foundation.refs import OperationRef, ScopeKind, VersionRef
+from digital_life_core.conversation.media.understanding import SCOPE_PERMISSION_FIELDS, media_scope_enabled
 from tests.test_host_application import HostFixture
 from tests.test_role_tool_loop import answered
 
@@ -183,7 +183,7 @@ class ReplyManagementTests(HostFixture, unittest.IsolatedAsyncioTestCase):
                          "reply_configuration_invalid")
 
     async def test_media_scope_permissions_are_role_shared_and_gate_private_or_group_work(self):
-        from companion_v2.configuration.models import ConfigLayer
+        from digital_life_core.configuration.models import ConfigLayer
         role_manager = ReplyManagement(self.app, self.context, layer=ConfigLayer.ROLE)
         status = role_manager.status(self.core).unwrap()
         changes = {
@@ -217,7 +217,7 @@ class ReplyManagementTests(HostFixture, unittest.IsolatedAsyncioTestCase):
         self.assertEqual({key: group_settings[key] for key in changes}, changes)
 
     async def test_role_defaults_are_inherited_and_private_windows_can_override_them(self):
-        from companion_v2.configuration.models import ConfigLayer, ConfigTarget
+        from digital_life_core.configuration.models import ConfigLayer, ConfigTarget
         role_manager = ReplyManagement(self.app, self.context, layer=ConfigLayer.ROLE)
         role_status = role_manager.status(self.core).unwrap()
         role_value = "角色默认表达，保持自然并主动接住话题。"
@@ -247,7 +247,7 @@ class ReplyManagementTests(HostFixture, unittest.IsolatedAsyncioTestCase):
             conversation_id="other-private-conversation", session_id="other-private-session")
         other_target = ConfigTarget(other_scope.installation_id, ConfigLayer.WINDOW,
             self.context.role_binding.role, other_scope)
-        from companion_v2.conversation.reply_settings import GROUP, OWNER
+        from digital_life_core.conversation.reply_settings import GROUP, OWNER
         owner = self.app.configuration._owners[OWNER]
         other = owner.read(other_target, self.app.configuration.registry.group(GROUP))
         field = other.fields[GROUP + ".style_prompt"]
@@ -301,7 +301,7 @@ class ReplyManagementTests(HostFixture, unittest.IsolatedAsyncioTestCase):
         self.assertFalse(role_manager.status(self.core).unwrap()["settings"]["group_wakeup_enabled"])
 
     async def test_old_group_conversation_override_is_found_and_cleared_after_stable_migration(self):
-        from companion_v2.configuration.owners import SparseConfigurationOwner
+        from digital_life_core.configuration.owners import SparseConfigurationOwner
 
         role_manager = ReplyManagement(self.app, self.context, layer=ConfigLayer.ROLE)
         role_status = role_manager.status(self.core).unwrap()
@@ -496,7 +496,7 @@ class ReplyManagementTests(HostFixture, unittest.IsolatedAsyncioTestCase):
         self.assertEqual(role_manager.status(self.core).unwrap()["settings"]["voice_language"], "ja")
 
     async def test_group_voice_language_command_writes_only_this_group_window(self):
-        from astrbot_host.functional_commands import execute_functional_command, parse_functional_command
+        from digital_life_host.functional_commands import execute_functional_command, parse_functional_command
 
         group_scope = replace(self.context.scope, kind=ScopeKind.GROUP,
                               native_scope_id="voice-command-group", conversation_id="voice-command-conversation",
@@ -515,7 +515,7 @@ class ReplyManagementTests(HostFixture, unittest.IsolatedAsyncioTestCase):
         self.assertEqual(group_status["provenance"]["voice_language"]["layer"], "window")
 
     async def test_group_voice_language_command_rejects_a_standard_member(self):
-        from astrbot_host.functional_commands import execute_functional_command, parse_functional_command
+        from digital_life_host.functional_commands import execute_functional_command, parse_functional_command
 
         group_scope = replace(self.context.scope, kind=ScopeKind.GROUP,
                               native_scope_id="voice-command-denied-group",

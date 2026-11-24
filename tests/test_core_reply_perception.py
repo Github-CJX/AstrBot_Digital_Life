@@ -6,15 +6,15 @@ from unittest.mock import AsyncMock, Mock
 from astrbot.core.agent.message import AudioURLPart, ImageURLPart, Message, TextPart, dump_messages_with_checkpoints
 from astrbot.core.provider.sources.fishaudio_tts_api_source import ProviderFishAudioTTSAPI
 from astrbot.core.provider.sources.openai_source import ProviderOpenAIOfficial
-from astrbot_host.core_reply import CORE_REPLY_CONTEXT_EXTRA, inject_core_reply_prompt
-from astrbot_host.core_reply_perception import (
+from digital_life_host.core_reply import CORE_REPLY_CONTEXT_EXTRA, inject_core_reply_prompt
+from digital_life_host.core_reply_perception import (
     inject_core_reply_perception_context,
     inject_core_reply_perception_policy,
     rewrite_core_reply_video_state,
     video_placeholder_paths,
     video_request_state,
 )
-from companion_v2.conversation.voice_reply import VoiceReplyPolicy
+from digital_life_core.conversation.voice_reply import VoiceReplyPolicy
 
 
 class Event:
@@ -41,23 +41,23 @@ def prepared(*, options=(True, True, True), route="chat-route", guidance=""):
 
 def perception_payload(request):
     value = request.extra_user_content_parts[-1].text
-    return json.loads(value.removeprefix("<companion_v2_context>\n")
-                      .removesuffix("\n</companion_v2_context>"))
+    return json.loads(value.removeprefix("<digital_life_core_context>\n")
+                      .removesuffix("\n</digital_life_core_context>"))
 
 
 def context_part(request):
     """本插件写的那段感知 JSON（按前缀找：注入的视频块会排在它后面）。"""
     for part in request.extra_user_content_parts:
         text = getattr(part, "text", None)
-        if isinstance(text, str) and text.startswith("<companion_v2_context>\n"):
+        if isinstance(text, str) and text.startswith("<digital_life_core_context>\n"):
             return part
-    raise AssertionError("request carries no companion_v2_context part")
+    raise AssertionError("request carries no digital_life_core_context part")
 
 
 def context_payload(request):
     text = context_part(request).text
-    return json.loads(text.removeprefix("<companion_v2_context>\n")
-                      .removesuffix("\n</companion_v2_context>"))
+    return json.loads(text.removeprefix("<digital_life_core_context>\n")
+                      .removesuffix("\n</digital_life_core_context>"))
 
 
 def video_state(request):

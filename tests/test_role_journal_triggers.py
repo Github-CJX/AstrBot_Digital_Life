@@ -7,15 +7,15 @@ import json
 import unittest
 from unittest.mock import patch
 
-from companion_v2.configuration.registry import FieldRegistry
-from companion_v2.execution.models import TaskContext, TaskError, encode
-from companion_v2.foundation.refs import AudienceRef, RoleOwnerRef
-from companion_v2.identity_policy.personas import ConversationRoute
-from companion_v2.model_gateway.models import ProviderResponse
-from companion_v2.model_gateway.routing import configuration_fields
-from companion_v2.role_work import RoleActivity, RoleActivityState
-from companion_v2.role_work.journal import JournalDraft, JournalKind, JournalState, MaterialKind
-from companion_v2.role_work.journal.writing import writing_profiles
+from digital_life_core.configuration.registry import FieldRegistry
+from digital_life_core.execution.models import TaskContext, TaskError, encode
+from digital_life_core.foundation.refs import AudienceRef, RoleOwnerRef
+from digital_life_core.identity_policy.personas import ConversationRoute
+from digital_life_core.model_gateway.models import ProviderResponse
+from digital_life_core.model_gateway.routing import configuration_fields
+from digital_life_core.role_work import RoleActivity, RoleActivityState
+from digital_life_core.role_work.journal import JournalDraft, JournalKind, JournalState, MaterialKind
+from digital_life_core.role_work.journal.writing import writing_profiles
 from tests.test_host_application import HostFixture
 from tests.test_management_access import NOW, ROLE, SCOPE
 from tests.test_role_tool_loop import answered

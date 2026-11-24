@@ -8,22 +8,22 @@ from types import SimpleNamespace as NS
 import unittest
 from unittest.mock import patch
 
-from companion_v2.configuration.models import ConfigLayer, ConfigTarget
-from companion_v2.configuration.owners import SparseConfigurationOwner
-from companion_v2.identity_policy.models import AuthorizationTier
-from companion_v2.identity_policy.object_access import ObjectAccessPolicy
-from companion_v2.conversation.participation import CONFIG_GROUP, GroupParticipationConfigurationOwner, configuration_fields
-from companion_v2.conversation.reply_settings import (GROUP as REPLY_GROUP, ReplyConfigurationOwner, target_for,
+from digital_life_core.configuration.models import ConfigLayer, ConfigTarget
+from digital_life_core.configuration.owners import SparseConfigurationOwner
+from digital_life_core.identity_policy.models import AuthorizationTier
+from digital_life_core.identity_policy.object_access import ObjectAccessPolicy
+from digital_life_core.conversation.participation import CONFIG_GROUP, GroupParticipationConfigurationOwner, configuration_fields
+from digital_life_core.conversation.reply_settings import (GROUP as REPLY_GROUP, ReplyConfigurationOwner, target_for,
     configuration_fields as reply_fields)
 from astrbot.core.config import DEFAULT_CONFIG
 from astrbot.core.pipeline.process_stage.stage import ProcessStage
-from companion_v2.conversation.reset import ConversationWindow, reset_window
-from astrbot_host.core_reply import CORE_REPLY_CONTEXT_EXTRA, activate_core_reply_delivery_guard
+from digital_life_core.conversation.reset import ConversationWindow, reset_window
+from digital_life_host.core_reply import CORE_REPLY_CONTEXT_EXTRA, activate_core_reply_delivery_guard
 from astrbot.core.agent.message import Message, ToolCall
 from astrbot.core.message.components import Plain
 from astrbot.core.message.message_event_result import MessageChain
-from astrbot_host.core_reply_tools import native_tool_name
-from astrbot_host.core_reply_tracking import (
+from digital_life_host.core_reply_tools import native_tool_name
+from digital_life_host.core_reply_tracking import (
     finish_core_reply_tracking, mark_core_reply_inflight, prepare_core_reply_tracking,
     observe_core_reply_tool_delivery,
 )
@@ -157,10 +157,10 @@ class GroupReplyAdmissionTests(GroupFixture, unittest.IsolatedAsyncioTestCase):
     def _context_payload(event):
         for part in event.core_request.extra_user_content_parts:
             text = getattr(part, "text", "")
-            if text.startswith("<companion_v2_context>"):
-                raw = text.removeprefix("<companion_v2_context>").removesuffix("</companion_v2_context>").strip()
+            if text.startswith("<digital_life_core_context>"):
+                raw = text.removeprefix("<digital_life_core_context>").removesuffix("</digital_life_core_context>").strip()
                 return json.loads(raw)
-        raise AssertionError("missing <companion_v2_context> payload")
+        raise AssertionError("missing <digital_life_core_context> payload")
 
     @classmethod
     def _participation_facts(cls, event):
@@ -374,7 +374,7 @@ class GroupReplyAdmissionTests(GroupFixture, unittest.IsolatedAsyncioTestCase):
     async def test_non_mention_core_reply_logs_reason_and_send_return_without_platform_confirmation(self):
         await self.configure(group_wakeup_bot_name="小星")
         event = self.event("named-reply", "小星来看看")
-        with self.assertLogs("astrbot_host.core_reply_tracking", level="INFO") as logs:
+        with self.assertLogs("digital_life_host.core_reply_tracking", level="INFO") as logs:
             prepared = await self.core_turn(event)
             await self.core_send(event)
         self.assertEqual(len(logs.output), 2)
@@ -393,7 +393,7 @@ class GroupReplyAdmissionTests(GroupFixture, unittest.IsolatedAsyncioTestCase):
 
     async def test_repeated_core_hooks_keep_one_turn_and_do_not_duplicate_reason_logs(self):
         event = self.event("help-reply", "如何处理这个问题？")
-        with self.assertLogs("astrbot_host.core_reply_tracking", level="INFO") as logs:
+        with self.assertLogs("digital_life_host.core_reply_tracking", level="INFO") as logs:
             prepared = await self.core_turn(event)
             for _ in range(2):
                 prepare_core_reply_tracking(event, prepared, admission=self.admission, now=self.clock.now,

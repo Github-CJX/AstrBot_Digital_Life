@@ -22,10 +22,10 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
-from companion_v2.capabilities.models import CapabilityDesiredState  # noqa: E402
-from companion_v2.capabilities.repositories import CapabilityRepository  # noqa: E402
-from companion_v2.foundation.refs import SubjectKind, SubjectRef  # noqa: E402
-from companion_v2.storage.runtime import StorageRuntime  # noqa: E402
+from digital_life_core.capabilities.models import CapabilityDesiredState  # noqa: E402
+from digital_life_core.capabilities.repositories import CapabilityRepository  # noqa: E402
+from digital_life_core.foundation.refs import SubjectKind, SubjectRef  # noqa: E402
+from digital_life_core.storage.runtime import StorageRuntime  # noqa: E402
 
 
 def main():

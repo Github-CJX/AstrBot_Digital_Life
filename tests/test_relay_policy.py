@@ -2,7 +2,7 @@
 
 import unittest
 
-from companion_v2.conversation.relay_policy import (
+from digital_life_core.conversation.relay_policy import (
     ALLOWED, DENIED_DISABLED, DENIED_GROUP, DENIED_MEMBER_DISABLED,
     DENIED_MEMBER_SENDER, DENIED_SELF, DENIED_TARGET,
     DENIED_TEXT_EMPTY, DENIED_TEXT_TOO_LONG, RelayRequest, decide)

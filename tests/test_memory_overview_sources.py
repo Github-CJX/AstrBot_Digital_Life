@@ -8,14 +8,14 @@ must not count assistant output or withdrawn inputs.
 
 import unittest
 
-from companion_v2.configuration.registry import FieldRegistry
-from companion_v2.configuration.service import ConfigurationService
-from companion_v2.execution.models import digest
-from companion_v2.foundation.refs import SourceRef, VersionRef
-from companion_v2.memory.configuration import configuration_fields
-from companion_v2.memory.management import MemoryManagement
-from companion_v2.memory.service import MemoryService
-from companion_v2.sources.models import SourceRecord
+from digital_life_core.configuration.registry import FieldRegistry
+from digital_life_core.configuration.service import ConfigurationService
+from digital_life_core.execution.models import digest
+from digital_life_core.foundation.refs import SourceRef, VersionRef
+from digital_life_core.memory.configuration import configuration_fields
+from digital_life_core.memory.management import MemoryManagement
+from digital_life_core.memory.service import MemoryService
+from digital_life_core.sources.models import SourceRecord
 from tests.memory_support import MemoryFixture
 
 

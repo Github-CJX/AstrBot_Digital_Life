@@ -2,11 +2,11 @@ from datetime import datetime, timedelta, timezone
 from types import SimpleNamespace
 import unittest
 
-from companion_v2.execution.models import TaskContext
-from companion_v2.foundation.outcome import Outcome
-from companion_v2.foundation.refs import AudienceRef, ScopeKind, ScopeRef, SubjectKind, SubjectRef
-from companion_v2.identity_policy.models import AuthenticatedHostPrincipal, ResolvedIdentity, RoleBinding
-from companion_v2.proactive.health_events import HealthContactEvents
+from digital_life_core.execution.models import TaskContext
+from digital_life_core.foundation.outcome import Outcome
+from digital_life_core.foundation.refs import AudienceRef, ScopeKind, ScopeRef, SubjectKind, SubjectRef
+from digital_life_core.identity_policy.models import AuthenticatedHostPrincipal, ResolvedIdentity, RoleBinding
+from digital_life_core.proactive.health_events import HealthContactEvents
 
 
 def context():

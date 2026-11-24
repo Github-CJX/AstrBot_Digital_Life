@@ -4,10 +4,10 @@ import json
 import unittest
 from unittest.mock import patch
 
-from companion_v2.configuration.registry import FieldRegistry
-from companion_v2.execution.models import TERMINAL
-from companion_v2.model_gateway.routing import configuration_fields
-from companion_v2.proactive.service import persona_judge_profile, plan_profile
+from digital_life_core.configuration.registry import FieldRegistry
+from digital_life_core.execution.models import TERMINAL
+from digital_life_core.model_gateway.routing import configuration_fields
+from digital_life_core.proactive.service import persona_judge_profile, plan_profile
 from tests.contact_schedule_support import ContactScheduleFixture
 from tests.proactive_support import ContactFixture
 from tests.test_role_tool_loop import answered

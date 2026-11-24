@@ -8,16 +8,16 @@ from types import SimpleNamespace as NS
 import unittest
 from unittest.mock import AsyncMock, patch
 
-from astrbot_host.account_session_api import AccountSessionWebAPI
-from astrbot_host.group_authority import GroupAuthority
-from astrbot_host.group_delivery import INTENT_PREFIX
-from astrbot_host.multi_api import PREFIX
-from astrbot_host.multi_settings import MultiHostSettings
-from astrbot_host.settings import HostControlError
-from companion_v2.adapters.astrbot.onebot_group import OneBotGroupSender
-from companion_v2.delivery.models import DeliveryEnvelope, LocalSender
-from companion_v2.execution.models import TaskContext, TaskError, digest
-from companion_v2.foundation.refs import AudienceRef
+from digital_life_host.account_session_api import AccountSessionWebAPI
+from digital_life_host.group_authority import GroupAuthority
+from digital_life_host.group_delivery import INTENT_PREFIX
+from digital_life_host.multi_api import PREFIX
+from digital_life_host.multi_settings import MultiHostSettings
+from digital_life_host.settings import HostControlError
+from digital_life_core.adapters.astrbot.onebot_group import OneBotGroupSender
+from digital_life_core.delivery.models import DeliveryEnvelope, LocalSender
+from digital_life_core.execution.models import TaskContext, TaskError, digest
+from digital_life_core.foundation.refs import AudienceRef
 from tests.group_host_support import GroupFixture, Query, group_config
 from tests.native_adapter_support import FakeEvent
 from tests.staging_bootstrap_support import database_contents, wait_for_batch
@@ -51,7 +51,7 @@ class GroupDeliveryTests(GroupFixture, unittest.IsolatedAsyncioTestCase):
                     "group_id": group_id, "enabled": enabled}
             request = NS(username="dashboard-admin", query=Query(),
                          body=AsyncMock(return_value=json.dumps(body).encode("utf-8")))
-            with patch("astrbot_host.account_session_api.request", request):
+            with patch("digital_life_host.account_session_api.request", request):
                 return await api.save_group_target()
 
         before = deepcopy(self.controller.config["multi_host"]["group_targets"])
@@ -94,7 +94,7 @@ class GroupDeliveryTests(GroupFixture, unittest.IsolatedAsyncioTestCase):
         request = NS(username="dashboard-admin", query=Query(),
                      body=AsyncMock(return_value=json.dumps(body).encode("utf-8")))
 
-        with patch("astrbot_host.account_session_api.request", request):
+        with patch("digital_life_host.account_session_api.request", request):
             result = await api.save_group_target()
 
         self.assertEqual(result["status"], "ok", result)
@@ -147,7 +147,7 @@ class GroupDeliveryTests(GroupFixture, unittest.IsolatedAsyncioTestCase):
         request = NS(username="dashboard-admin", query=Query(),
                      body=AsyncMock(return_value=json.dumps(body).encode("utf-8")))
 
-        with patch("astrbot_host.account_session_api.request", request):
+        with patch("digital_life_host.account_session_api.request", request):
             result = await api.save_group_target()
 
         self.assertEqual(result["status"], "error", result)
@@ -169,7 +169,7 @@ class GroupDeliveryTests(GroupFixture, unittest.IsolatedAsyncioTestCase):
         self.controller.register_routes()
         routes = {path: handler for path, handler, _, _ in self.native.registered_web_apis}
         request = NS(username="dashboard-admin", query=Query())
-        with patch("astrbot_host.multi_api.request", request):
+        with patch("digital_life_host.multi_api.request", request):
             for action in ("probe", "initialize", "start"):
                 self.assertEqual((await routes[PREFIX + "/" + action]())["status"], "ok")
             # 逐群投递授权已经移除：旧路由不再注册，配置里的群目标直接可发。

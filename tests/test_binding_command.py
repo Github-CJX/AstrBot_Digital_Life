@@ -17,7 +17,7 @@ The identity reading is tested separately, because it is what turns an event int
 
 import unittest
 
-from astrbot_host.binding import (
+from digital_life_host.binding import (
     BindRequest,
     binding_identity,
     describe_pin,

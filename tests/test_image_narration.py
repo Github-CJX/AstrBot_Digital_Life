@@ -1,15 +1,15 @@
 from types import SimpleNamespace
 import unittest
 
-from companion_v2.conversation.media.image_narration import (
+from digital_life_core.conversation.media.image_narration import (
     KIND,
     PROMPT,
     PrivateImageNarrationService,
 )
-from companion_v2.conversation.media.models import OWNER as IMAGE_OWNER
-from companion_v2.conversation.media.models import INSTRUCTION as IMAGE_INSTRUCTION
-from companion_v2.conversation.media.context_caption import PROMPT as HISTORY_IMAGE_PROMPT
-from companion_v2.foundation.refs import ScopeKind
+from digital_life_core.conversation.media.models import OWNER as IMAGE_OWNER
+from digital_life_core.conversation.media.models import INSTRUCTION as IMAGE_INSTRUCTION
+from digital_life_core.conversation.media.context_caption import PROMPT as HISTORY_IMAGE_PROMPT
+from digital_life_core.foundation.refs import ScopeKind
 
 
 class ImageNarrationTests(unittest.IsolatedAsyncioTestCase):

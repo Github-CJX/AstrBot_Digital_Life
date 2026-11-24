@@ -10,19 +10,19 @@ from datetime import timedelta
 import json
 import unittest
 
-from companion_v2.configuration.models import ConfigLayer, ConfigTarget
-from companion_v2.configuration.owners import SparseConfigurationOwner
-from companion_v2.configuration.registry import FieldRegistry, ValueKind
-from companion_v2.execution.models import TaskError, stamp
-from companion_v2.foundation.refs import ScopeKind
-from companion_v2.identity_policy.group_audience import group_audience
-from companion_v2.memory.configuration import configuration_fields as memory_fields
-from companion_v2.memory.episodes import (DEFAULTS, GUIDANCE, LIMITS, MAX_SOURCE_LINES, MAX_SUMMARY_CHARS,
+from digital_life_core.configuration.models import ConfigLayer, ConfigTarget
+from digital_life_core.configuration.owners import SparseConfigurationOwner
+from digital_life_core.configuration.registry import FieldRegistry, ValueKind
+from digital_life_core.execution.models import TaskError, stamp
+from digital_life_core.foundation.refs import ScopeKind
+from digital_life_core.identity_policy.group_audience import group_audience
+from digital_life_core.memory.configuration import configuration_fields as memory_fields
+from digital_life_core.memory.episodes import (DEFAULTS, GUIDANCE, LIMITS, MAX_SOURCE_LINES, MAX_SUMMARY_CHARS,
                                           dialogue_episode_material, dialogue_settings, episode_cursor,
                                           episode_due, episode_namespace, mark_covered, recent_dialogue_lines,
                                           settings_for)
-from companion_v2.memory.reflection import reflection_profile
-from companion_v2.model_gateway.routing import configuration_fields
+from digital_life_core.memory.reflection import reflection_profile
+from digital_life_core.model_gateway.routing import configuration_fields
 from tests.test_host_application import HostFixture
 from tests.test_management_access import NOW
 
@@ -174,9 +174,9 @@ class DialogueEpisodeMaterialTests(HostFixture, unittest.IsolatedAsyncioTestCase
     def other_subject_context(self, context):
         """The same bot and role, but a different authenticated human subject."""
         from dataclasses import replace
-        from companion_v2.execution.models import TaskContext
-        from companion_v2.foundation.refs import AudienceRef
-        from companion_v2.identity_policy.personas import ConversationRoute
+        from digital_life_core.execution.models import TaskContext
+        from digital_life_core.foundation.refs import AudienceRef
+        from digital_life_core.identity_policy.personas import ConversationRoute
         scope = replace(context.scope, native_scope_id="native-episode-other",
                         conversation_id="conversation-episode-other", session_id="session-episode-other")
         self.personas.register_route(ConversationRoute(scope, user=self.standard.subject), observed_at=NOW)
@@ -212,7 +212,7 @@ class DialogueEpisodeMaterialTests(HostFixture, unittest.IsolatedAsyncioTestCase
 
         async def respond(envelope):
             from tests.test_role_tool_loop import answered
-            from companion_v2.execution.models import encode
+            from digital_life_core.execution.models import encode
             if envelope.original.output_format != "memory_reflection":
                 return answered("好的")
             seen["materials"] = envelope.original.context.materials

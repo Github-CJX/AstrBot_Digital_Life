@@ -6,7 +6,7 @@ import sqlite3
 from tempfile import TemporaryDirectory
 import unittest
 
-from companion_v2.legacy.sqlite_snapshot import open_readonly_sqlite_snapshot
+from digital_life_core.legacy.sqlite_snapshot import open_readonly_sqlite_snapshot
 
 
 def _file_state(path: Path):

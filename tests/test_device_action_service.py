@@ -12,18 +12,18 @@ from datetime import timedelta
 from pathlib import Path
 from unittest.mock import Mock, patch
 
-from companion_v2.device.action_service import (
+from digital_life_core.device.action_service import (
     PhoneActionService, PhoneSettings, PhoneTaskRecord, load_settings, phone_profile,
 )
-from companion_v2.device.adb import UiElement
-from companion_v2.device.session import PhoneObservation, PhoneSession
-from companion_v2.device.skills import PREFIX as SKILL_PREFIX, PhoneSkillMemory, SkillScreen
-from companion_v2.adapters.astrbot.model_wire import build_wire
-from companion_v2.configuration.registry import FieldRegistry
-from companion_v2.execution.models import TaskContext, TaskError
-from companion_v2.foundation.refs import AudienceRef
-from companion_v2.model_gateway.routing import configuration_fields
-from companion_v2.storage.runtime import StorageRuntime
+from digital_life_core.device.adb import UiElement
+from digital_life_core.device.session import PhoneObservation, PhoneSession
+from digital_life_core.device.skills import PREFIX as SKILL_PREFIX, PhoneSkillMemory, SkillScreen
+from digital_life_core.adapters.astrbot.model_wire import build_wire
+from digital_life_core.configuration.registry import FieldRegistry
+from digital_life_core.execution.models import TaskContext, TaskError
+from digital_life_core.foundation.refs import AudienceRef
+from digital_life_core.model_gateway.routing import configuration_fields
+from digital_life_core.storage.runtime import StorageRuntime
 from tests.test_conversation_images import image_bytes
 from tests.test_host_application import HostFixture
 from tests.test_management_access import NOW, SCOPE

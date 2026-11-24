@@ -6,7 +6,7 @@ from pathlib import Path
 
 from tools.native_acceptance_guard import LEGACY_IDS, scan_dependencies
 
-CORE_ID = "astrbot_plugin_private_companion"
+CORE_ID = "astrbot_plugin_digital_life"
 EXCLUDED = {"data", "__pycache__", ".git", ".pytest_cache", "node_modules", "dist", "build", "logs"}
 
 
@@ -23,7 +23,7 @@ def snapshot(source, destination):
         raise ValueError("native acceptance installation must be new or empty")
     destination.mkdir(parents=True, exist_ok=True)
     selected = [source / p for p in ("main.py", "metadata.yaml", "_conf_schema.json", "requirements.txt")]
-    for name in ("astrbot_host", "companion_v2", "tests", "tools"):
+    for name in ("digital_life_host", "digital_life_core", "tests", "tools"):
         for base, dirs, files in os.walk(source / name, followlinks=False):
             for child in dirs:
                 p = Path(base) / child
@@ -39,7 +39,7 @@ def snapshot(source, destination):
             raise ValueError("native source is incomplete")
         relative = path.relative_to(source)
         payload = path.read_bytes()
-        if path.suffix == ".py" and relative.parts[0] in {"main.py", "astrbot_host", "companion_v2"}:
+        if path.suffix == ".py" and relative.parts[0] in {"main.py", "digital_life_host", "digital_life_core"}:
             findings.extend(scan_dependencies(payload.decode("utf-8-sig"), relative.as_posix()))
         target = destination / relative
         target.parent.mkdir(parents=True, exist_ok=True)

@@ -4,9 +4,9 @@ from pathlib import Path
 from tempfile import TemporaryDirectory
 import unittest
 
-from companion_v2.execution.models import TaskError
-from companion_v2.storage.runtime import StorageRuntime
-from companion_v2.together.mobile.requests import MobileRoomRequests
+from digital_life_core.execution.models import TaskError
+from digital_life_core.storage.runtime import StorageRuntime
+from digital_life_core.together.mobile.requests import MobileRoomRequests
 
 
 class MobileRoomRequestTests(unittest.TestCase):

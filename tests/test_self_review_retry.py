@@ -2,7 +2,7 @@
 
 import unittest
 
-from companion_v2.role_work.journal.self_review_service import (
+from digital_life_core.role_work.journal.self_review_service import (
     OUTPUT_FAILURE_RETRY_SECONDS,
     TRANSIENT_FAILURE_RETRY_SECONDS,
     retry_delay,

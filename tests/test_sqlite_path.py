@@ -4,7 +4,7 @@ from pathlib import Path
 from tempfile import TemporaryDirectory
 import unittest
 
-from companion_v2.storage.sqlite_path import readonly_uri
+from digital_life_core.storage.sqlite_path import readonly_uri
 
 
 class ReadonlySQLitePathTests(unittest.TestCase):

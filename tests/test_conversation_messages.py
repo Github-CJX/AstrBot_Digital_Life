@@ -8,26 +8,26 @@ import json
 import unittest
 from unittest.mock import patch
 
-from companion_v2.configuration.registry import FieldRegistry
-from companion_v2.configuration.service import ConfigurationService
-from companion_v2.conversation.delivery import DeliveryReceipt, LocalConversationDelivery, LocalSender
-from companion_v2.conversation.foreground import ClaimKind, ContextContribution, ContributionState, DraftClaim, ModelDraft
-from companion_v2.conversation.generation import LocalReplyGenerator
-from companion_v2.conversation.messages import ConversationMessages, DELIVERY_KIND, REPLY_ACTION, REPLY_KIND
-from companion_v2.conversation.models import InboundConversationEvent
-from companion_v2.conversation.segmentation import SegmentationPolicy
-from companion_v2.diagnostics.models import CheckStatus, DiagnosticContext, DiagnosticQuery
-from companion_v2.diagnostics.service import DiagnosticService
-from companion_v2.execution.models import Lane, ProviderBinding, SideEffect, TaskDefinition, TaskRegistration, TaskError, digest
-from companion_v2.execution.runner import LocalTaskRunner, TaskRun
-from companion_v2.foundation.outcome import Outcome
-from companion_v2.foundation.refs import SourceRef, SubjectKind, SubjectRef, VersionRef
-from companion_v2.identity_policy.personas import PersonaBinding, PersonaSelector, SelectorKind
-from companion_v2.model_gateway.budget import BudgetLedger
-from companion_v2.model_gateway.models import Amount, BudgetPolicy, ModelTaskProfile, ProviderResponse
-from companion_v2.model_gateway.routing import ModelRouter, configuration_fields
-from companion_v2.model_gateway.service import LocalModelGateway
-from companion_v2.sources.models import SourceRecord
+from digital_life_core.configuration.registry import FieldRegistry
+from digital_life_core.configuration.service import ConfigurationService
+from digital_life_core.conversation.delivery import DeliveryReceipt, LocalConversationDelivery, LocalSender
+from digital_life_core.conversation.foreground import ClaimKind, ContextContribution, ContributionState, DraftClaim, ModelDraft
+from digital_life_core.conversation.generation import LocalReplyGenerator
+from digital_life_core.conversation.messages import ConversationMessages, DELIVERY_KIND, REPLY_ACTION, REPLY_KIND
+from digital_life_core.conversation.models import InboundConversationEvent
+from digital_life_core.conversation.segmentation import SegmentationPolicy
+from digital_life_core.diagnostics.models import CheckStatus, DiagnosticContext, DiagnosticQuery
+from digital_life_core.diagnostics.service import DiagnosticService
+from digital_life_core.execution.models import Lane, ProviderBinding, SideEffect, TaskDefinition, TaskRegistration, TaskError, digest
+from digital_life_core.execution.runner import LocalTaskRunner, TaskRun
+from digital_life_core.foundation.outcome import Outcome
+from digital_life_core.foundation.refs import SourceRef, SubjectKind, SubjectRef, VersionRef
+from digital_life_core.identity_policy.personas import PersonaBinding, PersonaSelector, SelectorKind
+from digital_life_core.model_gateway.budget import BudgetLedger
+from digital_life_core.model_gateway.models import Amount, BudgetPolicy, ModelTaskProfile, ProviderResponse
+from digital_life_core.model_gateway.routing import ModelRouter, configuration_fields
+from digital_life_core.model_gateway.service import LocalModelGateway
+from digital_life_core.sources.models import SourceRecord
 from tests.test_management_access import INSTALLATION, NOW, SCOPE
 from tests.test_model_gateway import ModelFixture
 
@@ -188,7 +188,7 @@ class ConversationMessageTests(MessageFixture, unittest.IsolatedAsyncioTestCase)
         self.assertEqual(self.runtime.read_one("SELECT COUNT(*) n FROM operations", ())["n"], 0)
 
     async def test_generated_reply_log_preserves_the_final_segment_boundaries(self):
-        with self.assertLogs("companion_v2.conversation.generation", level="INFO") as captured:
+        with self.assertLogs("digital_life_core.conversation.generation", level="INFO") as captured:
             batch = await self.generate()
 
         lines = [line for line in captured.output if "回复正文已通过校验" in line]

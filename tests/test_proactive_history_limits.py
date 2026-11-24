@@ -3,10 +3,10 @@
 import json
 import unittest
 
-from companion_v2.conversation.flow import ConversationPolicy
-from companion_v2.conversation.foreground import BackgroundPromptTrigger
-from companion_v2.conversation.segmentation import LLM_SEGMENT_MARKER, SegmentationPolicy
-from companion_v2.proactive.prompts import history_round_groups
+from digital_life_core.conversation.flow import ConversationPolicy
+from digital_life_core.conversation.foreground import BackgroundPromptTrigger
+from digital_life_core.conversation.segmentation import LLM_SEGMENT_MARKER, SegmentationPolicy
+from digital_life_core.proactive.prompts import history_round_groups
 from tests.contact_schedule_support import ContactScheduleFixture
 from tests.test_role_tool_loop import answered
 

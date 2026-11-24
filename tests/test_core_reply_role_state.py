@@ -7,20 +7,20 @@ import unittest
 from unittest.mock import Mock
 
 from astrbot.core.provider.sources.openai_source import ProviderOpenAIOfficial
-from astrbot_host.core_reply import CORE_REPLY_CONTEXT_EXTRA
-from astrbot_host.core_reply_context import build_core_reply_prompt
-from astrbot_host.core_reply_perception import (
+from digital_life_host.core_reply import CORE_REPLY_CONTEXT_EXTRA
+from digital_life_host.core_reply_context import build_core_reply_prompt
+from digital_life_host.core_reply_perception import (
     inject_core_reply_perception_context,
     inject_core_reply_perception_policy,
 )
-from companion_v2.conversation.foreground import ContextContribution, ContributionState
-from companion_v2.conversation.reply_settings import GROUP
-from companion_v2.conversation.state_context import ConversationStateContext
-from companion_v2.execution.models import TaskError, encode
-from companion_v2.foundation.outcome import Outcome
-from companion_v2.foundation.refs import ScopeKind, ScopeRef, SourceRef, SubjectKind, SubjectRef, VersionRef
-from companion_v2.identity_policy.group_audience import group_audience
-from companion_v2.role_work.state.access import RoleStateAccess
+from digital_life_core.conversation.foreground import ContextContribution, ContributionState
+from digital_life_core.conversation.reply_settings import GROUP
+from digital_life_core.conversation.state_context import ConversationStateContext
+from digital_life_core.execution.models import TaskError, encode
+from digital_life_core.foundation.outcome import Outcome
+from digital_life_core.foundation.refs import ScopeKind, ScopeRef, SourceRef, SubjectKind, SubjectRef, VersionRef
+from digital_life_core.identity_policy.group_audience import group_audience
+from digital_life_core.role_work.state.access import RoleStateAccess
 
 
 AT = datetime(2026, 10, 16, 8, 0, tzinfo=timezone.utc)
@@ -165,8 +165,8 @@ class CoreReplyRoleStateTests(unittest.IsolatedAsyncioTestCase):
                 self.assertEqual(len(request.extra_user_content_parts), 1)
                 self.assertTrue(request.extra_user_content_parts[0]._no_save)
                 payload_text = request.extra_user_content_parts[0].text
-                payload = json.loads(payload_text.removeprefix("<companion_v2_context>\n")
-                                     .removesuffix("\n</companion_v2_context>"))
+                payload = json.loads(payload_text.removeprefix("<digital_life_core_context>\n")
+                                     .removesuffix("\n</digital_life_core_context>"))
                 self.assertIn("精力很低", payload["companion_background"])
                 self.assertIn("有点饿", payload["companion_background"])
 

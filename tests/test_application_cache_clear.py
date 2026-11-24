@@ -5,7 +5,7 @@ from __future__ import annotations
 import unittest
 from types import SimpleNamespace
 
-from companion_v2.host.application import CompanionApplication
+from digital_life_core.host.application import CompanionApplication
 
 
 class ClearCachesTests(unittest.TestCase):

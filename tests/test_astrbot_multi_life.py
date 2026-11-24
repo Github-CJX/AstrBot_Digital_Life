@@ -7,11 +7,11 @@ from unittest.mock import patch
 
 from tests.multi_life_support import MultiLifeFixture
 from tests.group_host_support import group_config
-from astrbot_host.management_identity import dashboard_operator
-from companion_v2.execution.models import digest
-from companion_v2.role_work.life.management import RoleLifeManagement
-from companion_v2.identity_policy.models import AuthorizationTier
-from companion_v2.identity_policy.object_access import ObjectAccessPolicy
+from digital_life_host.management_identity import dashboard_operator
+from digital_life_core.execution.models import digest
+from digital_life_core.role_work.life.management import RoleLifeManagement
+from digital_life_core.identity_policy.models import AuthorizationTier
+from digital_life_core.identity_policy.object_access import ObjectAccessPolicy
 
 
 class MultiLifeTests(MultiLifeFixture, unittest.IsolatedAsyncioTestCase):

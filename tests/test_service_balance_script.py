@@ -19,9 +19,9 @@ from cryptography.hazmat.primitives import hashes, serialization
 from cryptography.hazmat.primitives.asymmetric import rsa
 from cryptography.x509.oid import NameOID
 
-from astrbot_host.service_balance import configured_balance_port, balance_observation_data
-from astrbot_host.service_balance_script import BalanceQueryError, ScriptServiceBalancePort, _execute
-from companion_v2.proactive.balance_events import BalanceObservation
+from digital_life_host.service_balance import configured_balance_port, balance_observation_data
+from digital_life_host.service_balance_script import BalanceQueryError, ScriptServiceBalancePort, _execute
+from digital_life_core.proactive.balance_events import BalanceObservation
 from tests.contact_schedule_support import ContactScheduleFixture
 
 SCRIPT = """({request:{url:"{{baseUrl}}/v1/user/balance",method:"POST",
@@ -137,7 +137,7 @@ class BuiltinBalancePresetTests(unittest.TestCase):
         request = _execute(port.script, variables=port.variables)
         self.assertEqual(request["url"], "https://balance.example.test/user/balance")
         self.assertEqual(request["method"], "GET")
-        self.assertEqual(request["headers"]["User-Agent"], "astrbot_plugin_private_companion")
+        self.assertEqual(request["headers"]["User-Agent"], "astrbot_plugin_digital_life")
         for active in (True, None):
             self.assertEqual(self.extract("generic", {"balance": 0, "is_active": active}).balance, Decimal(0))
         with self.assertRaises(BalanceQueryError) as raised:
@@ -193,7 +193,7 @@ class BuiltinBalancePresetTests(unittest.TestCase):
         for script in self.presets.values():
             self.assertNotIn("cc-switch", script)
             request = _execute(script)
-            self.assertEqual(request["headers"]["User-Agent"], "astrbot_plugin_private_companion")
+            self.assertEqual(request["headers"]["User-Agent"], "astrbot_plugin_digital_life")
 
 
 class ScriptBalanceContactTests(ContactScheduleFixture, unittest.IsolatedAsyncioTestCase):
@@ -214,7 +214,7 @@ class ScriptBalanceContactTests(ContactScheduleFixture, unittest.IsolatedAsyncio
         self.settings(app, changes).unwrap()
         self.advance(app, 60)
         await self.automatic_delivery(app)
-        from companion_v2.proactive.balance_events import SOURCE_OWNER
+        from digital_life_core.proactive.balance_events import SOURCE_OWNER
         material = next(item for item in self.contact_calls()[0].original.context.materials if item.owner == SOURCE_OWNER)
         body = json.loads(material.payload)
         self.assertEqual((body["level"], body["amount"], body["currency"]), ("critical", "2.25", "CNY"))
@@ -225,8 +225,8 @@ class ScriptBalanceContactTests(ContactScheduleFixture, unittest.IsolatedAsyncio
 class ScriptBalanceKeywordTests(unittest.IsolatedAsyncioTestCase):
     async def test_script_unit_and_amount_enter_the_existing_keyword_material(self):
         from types import SimpleNamespace
-        from astrbot_host.service_balance import balance_keyword_material
-        from companion_v2.foundation.refs import ScopeKind
+        from digital_life_host.service_balance import balance_keyword_material
+        from digital_life_core.foundation.refs import ScopeKind
         class ExtractedPort(ScriptServiceBalancePort):
             async def fetch(self):
                 raw = json.dumps({"success": True, "data": {"display": {
@@ -235,7 +235,7 @@ class ScriptBalanceKeywordTests(unittest.IsolatedAsyncioTestCase):
                 return self.parse(await self._run(raw), datetime.now(timezone.utc))
         app = SimpleNamespace(balance_port=ExtractedPort(settings()), runtime=object())
         context = SimpleNamespace(scope=SimpleNamespace(kind=ScopeKind.PRIVATE))
-        with patch("companion_v2.expression.configuration.source_subject_allowed_for_context", return_value=True):
+        with patch("digital_life_core.expression.configuration.source_subject_allowed_for_context", return_value=True):
             spec = balance_keyword_material(app)
             self.assertTrue(spec.usable(context))
         result = await spec.prepare(context, "余额", datetime.now(timezone.utc))
@@ -245,7 +245,7 @@ class ScriptBalanceKeywordTests(unittest.IsolatedAsyncioTestCase):
 
     async def test_source_change_discards_an_inflight_keyword_amount(self):
         from types import SimpleNamespace
-        from astrbot_host.service_balance import balance_keyword_material
+        from digital_life_host.service_balance import balance_keyword_material
         started, release = asyncio.Event(), asyncio.Event()
         class Port:
             async def fetch(self):

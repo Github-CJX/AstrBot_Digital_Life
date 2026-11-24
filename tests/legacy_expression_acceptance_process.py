@@ -30,13 +30,13 @@ ROOT = Path(__file__).resolve().parents[1]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
-from companion_v2.execution.models import TaskContext, digest
-from companion_v2.expression.legacy_import import identifiers, signal_id
-from companion_v2.expression.sample_review import ExpressionSampleReviewStore, PREFIX
-from companion_v2.foundation.refs import AudienceRef, RoleOwnerRef, ScopeKind
-from companion_v2.legacy.archive import build_v1_archive_plan
-from companion_v2.legacy.expression_data import expression_profiles
-from companion_v2.legacy.migration import LegacyMigration
+from digital_life_core.execution.models import TaskContext, digest
+from digital_life_core.expression.legacy_import import identifiers, signal_id
+from digital_life_core.expression.sample_review import ExpressionSampleReviewStore, PREFIX
+from digital_life_core.foundation.refs import AudienceRef, RoleOwnerRef, ScopeKind
+from digital_life_core.legacy.archive import build_v1_archive_plan
+from digital_life_core.legacy.expression_data import expression_profiles
+from digital_life_core.legacy.migration import LegacyMigration
 
 ROLE_ID = "role-a"
 BOT_ID = "bot-a"
@@ -130,8 +130,8 @@ def _load_source(args):
 
 def _build_runtime(args, config, profiles, private, group):
     from astrbot.core import db_helper
-    from astrbot_host.multi_controller import AstrBotMultiController
-    from companion_v2.adapters.astrbot.staging import NativeAdapterTypes
+    from digital_life_host.multi_controller import AstrBotMultiController
+    from digital_life_core.adapters.astrbot.staging import NativeAdapterTypes
     from tests.multi_host_support import MultiNativeContext, multi_config
     from tests.native_adapter_support import (FakeEvent, FakePlatform, FakeProvider,
                                               FakeReverseApi)
@@ -174,7 +174,7 @@ def _build_runtime(args, config, profiles, private, group):
 
 
 def _web_api(controller, data_root):
-    from astrbot_host.legacy_api import LegacyMigrationWebAPI
+    from digital_life_host.legacy_api import LegacyMigrationWebAPI
     from types import SimpleNamespace as NS
     api = LegacyMigrationWebAPI.__new__(LegacyMigrationWebAPI)
     api.controller = NS(runtime=controller.session.runtime, now=lambda: NOW,

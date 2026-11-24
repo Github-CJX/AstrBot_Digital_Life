@@ -5,12 +5,12 @@ from pathlib import Path
 from tempfile import TemporaryDirectory
 import unittest
 
-from companion_v2.execution.models import TaskError
-from companion_v2.foundation.refs import ReferenceValidationError
-from companion_v2.library import (ArchiveConsent, ArchiveEntry, ArchiveReview, AssetReference,
+from digital_life_core.execution.models import TaskError
+from digital_life_core.foundation.refs import ReferenceValidationError
+from digital_life_core.library import (ArchiveConsent, ArchiveEntry, ArchiveReview, AssetReference,
                                  ConsentState, EntryKind, EntryOrigin, EntryState,
                                  ReadingArchiveRepository, ReadingProgress)
-from companion_v2.storage.runtime import StorageRuntime
+from digital_life_core.storage.runtime import StorageRuntime
 
 
 def at(day=1):
@@ -244,7 +244,7 @@ class ReferentialIntegrityTests(ArchiveTestCase):
 
 class SchemaUpgradeTests(unittest.TestCase):
     def test_a_fresh_data_root_lands_on_the_reading_archive_schema(self):
-        from companion_v2.storage import schema
+        from digital_life_core.storage import schema
         with TemporaryDirectory() as root:
             runtime = StorageRuntime.open(data_root=Path(root), installation_id="install-1")
             try:

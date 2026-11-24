@@ -13,9 +13,9 @@ participation_prompts.py 的提示词、group_interjection.py 的插话与跟读
 
 import unittest
 
-from companion_v2.configuration.management import GroupParticipationManagement
-from companion_v2.configuration.models import ConfigLayer, ConfigurationError
-from companion_v2.conversation.participation import (CONFIG_DEFAULTS, CONFIG_GROUP, CONFIG_LIMITS,
+from digital_life_core.configuration.management import GroupParticipationManagement
+from digital_life_core.configuration.models import ConfigLayer, ConfigurationError
+from digital_life_core.conversation.participation import (CONFIG_DEFAULTS, CONFIG_GROUP, CONFIG_LIMITS,
                                                      CONFIG_OWNER, MAX_INTERRUPT_TEXT,
                                                      GroupParticipationConfigurationOwner,
                                                      configuration_fields, validate_interrupt_text)
@@ -97,7 +97,7 @@ class OwnerWritePathTests(unittest.TestCase):
         return {CONFIG_GROUP + ".group_repeat_interrupt_text": self._Item(value)}
 
     def test_preview_and_write_apply_the_same_rule_as_the_reader(self):
-        from companion_v2.conversation.participation import _check_interrupt_text
+        from digital_life_core.conversation.participation import _check_interrupt_text
         for value in ("禁止复读", "长" * MAX_INTERRUPT_TEXT):
             with self.subTest(value=repr(value)):
                 _check_interrupt_text(self._fields(value))  # 不抛
@@ -108,7 +108,7 @@ class OwnerWritePathTests(unittest.TestCase):
 
     def test_a_snapshot_without_the_field_is_left_alone(self):
         """分段预览可能只带被改的字段；没有这一项时不能凭空报错。"""
-        from companion_v2.conversation.participation import _check_interrupt_text
+        from digital_life_core.conversation.participation import _check_interrupt_text
         _check_interrupt_text({})
         _check_interrupt_text({CONFIG_GROUP + ".enable_group_repeat_follow": self._Item(True)})
 
@@ -124,7 +124,7 @@ class GroupDefaultsTests(unittest.TestCase):
 
     def test_every_switch_is_a_real_boolean(self):
         """开关集合由源码派生，别再手工数一遍。"""
-        from companion_v2.conversation.participation import CONFIG_SWITCHES
+        from digital_life_core.conversation.participation import CONFIG_SWITCHES
         switches = [name for name, value in CONFIG_DEFAULTS.items() if type(value) is bool]
         self.assertEqual(set(switches), set(CONFIG_SWITCHES))
         self.assertTrue({"enable_group_behavior_learning", "enable_group_behavior_imitation",

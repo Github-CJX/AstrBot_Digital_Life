@@ -10,7 +10,7 @@ from tests import test_persona_designer_browser as designer_support
 
 
 BRIDGE = designer_support.HARNESS.split("<script>", 1)[1].split("</script>", 1)[0] + r"""
-const host='astrbot_plugin_private_companion', base='targets/first/roles/role-a/persona';
+const host='astrbot_plugin_digital_life', base='targets/first/roles/role-a/persona';
 window.questionnaire={calls:[], originals:{original:'原人格 A，保留空白。  \n\n',second:'原人格 B。'}, history:{
   original:[{version_id:'persona-draft-v000001',sequence:1,kind:'draft',draft_text:'原问卷已保存的旧稿',
     original_text:'原人格 A，保留空白。  \n\n',note:'旧版本',created_at:'2026-10-30T12:00:00Z'}],second:[]}};

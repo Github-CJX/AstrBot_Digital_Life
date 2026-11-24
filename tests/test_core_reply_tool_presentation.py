@@ -14,11 +14,11 @@ from astrbot.core.message.message_event_result import MessageChain
 from astrbot.core.pipeline.process_stage.follow_up import _ACTIVE_AGENT_RUNNERS
 from astrbot.core.provider.entities import LLMResponse, ProviderRequest
 
-from astrbot_host.core_reply import CORE_REPLY_CONTEXT_EXTRA
-from astrbot_host.core_reply_tool_dispatch import observe_core_tool_dispatch_begin, restore_core_tool_dispatch
-from astrbot_host.core_reply_turn_gate import close_core_reply_turn, install_core_reply_turn
-from astrbot_host.core_reply_voice_authoring import prepare_core_voice_authoring, restore_core_voice_authoring
-from companion_v2.conversation.voice_reply import VoiceReplyPolicy
+from digital_life_host.core_reply import CORE_REPLY_CONTEXT_EXTRA
+from digital_life_host.core_reply_tool_dispatch import observe_core_tool_dispatch_begin, restore_core_tool_dispatch
+from digital_life_host.core_reply_turn_gate import close_core_reply_turn, install_core_reply_turn
+from digital_life_host.core_reply_voice_authoring import prepare_core_voice_authoring, restore_core_voice_authoring
+from digital_life_core.conversation.voice_reply import VoiceReplyPolicy
 from tests.test_core_reply_voice import FakeEvent
 
 
@@ -95,15 +95,15 @@ class MediaToolPresentationTests(unittest.IsolatedAsyncioTestCase):
         return event, shown
 
     async def test_reaction_search_defers_complete_text_until_final_reply(self):
-        _, shown = await self.run_search("companion_v2_reaction_search")
+        _, shown = await self.run_search("digital_life_core_reaction_search")
         self.assertEqual(shown, ["生日快乐。"])
 
     async def test_reaction_search_defers_streamed_draft_too(self):
-        _, shown = await self.run_search("companion_v2_reaction_search", streaming=True)
+        _, shown = await self.run_search("digital_life_core_reaction_search", streaming=True)
         self.assertEqual(shown, ["生日快乐。"])
 
     async def test_reaction_search_and_voice_keep_one_final_speech_span(self):
-        event, shown = await self.run_search("companion_v2_reaction_search", voice=True)
+        event, shown = await self.run_search("digital_life_core_reaction_search", voice=True)
         self.assertEqual(shown, ["生日快乐。"])
         authored = event.get_extra(CORE_REPLY_CONTEXT_EXTRA)["_voice_authored"]
         self.assertEqual(len(authored["spans"]), 1)
@@ -113,7 +113,7 @@ class MediaToolPresentationTests(unittest.IsolatedAsyncioTestCase):
         # send that prose: AstrBot would deliver it and then deliver the reply
         # generated after the tool, which is the duplicate send the group path
         # used to avoid by removing the tool from the turn's tool set.
-        _, shown = await self.run_search("companion_v2_group_participation_choose")
+        _, shown = await self.run_search("digital_life_core_group_participation_choose")
         self.assertEqual(shown, ["生日快乐。"])
 
     async def test_any_tool_step_prose_is_folded_into_the_final_reply(self):

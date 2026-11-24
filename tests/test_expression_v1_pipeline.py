@@ -14,29 +14,29 @@ from unittest.mock import patch
 from astrbot.api.web import PluginRequest, bind_request_context
 from starlette.requests import Request
 
-from companion_v2.configuration.registry import FieldRegistry
-from companion_v2.conversation.flow import ConversationPolicy
-from companion_v2.conversation.foreground import ClaimKind, DraftClaim
-from companion_v2.execution.models import TaskContext
-from companion_v2.execution.runner import RunResult
-from companion_v2.expression import learning
-from companion_v2.expression.configuration import (GROUP, PRIVATE_GROUP, private_target_for,
+from digital_life_core.configuration.registry import FieldRegistry
+from digital_life_core.conversation.flow import ConversationPolicy
+from digital_life_core.conversation.foreground import ClaimKind, DraftClaim
+from digital_life_core.execution.models import TaskContext
+from digital_life_core.execution.runner import RunResult
+from digital_life_core.expression import learning
+from digital_life_core.expression.configuration import (GROUP, PRIVATE_GROUP, private_target_for,
     read_settings, target_for)
-from companion_v2.expression.review import (ExpressionDraftReview, REVIEW_BUDGET_SECONDS,
+from digital_life_core.expression.review import (ExpressionDraftReview, REVIEW_BUDGET_SECONDS,
     REVIEW_PROVIDER_TIMEOUT_SECONDS, REVIEW_WAIT_SECONDS, expression_review_profile, reviewed_text)
-from companion_v2.expression.sharing import build_pack
-from companion_v2.expression.style_management import ExpressionStyleManagement
-from companion_v2.expression.style_service import expression_learning_profile
-from companion_v2.conversation.style_context import EXPRESSION_STYLE_INSTRUCTION
-from companion_v2.foundation.refs import (AudienceRef, OperationRef, ScopeKind, ScopeRef,
+from digital_life_core.expression.sharing import build_pack
+from digital_life_core.expression.style_management import ExpressionStyleManagement
+from digital_life_core.expression.style_service import expression_learning_profile
+from digital_life_core.conversation.style_context import EXPRESSION_STYLE_INSTRUCTION
+from digital_life_core.foundation.refs import (AudienceRef, OperationRef, ScopeKind, ScopeRef,
     SubjectKind, SubjectRef, VersionRef)
-from companion_v2.identity_policy.personas import ConversationRoute
-from companion_v2.foundation.outcome import Outcome
-from companion_v2.role_profile.configuration import (GROUP as ROLE_PROFILE_GROUP,
+from digital_life_core.identity_policy.personas import ConversationRoute
+from digital_life_core.foundation.outcome import Outcome
+from digital_life_core.role_profile.configuration import (GROUP as ROLE_PROFILE_GROUP,
     RoleProfileConfigurationOwner, configuration_fields as role_profile_fields,
     target_for as role_profile_target_for)
 from types import SimpleNamespace
-from companion_v2.model_gateway.routing import configuration_fields
+from digital_life_core.model_gateway.routing import configuration_fields
 from tests.proactive_support import ContactFixture
 from tests.group_host_support import GroupFixture
 from tests.native_adapter_support import completion
@@ -363,7 +363,7 @@ class ExpressionReplyPipelineTests(ExpressionFixture, HostFixture, unittest.Isol
                         stopped.set()
                 self.model_behavior = model
                 before = len(self.sent)
-                with patch("companion_v2.expression.review.REVIEW_WAIT_SECONDS", 0.1):
+                with patch("digital_life_core.expression.review.REVIEW_WAIT_SECONDS", 0.1):
                     await self.reply(host, "failed-" + failure)
                 self.assertTrue(entered.is_set())
                 self.assertEqual([item.text.strip() for item in self.sent[before:]], ORIGINAL.splitlines())
@@ -400,8 +400,8 @@ class ExpressionReplyPipelineTests(ExpressionFixture, HostFixture, unittest.Isol
             return answered(ORIGINAL)
         self.model_behavior = held_review
         before = len(self.sent)
-        with patch("companion_v2.expression.review.REVIEW_WAIT_SECONDS", 0.1), \
-                self.assertLogs("companion_v2.expression.review", level="INFO") as captured:
+        with patch("digital_life_core.expression.review.REVIEW_WAIT_SECONDS", 0.1), \
+                self.assertLogs("digital_life_core.expression.review", level="INFO") as captured:
             await self.reply(host, "budget-exhausted")
         self.assertTrue(entered.is_set())
         self.assertEqual([item.text.strip() for item in self.sent[before:]], ORIGINAL.splitlines())
@@ -494,8 +494,8 @@ class ExpressionGroupPipelineTests(GroupFixture, unittest.IsolatedAsyncioTestCas
                 await listing
 
     async def request(self, suffix, data=None, *, query=""):
-        from companion_v2.execution.models import digest
-        path = "/astrbot_plugin_private_companion/host/targets/group-a/roles/" + digest("role-a") + "/reply" + suffix
+        from digital_life_core.execution.models import digest
+        path = "/astrbot_plugin_digital_life/host/targets/group-a/roles/" + digest("role-a") + "/reply" + suffix
         body = json.dumps(data, ensure_ascii=False).encode("utf-8") if data is not None else b""
         method = "POST" if data is not None else "GET"
         async def receive():
@@ -515,7 +515,7 @@ class ExpressionGroupPipelineTests(GroupFixture, unittest.IsolatedAsyncioTestCas
         receipt = None
         if shared:
             target = target_for(installation_id=app.runtime.installation_id)
-            from astrbot_host.management_identity import dashboard_operator
+            from digital_life_host.management_identity import dashboard_operator
             operator = dashboard_operator(app.runtime, "admin", at=self.clock.now())
             snapshot = app.configuration.read(operator, target=target, group_id=GROUP,
                                               observed_at=self.clock.now()).unwrap()

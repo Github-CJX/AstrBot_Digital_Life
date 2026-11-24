@@ -6,9 +6,9 @@ import json
 import unittest
 
 from astrbot.api.web import PluginRequest, bind_request_context
-from astrbot_host.multi_api import MultiHostWebAPI
-from astrbot_host.performance_mode import performance_enabled, performance_status
-from astrbot_host.role_paths import HOST_PREFIX
+from digital_life_host.multi_api import MultiHostWebAPI
+from digital_life_host.performance_mode import performance_enabled, performance_status
+from digital_life_host.role_paths import HOST_PREFIX
 
 
 class PerformanceModeTests(unittest.TestCase):

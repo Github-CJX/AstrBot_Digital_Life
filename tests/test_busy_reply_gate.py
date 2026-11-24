@@ -16,17 +16,17 @@ import json
 import unittest
 from unittest.mock import patch
 
-from companion_v2.configuration.models import ConfigLayer
-from companion_v2.configuration.registry import FieldRegistry, ValueKind
-from companion_v2.configuration.service import ConfigurationService
-from companion_v2.conversation import busy_gate
-from companion_v2.conversation.busy_gate import (BusyGateConfigurationOwner, Settings, busy_context,
+from digital_life_core.configuration.models import ConfigLayer
+from digital_life_core.configuration.registry import FieldRegistry, ValueKind
+from digital_life_core.configuration.service import ConfigurationService
+from digital_life_core.conversation import busy_gate
+from digital_life_core.conversation.busy_gate import (BusyGateConfigurationOwner, Settings, busy_context,
                                                  busy_exempt_source, bypass_reason, configuration_fields,
                                                  defer_seconds, is_busy_text, keywords, proactive_defer_until,
                                                  validate_defer_seconds)
-from companion_v2.conversation.flow import ConversationPolicy
-from companion_v2.execution.models import TaskError
-from companion_v2.identity_policy.personas import RuntimeIdentity
+from digital_life_core.conversation.flow import ConversationPolicy
+from digital_life_core.execution.models import TaskError
+from digital_life_core.identity_policy.personas import RuntimeIdentity
 from tests.contact_schedule_support import ContactScheduleFixture
 from tests.test_host_application import HostFixture
 from tests.test_management_access import NOW, SCOPE
@@ -201,8 +201,8 @@ class BusyGateOwnerTests(HostFixture, unittest.TestCase):
         self.target = busy_gate.target_for(self.window_context())
 
     def window_context(self):
-        from companion_v2.execution.models import TaskContext
-        from companion_v2.foundation.refs import AudienceRef
+        from digital_life_core.execution.models import TaskContext
+        from digital_life_core.foundation.refs import AudienceRef
         return TaskContext(self.important, self.identity.resolve_role(SCOPE, observed_at=NOW).unwrap(),
                            AudienceRef(SCOPE, (self.important.subject,)))
 
@@ -254,8 +254,8 @@ class BusyGateHostTests(HostFixture, unittest.IsolatedAsyncioTestCase):
 
     def accept_deferred(self, app, context, *, defer, identifier=None):
         """Drive one accept with an explicit deferral; no host wiring is needed."""
-        from companion_v2.conversation.models import InboundConversationEvent
-        from companion_v2.execution.models import digest
+        from digital_life_core.conversation.models import InboundConversationEvent
+        from digital_life_core.execution.models import digest
         identifier = identifier or "delayed-" + str(self.calls)
         self.calls += 1
         body = "延迟期间的输入"
@@ -265,9 +265,9 @@ class BusyGateHostTests(HostFixture, unittest.IsolatedAsyncioTestCase):
         return app.flow.accept(context, event, role_instruction="原角色人格提示", defer_seconds=defer)
 
     def source(self, app, context, identifier, body):
-        from companion_v2.foundation.refs import AudienceRef, SourceRef, VersionRef
-        from companion_v2.execution.models import digest
-        from companion_v2.sources.models import SourceRecord
+        from digital_life_core.foundation.refs import AudienceRef, SourceRef, VersionRef
+        from digital_life_core.execution.models import digest
+        from digital_life_core.sources.models import SourceRecord
         reference = SourceRef(identifier, "conversation.host_input", context.scope,
                               VersionRef(identifier, 1), self.clock.now())
         app.messages.sources.publish(SourceRecord(reference, AudienceRef(context.scope, (context.actor.subject,)),
@@ -386,7 +386,7 @@ class BusyGateHostTests(HostFixture, unittest.IsolatedAsyncioTestCase):
         await self.done(app, batch)
         self.calendar(app, context, start=NOW)
         self.gate(app, context, {"busy_reply_gate_enabled": True})
-        from companion_v2.conversation.busy_gate import SettingsReader
+        from digital_life_core.conversation.busy_gate import SettingsReader
         settings = SettingsReader(app.runtime).read(context)
         for index, text in enumerate(("救命，我现在很不舒服", "/状态", "陪伴设置")):
             self.assertTrue(busy_gate.bypass_reason(text, settings=settings), text)
@@ -480,9 +480,9 @@ class BusyGateProactiveTests(ContactScheduleFixture, unittest.IsolatedAsyncioTes
 
     def open_commitment(self, app, context, *, identifier="appointment", minutes=20):
         """One human-accepted commitment, so the calendar can emit a real occurrence."""
-        from companion_v2.agenda.models import Schedule
-        from companion_v2.execution.models import encode
-        from companion_v2.role_work.state.management import StateManagement
+        from digital_life_core.agenda.models import Schedule
+        from digital_life_core.execution.models import encode
+        from digital_life_core.role_work.state.management import StateManagement
         from tests.test_role_state import calendar_data
 
         manager = StateManagement(app, context)

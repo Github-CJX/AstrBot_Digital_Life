@@ -6,12 +6,12 @@ from pathlib import Path
 from tempfile import TemporaryDirectory
 import unittest
 
-from companion_v2.foundation.refs import ScopeKind, ScopeRef, SubjectKind, SubjectRef
-from companion_v2.identity_policy.personas import (
+from digital_life_core.foundation.refs import ScopeKind, ScopeRef, SubjectKind, SubjectRef
+from digital_life_core.identity_policy.personas import (
     ConversationRoute, PersonaBinding, PersonaDirectory, PersonaSelector, SelectorKind,
 )
-from companion_v2.identity_policy.repository import PersistentIdentityDirectory
-from companion_v2.storage.runtime import StorageRuntime
+from digital_life_core.identity_policy.repository import PersistentIdentityDirectory
+from digital_life_core.storage.runtime import StorageRuntime
 
 
 NOW = datetime(2026, 9, 21, 4, 0, tzinfo=timezone.utc)

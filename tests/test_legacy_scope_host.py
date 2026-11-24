@@ -4,9 +4,9 @@ import unittest
 from types import SimpleNamespace
 from unittest.mock import AsyncMock, patch
 
-from astrbot_host.identity_derivation import derive_role_id
-from astrbot_host.legacy_api import LegacyMigrationWebAPI
-from companion_v2.foundation.outcome import Outcome
+from digital_life_host.identity_derivation import derive_role_id
+from digital_life_host.legacy_api import LegacyMigrationWebAPI
+from digital_life_core.foundation.outcome import Outcome
 
 
 class ScopePreviewTests(unittest.TestCase):
@@ -45,7 +45,7 @@ class ScopePreviewTests(unittest.TestCase):
             {"group_networks": [], "private_contacts": {}},
         ]
         migration = SimpleNamespace(discover=lambda: Outcome.success(True), v1_configuration=None)
-        with patch("companion_v2.legacy.data_migration.build_data_plan",
+        with patch("digital_life_core.legacy.data_migration.build_data_plan",
                    side_effect=[SimpleNamespace(document=lambda item=item: item) for item in documents]):
             result = api._scope(migration, None, self.session())
         self.assertTrue(result.is_success)
@@ -134,7 +134,7 @@ class BatchApplyTests(unittest.IsolatedAsyncioTestCase):
                 return {"status": "ok", "data": {"idempotent": True}}
 
         with patch.object(LegacyMigrationWebAPI, "_scope", return_value=Outcome.success(scope)), \
-             patch("astrbot_host.legacy_group_data_api.LegacyGroupDataWebAPI", FakeGroupAPI):
+             patch("digital_life_host.legacy_group_data_api.LegacyGroupDataWebAPI", FakeGroupAPI):
             result = await api._batch_apply(None, None, None,
                                             {"token": "t", "personas": [], "groups": [
                                                 {"persona_id": "auto", "group_id": "109"}]})

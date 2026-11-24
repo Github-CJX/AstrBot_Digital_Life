@@ -7,12 +7,12 @@ from unittest.mock import patch
 
 import unittest
 
-from astrbot_host.identity_derivation import derive_role_id
-from astrbot_host.legacy_api import LegacyMigrationWebAPI
-from astrbot_host.multi_controller import AstrBotMultiController
-from companion_v2.adapters.astrbot.staging import NativeAdapterTypes
-from companion_v2.foundation.clock import DeterministicClock
-from companion_v2.legacy.migration import LegacyMigration
+from digital_life_host.identity_derivation import derive_role_id
+from digital_life_host.legacy_api import LegacyMigrationWebAPI
+from digital_life_host.multi_controller import AstrBotMultiController
+from digital_life_core.adapters.astrbot.staging import NativeAdapterTypes
+from digital_life_core.foundation.clock import DeterministicClock
+from digital_life_core.legacy.migration import LegacyMigration
 from tests.multi_host_support import MultiNativeContext, multi_config
 from tests.native_adapter_support import FakeEvent, FakeProvider, FakeReverseApi
 from tests.test_management_access import NOW
@@ -55,7 +55,7 @@ class LegacyBatchHostTests(unittest.IsolatedAsyncioTestCase):
         api.controller = SimpleNamespace(runtime=self.controller.runtime, now=self.clock.now,
             data_root=Path(self.target.name) / "data", web_api=self.controller.web_api,
             config=self.controller.config, role_id=self.role_id)
-        from astrbot_host.management_identity import dashboard_operator
+        from digital_life_host.management_identity import dashboard_operator
         api._operator = lambda: dashboard_operator(
             self.controller.runtime, "migration-test-admin", at=self.clock.now())
         return api

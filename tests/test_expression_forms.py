@@ -7,16 +7,16 @@ from datetime import datetime, timezone
 from types import SimpleNamespace
 from unittest.mock import patch
 
-from companion_v2.expression import learning
-from companion_v2.expression import style_rotation
-from companion_v2.expression.configuration import read_settings
-from companion_v2.expression.sharing import build_pack, normalize_pack
-from companion_v2.execution.models import digest, stamp
-from companion_v2.expression.style_management import ExpressionStyleManagement
-from companion_v2.conversation.foreground import PromptMaterial, PromptRequest, SealedForegroundContext
-from companion_v2.conversation.generation import _filter_expression_style_materials
-from companion_v2.conversation.messages import ConversationMessages
-from companion_v2.conversation.style_context import (ConversationExpressionStyleContext,
+from digital_life_core.expression import learning
+from digital_life_core.expression import style_rotation
+from digital_life_core.expression.configuration import read_settings
+from digital_life_core.expression.sharing import build_pack, normalize_pack
+from digital_life_core.execution.models import digest, stamp
+from digital_life_core.expression.style_management import ExpressionStyleManagement
+from digital_life_core.conversation.foreground import PromptMaterial, PromptRequest, SealedForegroundContext
+from digital_life_core.conversation.generation import _filter_expression_style_materials
+from digital_life_core.conversation.messages import ConversationMessages
+from digital_life_core.conversation.style_context import (ConversationExpressionStyleContext,
     EXPRESSION_STYLE_INSTRUCTION, SNAPSHOT_VERSION)
 from tests.test_expression_v1_pipeline import ExpressionFixture, materials, RULE
 from tests import test_expression_v1_pipeline as pipeline

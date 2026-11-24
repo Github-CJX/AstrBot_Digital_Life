@@ -2,7 +2,7 @@
 "use strict";
 window.CompanionNativePerceptionPage = (() => {
   const product = window.CompanionProduct;
-  const prefix = "/astrbot_plugin_private_companion/";
+  const prefix = "/astrbot_plugin_digital_life/";
   const esc = value => String(value ?? "").replace(/[&<>"']/g, char => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[char]));
   const errors = {
     configuration_revision_conflict:"配置已变化，草稿仍在。刷新后核对，再采用最新版本保存。",

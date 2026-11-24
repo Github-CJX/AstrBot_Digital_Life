@@ -28,7 +28,7 @@ function targets() {
     installation_id: 'inst', operator_id: 'operator',
     targets: [{
       target_id: 'target-1', scope_kind: 'private', participant_id: 'user-1', platform_id: 'aiocqhttp', account_id: 'bot-1',
-      roles: [{role_id: 'role-1', memory_api: '/astrbot_plugin_private_companion/memory'}],
+      roles: [{role_id: 'role-1', memory_api: '/astrbot_plugin_digital_life/memory'}],
     }],
   };
 }
@@ -60,7 +60,7 @@ function harness(routes, ownerDocument) {
       bridgeFor: () => ({then: resolve => resolve(window.AstrBotPluginPage)}),
     },
     AstrBotPluginPage: {
-      ready: () => Promise.resolve({pluginName: 'astrbot_plugin_private_companion'}),
+      ready: () => Promise.resolve({pluginName: 'astrbot_plugin_digital_life'}),
       /* 归属是静态读数，随手回答掉。若让它排队，用例里那些「手动回答目录、
          再 settle() 若干拍」的写法会卡在这一条上：目录请求根本还没发出去，
          测试就把 settle 走完了。 */
@@ -511,9 +511,9 @@ test('事实与经历跟随小屋的 Bot 和角色，未选窗口不借私聊读
   product.selection = () => ({bot_id: 'bot-a', role_id: 'same-role', target_id: null});
   product.roleSelection = () => ({bot_id: 'bot-a', role_id: 'same-role', target_id: 'private-a'});
   const catalog = {installation_id: 'inst', operator_id: 'operator', targets: [
-    {bot_id: 'bot-a', target_id: 'private-a', display_name: '甲的窗口', scope_kind: 'private', roles: [{role_id: 'same-role', memory_api: '/astrbot_plugin_private_companion/memory'}]},
-    {bot_id: 'bot-b', target_id: 'private-b', display_name: '乙的窗口', scope_kind: 'private', roles: [{role_id: 'same-role', memory_api: '/astrbot_plugin_private_companion/other-memory'}]},
-    {bot_id: 'bot-a', target_id: 'private-c', display_name: '另一角色的窗口', scope_kind: 'private', roles: [{role_id: 'other-role', memory_api: '/astrbot_plugin_private_companion/other-memory'}]},
+    {bot_id: 'bot-a', target_id: 'private-a', display_name: '甲的窗口', scope_kind: 'private', roles: [{role_id: 'same-role', memory_api: '/astrbot_plugin_digital_life/memory'}]},
+    {bot_id: 'bot-b', target_id: 'private-b', display_name: '乙的窗口', scope_kind: 'private', roles: [{role_id: 'same-role', memory_api: '/astrbot_plugin_digital_life/other-memory'}]},
+    {bot_id: 'bot-a', target_id: 'private-c', display_name: '另一角色的窗口', scope_kind: 'private', roles: [{role_id: 'other-role', memory_api: '/astrbot_plugin_digital_life/other-memory'}]},
   ]};
   const mounted = h.page.mount(h.element); await h.settle();
   h.reply(h.requests.find(request => request.route === 'page/targets'), catalog);

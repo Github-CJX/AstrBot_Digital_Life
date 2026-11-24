@@ -6,7 +6,7 @@ import shutil
 import unittest
 
 from tests import test_astrbot_staging_host as host_support
-from astrbot_host.native_extensions.live.soullink_runtime import SoullinkRuntimeBridge
+from digital_life_host.native_extensions.live.soullink_runtime import SoullinkRuntimeBridge
 
 
 NODE_PATH = shutil.which("node")

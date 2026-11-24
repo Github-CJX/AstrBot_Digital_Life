@@ -10,14 +10,14 @@ from types import SimpleNamespace
 import unittest
 from unittest.mock import patch
 
-from companion_v2.execution.models import encode
-from companion_v2.foundation.outcome import Outcome
-from companion_v2.memory.query import MemoryQuery
-from companion_v2.memory.reflection import MemoryReflection
-from companion_v2.memory.reflection_inputs import span_key
-from companion_v2.memory.writer import MemoryWriter
-from companion_v2.storage.runtime import StorageOpenError, StorageRuntime
-from companion_v2.storage.schema import SCHEMA_VERSION
+from digital_life_core.execution.models import encode
+from digital_life_core.foundation.outcome import Outcome
+from digital_life_core.memory.query import MemoryQuery
+from digital_life_core.memory.reflection import MemoryReflection
+from digital_life_core.memory.reflection_inputs import span_key
+from digital_life_core.memory.writer import MemoryWriter
+from digital_life_core.storage.runtime import StorageOpenError, StorageRuntime
+from digital_life_core.storage.schema import SCHEMA_VERSION
 from tests.execution_support import remove_v27
 from tests.memory_support import MemoryFixture
 
@@ -245,7 +245,7 @@ class MemorySelectionTests(SelectionFixture, unittest.TestCase):
         self.seed(3)
         self.reflection.selection.candidate_items = 1
         first = self.prepare()
-        from companion_v2.memory import codec
+        from digital_life_core.memory import codec
         original = codec.evidence(self.manifest(first["batch_id"])["evidence"][0])
         self.memory.sources.revoke(original.source, expected_governance_revision=1, observed_at=self.clock.now()).unwrap()
         result = self.reflection.prepare(self.context, request_id="selection", **self.window)

@@ -5,22 +5,22 @@ import json
 import unittest
 from unittest.mock import patch
 
-from companion_v2.agenda.models import AgendaTarget, Schedule
-from companion_v2.configuration.models import ConfigLayer, ConfigTarget
-from companion_v2.conversation.delivery import DeliveryReceipt
-from companion_v2.conversation.reply_settings import GROUP as PRESENTATION_GROUP
-from companion_v2.conversation.text_processing import TEXT_DEFAULTS
-from companion_v2.conversation.foreground import BackgroundPromptTrigger
-from companion_v2.delivery.service import DeliveryRequest
-from companion_v2.execution.models import TaskError, digest
-from companion_v2.foundation.refs import SubjectKind, SubjectRef
-from companion_v2.identity_policy.personas import ConversationRoute
-from companion_v2.identity_policy.models import AuthorizationTier
-from companion_v2.proactive.configuration import GROUP, target_for
-from companion_v2.proactive.prompts import contact_output, history_round_materials
-from companion_v2.proactive.service import CONTACT_KIND
-from companion_v2.model_gateway.models import Amount, BudgetPolicy
-from companion_v2.adapters.astrbot.model_wire import build_wire
+from digital_life_core.agenda.models import AgendaTarget, Schedule
+from digital_life_core.configuration.models import ConfigLayer, ConfigTarget
+from digital_life_core.conversation.delivery import DeliveryReceipt
+from digital_life_core.conversation.reply_settings import GROUP as PRESENTATION_GROUP
+from digital_life_core.conversation.text_processing import TEXT_DEFAULTS
+from digital_life_core.conversation.foreground import BackgroundPromptTrigger
+from digital_life_core.delivery.service import DeliveryRequest
+from digital_life_core.execution.models import TaskError, digest
+from digital_life_core.foundation.refs import SubjectKind, SubjectRef
+from digital_life_core.identity_policy.personas import ConversationRoute
+from digital_life_core.identity_policy.models import AuthorizationTier
+from digital_life_core.proactive.configuration import GROUP, target_for
+from digital_life_core.proactive.prompts import contact_output, history_round_materials
+from digital_life_core.proactive.service import CONTACT_KIND
+from digital_life_core.model_gateway.models import Amount, BudgetPolicy
+from digital_life_core.adapters.astrbot.model_wire import build_wire
 from tests.proactive_support import ContactFixture
 from tests.test_management_access import INSTALLATION, NOW, ROLE, SCOPE
 from tests.test_role_tool_loop import answered
@@ -236,7 +236,7 @@ class ProactiveContactTests(ContactFixture, unittest.IsolatedAsyncioTestCase):
                                (json.dumps(data, ensure_ascii=False), row["contact_id"]))
         restored = app.proactive._part_request(request.source_ref, request.context, data, 0, request.not_before)
         self.assertEqual(restored, request)
-        with patch("companion_v2.proactive.service.logger.warning") as warning:
+        with patch("digital_life_core.proactive.service.logger.warning") as warning:
             self.assertFalse(app.proactive.delivery_confirmed(request.delivery_id))
         warning.assert_not_called()
         self.assertEqual(len(app.proactive._delivery_rows(task.task_id)), 1)
@@ -286,7 +286,7 @@ class ProactiveContactTests(ContactFixture, unittest.IsolatedAsyncioTestCase):
         self.assertEqual([message.text for message in self.sent], ["第一句。", "第二句。"])
 
     async def test_full_delivery_queue_retries_the_next_part_without_replaying_the_first(self):
-        from companion_v2.foundation.outcome import Outcome
+        from digital_life_core.foundation.outcome import Outcome
 
         app = await self.enabled()
         self.presentation_settings(app, {"enabled": True, "llm_controlled": True,
@@ -687,7 +687,7 @@ class ProactiveContactTests(ContactFixture, unittest.IsolatedAsyncioTestCase):
         async def prose(_envelope):
             return answered("这句不是 JSON，只是一句随手写的话。")
         self.model_behavior = prose
-        with self.assertLogs("companion_v2.proactive.service", level="WARNING") as logs:
+        with self.assertLogs("digital_life_core.proactive.service", level="WARNING") as logs:
             task = (await self.contact(app)).unwrap().task
 
         self.assertEqual(task.state, "succeeded", "a malformed answer is not a task failure")
@@ -731,7 +731,7 @@ class ProactiveContactTests(ContactFixture, unittest.IsolatedAsyncioTestCase):
         async def full(envelope):
             return answered('{"decision":"send","text":"准备好的文本"}')
         self.model_behavior = full
-        from companion_v2.foundation.outcome import Outcome
+        from digital_life_core.foundation.outcome import Outcome
         with patch.object(app.outbound, "queue", return_value=Outcome.failed("task_queue_full", "no delivery capacity")):
             task = (await self.contact(app)).unwrap().task
         self.assertNotEqual(task.state, "succeeded")

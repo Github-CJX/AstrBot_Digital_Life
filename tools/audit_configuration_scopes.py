@@ -69,14 +69,14 @@ def model_profiles():
     Parse its declarations instead of importing AstrBot or maintaining a second
     list that could omit profiles present only in multi-host mode.
     """
-    from companion_v2.execution.models import Lane
-    from companion_v2.model_gateway.models import ModelTaskProfile
+    from digital_life_core.execution.models import Lane
+    from digital_life_core.model_gateway.models import ModelTaskProfile
 
     profiles = [ModelTaskProfile("conversation.reply", Lane.FOREGROUND, "scope-audit", "审计")]
-    tree = ast.parse((ROOT / "astrbot_host/multi_session.py").read_text(encoding="utf-8"))
+    tree = ast.parse((ROOT / "digital_life_host/multi_session.py").read_text(encoding="utf-8"))
     imports = {alias.asname or alias.name: (node.module, alias.name)
                for node in tree.body if isinstance(node, ast.ImportFrom)
-               and node.module and node.module.startswith("companion_v2.") for alias in node.names}
+               and node.module and node.module.startswith("digital_life_core.") for alias in node.names}
     assembly = next(node.value for node in ast.walk(tree) if isinstance(node, ast.Assign)
                     and any(isinstance(target, ast.Name) and target.id == "profiles" for target in node.targets))
     for call in ast.walk(assembly):
@@ -94,15 +94,15 @@ def model_profiles():
 
 
 def inventory():
-    from companion_v2.configuration.models import ConfigLayer
-    from companion_v2.configuration.owners import SparseConfigurationOwner
-    from companion_v2.configuration.role_settings import RoleSharedSettingsOwner
-    from companion_v2.conversation.segmentation import SegmentationPolicy
-    from companion_v2.configuration import management
-    from companion_v2.foundation.refs import ScopeKind, ScopeRef, SubjectKind, SubjectRef
-    from companion_v2.memory.management import MemoryManagement
-    from companion_v2.role_work.state.configuration import DEFAULTS as STATE_DEFAULTS
-    from companion_v2.role_work.state.settings_scope import role_preference
+    from digital_life_core.configuration.models import ConfigLayer
+    from digital_life_core.configuration.owners import SparseConfigurationOwner
+    from digital_life_core.configuration.role_settings import RoleSharedSettingsOwner
+    from digital_life_core.conversation.segmentation import SegmentationPolicy
+    from digital_life_core.configuration import management
+    from digital_life_core.foundation.refs import ScopeKind, ScopeRef, SubjectKind, SubjectRef
+    from digital_life_core.memory.management import MemoryManagement
+    from digital_life_core.role_work.state.configuration import DEFAULTS as STATE_DEFAULTS
+    from digital_life_core.role_work.state.settings_scope import role_preference
 
     registered, origins, modules = {}, defaultdict(list), {}
 
@@ -114,7 +114,7 @@ def inventory():
             origins[field.field_id].append({"file": module.replace(".", "/") + ".py",
                                            "factory": factory, "line": line})
 
-    for path in sorted((ROOT / "companion_v2").rglob("*.py")):
+    for path in sorted((ROOT / "digital_life_core").rglob("*.py")):
         source = path.read_text(encoding="utf-8")
         if "configuration_fields" not in source:
             continue
@@ -127,10 +127,10 @@ def inventory():
             factory = getattr(module, node.name)
             required = [p for p in inspect.signature(factory).parameters.values()
                         if p.default is p.empty and p.kind not in (p.VAR_POSITIONAL, p.VAR_KEYWORD)]
-            if name == "companion_v2.model_gateway.routing":
+            if name == "digital_life_core.model_gateway.routing":
                 fields = factory(model_profiles())
                 family = "model"
-            elif name == "companion_v2.conversation.reply_settings":
+            elif name == "digital_life_core.conversation.reply_settings":
                 fields, family = factory(SegmentationPolicy(), False, 0.5), "business"
             elif required:
                 raise ValueError("unhandled required field factory: " + name + ":" + node.name)
@@ -140,15 +140,15 @@ def inventory():
 
     # The host catalog is safe to import and is the source of truth for both
     # bundled extensions and integrations supplied by separate plugins.
-    from astrbot_host.integration_catalog import BUNDLED_EXTENSIONS, EXTERNAL_PROVIDERS
+    from digital_life_host.integration_catalog import BUNDLED_EXTENSIONS, EXTERNAL_PROVIDERS
     declarations = (*BUNDLED_EXTENSIONS, *EXTERNAL_PROVIDERS)
-    from companion_v2.capabilities.configuration import CapabilityConfigurationOwner
+    from digital_life_core.capabilities.configuration import CapabilityConfigurationOwner
     for declaration in declarations:
         extension_id = declaration.get("extension_id")
         if not extension_id:
             continue
         owner = CapabilityConfigurationOwner(None, extension_id=extension_id)
-        add(owner.fields, "companion_v2.capabilities.configuration", "CapabilityConfigurationOwner.fields", 32,
+        add(owner.fields, "digital_life_core.capabilities.configuration", "CapabilityConfigurationOwner.fields", 32,
             "capability")
 
     role = SubjectRef("scope-audit", SubjectKind.BOT, "audit-role")
@@ -164,7 +164,7 @@ def inventory():
             editor = cls.__new__(cls)
             editor.context = context
             targets[cls.group] = editor._target().layer.value
-    from companion_v2.conversation.perception_management import PerceptionManagement
+    from digital_life_core.conversation.perception_management import PerceptionManagement
     targets["conversation.presentation"] = ConfigLayer.ROLE.value
     targets["conversation.perception"] = inspect.signature(PerceptionManagement.__init__).parameters["layer"].default.value
     targets["memory"] = inspect.signature(MemoryManagement.settings).parameters["layer"].default
@@ -278,17 +278,17 @@ def database_counts(path, fields):
 
 
 def behavior_probes():
-    from companion_v2.configuration.models import ConfigLayer, ConfigTarget, ConfigurationError
-    from companion_v2.configuration.owners import SparseConfigurationOwner
-    from companion_v2.conversation.segmentation import SegmentationPolicy
-    from companion_v2.conversation.reply_settings import (GROUP, configuration_fields,
+    from digital_life_core.configuration.models import ConfigLayer, ConfigTarget, ConfigurationError
+    from digital_life_core.configuration.owners import SparseConfigurationOwner
+    from digital_life_core.conversation.segmentation import SegmentationPolicy
+    from digital_life_core.conversation.reply_settings import (GROUP, configuration_fields,
         ReplyConfigurationOwner)
-    from companion_v2.foundation.refs import ScopeKind, ScopeRef, SubjectKind, SubjectRef
-    from companion_v2.qzone.configuration import configuration_fields as qzone_fields, QzoneConfigurationOwner
-    from companion_v2.role_work.state.configuration import configuration_fields as state_fields, StateConfigurationOwner
-    from companion_v2.role_work.growth.configuration import SKILL_FIELDS, SkillConfigurationOwner
-    from companion_v2.storage.runtime import StorageRuntime
-    from companion_v2.model_gateway.routing import ModelRouter, configuration_fields as model_fields
+    from digital_life_core.foundation.refs import ScopeKind, ScopeRef, SubjectKind, SubjectRef
+    from digital_life_core.qzone.configuration import configuration_fields as qzone_fields, QzoneConfigurationOwner
+    from digital_life_core.role_work.state.configuration import configuration_fields as state_fields, StateConfigurationOwner
+    from digital_life_core.role_work.growth.configuration import SKILL_FIELDS, SkillConfigurationOwner
+    from digital_life_core.storage.runtime import StorageRuntime
+    from digital_life_core.model_gateway.routing import ModelRouter, configuration_fields as model_fields
 
     result = {}
     with TemporaryDirectory(prefix="v2-scope-audit-") as temporary:

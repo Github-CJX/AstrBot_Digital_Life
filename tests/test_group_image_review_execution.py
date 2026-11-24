@@ -5,12 +5,12 @@ import json
 from types import MappingProxyType
 import unittest
 
-from companion_v2.conversation.foreground import ModelDraft
-from companion_v2.conversation.media.review import DEFAULTS
-from companion_v2.execution.models import ProviderBinding
-from companion_v2.model_gateway.failures import ModelFailure
-from companion_v2.model_gateway.models import Amount, LocalProvider, ProviderResponse
-from companion_v2.conversation.reply_settings import (ReplyConfigurationOwner,
+from digital_life_core.conversation.foreground import ModelDraft
+from digital_life_core.conversation.media.review import DEFAULTS
+from digital_life_core.execution.models import ProviderBinding
+from digital_life_core.model_gateway.failures import ModelFailure
+from digital_life_core.model_gateway.models import Amount, LocalProvider, ProviderResponse
+from digital_life_core.conversation.reply_settings import (ReplyConfigurationOwner,
     configuration_fields as reply_fields, target_for)
 from tests.group_host_support import group_config
 from tests.group_image_delivery_support import GroupImageDeliveryFixture

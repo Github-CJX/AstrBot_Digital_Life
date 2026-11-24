@@ -1,7 +1,7 @@
 /* 配置分区三方对账。
  *
  * 一个分区要在页面上真的能用，三处必须同时存在：
- *   1. 后端 astrbot_host/configuration_api.py 的 SECTIONS 里注册了编辑器
+ *   1. 后端 digital_life_host/configuration_api.py 的 SECTIONS 里注册了编辑器
  *   2. 前端 config-editor.js 的 spec 里声明了它（标题、字段标签）
  *   3. app.js 里有 mountConfigEditor(..., ['它'])
  *
@@ -21,7 +21,7 @@ const vm = require("node:vm");
 
 const ROOT = path.join(__dirname, "..");
 const PAGE = path.join(ROOT, "pages", "陪伴小屋");
-const BACKEND = path.join(ROOT, "astrbot_host", "configuration_api.py");
+const BACKEND = path.join(ROOT, "digital_life_host", "configuration_api.py");
 /* system.prompts is edited by maintenance-page.js through its own
    sections=system.prompts request; it is not a config-editor card. Keep it
    out of the config-editor three-way count instead of pretending it has a

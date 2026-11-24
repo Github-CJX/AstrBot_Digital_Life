@@ -1,6 +1,6 @@
 from datetime import datetime, timezone
 
-from companion_v2.conversation.date_context import project_local_date
+from digital_life_core.conversation.date_context import project_local_date
 
 
 class Provider:

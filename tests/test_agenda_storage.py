@@ -7,12 +7,12 @@ from tempfile import TemporaryDirectory
 import unittest
 from unittest.mock import patch
 
-from companion_v2.agenda.models import encode, stamp
-from companion_v2.configuration.service import ConfigurationService
-from companion_v2.identity_policy.models import AuthorizationTier, CapabilityGrant, IdentityBinding
-from companion_v2.identity_policy.repository import PersistentIdentityDirectory
-from companion_v2.storage.runtime import StorageOpenError, StorageRuntime
-from companion_v2.storage.schema import (
+from digital_life_core.agenda.models import encode, stamp
+from digital_life_core.configuration.service import ConfigurationService
+from digital_life_core.identity_policy.models import AuthorizationTier, CapabilityGrant, IdentityBinding
+from digital_life_core.identity_policy.repository import PersistentIdentityDirectory
+from digital_life_core.storage.runtime import StorageOpenError, StorageRuntime
+from digital_life_core.storage.schema import (
     migration_count,
     MIGRATION_V1_TO_V2_ID, MIGRATION_V1_TO_V2_FINGERPRINT,
     MIGRATION_V2_TO_V3_ID, MIGRATION_V2_TO_V3_FINGERPRINT,
@@ -157,7 +157,7 @@ class AgendaStorageTests(unittest.TestCase):
         self.assertEqual(len(self.open_runtime().read_all("SELECT * FROM schema_migrations", ())), migration_count())
 
     def test_failed_v4_ddl_rolls_back_and_original_config_can_upgrade_later(self):
-        with patch("companion_v2.storage.runtime.V4_MIGRATION_STATEMENTS", (*V4_MIGRATION_STATEMENTS[:4], "INVALID DDL")):
+        with patch("digital_life_core.storage.runtime.V4_MIGRATION_STATEMENTS", (*V4_MIGRATION_STATEMENTS[:4], "INVALID DDL")):
             with self.assertRaises(StorageOpenError):
                 self.open_runtime()
         self.assert_v3_unchanged()

@@ -11,12 +11,12 @@ from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from tempfile import TemporaryDirectory
 
-from companion_v2.execution.models import TaskError
-from companion_v2.qzone.comment_scan import (BACKOFF_BASE, BACKOFF_CAP, DEFERRED, DUPLICATE, FAILED,
+from digital_life_core.execution.models import TaskError
+from digital_life_core.qzone.comment_scan import (BACKOFF_BASE, BACKOFF_CAP, DEFERRED, DUPLICATE, FAILED,
                                              NOT_DUE, READY, UNKNOWN, CommentScanner,
                                              reply_operation_key)
-from companion_v2.qzone.inbox import CommentInbox
-from companion_v2.storage.runtime import StorageRuntime
+from digital_life_core.qzone.inbox import CommentInbox
+from digital_life_core.storage.runtime import StorageRuntime
 
 
 NOW = datetime(2026, 9, 30, 12, 0, tzinfo=timezone.utc)
@@ -275,7 +275,7 @@ class ReplyTests(ScannerTestCase):
 
 
 def _event():
-    from companion_v2.qzone.comments import comment_event
+    from digital_life_core.qzone.comments import comment_event
     return comment_event(platform="qq-main", login="100", post_tid="ref-1", uin="7", content="今天天气不错")
 
 

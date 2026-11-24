@@ -4,7 +4,7 @@ import asyncio
 from datetime import datetime, timedelta, timezone
 import unittest
 
-from companion_v2.conversation.keyword_materials import (
+from digital_life_core.conversation.keyword_materials import (
     KeywordMaterialSpec,
     KeywordMaterials,
     render,

@@ -10,30 +10,30 @@ import unittest
 
 from tests import astrbot_data_root  # noqa: F401 - isolate SDK root before AstrBot imports
 from tests import test_astrbot_staging_host as host_support  # noqa: F401
-from astrbot_host.capability_role_selection import AUTO_ROLE_EXTENSIONS
-from astrbot_host.content_access import CONTENT_EXTENSION, ensure_content_access
-from astrbot_host.core_reply import prepare_core_reply_event
-from astrbot_host.core_reply_tools import close_core_reply_tools, inject_core_reply_tools
-from astrbot_host.integration_registry import IntegrationRegistry
-from astrbot_host.native_extensions.scheduled_authoring import ScheduledAuthoring
-from companion_v2.capabilities.models import CapabilityAuthorizationState
-from companion_v2.capabilities.repositories import CapabilityRepository
-from companion_v2.configuration.models import ConfigLayer, ConfigTarget
-from companion_v2.configuration.owners import SparseConfigurationOwner
-from companion_v2.configuration.registry import FieldRegistry
-from companion_v2.conversation.content.authoring_service import (
+from digital_life_host.capability_role_selection import AUTO_ROLE_EXTENSIONS
+from digital_life_host.content_access import CONTENT_EXTENSION, ensure_content_access
+from digital_life_host.core_reply import prepare_core_reply_event
+from digital_life_host.core_reply_tools import close_core_reply_tools, inject_core_reply_tools
+from digital_life_host.integration_registry import IntegrationRegistry
+from digital_life_host.native_extensions.scheduled_authoring import ScheduledAuthoring
+from digital_life_core.capabilities.models import CapabilityAuthorizationState
+from digital_life_core.capabilities.repositories import CapabilityRepository
+from digital_life_core.configuration.models import ConfigLayer, ConfigTarget
+from digital_life_core.configuration.owners import SparseConfigurationOwner
+from digital_life_core.configuration.registry import FieldRegistry
+from digital_life_core.conversation.content.authoring_service import (
     FIELDS as AUTHORING_FIELDS,
     GROUP as AUTHORING_GROUP,
 )
-from companion_v2.conversation.content.authoring_tasks import DRAFT_KIND, authoring_profiles
-from companion_v2.conversation.content.authoring_workflow import INSTRUCTION as AUTHORING_INSTRUCTION
-from companion_v2.conversation.flow import ConversationPolicy
-from companion_v2.execution.models import TaskContext, encode, require
-from companion_v2.foundation.refs import AudienceRef
-from companion_v2.identity_policy.models import AuthorizationTier
-from companion_v2.identity_policy.object_access import ObjectAccessPolicy
-from companion_v2.identity_policy.personas import ConversationRoute
-from companion_v2.model_gateway.routing import configuration_fields
+from digital_life_core.conversation.content.authoring_tasks import DRAFT_KIND, authoring_profiles
+from digital_life_core.conversation.content.authoring_workflow import INSTRUCTION as AUTHORING_INSTRUCTION
+from digital_life_core.conversation.flow import ConversationPolicy
+from digital_life_core.execution.models import TaskContext, encode, require
+from digital_life_core.foundation.refs import AudienceRef
+from digital_life_core.identity_policy.models import AuthorizationTier
+from digital_life_core.identity_policy.object_access import ObjectAccessPolicy
+from digital_life_core.identity_policy.personas import ConversationRoute
+from digital_life_core.model_gateway.routing import configuration_fields
 from tests.native_content_support import NativeContentFixture
 from tests.test_astrbot_core_reply import FakeEvent
 from tests.test_host_application import HostFixture
@@ -207,7 +207,7 @@ class ContentAuthoringHostAccessTests(NativeContentFixture, HostFixture, unittes
         ).unwrap()
 
         with self.assertLogs(
-            "astrbot_host.native_extensions.scheduled_authoring", level="WARNING"
+            "digital_life_host.native_extensions.scheduled_authoring", level="WARNING"
         ) as first_logs:
             self.assertFalse(scheduled.ready(core_context, window))
         self.assertTrue(
@@ -218,14 +218,14 @@ class ContentAuthoringHostAccessTests(NativeContentFixture, HostFixture, unittes
         # Immediate repeat within 300s is suppressed by rate limiter.
         now_tick[0] += 30.0
         with self.assertNoLogs(
-            "astrbot_host.native_extensions.scheduled_authoring", level="WARNING"
+            "digital_life_host.native_extensions.scheduled_authoring", level="WARNING"
         ):
             self.assertFalse(scheduled.ready(core_context, window))
 
         # After cooldown window, warning emits again.
         now_tick[0] += scheduled.BLOCKED_LOG_INTERVAL_SECONDS + 1.0
         with self.assertLogs(
-            "astrbot_host.native_extensions.scheduled_authoring", level="WARNING"
+            "digital_life_host.native_extensions.scheduled_authoring", level="WARNING"
         ) as later_logs:
             self.assertFalse(scheduled.ready(core_context, window))
         self.assertTrue(
@@ -250,7 +250,7 @@ class ContentAuthoringHostAccessTests(NativeContentFixture, HostFixture, unittes
             observed_at=self.clock.now(),
         )
         with self.assertLogs(
-            "astrbot_host.native_extensions.scheduled_authoring", level="WARNING"
+            "digital_life_host.native_extensions.scheduled_authoring", level="WARNING"
         ) as cfg_logs:
             self.assertFalse(scheduled.ready(core_context, window))
         self.assertTrue(
@@ -265,7 +265,7 @@ class ContentAuthoringHostAccessTests(NativeContentFixture, HostFixture, unittes
                 (scheduled.key(core_context, window), encode({"state": "written"})),
             )
         with self.assertNoLogs(
-            "astrbot_host.native_extensions.scheduled_authoring", level="WARNING"
+            "digital_life_host.native_extensions.scheduled_authoring", level="WARNING"
         ):
             self.assertFalse(scheduled.ready(core_context, window))
 

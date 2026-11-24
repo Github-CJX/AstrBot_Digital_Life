@@ -18,13 +18,13 @@ import tempfile
 import unittest
 from unittest.mock import patch
 
-from companion_v2.legacy.archive import build_v1_archive_plan, copy_v1_archive, verify_v1_archive
-from companion_v2.storage import backup as backup_module
-from companion_v2.storage.backup import InstallationBackup, PENDING_FILENAME, apply_pending
-from companion_v2.storage.management import (
+from digital_life_core.legacy.archive import build_v1_archive_plan, copy_v1_archive, verify_v1_archive
+from digital_life_core.storage import backup as backup_module
+from digital_life_core.storage.backup import InstallationBackup, PENDING_FILENAME, apply_pending
+from digital_life_core.storage.management import (
     cleanup_backups, copy_backup_snapshots, remove_transferred_backup_snapshots,
 )
-from companion_v2.storage.runtime import StorageRuntime
+from digital_life_core.storage.runtime import StorageRuntime
 
 
 NOW = datetime(2026, 10, 27, 6, tzinfo=timezone.utc)
@@ -665,14 +665,14 @@ class R1BackupRestoreTests(unittest.TestCase):
         import inspect
 
         host_root = Path(__file__).resolve().parent.parent
-        # ``astrbot_host/multi_controller.py`` already carries a UTF-8 BOM in the
+        # ``digital_life_host/multi_controller.py`` already carries a UTF-8 BOM in the
         # frozen baseline, so host sources are read tolerantly here.
         def host_tree(relative: str):
             return ast.parse((host_root / relative).read_text(encoding="utf-8-sig"))
 
-        tree = host_tree("astrbot_host/backup_api.py")
+        tree = host_tree("digital_life_host/backup_api.py")
         imported = {alias.name for node in ast.walk(tree)
-                    if isinstance(node, ast.ImportFrom) and node.module == "companion_v2.storage.backup"
+                    if isinstance(node, ast.ImportFrom) and node.module == "digital_life_core.storage.backup"
                     for alias in node.names}
         self.assertTrue(imported)
         for name in imported:
@@ -691,14 +691,14 @@ class R1BackupRestoreTests(unittest.TestCase):
         # ``apply_staged_restore`` call (and refuses to open before a pending
         # rollback is finished). The single-target controller still calls the
         # engine function directly.
-        gate_calls = [node for node in ast.walk(host_tree("astrbot_host/multi_controller.py"))
+        gate_calls = [node for node in ast.walk(host_tree("digital_life_host/multi_controller.py"))
                       if isinstance(node, ast.Call) and getattr(node.func, "id", None) == "guard_restore_startup"]
-        self.assertTrue(gate_calls, "astrbot_host/multi_controller.py must gate the open")
+        self.assertTrue(gate_calls, "digital_life_host/multi_controller.py must gate the open")
         for call in gate_calls:
             keywords = {keyword.arg for keyword in call.keywords}
-            self.assertIn("installation_id", keywords, "astrbot_host/multi_controller.py")
-            self.assertIn("backup_directory", keywords, "astrbot_host/multi_controller.py")
-        for relative in ("astrbot_host/backup_api.py", "astrbot_host/controller.py"):
+            self.assertIn("installation_id", keywords, "digital_life_host/multi_controller.py")
+            self.assertIn("backup_directory", keywords, "digital_life_host/multi_controller.py")
+        for relative in ("digital_life_host/backup_api.py", "digital_life_host/controller.py"):
             calls = [node for node in ast.walk(host_tree(relative))
                      if isinstance(node, ast.Call) and getattr(node.func, "id", None) == "apply_staged_restore"]
             self.assertTrue(calls, relative)

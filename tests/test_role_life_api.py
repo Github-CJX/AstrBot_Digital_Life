@@ -8,8 +8,8 @@ from tests import test_relationship_management_host as support
 from tests.native_adapter_support import completion
 from astrbot.api.web import PluginRequest, bind_request_context
 from starlette.requests import Request
-from astrbot_host.life_api import PREFIX
-from companion_v2.storage.runtime import StorageOpenError
+from digital_life_host.life_api import PREFIX
+from digital_life_core.storage.runtime import StorageOpenError
 
 
 class LifeAPITests(unittest.IsolatedAsyncioTestCase):

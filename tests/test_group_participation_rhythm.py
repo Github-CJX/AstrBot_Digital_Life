@@ -18,20 +18,20 @@ from tempfile import TemporaryDirectory
 from types import SimpleNamespace as NS
 import unittest
 
-from companion_v2.configuration.models import ConfigLayer, ConfigTarget
-from companion_v2.conversation.group_interjection import (ACKNOWLEDGED_STEP, IGNORED_STEP, INTERJECTION,
+from digital_life_core.configuration.models import ConfigLayer, ConfigTarget
+from digital_life_core.conversation.group_interjection import (ACKNOWLEDGED_STEP, IGNORED_STEP, INTERJECTION,
                                                           REPEAT_FOLLOW, REPEAT_INTERRUPT, WEIGHT_MAX,
                                                           WEIGHT_MIN, WEIGHT_START)
-from companion_v2.conversation.group_observation import (PREFIX, TOPIC_KIND, fold_mood, fold_topic_threads,
+from digital_life_core.conversation.group_observation import (PREFIX, TOPIC_KIND, fold_mood, fold_topic_threads,
                                                           joke_guard, moment_candidates, moment_portrait,
                                                           topic_signature, topic_signatures_similar)
-from companion_v2.conversation.group_timing import RepeatPolicy, clean_group_text, repeat_burst, repeat_signature
-from companion_v2.conversation.participation import (CONFIG_GROUP, CONFIG_LIMITS, GroupParticipation,
+from digital_life_core.conversation.group_timing import RepeatPolicy, clean_group_text, repeat_burst, repeat_signature
+from digital_life_core.conversation.participation import (CONFIG_GROUP, CONFIG_LIMITS, GroupParticipation,
                                                      GroupParticipationConfigurationOwner,
                                                      configuration_fields)
-from companion_v2.foundation.refs import ScopeKind, ScopeRef, SubjectKind, SubjectRef
-from companion_v2.memory.group.access import owner_key
-from companion_v2.storage.runtime import StorageRuntime
+from digital_life_core.foundation.refs import ScopeKind, ScopeRef, SubjectKind, SubjectRef
+from digital_life_core.memory.group.access import owner_key
+from digital_life_core.storage.runtime import StorageRuntime
 
 
 INSTALLATION = "group-rhythm-installation"

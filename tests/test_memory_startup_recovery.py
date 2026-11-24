@@ -5,13 +5,13 @@ import json
 import unittest
 from unittest.mock import patch
 
-from companion_v2.configuration.registry import FieldRegistry
-from companion_v2.execution.models import TaskError, encode
-from companion_v2.foundation.outcome import Outcome
-from companion_v2.memory import reflection_recovery
-from companion_v2.memory.reflection import reflection_profile
-from companion_v2.model_gateway.models import ProviderResponse
-from companion_v2.model_gateway.routing import configuration_fields
+from digital_life_core.configuration.registry import FieldRegistry
+from digital_life_core.execution.models import TaskError, encode
+from digital_life_core.foundation.outcome import Outcome
+from digital_life_core.memory import reflection_recovery
+from digital_life_core.memory.reflection import reflection_profile
+from digital_life_core.model_gateway.models import ProviderResponse
+from digital_life_core.model_gateway.routing import configuration_fields
 from tests import test_memory_recovery as support
 from tests.test_host_application import HostFixture
 from tests.test_role_tool_loop import answered
@@ -178,7 +178,7 @@ class MemoryStartupRecoveryTests(HostFixture, unittest.IsolatedAsyncioTestCase):
         host, context, prepared = await self.setup_reflection()
         app = host.application
         await self.capture(app, context, prepared["batch_id"])
-        from companion_v2.memory.codec import evidence
+        from digital_life_core.memory.codec import evidence
         source = evidence(json.loads(self.row(app, prepared["batch_id"])["manifest_json"])["evidence"][0]).source
         app.memory.writer.sources.revoke(source, expected_governance_revision=1, observed_at=self.clock.now()).unwrap()
         calls = len(self.called)

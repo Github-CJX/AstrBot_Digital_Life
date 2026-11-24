@@ -12,9 +12,9 @@ from tempfile import TemporaryDirectory
 import unittest
 from unittest.mock import Mock, patch
 
-from companion_v2.foundation.outcome import Outcome
-from companion_v2.storage import backup as module
-from companion_v2.storage.backup import (
+from digital_life_core.foundation.outcome import Outcome
+from digital_life_core.storage import backup as module
+from digital_life_core.storage.backup import (
     BACKUP_FORMAT, InstallationBackup, PENDING_FILENAME, apply_pending, current_schema_version,
 )
 
@@ -24,7 +24,7 @@ INSTALLATION_ID = "installation-backup-alpha"
 
 
 def _open(temporary: str):
-    from companion_v2.storage.runtime import StorageRuntime
+    from digital_life_core.storage.runtime import StorageRuntime
     return StorageRuntime.open(data_root=Path(temporary) / "data", installation_id=INSTALLATION_ID)
 
 

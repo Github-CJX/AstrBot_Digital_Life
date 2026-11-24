@@ -3,14 +3,14 @@ import sqlite3
 import unittest
 from unittest.mock import patch
 
-from companion_v2.storage.runtime import StorageOpenError, StorageRuntime
-from companion_v2.storage.schema import (
+from digital_life_core.storage.runtime import StorageOpenError, StorageRuntime
+from digital_life_core.storage.schema import (
     MIGRATION_V7_TO_V8_ID, MIGRATION_V8_TO_V9_ID, MIGRATION_V8_TO_V9_FINGERPRINT,
     SCHEMA_VERSION, SCHEMA_VERSION_V8, V8_REQUIRED_TABLES,
 )
 from tests.execution_support import remove_v9
 from tests.test_diagnostics import DiagnosticFixture
-from companion_v2.diagnostics.repairs import RepairProposalService
+from digital_life_core.diagnostics.repairs import RepairProposalService
 from tests.test_management_access import INSTALLATION
 
 
@@ -45,7 +45,7 @@ class ExecutionStorageTests(DiagnosticFixture):
         self.open_runtime().close()
 
     def test_failed_upgrade_rolls_back_v8_records_and_version_then_retries(self):
-        with patch("companion_v2.storage.runtime.V9_MIGRATION_STATEMENTS",
+        with patch("digital_life_core.storage.runtime.V9_MIGRATION_STATEMENTS",
                    ("CREATE TABLE execution_tasks(task_id TEXT)", "INVALID EXECUTION MIGRATION")):
             with self.assertRaises(StorageOpenError):
                 StorageRuntime.open(data_root=self.root, installation_id=INSTALLATION)

@@ -5,10 +5,10 @@ from types import SimpleNamespace
 import unittest
 from unittest.mock import patch
 
-from companion_v2.conversation.group_admission import GroupReplyAdmission
-from companion_v2.foundation.outcome import Outcome
-from companion_v2.memory.time_intent import absolute_day_window
-from astrbot_host.core_reply_context import _memory_materials
+from digital_life_core.conversation.group_admission import GroupReplyAdmission
+from digital_life_core.foundation.outcome import Outcome
+from digital_life_core.memory.time_intent import absolute_day_window
+from digital_life_host.core_reply_context import _memory_materials
 
 
 NOW = datetime(2026, 10, 19, tzinfo=timezone.utc)
@@ -43,9 +43,9 @@ class AbsoluteMemoryDayTests(unittest.TestCase):
         owner = SimpleNamespace(memory=memory, delegated=lambda: False,
                                 contributions=lambda snapshot, context: snapshot)
         native_input = SimpleNamespace(event_id="date-question", text="七月二十四号我们聊了什么")
-        with (patch("companion_v2.memory.habits.habit_capture", return_value=()),
-              patch("companion_v2.memory.models.owner_key", return_value="test-owner"),
-              patch("companion_v2.memory.pinned.select_pinned", return_value=((), 0))):
+        with (patch("digital_life_core.memory.habits.habit_capture", return_value=()),
+              patch("digital_life_core.memory.models.owner_key", return_value="test-owner"),
+              patch("digital_life_core.memory.pinned.select_pinned", return_value=((), 0))):
             snapshot = _memory_materials(owner, SimpleNamespace(key="private-route"),
                                          native_input, NOW, "Asia/Shanghai")
         self.assertEqual(snapshot["references"], [{"atom_id": "fact-1", "revision": 1}])

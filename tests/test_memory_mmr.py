@@ -1,6 +1,6 @@
 import unittest
 
-from companion_v2.memory.mmr import rank
+from digital_life_core.memory.mmr import rank
 
 
 class MemoryMmrTests(unittest.TestCase):

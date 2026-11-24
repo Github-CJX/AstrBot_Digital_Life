@@ -11,10 +11,10 @@ from datetime import timedelta
 import json
 import unittest
 
-from astrbot_host.management_identity import dashboard_operator
-from companion_v2.configuration.models import ConfigLayer, ConfigTarget
-from companion_v2.execution.models import TaskContext
-from companion_v2.expression.configuration import (GROUP, ExpressionConfigurationOwner,
+from digital_life_host.management_identity import dashboard_operator
+from digital_life_core.configuration.models import ConfigLayer, ConfigTarget
+from digital_life_core.execution.models import TaskContext
+from digital_life_core.expression.configuration import (GROUP, ExpressionConfigurationOwner,
                                                    configuration_fields, read_settings)
 from tests.group_host_support import GroupFixture
 from tests.multi_host_support import MultiFixture, multi_config

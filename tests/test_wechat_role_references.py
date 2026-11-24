@@ -4,17 +4,17 @@ from hashlib import sha256
 from types import SimpleNamespace as NS
 from unittest.mock import patch
 
-from astrbot_host.role_reference_owner import RoleReferenceOwnerResolver
-from companion_v2.configuration.management import ReferenceManagement, WardrobeManagement
-from companion_v2.configuration.models import ConfigLayer, ConfigTarget
-from companion_v2.conversation.media.models import ImageDescriptor
-from companion_v2.execution.models import TaskError, digest
-from companion_v2.foundation.refs import AudienceRef, RoleOwnerRef, ScopeKind
-from companion_v2.references import configuration as ref_config
-from companion_v2.references import wardrobe as wardrobe_config
-from companion_v2.references.management import ReferenceMaterialManagement
-from companion_v2.references.models import ReferenceKind, ReferenceRole
-from companion_v2.references.service import ReferenceAssetService, OWNED_REFERENCE_PREFIX
+from digital_life_host.role_reference_owner import RoleReferenceOwnerResolver
+from digital_life_core.configuration.management import ReferenceManagement, WardrobeManagement
+from digital_life_core.configuration.models import ConfigLayer, ConfigTarget
+from digital_life_core.conversation.media.models import ImageDescriptor
+from digital_life_core.execution.models import TaskError, digest
+from digital_life_core.foundation.refs import AudienceRef, RoleOwnerRef, ScopeKind
+from digital_life_core.references import configuration as ref_config
+from digital_life_core.references import wardrobe as wardrobe_config
+from digital_life_core.references.management import ReferenceMaterialManagement
+from digital_life_core.references.models import ReferenceKind, ReferenceRole
+from digital_life_core.references.service import ReferenceAssetService, OWNED_REFERENCE_PREFIX
 from tests import test_reference_assets as fixtures
 
 
@@ -238,7 +238,7 @@ class WeChatRoleReferenceTests(fixtures.MessageFixture):
         self.assertEqual(self.service.read_asset(self.qq, result['asset_id'])[1], payload)
 
     def test_provider_lease_rechecks_shared_asset_using_original_group_context(self):
-        from astrbot_host.native_extensions.images import ImageReferenceLease
+        from digital_life_host.native_extensions.images import ImageReferenceLease
         asset = self.register()
         group = self.group()
         ticket = {'registered_asset': asset, 'image': NS(content=b'owned-reference-bytes'),
@@ -269,8 +269,8 @@ class WeChatRoleReferenceTests(fixtures.MessageFixture):
         self.assertEqual(error.exception.code, 'reference_owner_ambiguous')
 
     def management_app(self):
-        from companion_v2.configuration.registry import FieldRegistry
-        from companion_v2.configuration.service import ConfigurationService
+        from digital_life_core.configuration.registry import FieldRegistry
+        from digital_life_core.configuration.service import ConfigurationService
         configuration = ConfigurationService(self.runtime,
             FieldRegistry(version='reference-sharing-test.v1', fields=(
                 *ref_config.configuration_fields(), *wardrobe_config.configuration_fields())),
@@ -324,8 +324,8 @@ class WeChatRoleReferenceTests(fixtures.MessageFixture):
     def test_native_group_core_request_receives_existing_qq_reference_catalog(self):
         from tests import astrbot_data_root
         from astrbot.core.provider.entities import ProviderRequest
-        from astrbot_host.core_reply_image_prompt import inject_core_image_prompt
-        from companion_v2.conversation.media.output_settings import DEFAULTS
+        from digital_life_host.core_reply_image_prompt import inject_core_image_prompt
+        from digital_life_core.conversation.media.output_settings import DEFAULTS
         self.register()
         group = self.group()
         session = NS(application=NS(tasks=self.tasks, messages=NS(
@@ -334,7 +334,7 @@ class WeChatRoleReferenceTests(fixtures.MessageFixture):
                          at=self.tasks.now())}, state={})
         offered = tuple(NS(spec=NS(action=action)) for action in ('image.generate', 'image.edit'))
         request = ProviderRequest(prompt='来张自拍', system_prompt='Original persona')
-        with patch('astrbot_host.core_reply_image_prompt.logger.warning') as warning:
+        with patch('digital_life_host.core_reply_image_prompt.logger.warning') as warning:
             inject_core_image_prompt(session, request, offered, DEFAULTS)
         warning.assert_not_called()
         material = session.state['_image_reference_material']

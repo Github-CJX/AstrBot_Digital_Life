@@ -6,14 +6,14 @@ import json
 import unittest
 from unittest.mock import patch
 
-from companion_v2.execution.models import encode
-from companion_v2.configuration.registry import FieldRegistry
-from companion_v2.foundation.outcome import Outcome
-from companion_v2.identity_policy.models import AuthorizationTier
-from companion_v2.memory.models import Proposal
-from companion_v2.memory.reflection import reflection_profile
-from companion_v2.memory.reflection_management import ReflectionManagement
-from companion_v2.model_gateway.routing import configuration_fields
+from digital_life_core.execution.models import encode
+from digital_life_core.configuration.registry import FieldRegistry
+from digital_life_core.foundation.outcome import Outcome
+from digital_life_core.identity_policy.models import AuthorizationTier
+from digital_life_core.memory.models import Proposal
+from digital_life_core.memory.reflection import reflection_profile
+from digital_life_core.memory.reflection_management import ReflectionManagement
+from digital_life_core.model_gateway.routing import configuration_fields
 from tests import test_memory_recovery as support
 from tests.test_host_application import HostFixture
 from tests.test_role_tool_loop import answered

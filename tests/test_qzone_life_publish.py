@@ -11,31 +11,31 @@ from types import SimpleNamespace as NS
 import unittest
 from unittest.mock import AsyncMock, patch
 
-# Import the host fixture before companion_v2 / AstrBot SDK imports so ASTRBOT_ROOT stays isolated.
+# Import the host fixture before digital_life_core / AstrBot SDK imports so ASTRBOT_ROOT stays isolated.
 from tests import test_astrbot_staging_host as staging_support
 from tests.multi_host_support import MultiFixture, multi_config
 from tests.native_adapter_support import FakeEvent
 from tests.test_qzone_extension import FakeTransport
 
-from astrbot_host.management_identity import dashboard_operator
-from astrbot_host.persona_workshop_api import _session_provider_id, current_role_profile
-from astrbot_host.qzone_life_publish import QzoneLifePublisher
-from companion_v2.adapters.astrbot.staging import NativeAdapterTypes
-from companion_v2.capabilities import CapabilityAuthorizationState
-from companion_v2.execution.models import TaskError
-from companion_v2.foundation.refs import (OperationRef, RoleOwnerRef, ScopeKind, ScopeRef,
+from digital_life_host.management_identity import dashboard_operator
+from digital_life_host.persona_workshop_api import _session_provider_id, current_role_profile
+from digital_life_host.qzone_life_publish import QzoneLifePublisher
+from digital_life_core.adapters.astrbot.staging import NativeAdapterTypes
+from digital_life_core.capabilities import CapabilityAuthorizationState
+from digital_life_core.execution.models import TaskError
+from digital_life_core.foundation.refs import (OperationRef, RoleOwnerRef, ScopeKind, ScopeRef,
                                           SubjectKind, SubjectRef, VersionRef)
-from companion_v2.qzone import life_publish
-from companion_v2.qzone.capability import CAPABILITIES, EXTENSION, package_descriptor
-from companion_v2.qzone.configuration import (GROUP as QZONE_GROUP, OWNER as QZONE_OWNER,
+from digital_life_core.qzone import life_publish
+from digital_life_core.qzone.capability import CAPABILITIES, EXTENSION, package_descriptor
+from digital_life_core.qzone.configuration import (GROUP as QZONE_GROUP, OWNER as QZONE_OWNER,
                                             target_for as qzone_target_for)
-from companion_v2.qzone.policy import QzoneRuntimeState, note_publish, publish_reason
-from companion_v2.qzone.service import local_day, owner_key
-from companion_v2.qzone.topics import QzoneScene, QzoneTopic
-from companion_v2.role_profile.configuration import (GROUP as ROLE_PROFILE_GROUP,
+from digital_life_core.qzone.policy import QzoneRuntimeState, note_publish, publish_reason
+from digital_life_core.qzone.service import local_day, owner_key
+from digital_life_core.qzone.topics import QzoneScene, QzoneTopic
+from digital_life_core.role_profile.configuration import (GROUP as ROLE_PROFILE_GROUP,
                                                  OWNER as ROLE_PROFILE_OWNER,
                                                  target_for as role_profile_target_for)
-from companion_v2.role_work.journal import JournalContext, JournalDraft, JournalKey, JournalKind
+from digital_life_core.role_work.journal import JournalContext, JournalDraft, JournalKey, JournalKind
 
 
 NOW = datetime(2026, 11, 9, 4, 0, tzinfo=timezone.utc)  # 12:00 Asia/Shanghai
@@ -290,7 +290,7 @@ class SingleHostPublisherTests(unittest.IsolatedAsyncioTestCase):
         types = NativeAdapterTypes("4.27.2", staging_support.FakeEvent, staging_support.FakeProvider,
                                    NS, NS, staging_support.FakeReverseApi)
         transport = FakeTransport()
-        with patch("astrbot_host.controller.build_qzone_transport", return_value=transport):
+        with patch("digital_life_host.controller.build_qzone_transport", return_value=transport):
             controller = staging_support.AstrBotStagingController(
                 native, staging_support.host_config(), Path(temporary.name),
                 native_types=types, now=lambda: staging_support.NOW,
@@ -332,7 +332,7 @@ class SingleHostPublisherTests(unittest.IsolatedAsyncioTestCase):
 class MultiHostPublisherTests(MultiFixture, unittest.IsolatedAsyncioTestCase):
     async def test_multi_host_resolves_context_profile_and_publishes(self):
         transport = FakeTransport()
-        with patch("astrbot_host.multi_controller.build_qzone_transport", return_value=transport):
+        with patch("digital_life_host.multi_controller.build_qzone_transport", return_value=transport):
             app = await self.start_host()
         session = self.controller.session
         self.assertFalse(hasattr(session, "profile"))
@@ -374,7 +374,7 @@ class MultiHostPublisherTests(MultiFixture, unittest.IsolatedAsyncioTestCase):
 
     async def test_multi_host_prefers_consented_window_when_first_window_lacks_consent(self):
         transport = FakeTransport()
-        with patch("astrbot_host.multi_controller.build_qzone_transport", return_value=transport):
+        with patch("digital_life_host.multi_controller.build_qzone_transport", return_value=transport):
             await self.start_host()
         session = self.controller.session
         first_ctx, _ = await session.synchronize(session.settings.target("first"))
@@ -412,7 +412,7 @@ class MultiHostPublisherTests(MultiFixture, unittest.IsolatedAsyncioTestCase):
         self.controller = self.make_controller(config)
         self.window_personas["qq-second:FriendMessage:300"] = "second"
         transport = FakeTransport()
-        with patch("astrbot_host.multi_controller.build_qzone_transport", return_value=transport):
+        with patch("digital_life_host.multi_controller.build_qzone_transport", return_value=transport):
             await self.start_host()
 
         session = self.controller.session
@@ -461,7 +461,7 @@ class MultiHostPublisherTests(MultiFixture, unittest.IsolatedAsyncioTestCase):
         config["multi_host"]["targets"] = [config["multi_host"]["targets"][0]]
         self.controller = self.make_controller(config)
         transport = FakeTransport()
-        with patch("astrbot_host.multi_controller.build_qzone_transport", return_value=transport):
+        with patch("digital_life_host.multi_controller.build_qzone_transport", return_value=transport):
             await self.start_host()
 
         session = self.controller.session
@@ -495,7 +495,7 @@ class MultiHostPublisherTests(MultiFixture, unittest.IsolatedAsyncioTestCase):
 
     async def test_multi_host_unauthorized_zone_does_not_spend_model_or_lock_attempt(self):
         transport = FakeTransport()
-        with patch("astrbot_host.multi_controller.build_qzone_transport", return_value=transport):
+        with patch("digital_life_host.multi_controller.build_qzone_transport", return_value=transport):
             app = await self.start_host()
         session = self.controller.session
         context, _ = await session.synchronize(session.settings.target("first"))
@@ -529,7 +529,7 @@ class MultiHostPublisherTests(MultiFixture, unittest.IsolatedAsyncioTestCase):
         ]
         self.controller = self.make_controller(config)
         transport = FakeTransport()
-        with patch("astrbot_host.multi_controller.build_qzone_transport", return_value=transport):
+        with patch("digital_life_host.multi_controller.build_qzone_transport", return_value=transport):
             await self.start_host()
         session = self.controller.session
         context, _ = await session.synchronize(session.settings.target("first"))
@@ -562,7 +562,7 @@ class MultiHostPublisherTests(MultiFixture, unittest.IsolatedAsyncioTestCase):
         ]
         self.controller = self.make_controller(config)
         transport = FakeTransport()
-        with patch("astrbot_host.multi_controller.build_qzone_transport", return_value=transport):
+        with patch("digital_life_host.multi_controller.build_qzone_transport", return_value=transport):
             app = await self.start_host()
         session = self.controller.session
         window_a, _ = await session.synchronize(session.settings.target("first"))
@@ -635,7 +635,7 @@ class MultiHostPublisherTests(MultiFixture, unittest.IsolatedAsyncioTestCase):
         self.controller = self.make_controller(config)
         self.window_personas["qq-second:FriendMessage:300"] = "second"
         transport = FakeTransport()
-        with patch("astrbot_host.multi_controller.build_qzone_transport", return_value=transport):
+        with patch("digital_life_host.multi_controller.build_qzone_transport", return_value=transport):
             app = await self.start_host()
         session = self.controller.session
         ctx_a, _ = await session.synchronize(session.settings.target("first"))
@@ -681,7 +681,7 @@ class MultiHostPublisherTests(MultiFixture, unittest.IsolatedAsyncioTestCase):
 
     async def test_mid_draft_consent_revocation_aborts_before_publish(self):
         transport = FakeTransport()
-        with patch("astrbot_host.multi_controller.build_qzone_transport", return_value=transport):
+        with patch("digital_life_host.multi_controller.build_qzone_transport", return_value=transport):
             app = await self.start_host()
         session = self.controller.session
         ctx_a, _ = await session.synchronize(session.settings.target("first"))
@@ -708,7 +708,7 @@ class MultiHostPublisherTests(MultiFixture, unittest.IsolatedAsyncioTestCase):
         config["multi_host"]["targets"] = [config["multi_host"]["targets"][0]]
         self.controller = self.make_controller(config)
         transport = FakeTransport()
-        with patch("astrbot_host.multi_controller.build_qzone_transport", return_value=transport):
+        with patch("digital_life_host.multi_controller.build_qzone_transport", return_value=transport):
             app = await self.start_host()
         session = self.controller.session
         target = session.settings.target("first")
@@ -735,7 +735,7 @@ class MultiHostPublisherTests(MultiFixture, unittest.IsolatedAsyncioTestCase):
 
     async def test_action_blocked_logs_known_duplicate_reason_and_defers_to_normal_interval(self):
         transport = FakeTransport()
-        with patch("astrbot_host.multi_controller.build_qzone_transport", return_value=transport):
+        with patch("digital_life_host.multi_controller.build_qzone_transport", return_value=transport):
             app = await self.start_host()
         session = self.controller.session
         context, _ = await session.synchronize(session.settings.target("first"))
@@ -751,7 +751,7 @@ class MultiHostPublisherTests(MultiFixture, unittest.IsolatedAsyncioTestCase):
         publisher = QzoneLifePublisher(self.controller, draw=lambda: 0.0)
         with patch.object(self.native.provider, "text_chat",
                           AsyncMock(return_value=NS(completion_text=duplicate_text))) as chat:
-            with self.assertLogs("astrbot_host.qzone_life_publish", level="WARNING") as captured:
+            with self.assertLogs("digital_life_host.qzone_life_publish", level="WARNING") as captured:
                 blocked = await publisher.tick(now=at)
             self.assertEqual(blocked, {"reason": "publish_failed", "code": "qzone_action_blocked"})
             self.assertEqual(chat.await_count, 1)
@@ -770,7 +770,7 @@ class MultiHostPublisherTests(MultiFixture, unittest.IsolatedAsyncioTestCase):
         with patch.object(self.native.provider, "text_chat",
                           AsyncMock(return_value=NS(completion_text="全新一条毫不相关的傍晚散步记录。"))), \
              patch.object(app.qzone, "publish", AsyncMock(side_effect=secret_err)):
-            with self.assertLogs("astrbot_host.qzone_life_publish", level="WARNING") as captured2:
+            with self.assertLogs("digital_life_host.qzone_life_publish", level="WARNING") as captured2:
                 blocked2 = await publisher.tick(now=later_6h)
         self.assertEqual(blocked2, {"reason": "publish_failed", "code": "qzone_action_blocked"})
         log_text2 = "\n".join(captured2.output)

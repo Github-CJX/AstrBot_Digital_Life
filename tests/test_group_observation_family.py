@@ -14,17 +14,17 @@ from datetime import timedelta
 import json
 import unittest
 
-from companion_v2.configuration.registry import FieldRegistry, ValueKind
-from companion_v2.conversation.group_observation import (JOKE_KIND, JOKE_OBJECTION_BLOCK, MAX_MOMENTS,
+from digital_life_core.configuration.registry import FieldRegistry, ValueKind
+from digital_life_core.conversation.group_observation import (JOKE_KIND, JOKE_OBJECTION_BLOCK, MAX_MOMENTS,
                                                          MAX_MOMENT_CHARS, MAX_PROCESSED_KEYS, MOMENTS_KIND,
                                                          MOMENT_TTL_SECONDS, MOOD_KIND, MOOD_LABELS, fold_mood,
                                                          fold_moments, history_items, joke_guard,
                                                          moment_candidates, moment_facts, moment_portrait,
                                                          mood_facts, parse_moment, project_mood, project_strength)
-from companion_v2.conversation.participation import (CONFIG_DEFAULTS, CONFIG_GROUP, CONFIG_LIMITS, CONFIG_OWNER,
+from digital_life_core.conversation.participation import (CONFIG_DEFAULTS, CONFIG_GROUP, CONFIG_LIMITS, CONFIG_OWNER,
                                                      configuration_fields, group_participation_settings)
-from companion_v2.conversation.participation_prompts import (DENOISE_LINE, observation_instruction)
-from companion_v2.conversation.reply_settings import GROUP_SAFETY_DEFAULTS
+from digital_life_core.conversation.participation_prompts import (DENOISE_LINE, observation_instruction)
+from digital_life_core.conversation.reply_settings import GROUP_SAFETY_DEFAULTS
 from tests.test_group_participation_rhythm import (TURN, GroupRhythmFixture, burst_history,
                                                    member as _member)
 

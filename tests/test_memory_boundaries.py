@@ -5,11 +5,11 @@ import json
 from threading import Barrier
 import unittest
 
-from companion_v2.execution.models import digest
-from companion_v2.identity_policy.models import AuthorizationTier
-from companion_v2.memory.models import AtomRef, owner_key
-from companion_v2.memory.query import MemoryQuery
-from companion_v2.memory.writer import MemoryWriter
+from digital_life_core.execution.models import digest
+from digital_life_core.identity_policy.models import AuthorizationTier
+from digital_life_core.memory.models import AtomRef, owner_key
+from digital_life_core.memory.query import MemoryQuery
+from digital_life_core.memory.writer import MemoryWriter
 from tests.memory_support import MemoryFixture
 
 

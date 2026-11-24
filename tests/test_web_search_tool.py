@@ -4,9 +4,9 @@ import unittest
 from datetime import datetime, timezone
 from types import SimpleNamespace
 
-from companion_v2.conversation.web_tools import ACTION, WebSearchTools
-from companion_v2.execution.models import TaskError
-from companion_v2.foundation.refs import ScopeKind
+from digital_life_core.conversation.web_tools import ACTION, WebSearchTools
+from digital_life_core.execution.models import TaskError
+from digital_life_core.foundation.refs import ScopeKind
 
 
 class WebSearchToolTests(unittest.IsolatedAsyncioTestCase):

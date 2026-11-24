@@ -13,23 +13,23 @@ import unittest
 from unittest.mock import AsyncMock, patch
 
 from astrbot.api.web import PluginMultiDict
-from companion_v2.foundation.outcome import Outcome
-from companion_v2.foundation.refs import AudienceRef, ScopeKind, ScopeRef
-from companion_v2.execution.models import TaskContext
-from companion_v2.storage.runtime import StorageRuntime
+from digital_life_core.foundation.outcome import Outcome
+from digital_life_core.foundation.refs import AudienceRef, ScopeKind, ScopeRef
+from digital_life_core.execution.models import TaskContext
+from digital_life_core.storage.runtime import StorageRuntime
 from tests.test_host_application import HostFixture
 from tests.test_management_access import NOW, SCOPE
 
-from astrbot_host.configuration_api import ConfigurationWebAPI
-from astrbot_host.image_material_api import ImageMaterialsWebAPI
-from astrbot_host.life_api import LifeWebAPI
-from astrbot_host.memory_api import MemoryWebAPI
-from astrbot_host.model_api import ModelWebAPI
-from astrbot_host.page_api import PageWebAPI
-from astrbot_host.persona_workshop_api import PersonaWorkshopWebAPI
-from astrbot_host.qzone_api import QzoneWebAPI
-from astrbot_host.reply_api import ReplyWebAPI
-from astrbot_host.state_api import StateWebAPI
+from digital_life_host.configuration_api import ConfigurationWebAPI
+from digital_life_host.image_material_api import ImageMaterialsWebAPI
+from digital_life_host.life_api import LifeWebAPI
+from digital_life_host.memory_api import MemoryWebAPI
+from digital_life_host.model_api import ModelWebAPI
+from digital_life_host.page_api import PageWebAPI
+from digital_life_host.persona_workshop_api import PersonaWorkshopWebAPI
+from digital_life_host.qzone_api import QzoneWebAPI
+from digital_life_host.reply_api import ReplyWebAPI
+from digital_life_host.state_api import StateWebAPI
 
 
 class _Query(dict):
@@ -45,7 +45,7 @@ def _fake_request(*, username="admin", query=None, body=b""):
         username=username,
         query=_Query(query or {}),
         body=read,
-        plugin_name="astrbot_plugin_private_companion",
+        plugin_name="astrbot_plugin_digital_life",
     )
 
 
@@ -110,12 +110,12 @@ class ControlLockReleaseAndConcurrencyTests(unittest.IsolatedAsyncioTestCase):
             release_both.wait(5)
             return Outcome.success({"state": {"values": {}}, "calendar": {"items": []}})
 
-        with patch("astrbot_host.life_api.request", _fake_request()), \
-                patch("astrbot_host.state_api.request", _fake_request()), \
-                patch("astrbot_host.life_api.dashboard_operator", return_value=object()), \
-                patch("astrbot_host.state_api.dashboard_operator", return_value=object()), \
-                patch("astrbot_host.life_api.RoleLifeManagement", return_value=NS(status=slow_life_status)), \
-                patch("astrbot_host.state_api.StateManagement", return_value=NS(status=slow_state_status)):
+        with patch("digital_life_host.life_api.request", _fake_request()), \
+                patch("digital_life_host.state_api.request", _fake_request()), \
+                patch("digital_life_host.life_api.dashboard_operator", return_value=object()), \
+                patch("digital_life_host.state_api.dashboard_operator", return_value=object()), \
+                patch("digital_life_host.life_api.RoleLifeManagement", return_value=NS(status=slow_life_status)), \
+                patch("digital_life_host.state_api.StateManagement", return_value=NS(status=slow_state_status)):
             t_life = asyncio.create_task(life_api.status())
             t_state = asyncio.create_task(state_api.status())
             try:
@@ -152,11 +152,11 @@ class ControlLockReleaseAndConcurrencyTests(unittest.IsolatedAsyncioTestCase):
                 return blocking
 
             req = NS(username="admin", query=PluginMultiDict(list(query)))
-            with patch("astrbot_host.image_material_api.request", req), \
-                    patch("astrbot_host.image_material_api.dashboard_operator", return_value=object()), \
-                    patch("astrbot_host.image_material_api.ObjectAccessPolicy", return_value=ok_policy), \
+            with patch("digital_life_host.image_material_api.request", req), \
+                    patch("digital_life_host.image_material_api.dashboard_operator", return_value=object()), \
+                    patch("digital_life_host.image_material_api.ObjectAccessPolicy", return_value=ok_policy), \
                     patch(
-                        "astrbot_host.image_material_api.ReferenceMaterialManagement",
+                        "digital_life_host.image_material_api.ReferenceMaterialManagement",
                         return_value=NS(**{method_name: make_blocking()}),
                     ):
                 res = await _assert_off_loop_and_lock_free(
@@ -179,9 +179,9 @@ class ControlLockReleaseAndConcurrencyTests(unittest.IsolatedAsyncioTestCase):
         )
         controller = _fake_controller(application=app, runtime=rt)
         api = ModelWebAPI(controller)
-        with patch("astrbot_host.model_api.request", _fake_request()), \
-                patch("astrbot_host.model_api.dashboard_operator", return_value=object()), \
-                patch("astrbot_host.model_api.ModelManagement", return_value=NS(authorize=lambda op: Outcome.success(True))):
+        with patch("digital_life_host.model_api.request", _fake_request()), \
+                patch("digital_life_host.model_api.dashboard_operator", return_value=object()), \
+                patch("digital_life_host.model_api.ModelManagement", return_value=NS(authorize=lambda op: Outcome.success(True))):
             res = await _assert_off_loop_and_lock_free(
                 self, controller, api.image_observability(), entered, release
             )
@@ -197,9 +197,9 @@ class ControlLockReleaseAndConcurrencyTests(unittest.IsolatedAsyncioTestCase):
             release.wait(5)
             return Outcome.success({"items": []})
 
-        with patch("astrbot_host.memory_api.request", _fake_request()), \
-                patch("astrbot_host.memory_api.dashboard_operator", return_value=object()), \
-                patch("astrbot_host.memory_api.MemoryManagement", return_value=NS(list=slow_memory_list)):
+        with patch("digital_life_host.memory_api.request", _fake_request()), \
+                patch("digital_life_host.memory_api.dashboard_operator", return_value=object()), \
+                patch("digital_life_host.memory_api.MemoryManagement", return_value=NS(list=slow_memory_list)):
             res = await _assert_off_loop_and_lock_free(
                 self, controller, MemoryWebAPI(controller).list(), entered, release
             )
@@ -214,9 +214,9 @@ class ControlLockReleaseAndConcurrencyTests(unittest.IsolatedAsyncioTestCase):
             release.wait(5)
             return Outcome.success({"settings": {}})
 
-        with patch("astrbot_host.reply_api.request", _fake_request()), \
-                patch("astrbot_host.reply_api.dashboard_operator", return_value=object()), \
-                patch("astrbot_host.reply_api.ReplyManagement", return_value=NS(status=slow_reply_status)), \
+        with patch("digital_life_host.reply_api.request", _fake_request()), \
+                patch("digital_life_host.reply_api.dashboard_operator", return_value=object()), \
+                patch("digital_life_host.reply_api.ReplyManagement", return_value=NS(status=slow_reply_status)), \
                 patch.object(ReplyWebAPI, "_tts_catalog", return_value={"state": "unavailable", "providers": []}):
             res = await _assert_off_loop_and_lock_free(
                 self, controller, ReplyWebAPI(controller).status(), entered, release
@@ -232,9 +232,9 @@ class ControlLockReleaseAndConcurrencyTests(unittest.IsolatedAsyncioTestCase):
             release.wait(5)
             return {"installed": False}
 
-        with patch("astrbot_host.qzone_api.request", _fake_request()), \
-                patch("astrbot_host.qzone_api.dashboard_operator", return_value=object()), \
-                patch("astrbot_host.qzone_api.QzoneAccess", return_value=NS(status=slow_qzone_status)):
+        with patch("digital_life_host.qzone_api.request", _fake_request()), \
+                patch("digital_life_host.qzone_api.dashboard_operator", return_value=object()), \
+                patch("digital_life_host.qzone_api.QzoneAccess", return_value=NS(status=slow_qzone_status)):
             res = await _assert_off_loop_and_lock_free(
                 self, controller, QzoneWebAPI(controller).status(), entered, release
             )
@@ -250,9 +250,9 @@ class ControlLockReleaseAndConcurrencyTests(unittest.IsolatedAsyncioTestCase):
             return None, None, None, {"name": "test"}
 
         ok_policy = NS(feature_access=lambda *a, **kw: Outcome.success(True))
-        with patch("astrbot_host.persona_workshop_api.request", _fake_request()), \
-                patch("astrbot_host.persona_workshop_api.dashboard_operator", return_value=object()), \
-                patch("astrbot_host.persona_workshop_api.ObjectAccessPolicy", return_value=ok_policy), \
+        with patch("digital_life_host.persona_workshop_api.request", _fake_request()), \
+                patch("digital_life_host.persona_workshop_api.dashboard_operator", return_value=object()), \
+                patch("digital_life_host.persona_workshop_api.ObjectAccessPolicy", return_value=ok_policy), \
                 patch.object(PersonaWorkshopWebAPI, "_role_profile_snapshot_for", side_effect=slow_profile_snapshot):
             res = await _assert_off_loop_and_lock_free(
                 self, controller, PersonaWorkshopWebAPI(controller).profile_export(), entered, release
@@ -269,11 +269,11 @@ class ControlLockReleaseAndConcurrencyTests(unittest.IsolatedAsyncioTestCase):
 
         controller = _fake_controller(web_api=NS(target_inventory=slow_inventory))
         fake_operator = NS(subject=NS(subject_id="op-1"))
-        with patch("astrbot_host.page_api.request", _fake_request()), \
-                patch("astrbot_host.page_api.dashboard_operator", return_value=fake_operator), \
-                patch("astrbot_host.page_api.ObjectAccessPolicy", return_value=ok_policy), \
-                patch("astrbot_host.page_api.GroupRemarks", return_value=NS(apply=lambda rows: rows)), \
-                patch("astrbot_host.page_api.display_names", return_value=NS(targets=AsyncMock(return_value=[]))):
+        with patch("digital_life_host.page_api.request", _fake_request()), \
+                patch("digital_life_host.page_api.dashboard_operator", return_value=fake_operator), \
+                patch("digital_life_host.page_api.ObjectAccessPolicy", return_value=ok_policy), \
+                patch("digital_life_host.page_api.GroupRemarks", return_value=NS(apply=lambda rows: rows)), \
+                patch("digital_life_host.page_api.display_names", return_value=NS(targets=AsyncMock(return_value=[]))):
             res = await _assert_off_loop_and_lock_free(
                 self, controller, PageWebAPI(controller).targets(), entered, release
             )
@@ -288,9 +288,9 @@ class ControlLockReleaseAndConcurrencyTests(unittest.IsolatedAsyncioTestCase):
             release.wait(5)
             return {"groups": []}
 
-        with patch("astrbot_host.configuration_api.request", _fake_request()), \
-                patch("astrbot_host.configuration_api.dashboard_operator", return_value=object()), \
-                patch("companion_v2.conversation.behavior.management.BehaviorManagement",
+        with patch("digital_life_host.configuration_api.request", _fake_request()), \
+                patch("digital_life_host.configuration_api.dashboard_operator", return_value=object()), \
+                patch("digital_life_core.conversation.behavior.management.BehaviorManagement",
                       return_value=NS(status=slow_behavior_status)):
             res = await _assert_off_loop_and_lock_free(
                 self, controller, ConfigurationWebAPI(controller).behavior_status(), entered, release
@@ -323,14 +323,14 @@ class ConfigurationCacheAndNativeImageStoreTests(HostFixture, unittest.IsolatedA
             wrapped_sections[name] = make_wrapper(name, cls)
         api.sections = wrapped_sections
 
-        with patch("astrbot_host.configuration_api.dashboard_operator", return_value=self.core):
-            with patch("astrbot_host.configuration_api.request", _fake_request(query={"sections": "quota,busy_gate,recall"})):
+        with patch("digital_life_host.configuration_api.dashboard_operator", return_value=self.core):
+            with patch("digital_life_host.configuration_api.request", _fake_request(query={"sections": "quota,busy_gate,recall"})):
                 first = await api.status()
             self.assertEqual(first["status"], "ok", first)
             self.assertEqual(call_counts, {"quota": 1, "busy_gate": 1, "recall": 1})
 
             # Second identical read hits the DB-token-validated cache with zero extra section status calls!
-            with patch("astrbot_host.configuration_api.request", _fake_request(query={"sections": "quota,busy_gate,recall"})):
+            with patch("digital_life_host.configuration_api.request", _fake_request(query={"sections": "quota,busy_gate,recall"})):
                 second = await api.status()
             self.assertEqual(second["status"], "ok", second)
             self.assertEqual(call_counts, {"quota": 1, "busy_gate": 1, "recall": 1})
@@ -345,11 +345,11 @@ class ConfigurationCacheAndNativeImageStoreTests(HostFixture, unittest.IsolatedA
                 "edit_token": token,
                 "changes": {"busy_reply_gate_enabled": not old_enabled},
             }).encode("utf-8")
-            with patch("astrbot_host.configuration_api.request", _fake_request(body=body)):
+            with patch("digital_life_host.configuration_api.request", _fake_request(body=body)):
                 saved = await api.configure()
             self.assertEqual(saved["status"], "ok", saved)
 
-            with patch("astrbot_host.configuration_api.request", _fake_request(query={"sections": "busy_gate"})):
+            with patch("digital_life_host.configuration_api.request", _fake_request(query={"sections": "busy_gate"})):
                 third = await api.status()
             self.assertEqual(third["status"], "ok", third)
             self.assertEqual(call_counts["busy_gate"], 2)
@@ -365,7 +365,7 @@ class ConfigurationCacheAndNativeImageStoreTests(HostFixture, unittest.IsolatedA
                     "UPDATE configuration_targets SET revision = revision + 1 WHERE target_key IN "
                     "(SELECT target_key FROM configuration_targets LIMIT 1)"
                 )
-            with patch("astrbot_host.configuration_api.request", _fake_request(query={"sections": "busy_gate"})):
+            with patch("digital_life_host.configuration_api.request", _fake_request(query={"sections": "busy_gate"})):
                 fourth = await api.status()
             self.assertEqual(fourth["status"], "ok", fourth)
             self.assertEqual(call_counts["busy_gate"], 3)
@@ -386,7 +386,7 @@ class ConfigurationCacheAndNativeImageStoreTests(HostFixture, unittest.IsolatedA
                 "planning_timezone": "Asia/Shanghai",
             }
 
-        with patch("astrbot_host.state_api.request", _fake_request()), \
+        with patch("digital_life_host.state_api.request", _fake_request()), \
                 patch.object(StateWebAPI, "_read_weather_context", side_effect=slow_weather_ctx):
             res = await _assert_off_loop_and_lock_free(self, controller, api.weather(), entered, release)
         self.assertEqual(res["status"], "ok", res)
@@ -402,10 +402,10 @@ class ConfigurationCacheAndNativeImageStoreTests(HostFixture, unittest.IsolatedA
 
         model_api = ModelWebAPI(controller)
         body = json.dumps({"check": "sqlite"}).encode("utf-8")
-        with patch("astrbot_host.model_api.request", _fake_request(body=body)), \
-                patch("astrbot_host.model_api.dashboard_operator", return_value=object()), \
+        with patch("digital_life_host.model_api.request", _fake_request(body=body)), \
+                patch("digital_life_host.model_api.dashboard_operator", return_value=object()), \
                 patch(
-                    "astrbot_host.model_api.ModelManagement",
+                    "digital_life_host.model_api.ModelManagement",
                     return_value=NS(authorize=lambda op: Outcome.success(True), check_storage=slow_check_storage),
                 ):
             res2 = await _assert_off_loop_and_lock_free(self, controller, model_api.storage_test(), entered2, release2)
@@ -434,11 +434,11 @@ class ConfigurationCacheAndNativeImageStoreTests(HostFixture, unittest.IsolatedA
         controller = _fake_controller(
             web_api=NS(target_inventory=target_inventory, _ensure_role_routes=ensure_role_routes)
         )
-        with patch("astrbot_host.page_api.request", _fake_request()), \
-                patch("astrbot_host.page_api.dashboard_operator", return_value=fake_operator), \
-                patch("astrbot_host.page_api.ObjectAccessPolicy", return_value=ok_policy), \
-                patch("astrbot_host.page_api.GroupRemarks", return_value=NS(apply=lambda rows: rows)), \
-                patch("astrbot_host.page_api.display_names", return_value=NS(targets=AsyncMock(side_effect=lambda rows: rows))):
+        with patch("digital_life_host.page_api.request", _fake_request()), \
+                patch("digital_life_host.page_api.dashboard_operator", return_value=fake_operator), \
+                patch("digital_life_host.page_api.ObjectAccessPolicy", return_value=ok_policy), \
+                patch("digital_life_host.page_api.GroupRemarks", return_value=NS(apply=lambda rows: rows)), \
+                patch("digital_life_host.page_api.display_names", return_value=NS(targets=AsyncMock(side_effect=lambda rows: rows))):
             res = await PageWebAPI(controller).targets()
 
         self.assertEqual(res["status"], "ok", res)
@@ -454,11 +454,11 @@ class ConfigurationCacheAndNativeImageStoreTests(HostFixture, unittest.IsolatedA
             controller._terminated = True
             return rows
 
-        with patch("astrbot_host.page_api.request", _fake_request()), \
-                patch("astrbot_host.page_api.dashboard_operator", return_value=fake_operator), \
-                patch("astrbot_host.page_api.ObjectAccessPolicy", return_value=ok_policy), \
-                patch("astrbot_host.page_api.GroupRemarks", return_value=NS(apply=lambda rows: rows)), \
-                patch("astrbot_host.page_api.display_names",
+        with patch("digital_life_host.page_api.request", _fake_request()), \
+                patch("digital_life_host.page_api.dashboard_operator", return_value=fake_operator), \
+                patch("digital_life_host.page_api.ObjectAccessPolicy", return_value=ok_policy), \
+                patch("digital_life_host.page_api.GroupRemarks", return_value=NS(apply=lambda rows: rows)), \
+                patch("digital_life_host.page_api.display_names",
                       return_value=NS(targets=AsyncMock(side_effect=terminate_during_display_names))):
             res_stopped = await PageWebAPI(controller).targets()
         self.assertEqual(res_stopped["status"], "error")

@@ -19,22 +19,22 @@ import time
 from types import SimpleNamespace
 import unittest
 
-from companion_v2.configuration.models import ConfigLayer, ConfigTarget, ConfigurationError
-from companion_v2.configuration.owners import SparseConfigurationOwner
-from companion_v2.configuration.registry import FieldRegistry
-from companion_v2.conversation.media.models import ImageDescriptor
-from companion_v2.expression import reaction_lexicon
-from companion_v2.expression.reaction_configuration import (DEFAULTS, GROUP, OWNER as CONFIG_OWNER,
+from digital_life_core.configuration.models import ConfigLayer, ConfigTarget, ConfigurationError
+from digital_life_core.configuration.owners import SparseConfigurationOwner
+from digital_life_core.configuration.registry import FieldRegistry
+from digital_life_core.conversation.media.models import ImageDescriptor
+from digital_life_core.expression import reaction_lexicon
+from digital_life_core.expression.reaction_configuration import (DEFAULTS, GROUP, OWNER as CONFIG_OWNER,
     ReactionConfigurationOwner, ReactionSettings, configuration_fields, migrate_window_values,
     read_settings, read_snapshot)
-from companion_v2.expression.reactions import (DUPLICATE_WINDOW_FLOOR, MINIMUM_RELEVANCE,
+from digital_life_core.expression.reactions import (DUPLICATE_WINDOW_FLOOR, MINIMUM_RELEVANCE,
     RELEVANCE_FLOOR_DELTA, ReactionLibrary)
-from companion_v2.expression.semantic_service import REACTION_BACKFILL_KEY, SemanticService
-from companion_v2.foundation.refs import ScopeKind, ScopeRef, SubjectKind, SubjectRef
-from companion_v2.model_gateway.embedding import EmbeddingGateway
-from companion_v2.model_gateway.semantic_search import (VECTOR_LED_MIN_CANDIDATES, CatalogSearch)
-from companion_v2.storage.runtime import StorageRuntime
-from companion_v2.storage.semantic import SemanticStore
+from digital_life_core.expression.semantic_service import REACTION_BACKFILL_KEY, SemanticService
+from digital_life_core.foundation.refs import ScopeKind, ScopeRef, SubjectKind, SubjectRef
+from digital_life_core.model_gateway.embedding import EmbeddingGateway
+from digital_life_core.model_gateway.semantic_search import (VECTOR_LED_MIN_CANDIDATES, CatalogSearch)
+from digital_life_core.storage.runtime import StorageRuntime
+from digital_life_core.storage.semantic import SemanticStore
 from tests.test_host_application import HostFixture
 from tests.test_management_access import ROLE as HOST_ROLE, SCOPE as HOST_SCOPE
 

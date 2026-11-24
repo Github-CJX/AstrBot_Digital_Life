@@ -5,7 +5,7 @@ const test = require('node:test');
 
 const page = fs.readFileSync(path.resolve(__dirname, '../pages/陪伴小屋/state-page.js'), 'utf8');
 const maintenance = fs.readFileSync(
-  path.resolve(__dirname, '../companion_v2/role_work/state/maintenance.py'), 'utf8');
+  path.resolve(__dirname, '../digital_life_core/role_work/state/maintenance.py'), 'utf8');
 
 test('failed maintenance no longer leaves an unclickable 更新中 button', () => {
   assert.doesNotMatch(page, /pending&&!pending\.retryable/,

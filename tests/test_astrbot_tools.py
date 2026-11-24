@@ -1,10 +1,10 @@
 from dataclasses import replace
 import unittest
 
-from companion_v2.adapters.astrbot.tools import AstrBotToolDeclaration, map_tools
-from companion_v2.conversation.tool_loop import LocalRoleTools
-from companion_v2.execution.models import TaskError, encode
-from companion_v2.model_gateway.models import ToolSpec
+from digital_life_core.adapters.astrbot.tools import AstrBotToolDeclaration, map_tools
+from digital_life_core.conversation.tool_loop import LocalRoleTools
+from digital_life_core.execution.models import TaskError, encode
+from digital_life_core.model_gateway.models import ToolSpec
 from tests.test_external_tools import ExternalFixture, descriptor
 
 
@@ -56,7 +56,7 @@ class AstrBotToolMappingTests(ExternalFixture, unittest.IsolatedAsyncioTestCase)
         self.port.current[original.host_tool_id] = replace(original, descriptor=replace(
             original.descriptor, binding=replace(original.descriptor.binding, version="2",
                                                  generation="host-reloaded")))
-        with self.assertLogs("companion_v2.conversation.external_tools", level="WARNING") as logs:
+        with self.assertLogs("digital_life_core.conversation.external_tools", level="WARNING") as logs:
             self.assertIn("device.read", {s.action for s in self.extension.catalog_for(self.context)})
         self.assertEqual(len(logs.records), 1)
         await self.deliver_next(batch)

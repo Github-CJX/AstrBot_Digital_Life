@@ -2,14 +2,14 @@ import asyncio
 from dataclasses import replace
 import unittest
 
-from companion_v2.adapters.astrbot.tools import AstrBotToolDeclaration
-from companion_v2.capabilities.models import CapabilityAuthorizationState
-from companion_v2.capabilities.repositories import CapabilityRepository
-from companion_v2.conversation.external_tools import ExternalToolResponse
-from companion_v2.conversation.flow import ConversationPolicy
-from companion_v2.execution.models import digest
-from companion_v2.foundation.refs import SourceRef, VersionRef
-from companion_v2.sources.models import SourceRecord
+from digital_life_core.adapters.astrbot.tools import AstrBotToolDeclaration
+from digital_life_core.capabilities.models import CapabilityAuthorizationState
+from digital_life_core.capabilities.repositories import CapabilityRepository
+from digital_life_core.conversation.external_tools import ExternalToolResponse
+from digital_life_core.conversation.flow import ConversationPolicy
+from digital_life_core.execution.models import digest
+from digital_life_core.foundation.refs import SourceRef, VersionRef
+from digital_life_core.sources.models import SourceRecord
 from tests.test_astrbot_tools import HostTools
 from tests.test_external_tools import PACKAGE, descriptor, tool_call
 from tests.test_host_application import HostFixture

@@ -10,12 +10,12 @@ import json
 import unittest
 from unittest.mock import patch
 
-from companion_v2.configuration.models import ConfigurationError
-from companion_v2.proactive import rhythm
-from companion_v2.proactive.configuration import (CURVE_CEILING, CURVE_FLOOR, DEFAULT_HOUR_CURVE, GROUP,
+from digital_life_core.configuration.models import ConfigurationError
+from digital_life_core.proactive import rhythm
+from digital_life_core.proactive.configuration import (CURVE_CEILING, CURVE_FLOOR, DEFAULT_HOUR_CURVE, GROUP,
                                                   configuration_fields, curve_text, hour_activity_curve)
-from companion_v2.proactive.greetings import ANCHOR_PURPOSE, INSOMNIA_PURPOSE
-from companion_v2.proactive.preferences import ContactPreferences
+from digital_life_core.proactive.greetings import ANCHOR_PURPOSE, INSOMNIA_PURPOSE
+from digital_life_core.proactive.preferences import ContactPreferences
 from tests.contact_schedule_support import ContactScheduleFixture
 
 
@@ -290,9 +290,9 @@ class RhythmSchedulingTests(ContactScheduleFixture, unittest.IsolatedAsyncioTest
         self.assertTrue(held.share_allowed(context, preferences, "reminder-slot", purpose="reminder"))
 
     async def test_sleep_hold_defers_discretionary_contacts_while_exempting_events_and_awake_grace(self):
-        from companion_v2.role_work.life import configuration as life_configuration
-        from companion_v2.role_work.life import rest_gate
-        from companion_v2.role_work.life.configuration import LifeConfigurationOwner
+        from digital_life_core.role_work.life import configuration as life_configuration
+        from digital_life_core.role_work.life import rest_gate
+        from digital_life_core.role_work.life.configuration import LifeConfigurationOwner
 
         host, _ = await self.scheduled()
         app = host.application

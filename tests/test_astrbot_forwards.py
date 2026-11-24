@@ -7,9 +7,9 @@ from functools import partial
 import unittest
 from unittest.mock import AsyncMock
 
-from astrbot_host.media import load_native_image
-from companion_v2.adapters.astrbot.forwards import read_private_forwards
-from companion_v2.conversation.forwards.models import MAX_NODES, MAX_DEPTH, ForwardIntakePolicy
+from digital_life_host.media import load_native_image
+from digital_life_core.adapters.astrbot.forwards import read_private_forwards
+from digital_life_core.conversation.forwards.models import MAX_NODES, MAX_DEPTH, ForwardIntakePolicy
 from tests.animation_support import animation_bytes
 from tests.forward_support import FakeForward, ForwardFixture, node_raw, outer_raw
 from tests.native_adapter_support import FakeReverseApi

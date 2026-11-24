@@ -1,6 +1,6 @@
 """V1 数据迁移的发现与试算。
 
-测的是 ``companion_v2.legacy.migration``：它只读、不写、不做无根据的转换。
+测的是 ``digital_life_core.legacy.migration``：它只读、不写、不做无根据的转换。
 「能迁 / 不能迁 / 迁了会改成什么」这三件事必须在界面点执行之前就确定下来，
 所以这里的断言全部对着那个契约。
 
@@ -16,7 +16,7 @@ import sqlite3
 import tempfile
 import unittest
 
-from companion_v2.legacy.migration import (
+from digital_life_core.legacy.migration import (
     GROUP_OF_SCOPE,
     HANDLERS,
     LegacyMigration,
@@ -100,7 +100,7 @@ class DiscoveryTests(LegacyMigrationTestCase):
                             for item in findings.values()))
 
     def test_every_declared_source_appears_in_the_plan(self) -> None:
-        from companion_v2.legacy.catalog import LEGACY_COMPATIBILITY_CATALOG
+        from digital_life_core.legacy.catalog import LEGACY_COMPATIBILITY_CATALOG
 
         reported = {item.source_id for item in self.plan().findings}
         self.assertEqual(reported,
@@ -113,7 +113,7 @@ class DiscoveryTests(LegacyMigrationTestCase):
                          MigrationState.ABSENT.value)
 
     def test_global_astrbot_plugin_data_wins_over_stale_embedded_copy(self) -> None:
-        v1_root = self.root / "data" / "plugins" / "astrbot_plugin_private_companion"
+        v1_root = self.root / "data" / "plugins" / "astrbot_plugin_digital_life"
         v1_root.mkdir(parents=True)
         global_db = self.root / "data" / "plugin_data" / "astrbot_plugin_memory_companion" / "memory_companion.db"
         global_db.parent.mkdir(parents=True)
@@ -418,8 +418,8 @@ class ConversionTests(LegacyMigrationTestCase):
         写错一个字段名不会在这里报错——配置服务的校验器会拒绝它，而那时用户看到的
         是一句「保存失败」。所以在试算阶段就对着注册表核一遍。
         """
-        from companion_v2.proactive.configuration import configuration_fields
-        from companion_v2.role_work.state.configuration import configuration_fields as state_fields
+        from digital_life_core.proactive.configuration import configuration_fields
+        from digital_life_core.role_work.state.configuration import configuration_fields as state_fields
 
         registered = ({field.field_id for field in state_fields()}
                       | {field.field_id for field in configuration_fields()})

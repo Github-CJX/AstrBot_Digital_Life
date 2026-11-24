@@ -7,8 +7,8 @@ from types import SimpleNamespace as NS
 import unittest
 from unittest.mock import patch
 
-from companion_v2.execution.models import TaskContext
-from companion_v2.memory.models import owner_key
+from digital_life_core.execution.models import TaskContext
+from digital_life_core.memory.models import owner_key
 
 from tests.multi_host_support import MultiFixture, multi_config
 from tests.native_adapter_support import FakeEvent
@@ -208,7 +208,7 @@ class CoreReplyMaintenanceTests(MultiFixture, unittest.IsolatedAsyncioTestCase):
             release.set()
 
     async def test_restart_interrupts_native_turns_without_replaying_model_or_send(self):
-        from companion_v2.conversation.native_turns import NativeConversationTurns
+        from digital_life_core.conversation.native_turns import NativeConversationTurns
 
         app = await self.start_host()
         prepared = (await self.controller.prepare_core_reply(self.event(identifier="interrupted-native"))).unwrap()

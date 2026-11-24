@@ -7,11 +7,11 @@ import sqlite3
 import unittest
 from unittest.mock import patch
 
-from companion_v2.execution.models import TaskError, require, stamp
-from companion_v2.identity_policy.models import AuthorizationTier
-from companion_v2.memory.models import AtomRef, Proposal
-from companion_v2.memory.service import MemoryService
-from companion_v2.memory.wire import EvidenceBudget
+from digital_life_core.execution.models import TaskError, require, stamp
+from digital_life_core.identity_policy.models import AuthorizationTier
+from digital_life_core.memory.models import AtomRef, Proposal
+from digital_life_core.memory.service import MemoryService
+from digital_life_core.memory.wire import EvidenceBudget
 from tests.memory_support import MemoryFixture
 from tests.test_memory_wire import runtime_scope
 
@@ -21,9 +21,9 @@ class MemoryProposalWireTests(MemoryFixture, unittest.TestCase):
         super().setUp()
         self.service = MemoryService(self.tasks)
         self.stopped = False
-        self.wire = self.service.bind_proposal_wire_v1(provider_id="companion_v2.memory",
+        self.wire = self.service.bind_proposal_wire_v1(provider_id="digital_life_core.memory",
             provider_generation="command-1", scope_for_context=runtime_scope, require_running=self.running)
-        self.lookup = self.service.bind_operation_wire_v1(provider_id="companion_v2.memory",
+        self.lookup = self.service.bind_operation_wire_v1(provider_id="digital_life_core.memory",
             provider_generation="lookup-1", scope_for_context=runtime_scope)
         self.original = self.evidence()
         self.reference = self.wire.offer_source(self.context, self.original.source)
@@ -196,7 +196,7 @@ class MemoryProposalWireTests(MemoryFixture, unittest.TestCase):
 
     def test_query_issued_evidence_ref_can_be_submitted_without_forging_source_attribution(self):
         self.remember()
-        query = self.service.bind_query_wire_v1(provider_id="companion_v2.memory", provider_generation="query-1",
+        query = self.service.bind_query_wire_v1(provider_id="digital_life_core.memory", provider_generation="query-1",
             scope_for_context=runtime_scope, token_count=len, default_evidence_budget=EvidenceBudget(8, 2400, 800))
         request = self.request(wire=query, payload=dict(namespace="personal", visibility="private", purpose="reply", query_intent="咖啡"))
         del request["idempotency_key"]

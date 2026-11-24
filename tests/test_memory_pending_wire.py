@@ -4,10 +4,10 @@ from datetime import timedelta
 import unittest
 from unittest.mock import patch
 
-from companion_v2.execution.models import require, stamp
-from companion_v2.memory.service import MemoryService
-from companion_v2.memory.wire import EvidenceBudget
-from companion_v2.memory.models import AtomRef
+from digital_life_core.execution.models import require, stamp
+from digital_life_core.memory.service import MemoryService
+from digital_life_core.memory.wire import EvidenceBudget
+from digital_life_core.memory.models import AtomRef
 from tests.memory_support import MemoryFixture
 from tests.memory_stream_support import commit_fault
 from tests import test_memory_proposal_wire as proposal_support
@@ -22,9 +22,9 @@ class MemoryPendingWireTests(MemoryFixture, unittest.TestCase):
     def setUp(self):
         super().setUp()
         self.service = MemoryService(self.tasks)
-        self.wire = self.service.bind_proposal_wire_v1(provider_id="companion_v2.memory", provider_generation="command-1",
+        self.wire = self.service.bind_proposal_wire_v1(provider_id="digital_life_core.memory", provider_generation="command-1",
             scope_for_context=runtime_scope, require_running=lambda: require(self.tasks.check_generation()))
-        self.lookup = self.service.bind_operation_wire_v1(provider_id="companion_v2.memory", provider_generation="lookup-1", scope_for_context=runtime_scope)
+        self.lookup = self.service.bind_operation_wire_v1(provider_id="digital_life_core.memory", provider_generation="lookup-1", scope_for_context=runtime_scope)
         self.original = self.evidence()
         self.reference = self.wire.offer_source(self.context, self.original.source)
 
@@ -80,7 +80,7 @@ class MemoryPendingWireTests(MemoryFixture, unittest.TestCase):
     def test_pending_query_pages_are_isolated_by_bot_and_persona(self):
         others = self.other_memory_owners()
         _, output = self.pending()
-        query = self.service.bind_query_wire_v1(provider_id="companion_v2.memory", provider_generation="query-1",
+        query = self.service.bind_query_wire_v1(provider_id="digital_life_core.memory", provider_generation="query-1",
             scope_for_context=runtime_scope, token_count=len, default_evidence_budget=EvidenceBudget(8, 2400, 800))
         for dimension, context in {**others, "original": self.context}.items():
             with self.subTest(dimension=dimension):
@@ -128,7 +128,7 @@ class MemoryPendingWireTests(MemoryFixture, unittest.TestCase):
         result = self.resolve(output, "discard")
         self.assertEqual(result["output"]["proposal_state"], "skipped")
         tasks, _, _ = self.components(self.open_runtime())
-        lookup = MemoryService(tasks).bind_operation_wire_v1(provider_id="companion_v2.memory",
+        lookup = MemoryService(tasks).bind_operation_wire_v1(provider_id="digital_life_core.memory",
             provider_generation="lookup-2", scope_for_context=runtime_scope)
         self.assertEqual(self.query_receipt(wire=lookup)["output"], result["output"])
         self.assertEqual(self.wire.handle(self.context, request)["output"]["proposal_state"], "skipped")
@@ -213,7 +213,7 @@ class MemoryPendingWireTests(MemoryFixture, unittest.TestCase):
 
     def test_include_pending_returns_distinct_draft_and_invalidates_cursor_after_commit(self):
         _, output = self.pending()
-        query = self.service.bind_query_wire_v1(provider_id="companion_v2.memory", provider_generation="query-1",
+        query = self.service.bind_query_wire_v1(provider_id="digital_life_core.memory", provider_generation="query-1",
             scope_for_context=runtime_scope, token_count=len, default_evidence_budget=EvidenceBudget(8, 2400, 800))
         request = self.request(wire=query, payload=dict(namespace="personal", visibility="private", purpose="reply", query_intent="咖啡", include_pending=True))
         del request["idempotency_key"]
@@ -239,7 +239,7 @@ class MemoryPendingWireTests(MemoryFixture, unittest.TestCase):
         self.remember(replace(self.proposed(), predicate="第一条"), "first")
         self.remember(replace(self.proposed(), predicate="第二条"), "second")
         self.pending()
-        query = self.service.bind_query_wire_v1(provider_id="companion_v2.memory", provider_generation="query-1",
+        query = self.service.bind_query_wire_v1(provider_id="digital_life_core.memory", provider_generation="query-1",
             scope_for_context=runtime_scope, token_count=len, default_evidence_budget=EvidenceBudget(8, 2400, 800))
         request = self.request(wire=query, payload=dict(namespace="personal", visibility="private", purpose="reply", query_intent="咖啡", include_pending=True))
         del request["idempotency_key"]
@@ -259,7 +259,7 @@ class MemoryPendingWireTests(MemoryFixture, unittest.TestCase):
 
     def test_pending_queries_do_not_cross_sessions_or_return_revoked_evidence(self):
         self.pending()
-        query = self.service.bind_query_wire_v1(provider_id="companion_v2.memory", provider_generation="query-1",
+        query = self.service.bind_query_wire_v1(provider_id="digital_life_core.memory", provider_generation="query-1",
             scope_for_context=runtime_scope, token_count=len, default_evidence_budget=EvidenceBudget(8, 2400, 800))
         for revoked in (False, True):
             context = self.context if revoked else self.context_for(self.important, replace(self.context.scope, session_id="later"))

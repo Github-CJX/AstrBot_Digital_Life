@@ -4,7 +4,7 @@ from pathlib import Path
 from tempfile import TemporaryDirectory
 import unittest
 
-from companion_v2.foundation.refs import (
+from digital_life_core.foundation.refs import (
     ReferenceValidationError,
     RoleOwnerRef,
     ScopeKind,
@@ -14,14 +14,14 @@ from companion_v2.foundation.refs import (
     SubjectRef,
     VersionRef,
 )
-from companion_v2.relationships import (
+from digital_life_core.relationships import (
     EmotionSubject,
     PersistentRelationshipMemoryLedger,
     RelationshipMemory,
     RelationshipMemoryKind,
     RelationshipMemoryState as State,
 )
-from companion_v2.storage.runtime import StorageRuntime
+from digital_life_core.storage.runtime import StorageRuntime
 from tests.test_management_access import INSTALLATION, NOW, SCOPE
 
 

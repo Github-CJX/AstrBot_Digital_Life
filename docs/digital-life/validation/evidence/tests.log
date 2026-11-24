@@ -1,0 +1,18 @@
+
+==================================== ERRORS ====================================
+_____________ ERROR collecting tests/test_plugin_logging_bridge.py _____________
+ImportError while importing test module '/mnt/data/m1_work/astrbot_plugin_digital_life/tests/test_plugin_logging_bridge.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+/usr/lib/python3.13/importlib/__init__.py:88: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_plugin_logging_bridge.py:9: in <module>
+    from digital_life_host.logging_bridge import (
+digital_life_host/logging_bridge.py:6: in <module>
+    from astrbot.core.log import LogManager
+E   ModuleNotFoundError: No module named 'astrbot'
+=========================== short test summary info ============================
+ERROR tests/test_plugin_logging_bridge.py
+!!!!!!!!!!!!!!!!!!!! Interrupted: 1 error during collection !!!!!!!!!!!!!!!!!!!!
+1 error in 1.94s

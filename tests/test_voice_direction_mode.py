@@ -1,8 +1,8 @@
 import unittest
 from types import SimpleNamespace
 
-from astrbot_host.fish_audio import DRAMA_DIRECTION, INDEXTTS_DIRECTION, provider_direction
-from companion_v2.conversation.voice_reply import VoiceReplyPolicy
+from digital_life_host.fish_audio import DRAMA_DIRECTION, INDEXTTS_DIRECTION, provider_direction
+from digital_life_core.conversation.voice_reply import VoiceReplyPolicy
 
 
 def provider(provider_type, model, identifier="p1"):

@@ -4,16 +4,16 @@ import unittest
 from dataclasses import replace
 from unittest.mock import patch
 
-from companion_v2.configuration.registry import FieldRegistry
-from companion_v2.configuration.models import ConfigLayer, ConfigTarget
-from companion_v2.execution.models import TaskSpec, digest, encode
-from companion_v2.execution.runner import RunResult
-from companion_v2.identity_policy.models import AuthorizationTier
-from companion_v2.memory.management import MemoryManagement
-from companion_v2.memory.models import AtomRef, owner_key
-from companion_v2.memory.reflection import KIND, reflection_output_tokens, reflection_profile
-from companion_v2.foundation.outcome import Outcome
-from companion_v2.model_gateway.routing import configuration_fields
+from digital_life_core.configuration.registry import FieldRegistry
+from digital_life_core.configuration.models import ConfigLayer, ConfigTarget
+from digital_life_core.execution.models import TaskSpec, digest, encode
+from digital_life_core.execution.runner import RunResult
+from digital_life_core.identity_policy.models import AuthorizationTier
+from digital_life_core.memory.management import MemoryManagement
+from digital_life_core.memory.models import AtomRef, owner_key
+from digital_life_core.memory.reflection import KIND, reflection_output_tokens, reflection_profile
+from digital_life_core.foundation.outcome import Outcome
+from digital_life_core.model_gateway.routing import configuration_fields
 from tests.test_host_application import HostFixture
 from tests.test_role_tool_loop import answered
 
@@ -183,10 +183,10 @@ class MemoryReflectionTests(HostFixture, unittest.IsolatedAsyncioTestCase):
     async def test_new_correction_fences_a_prepared_old_reflection(self):
         host, context, prepared = await self.setup_reflection()
         app = host.application
-        from companion_v2.memory.models import Proposal
+        from digital_life_core.memory.models import Proposal
         event = host.receive(self.event("explicit", text="记住，我现在喝咖啡了")).unwrap()
         source = json.loads(app.runtime.read_one("SELECT event_json FROM conversation_inputs WHERE batch_id = ?", (event,))["event_json"])["source"]
-        from companion_v2.memory.codec import source as decode_source
+        from digital_life_core.memory.codec import source as decode_source
         evidence = app.memory.writer.access.capture(context, decode_source(source))
         app.memory.writer.submit(context, Proposal("add", predicate="饮用偏好", object="喝咖啡", representation="用户现在喝咖啡。",
             evidence=(evidence,), single_value=True), operation_key="explicit").unwrap()
@@ -319,7 +319,7 @@ class MemoryReflectionTests(HostFixture, unittest.IsolatedAsyncioTestCase):
     async def test_daily_reflection_can_accept_a_pending_proposal_without_duplicating_it(self):
         host, context, _ = await self.setup_reflection(prepare=False)
         app = host.application
-        from companion_v2.memory.models import Proposal
+        from digital_life_core.memory.models import Proposal
         evidence = next(iter(app.memory.query._documents(context, "personal", "sources")[1].values()))["evidence"]
         pending = app.memory.writer.submit(context, Proposal("add", predicate="饮用偏好", object="不喝咖啡", representation="用户不喝咖啡。",
             evidence=(evidence,), defer_until_boundary=True), operation_key="pending").unwrap()

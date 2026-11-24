@@ -75,7 +75,7 @@ function loadAllFeaturesSandbox(options = {}) {
 
   ctx.window.CompanionProduct = {
     scopeKey: () => options.scopeKey || "role-a",
-    role: () => ({config_api: options.configApi ?? "/astrbot_plugin_private_companion/host/targets/t1/roles/r1/config"}),
+    role: () => ({config_api: options.configApi ?? "/astrbot_plugin_digital_life/host/targets/t1/roles/r1/config"}),
     errorLabel: code => ({dashboard_identity_required: "请先登录管理界面"}[code] || "当前设置未能确认，请刷新并核对账号、人格与模型。"),
     request: async (method, route, body) => {
       requests.push({method, route, body: body ? JSON.parse(JSON.stringify(body)) : undefined});
@@ -198,7 +198,7 @@ test("复合键索引保留全部 10 个 enabled 与 2 个 group_enabled 且零�
 test("多目标模式并行拉取角色级与安装级分区并按各自 endpoint 分流保存", async () => {
   const roleApi = "host/targets/t1/roles/r1/config";
   const {api, requests} = loadAllFeaturesSandbox({
-    configApi: "/astrbot_plugin_private_companion/" + roleApi,
+    configApi: "/astrbot_plugin_digital_life/" + roleApi,
     onRequest(method, route) {
       if (method === "GET" && route === roleApi) {
         return {sections: {
@@ -284,7 +284,7 @@ test("默认工作台在异步 read() 完成前调用 selectSection 能在加载
   });
   ctx.window.CompanionProduct = {
     hosted: () => true,
-    role: () => ({role_id: "role-a", config_api: "/astrbot_plugin_private_companion/config"}),
+    role: () => ({role_id: "role-a", config_api: "/astrbot_plugin_digital_life/config"}),
     roleTarget: () => ({bot_id: "bot-a", scope_kind: "private"}),
     identity: () => ({installation_id: "inst", operator_id: "admin"}),
     scopeKey: () => "scope-a",
@@ -349,7 +349,7 @@ test("多分区保存部分失败时保留已成功分区的基线与新令牌�
   let failBudget = true;
   const roleApi = "host/targets/t1/roles/r1/config";
   const {api, requests} = loadAllFeaturesSandbox({
-    configApi: "/astrbot_plugin_private_companion/" + roleApi,
+    configApi: "/astrbot_plugin_digital_life/" + roleApi,
     onRequest(method, route, body) {
       if (method === "GET" && route === roleApi) {
         return {sections: {
@@ -394,7 +394,7 @@ test("保存分区时切换角色会停止旧批次并保留新角色的配置�
   let resolveSave;
   let started;
   const firstPost = new Promise(resolve => { started = resolve; });
-  const cfg = "/astrbot_plugin_private_companion/host/targets/t/roles/";
+  const cfg = "/astrbot_plugin_digital_life/host/targets/t/roles/";
   const options = {
     scopeKey: "role-a",
     configApi: cfg + "role-a/config",

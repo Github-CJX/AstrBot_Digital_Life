@@ -12,9 +12,9 @@ path. All providers and conversations are synthetic.
 from datetime import datetime
 import unittest
 
-from companion_v2.execution.models import TaskError
-from companion_v2.expression.style_management import ExpressionStyleManagement
-from companion_v2.expression.style_service import (LEARN_BUDGET_SECONDS, LEARN_PROVIDER_TIMEOUT_SECONDS,
+from digital_life_core.execution.models import TaskError
+from digital_life_core.expression.style_management import ExpressionStyleManagement
+from digital_life_core.expression.style_service import (LEARN_BUDGET_SECONDS, LEARN_PROVIDER_TIMEOUT_SECONDS,
     ExpressionStyleService, expression_learning_profile)
 from tests import test_expression_v1_pipeline as pipeline
 from tests.test_expression_v1_pipeline import ExpressionFixture

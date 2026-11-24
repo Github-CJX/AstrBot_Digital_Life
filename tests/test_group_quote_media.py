@@ -6,10 +6,10 @@ import json
 from types import SimpleNamespace as NS
 import unittest
 
-from astrbot_host.group_authority import GroupAuthority
-from companion_v2.adapters.astrbot.model_wire import tool_alias
-from companion_v2.conversation.quotes.service import quote_reference
-from companion_v2.execution.models import TaskContext, TaskError
+from digital_life_host.group_authority import GroupAuthority
+from digital_life_core.adapters.astrbot.model_wire import tool_alias
+from digital_life_core.conversation.quotes.service import quote_reference
+from digital_life_core.execution.models import TaskContext, TaskError
 from tests.audio_support import audio_bytes, silk_bytes
 from tests.forward_support import node_raw
 from tests.group_quote_media_support import GroupQuoteMediaFixture, Forward, Plain, Reply, FakeRecord, FakeVideo

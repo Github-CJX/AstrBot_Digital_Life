@@ -5,7 +5,7 @@ from __future__ import annotations
 import asyncio
 import unittest
 
-from astrbot_host.web_read_material import (
+from digital_life_host.web_read_material import (
     MAX_CHARS,
     _bounded,
     _read_with_fetch,

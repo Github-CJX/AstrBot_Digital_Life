@@ -5,13 +5,13 @@ from pathlib import Path
 from tempfile import TemporaryDirectory
 import unittest
 
-from companion_v2.execution.models import encode
-from companion_v2.foundation.refs import AssetRef, ReferenceValidationError, RoleOwnerRef, SourceRef, VersionRef
-from companion_v2.role_work import (
+from digital_life_core.execution.models import encode
+from digital_life_core.foundation.refs import AssetRef, ReferenceValidationError, RoleOwnerRef, SourceRef, VersionRef
+from digital_life_core.role_work import (
     PersistentRoleLifeLedger, RoleActivity, RoleActivityState as State, RoleArtifact,
     RoleArtifactJournalMeaning as Meaning, RoleArtifactKind, RoleLifeLedger,
 )
-from companion_v2.storage.runtime import StorageRuntime
+from digital_life_core.storage.runtime import StorageRuntime
 from tests.test_management_access import INSTALLATION, NOW, ROLE, SCOPE
 
 

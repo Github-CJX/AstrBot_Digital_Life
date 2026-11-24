@@ -14,18 +14,18 @@ import unittest
 
 from PIL import Image
 
-from companion_v2.configuration.models import ConfigLayer, ConfigurationError
-from companion_v2.execution.models import TaskError
-from companion_v2.foundation.refs import AudienceRef, ReferenceValidationError, ScopeKind
-from companion_v2.references.models import (ContentDigest, ReferenceKind, ReferenceRole,
+from digital_life_core.configuration.models import ConfigLayer, ConfigurationError
+from digital_life_core.execution.models import TaskError
+from digital_life_core.foundation.refs import AudienceRef, ReferenceValidationError, ScopeKind
+from digital_life_core.references.models import (ContentDigest, ReferenceKind, ReferenceRole,
                                             ReferenceSource, ReferenceState, WardrobeItem)
-from companion_v2.references.management import ReferenceMaterialManagement
-from companion_v2.references.repositories import ReferenceAssetRepository
-from companion_v2.references.service import OWNED_REFERENCE_PREFIX, ReferenceAssetService
-from companion_v2.references.usage import default_usage
-from companion_v2.references.prompts import image_reference_instruction
-from companion_v2.storage.reference_asset_schema import reference_limit
-from companion_v2.storage.runtime import StorageRuntime
+from digital_life_core.references.management import ReferenceMaterialManagement
+from digital_life_core.references.repositories import ReferenceAssetRepository
+from digital_life_core.references.service import OWNED_REFERENCE_PREFIX, ReferenceAssetService
+from digital_life_core.references.usage import default_usage
+from digital_life_core.references.prompts import image_reference_instruction
+from digital_life_core.storage.reference_asset_schema import reference_limit
+from digital_life_core.storage.runtime import StorageRuntime
 from tests.test_conversation_messages import MessageFixture
 
 
@@ -50,7 +50,7 @@ class SettingsStub:
     """Stands in for ReferenceSettings so a switch can be flipped per test."""
 
     def __init__(self, **options):
-        from companion_v2.references.configuration import DEFAULTS
+        from digital_life_core.references.configuration import DEFAULTS
         self.options = {**DEFAULTS, **options}
         self.reads = 0
 
@@ -450,7 +450,7 @@ class ReferenceGateTests(ReferenceAssetServiceTests):
 
 class ReferenceConfigurationTests(unittest.TestCase):
     def test_the_defaults_keep_the_old_behaviour(self):
-        from companion_v2.references import configuration as group
+        from digital_life_core.references import configuration as group
         self.assertEqual(group.DEFAULTS["enabled"], False)
         self.assertEqual(group.DEFAULTS["group_enabled"], False)
         self.assertEqual(group.DEFAULTS["daily_outfit_enabled"], False)
@@ -458,7 +458,7 @@ class ReferenceConfigurationTests(unittest.TestCase):
         self.assertFalse(group.validate(dict(group.DEFAULTS))["enabled"])
 
     def test_the_registered_fields_are_closed_and_bounded(self):
-        from companion_v2.references import configuration as group
+        from digital_life_core.references import configuration as group
         fields = {field.field_id: field for field in group.configuration_fields()}
         self.assertEqual(set(fields), {f"{group.GROUP}.{name}" for name in group.DEFAULTS})
         rotation = fields[f"{group.GROUP}.daily_outfit_rotation_days"]
@@ -469,7 +469,7 @@ class ReferenceConfigurationTests(unittest.TestCase):
             self.assertEqual(field.layers, (ConfigLayer.ROLE,))
 
     def test_an_out_of_range_or_wrongly_typed_value_is_rejected(self):
-        from companion_v2.references import configuration as group
+        from digital_life_core.references import configuration as group
         for name, value in (("daily_outfit_rotation_days", 0), ("daily_outfit_rotation_days", 366),
                             ("daily_outfit_rotation_days", True), ("enabled", 1),
                             ("daily_outfit_enabled", "yes"), ("group_enabled", "yes")):
@@ -477,7 +477,7 @@ class ReferenceConfigurationTests(unittest.TestCase):
                 group.validate({**group.DEFAULTS, name: value})
 
     def test_an_incomplete_document_is_rejected(self):
-        from companion_v2.references import configuration as group
+        from digital_life_core.references import configuration as group
         with self.assertRaises(ConfigurationError):
             group.validate({"enabled": True})
 
@@ -486,7 +486,7 @@ class WardrobeSettingsStub:
     """Stands in for WardrobeSettings so one switch can be flipped per test."""
 
     def __init__(self, **options):
-        from companion_v2.references.wardrobe import DEFAULTS
+        from digital_life_core.references.wardrobe import DEFAULTS
         self.options = {**DEFAULTS, **options}
         self.reads = 0
 
@@ -555,15 +555,15 @@ class WardrobeMaterialTests(ReferenceAssetServiceTests):
 
 class WardrobeConfigurationTests(unittest.TestCase):
     def test_the_defaults_keep_the_old_behaviour(self):
-        from companion_v2.references import wardrobe as group
+        from digital_life_core.references import wardrobe as group
         self.assertFalse(group.DEFAULTS["enabled"])
         self.assertFalse(group.DEFAULTS["prompt_enabled"])
         self.assertEqual(group.DEFAULTS["prompt_max_items"], 12)
         self.assertEqual(group.DEFAULTS["image_max_count"], 3)
 
     def test_all_six_settings_register_as_scalars(self):
-        from companion_v2.references import wardrobe as group
-        from companion_v2.configuration.registry import FieldRegistry
+        from digital_life_core.references import wardrobe as group
+        from digital_life_core.configuration.registry import FieldRegistry
         fields = group.configuration_fields()
         self.assertEqual({f.field_id.split(".")[-1] for f in fields}, set(group.DEFAULTS))
         registry = FieldRegistry(version="wardrobe.probe", fields=fields)
@@ -573,7 +573,7 @@ class WardrobeConfigurationTests(unittest.TestCase):
             self.assertEqual(field.layers, (ConfigLayer.ROLE,))
 
     def test_the_two_text_bounds_are_published_as_metadata(self):
-        from companion_v2.references import wardrobe as group
+        from digital_life_core.references import wardrobe as group
         fields = {f.field_id.split(".")[-1]: f for f in group.configuration_fields()}
         # The registry cannot enforce a text length, so it publishes the bound and
         # validate() enforces it; both facts are asserted together.
@@ -581,7 +581,7 @@ class WardrobeConfigurationTests(unittest.TestCase):
         self.assertEqual(fields["image_prompt"].maximum, group.MAX_IMAGE_PROMPT)
 
     def test_an_over_long_note_is_refused_and_never_truncated(self):
-        from companion_v2.references import wardrobe as group
+        from digital_life_core.references import wardrobe as group
         for name, maximum in (("tendency", group.MAX_TENDENCY), ("image_prompt", group.MAX_IMAGE_PROMPT)):
             with self.assertRaises(ConfigurationError, msg=name):
                 group.validate({**group.DEFAULTS, name: "长" * (maximum + 1)})
@@ -589,7 +589,7 @@ class WardrobeConfigurationTests(unittest.TestCase):
             self.assertEqual(len(at_bound[name]), maximum)
 
     def test_out_of_range_and_wrongly_typed_values_are_rejected(self):
-        from companion_v2.references import wardrobe as group
+        from digital_life_core.references import wardrobe as group
         for name, value in (("prompt_max_items", 0), ("prompt_max_items", 25),
                             ("image_max_count", 0), ("image_max_count", 9),
                             ("image_max_count", True), ("enabled", 1), ("tendency", 5)):
@@ -597,7 +597,7 @@ class WardrobeConfigurationTests(unittest.TestCase):
                 group.validate({**group.DEFAULTS, name: value})
 
     def test_an_incomplete_document_is_rejected(self):
-        from companion_v2.references import wardrobe as group
+        from digital_life_core.references import wardrobe as group
         with self.assertRaises(ConfigurationError):
             group.validate({"enabled": True})
 

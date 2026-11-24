@@ -8,13 +8,13 @@ from tempfile import TemporaryDirectory
 from types import SimpleNamespace
 import unittest
 
-from companion_v2.legacy.private_memory import SCHEMA, build_private_memory_plan, fingerprint
-from companion_v2.memory.private_legacy_import import import_private_memory
+from digital_life_core.legacy.private_memory import SCHEMA, build_private_memory_plan, fingerprint
+from digital_life_core.memory.private_legacy_import import import_private_memory
 from tests.memory_support import MemoryFixture
 
 
 def private_source(root, account, actor, *, text="七月二十四日一起看蓝风铃", bad_hash=False):
-    identity = {"companion_instance_id": "astrbot_plugin_private_companion",
+    identity = {"companion_instance_id": "astrbot_plugin_digital_life",
         "bot_account_id": "aiocqhttp:" + account, "adapter_instance_id": "aiocqhttp:main",
         "subject_namespace": "aiocqhttp:user", "platform_subject_id": actor}
     key = "chat-origin-v1:" + fingerprint(identity)
@@ -100,7 +100,7 @@ class PrivateMemoryMigrationTests(MemoryFixture, unittest.TestCase):
         self.assertEqual((len(original), len(preserved)), (1, 1))
 
     def test_core_reply_recalls_the_migrated_day_through_the_historical_query(self):
-        from astrbot_host.core_reply_context import _legacy_memory_materials
+        from digital_life_host.core_reply_context import _legacy_memory_materials
         self.import_history()
         owner = SimpleNamespace(query=self.recall, writer=self.memory)
         materials = _legacy_memory_materials(owner, self.context,
@@ -117,7 +117,7 @@ class PrivateMemoryMigrationTests(MemoryFixture, unittest.TestCase):
         self.assertEqual(items, [])
 
     def test_core_reply_handles_long_history_and_natural_language_queries(self):
-        from astrbot_host.core_reply_context import _legacy_memory_materials
+        from digital_life_host.core_reply_context import _legacy_memory_materials
         private_source(self.root, self.context.scope.account_id,
             self.context.actor.principal.native_account_id, text="蓝风铃往事" * 5000)
         self.import_history()
@@ -138,10 +138,10 @@ class PrivateMemoryAPIHostTests(MemoryFixture, unittest.IsolatedAsyncioTestCase)
         import asyncio
         from astrbot.api.web import PluginRequest, bind_request_context
         from starlette.requests import Request
-        from astrbot_host.legacy_api import LegacyMigrationWebAPI
-        from astrbot_host.legacy_private_memory_api import PrivateMemoryMigrationAPI
-        from astrbot_host.management_identity import dashboard_operator
-        from companion_v2.foundation.refs import SubjectKind
+        from digital_life_host.legacy_api import LegacyMigrationWebAPI
+        from digital_life_host.legacy_private_memory_api import PrivateMemoryMigrationAPI
+        from digital_life_host.management_identity import dashboard_operator
+        from digital_life_core.foundation.refs import SubjectKind
         with TemporaryDirectory() as directory:
             root = Path(directory)
             private_source(root, self.context.scope.account_id, self.context.actor.principal.native_account_id)

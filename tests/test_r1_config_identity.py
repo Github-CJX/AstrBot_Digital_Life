@@ -38,16 +38,16 @@ if _previous_astrbot_root is None:
     _astrbot_import_root = TemporaryDirectory(prefix="companion-v2-r1-import-")
     os.environ["ASTRBOT_ROOT"] = _astrbot_import_root.name
 
-from astrbot_host.persona_workshop_api import PERSONA_TRYOUT_SCENARIOS, PersonaWorkshopWebAPI
-from companion_v2.configuration.models import (ApplyMode, ConfigLayer, ConfigTarget,
+from digital_life_host.persona_workshop_api import PERSONA_TRYOUT_SCENARIOS, PersonaWorkshopWebAPI
+from digital_life_core.configuration.models import (ApplyMode, ConfigLayer, ConfigTarget,
     ConfigurationSnapshot, EffectiveValue)
-from companion_v2.configuration.registry import FieldRegistry
-from companion_v2.conversation.foreground import ModelDraft
-from companion_v2.execution.models import Lane, ProviderBinding, TaskError
-from companion_v2.legacy.configuration_migration import convert_configuration, configuration_rules
-from companion_v2.model_gateway.models import Amount, LocalProvider, ProviderResponse
-from companion_v2.model_gateway.routing import ModelRouter, configuration_fields
-from companion_v2.proactive.service import persona_judge_profile
+from digital_life_core.configuration.registry import FieldRegistry
+from digital_life_core.conversation.foreground import ModelDraft
+from digital_life_core.execution.models import Lane, ProviderBinding, TaskError
+from digital_life_core.legacy.configuration_migration import convert_configuration, configuration_rules
+from digital_life_core.model_gateway.models import Amount, LocalProvider, ProviderResponse
+from digital_life_core.model_gateway.routing import ModelRouter, configuration_fields
+from digital_life_core.proactive.service import persona_judge_profile
 from tests.multi_host_support import MultiFixture
 from tests.test_management_access import INSTALLATION, NOW, ROLE, SCOPE
 
@@ -72,7 +72,7 @@ def registry_for(profiles):
 
 
 def authoring_registry():
-    from companion_v2.conversation.content.authoring_tasks import authoring_profiles
+    from digital_life_core.conversation.content.authoring_tasks import authoring_profiles
     profiles = authoring_profiles("task-default", draft_tokens=2048)
     return registry_for(profiles), DRAFT_TARGET
 
@@ -82,7 +82,7 @@ def judge_registry():
 
 
 def planning_registry():
-    from companion_v2.agenda.planning import planning_profile
+    from digital_life_core.agenda.planning import planning_profile
     profile = planning_profile("task-default", max_output_tokens=2048)
     return registry_for((profile,)), profile
 
@@ -608,7 +608,7 @@ class MultiAccountPersonaWorkshopTests(MultiFixture, unittest.IsolatedAsyncioTes
         async def reader():
             return payload
 
-        with patch("astrbot_host.persona_workshop_api.request",
+        with patch("digital_life_host.persona_workshop_api.request",
                    NS(username="dashboard-admin", query=Query(), body=reader)):
             return await self.routes[self.persona_path(target_id, role_id) + suffix]()
 

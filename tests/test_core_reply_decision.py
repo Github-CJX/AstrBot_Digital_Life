@@ -10,19 +10,19 @@ from unittest.mock import AsyncMock, patch
 
 from astrbot.core.config import DEFAULT_CONFIG
 from astrbot.core.pipeline.process_stage.stage import ProcessStage
-from companion_v2.conversation.reply_settings import ReplyConfigurationOwner, configuration_fields, target_for
-from companion_v2.conversation.participation import (CONFIG_GROUP, GroupParticipationConfigurationOwner,
+from digital_life_core.conversation.reply_settings import ReplyConfigurationOwner, configuration_fields, target_for
+from digital_life_core.conversation.participation import (CONFIG_GROUP, GroupParticipationConfigurationOwner,
                                                     configuration_fields as participation_fields)
-from companion_v2.decision.client import LayaClientError
-from astrbot_host.laya_client import LayaDecisionClient
-from companion_v2.decision.contract import CONFIGURABLE_DECISION_FIELDS
-from companion_v2.decision.prompt import DECISION_QUESTIONS, decision_questions
-from companion_v2.decision.service import LayaDecisionService
-from companion_v2.decision.store import LayaSettingsStore, LayaSettingsError
-from companion_v2.foundation.outcome import Outcome
-from companion_v2.model_gateway.core_observations import observations_for_role
-from astrbot_host.core_reply import CORE_REPLY_CONTEXT_EXTRA
-from astrbot_host.core_reply_decision import core_decision_facts
+from digital_life_core.decision.client import LayaClientError
+from digital_life_host.laya_client import LayaDecisionClient
+from digital_life_core.decision.contract import CONFIGURABLE_DECISION_FIELDS
+from digital_life_core.decision.prompt import DECISION_QUESTIONS, decision_questions
+from digital_life_core.decision.service import LayaDecisionService
+from digital_life_core.decision.store import LayaSettingsStore, LayaSettingsError
+from digital_life_core.foundation.outcome import Outcome
+from digital_life_core.model_gateway.core_observations import observations_for_role
+from digital_life_host.core_reply import CORE_REPLY_CONTEXT_EXTRA
+from digital_life_host.core_reply_decision import core_decision_facts
 from tests.group_host_support import GroupFixture, group_config
 from tests.test_laya_decision import laya_result
 from tests.test_main_no_reply import ENTRY
@@ -74,10 +74,10 @@ class CoreReplyDecisionTests(GroupFixture, unittest.IsolatedAsyncioTestCase):
                 raise self.prediction
             return self.prediction
 
-        cuda_available = patch("astrbot_host.laya_client._cuda_available", return_value=True)
+        cuda_available = patch("digital_life_host.laya_client._cuda_available", return_value=True)
         cuda_available.start()
         self.addCleanup(cuda_available.stop)
-        mocked = self.predict_patch = patch("astrbot_host.laya_client._local_predict", side_effect=predict)
+        mocked = self.predict_patch = patch("digital_life_host.laya_client._local_predict", side_effect=predict)
         mocked.start()
         self.addCleanup(mocked.stop)
         context = (await self.controller.observe_group_early(self.group_event(identifier="configure-decision"))).unwrap()
@@ -290,7 +290,7 @@ class CoreReplyDecisionTests(GroupFixture, unittest.IsolatedAsyncioTestCase):
         self.assertTrue(any("火锅" in item["text"] for item in facts["recent_group_bot_messages"]))
 
     async def test_repeat_participation_is_classified_before_literal_action_without_main_model(self):
-        from companion_v2.configuration.models import ConfigLayer, ConfigTarget
+        from digital_life_core.configuration.models import ConfigLayer, ConfigTarget
 
         context = (await self.controller.observe_group_early(self.incoming("repeat-settings", "群聊讨论"))).unwrap()
         owner, fields = GroupParticipationConfigurationOwner(self.app.runtime), participation_fields()

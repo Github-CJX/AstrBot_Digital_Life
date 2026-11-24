@@ -3,7 +3,7 @@
 Production shape this reproduces (2026-10-30/31, session
 ``onebot_qq:GroupMessage:1032290619``): the persisted conversation contained
 
-    49 assistant  tool_calls=[call_314584 companion_v2_group_participation_choose]
+    49 assistant  tool_calls=[call_314584 digital_life_core_group_participation_choose]
     50 assistant  "除了我家那个死脑筋的经纪人还能有谁？..."
 
 i.e. an assistant message whose tool call is answered by nothing. Every provider
@@ -22,13 +22,13 @@ from unittest.mock import patch
 from astrbot.core.agent.message import Message, TextPart, ThinkPart
 from astrbot.core.provider.entities import LLMResponse
 
-from astrbot_host import core_reply_history_guard as history_guard
-from astrbot_host.core_reply import CORE_REPLY_CONTEXT_EXTRA
-from astrbot_host.core_reply_history_guard import (
+from digital_life_host import core_reply_history_guard as history_guard
+from digital_life_host.core_reply import CORE_REPLY_CONTEXT_EXTRA
+from digital_life_host.core_reply_history_guard import (
     repair_request_history,
     repair_run_context_history,
 )
-from companion_v2.conversation.history_legality import (
+from digital_life_core.conversation.history_legality import (
     MISSING_TOOL_RESULT_TEXT,
     repair_tool_call_pairing,
     tool_call_pairing_is_legal,
@@ -37,7 +37,7 @@ from companion_v2.conversation.history_legality import (
 logger_name = history_guard.__name__
 
 
-def tool_call(call_id, name="companion_v2_group_participation_choose", arguments="{}"):
+def tool_call(call_id, name="digital_life_core_group_participation_choose", arguments="{}"):
     return {"type": "function", "id": call_id, "function": {"name": name, "arguments": arguments}}
 
 
@@ -194,7 +194,7 @@ class HistoryLegalityTests(unittest.TestCase):
             Message(role="user", content="你要揍谁"),
             Message(role="assistant", content=[TextPart(text="")],
                     tool_calls=[{"type": "function", "id": "call_314584",
-                                 "function": {"name": "companion_v2_group_participation_choose", "arguments": "{}"}}]),
+                                 "function": {"name": "digital_life_core_group_participation_choose", "arguments": "{}"}}]),
             Message(role="assistant", content="除了我家那个死脑筋的经纪人还能有谁？"),
         ]
 
@@ -266,7 +266,7 @@ class CoreReplyHistoryGuardTests(unittest.TestCase):
             Message(role="user", content="刚睡醒来上这么一集真是惬意"),
             Message(role="assistant", content=None,
                     tool_calls=[{"type": "function", "id": "call_689163",
-                                 "function": {"name": "companion_v2_group_participation_choose", "arguments": "{}"}}]),
+                                 "function": {"name": "digital_life_core_group_participation_choose", "arguments": "{}"}}]),
             Message(role="assistant", content="你管这种吵死人的噪音叫惬意啊？"),
         ])
 

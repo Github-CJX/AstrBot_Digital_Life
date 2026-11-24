@@ -11,7 +11,7 @@ from tests.multi_host_support import MultiFixture
 from tests.staging_bootstrap_support import database_contents
 from tests.test_management_access import NOW
 from tests.test_native_extensions_registry import Port, Star
-from companion_v2.capabilities.repositories import CapabilityRepository
+from digital_life_core.capabilities.repositories import CapabilityRepository
 
 
 def screen_declaration(declarations):

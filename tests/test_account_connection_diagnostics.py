@@ -5,8 +5,8 @@ import unittest
 from unittest.mock import AsyncMock, patch
 
 from tests import astrbot_data_root  # noqa: F401
-from astrbot_host.account_session_api import AccountSessionWebAPI
-from astrbot_host.setup_api import SetupWebAPI
+from digital_life_host.account_session_api import AccountSessionWebAPI
+from digital_life_host.setup_api import SetupWebAPI
 
 
 class AccountConnectionDiagnosticTests(unittest.IsolatedAsyncioTestCase):

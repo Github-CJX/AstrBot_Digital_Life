@@ -10,15 +10,15 @@ import sys
 import unittest
 from unittest.mock import patch
 
-from companion_v2.foundation.refs import OperationRef, VersionRef
-from companion_v2.foundation.refs import RoleOwnerRef
-from companion_v2.execution.models import TaskError, encode
-from companion_v2.adapters.astrbot.staging_config import REBINDING_FIELDS, StagingConfiguration
-from companion_v2.identity_policy.models import AuthorizationTier
-from companion_v2.identity_policy.object_access import ObjectAccessPolicy
-from companion_v2.model_gateway.models import Amount, BudgetPolicy
-from companion_v2.role_work import PersistentRoleLifeLedger, RoleActivity, RoleActivityState
-from companion_v2.role_work.journal import JournalContext, JournalKey, JournalKind
+from digital_life_core.foundation.refs import OperationRef, VersionRef
+from digital_life_core.foundation.refs import RoleOwnerRef
+from digital_life_core.execution.models import TaskError, encode
+from digital_life_core.adapters.astrbot.staging_config import REBINDING_FIELDS, StagingConfiguration
+from digital_life_core.identity_policy.models import AuthorizationTier
+from digital_life_core.identity_policy.object_access import ObjectAccessPolicy
+from digital_life_core.model_gateway.models import Amount, BudgetPolicy
+from digital_life_core.role_work import PersistentRoleLifeLedger, RoleActivity, RoleActivityState
+from digital_life_core.role_work.journal import JournalContext, JournalKey, JournalKind
 from tests.native_adapter_support import FakeEvent, FakeProvider, completion
 from tests.staging_bootstrap_support import BootstrapFixture, database_contents
 from tests.test_management_access import NOW
@@ -326,7 +326,7 @@ class StagingBootstrapTests(BootstrapFixture, unittest.IsolatedAsyncioTestCase):
                           budget=BudgetPolicy(*(Amount(10 ** 7, 10 ** 8) for _ in range(5))))
         bootstrap = self.make_bootstrap(configuration=drifted)
 
-        with self.assertLogs("companion_v2.adapters.astrbot.staging_bootstrap", level="WARNING") as captured:
+        with self.assertLogs("digital_life_core.adapters.astrbot.staging_bootstrap", level="WARNING") as captured:
             replayed = (await bootstrap.initialize()).unwrap()
             session = self.load_session(bootstrap)
 
@@ -358,7 +358,7 @@ class StagingBootstrapTests(BootstrapFixture, unittest.IsolatedAsyncioTestCase):
 
         drifted = self.make_bootstrap(configuration=replace(self.config, task_prompt="另一份提示词",
                                                            max_output_tokens=999))
-        with self.assertLogs("companion_v2.adapters.astrbot.staging_bootstrap", level="WARNING") as captured:
+        with self.assertLogs("digital_life_core.adapters.astrbot.staging_bootstrap", level="WARNING") as captured:
             self.assertTrue((await drifted.initialize()).unwrap().replayed)
             self.load_session(drifted)
         self.assertIn("旧版", "\n".join(captured.output))

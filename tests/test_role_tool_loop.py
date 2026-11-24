@@ -8,21 +8,21 @@ from types import SimpleNamespace
 import unittest
 from unittest.mock import patch
 
-from companion_v2.agenda.models import AgendaTarget
-from companion_v2.agenda.service import AgendaService
-from companion_v2.conversation.foreground import ClaimKind, DraftClaim, ModelDraft
-from companion_v2.conversation.tool_loop import LocalRoleTools, ToolSource
-from companion_v2.diagnostics.models import DiagnosticContext, DiagnosticQuery
-from companion_v2.diagnostics.service import DiagnosticService
-from companion_v2.execution.models import Lane, TaskError, encode
-from companion_v2.execution.runner import TaskRun
-from companion_v2.foundation.refs import ScopeKind
-from companion_v2.foundation.refs import SubjectKind, SubjectRef
-from companion_v2.model_gateway.budget import BudgetLedger
-from companion_v2.model_gateway.models import Amount, BudgetPolicy, ProviderResponse, ToolCall
-from companion_v2.model_gateway.routing import ModelRouter
-from companion_v2.model_gateway.service import LocalModelGateway
-from companion_v2.proactive.external_materials import WeatherSnapshot
+from digital_life_core.agenda.models import AgendaTarget
+from digital_life_core.agenda.service import AgendaService
+from digital_life_core.conversation.foreground import ClaimKind, DraftClaim, ModelDraft
+from digital_life_core.conversation.tool_loop import LocalRoleTools, ToolSource
+from digital_life_core.diagnostics.models import DiagnosticContext, DiagnosticQuery
+from digital_life_core.diagnostics.service import DiagnosticService
+from digital_life_core.execution.models import Lane, TaskError, encode
+from digital_life_core.execution.runner import TaskRun
+from digital_life_core.foundation.refs import ScopeKind
+from digital_life_core.foundation.refs import SubjectKind, SubjectRef
+from digital_life_core.model_gateway.budget import BudgetLedger
+from digital_life_core.model_gateway.models import Amount, BudgetPolicy, ProviderResponse, ToolCall
+from digital_life_core.model_gateway.routing import ModelRouter
+from digital_life_core.model_gateway.service import LocalModelGateway
+from digital_life_core.proactive.external_materials import WeatherSnapshot
 from tests.test_conversation_messages import MessageFixture
 from tests.test_management_access import INSTALLATION, NOW
 
@@ -392,7 +392,7 @@ class RoleToolLoopTests(ToolLoopFixture, unittest.IsolatedAsyncioTestCase):
         self.assertEqual(len(self.rows()), 8)
         self.assertEqual(len(self.called), 9)
         self.assertEqual(self.called[-1][1].tools, ())
-        from companion_v2.conversation.generation import MODEL_FAILURE_NOTICE
+        from digital_life_core.conversation.generation import MODEL_FAILURE_NOTICE
         self.assertEqual([part["text"] for part in self.parts(batch)], [MODEL_FAILURE_NOTICE])
 
     async def test_unknown_usage_remains_reserved_across_successful_continuation(self):

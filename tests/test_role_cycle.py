@@ -5,11 +5,11 @@ from datetime import datetime, timedelta, timezone
 import json
 import unittest
 
-from companion_v2.conversation.state_context import ConversationStateContext
-from companion_v2.execution.models import TaskError, digest, encode
-from companion_v2.role_work.state import cycle
-from companion_v2.role_work.state.configuration import DEFAULTS, GROUP, target_for
-from companion_v2.role_work.state.service import RoleStateService
+from digital_life_core.conversation.state_context import ConversationStateContext
+from digital_life_core.execution.models import TaskError, digest, encode
+from digital_life_core.role_work.state import cycle
+from digital_life_core.role_work.state.configuration import DEFAULTS, GROUP, target_for
+from digital_life_core.role_work.state.service import RoleStateService
 from tests.test_management_access import NOW
 from tests.test_role_state import StateFixture, state_data
 from tests.test_role_tool_loop import answered

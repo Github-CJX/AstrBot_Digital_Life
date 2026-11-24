@@ -10,8 +10,8 @@ from tempfile import TemporaryDirectory
 import unittest
 from unittest.mock import patch
 
-from companion_v2.legacy.archive import verify_v1_archive
-from companion_v2.legacy.memory_archive import (
+from digital_life_core.legacy.archive import verify_v1_archive
+from digital_life_core.legacy.memory_archive import (
     build_memory_database_plan,
     copy_memory_database_archive,
 )
@@ -125,7 +125,7 @@ class LegacyMemoryPackageArchiveTests(unittest.TestCase):
 
             reopened = subprocess.run(
                 [sys.executable, "-c",
-                 "import json,sys; from companion_v2.legacy.archive import verify_v1_archive; "
+                 "import json,sys; from digital_life_core.legacy.archive import verify_v1_archive; "
                  "print(json.dumps(verify_v1_archive(sys.argv[1]), sort_keys=True))",
                  str(archive_path)],
                 check=True, capture_output=True, text=True,
@@ -180,7 +180,7 @@ class LegacyMemoryPackageArchiveTests(unittest.TestCase):
             unreadable.parent.mkdir(parents=True)
             unreadable.write_bytes(b"opaque")
             original_hash = __import__(
-                "companion_v2.legacy.memory_archive", fromlist=["_sha256_file"]
+                "digital_life_core.legacy.memory_archive", fromlist=["_sha256_file"]
             )._sha256_file
 
             def deny_one_path(path):
@@ -189,7 +189,7 @@ class LegacyMemoryPackageArchiveTests(unittest.TestCase):
                 return original_hash(path)
 
             archive_root = base / "v2" / "archives"
-            with patch("companion_v2.legacy.memory_archive._sha256_file", side_effect=deny_one_path):
+            with patch("digital_life_core.legacy.memory_archive._sha256_file", side_effect=deny_one_path):
                 plan = build_memory_database_plan(main)
                 self.assertEqual(plan.state, "incomplete")
                 self.assertIn(("memory_audits/restricted.json", "entry_unreadable"), plan.issues)
@@ -215,8 +215,8 @@ class LegacyMemoryPackageArchiveTests(unittest.TestCase):
             historical.write_bytes(b"oversized sidecar")
             database_bytes = main.stat().st_size + scoped.stat().st_size
 
-            with patch("companion_v2.legacy.memory_archive.MAX_DATABASE_BYTES", database_bytes), \
-                    patch("companion_v2.legacy.memory_archive._sha256_file",
+            with patch("digital_life_core.legacy.memory_archive.MAX_DATABASE_BYTES", database_bytes), \
+                    patch("digital_life_core.legacy.memory_archive._sha256_file",
                           side_effect=AssertionError("over-limit file must not be hashed")):
                 plan = build_memory_database_plan(main)
 

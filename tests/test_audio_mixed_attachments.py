@@ -2,8 +2,8 @@
 
 import unittest
 
-from astrbot_host.audio.loader import load_native_audio
-from companion_v2.execution.models import TaskError
+from digital_life_host.audio.loader import load_native_audio
+from digital_life_core.execution.models import TaskError
 from tests.audio_support import FakeRecord
 from tests.forward_support import ForwardFixture
 from tests.test_conversation_quotes import FakeReply

@@ -13,13 +13,13 @@ from tests.staging_bootstrap_support import wait_for_batch
 from tests.audio_support import FakeRecord
 from tests.video_support import FakeVideo
 from astrbot.core.message.components import Image, Plain, Reply
-from astrbot_host.audio.loader import load_native_audio
-from astrbot_host.media import load_native_image
-from astrbot_host.video.loader import load_native_video
-from companion_v2.adapters.astrbot.group_quotes import read_group_quote
-from companion_v2.adapters.astrbot.quotes import read_private_quote
-from companion_v2.conversation.messages import event_from_document
-from companion_v2.execution.models import TaskContext
+from digital_life_host.audio.loader import load_native_audio
+from digital_life_host.media import load_native_image
+from digital_life_host.video.loader import load_native_video
+from digital_life_core.adapters.astrbot.group_quotes import read_group_quote
+from digital_life_core.adapters.astrbot.quotes import read_private_quote
+from digital_life_core.conversation.messages import event_from_document
+from digital_life_core.execution.models import TaskContext
 
 
 def group_raw(*, group="300", account="100", sender="201", **kwargs):

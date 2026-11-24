@@ -6,11 +6,11 @@ from types import SimpleNamespace as NS
 import unittest
 from unittest.mock import AsyncMock, patch
 
-from companion_v2.configuration.models import ConfigLayer, ConfigTarget
-from companion_v2.conversation.participation import (CONFIG_GROUP, GroupParticipationConfigurationOwner,
+from digital_life_core.configuration.models import ConfigLayer, ConfigTarget
+from digital_life_core.conversation.participation import (CONFIG_GROUP, GroupParticipationConfigurationOwner,
                                                     configuration_fields as participation_fields)
-from companion_v2.conversation.reply_settings import ReplyConfigurationOwner, configuration_fields, target_for
-from companion_v2.decision.prompt import build_state, decision_questions, render_model_state
+from digital_life_core.conversation.reply_settings import ReplyConfigurationOwner, configuration_fields, target_for
+from digital_life_core.decision.prompt import build_state, decision_questions, render_model_state
 from tests.group_host_support import GroupFixture, group_config
 from tests.test_main_no_reply import ENTRY
 

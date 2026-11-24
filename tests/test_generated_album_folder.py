@@ -16,11 +16,11 @@ from unittest.mock import patch
 
 from PIL import Image
 
-from companion_v2.conversation.media.generated import GeneratedAlbumImage
-from companion_v2.conversation.media.models import ImageDescriptor
-from companion_v2.execution.models import TaskError
-from companion_v2.foundation.refs import ScopeKind, ScopeRef, SubjectKind, SubjectRef
-from companion_v2.storage.generated_album import (
+from digital_life_core.conversation.media.generated import GeneratedAlbumImage
+from digital_life_core.conversation.media.models import ImageDescriptor
+from digital_life_core.execution.models import TaskError
+from digital_life_core.foundation.refs import ScopeKind, ScopeRef, SubjectKind, SubjectRef
+from digital_life_core.storage.generated_album import (
     album_filename,
     album_short_id,
     generated_album_root,
@@ -29,7 +29,7 @@ from companion_v2.storage.generated_album import (
     safe_role_slug,
     sync_generated_album_folder,
 )
-from companion_v2.storage.image_payloads import image_root, store_image
+from digital_life_core.storage.image_payloads import image_root, store_image
 
 
 def _image_bytes(color: str, *, fmt: str = "PNG") -> bytes:
@@ -240,7 +240,7 @@ class GeneratedAlbumStorageUnitTests(unittest.TestCase):
 
             # Second sync skips existing copies.
             with patch(
-                "companion_v2.storage.generated_album.tempfile.mkstemp",
+                "digital_life_core.storage.generated_album.tempfile.mkstemp",
                 side_effect=AssertionError("mkstemp should not be called on already-synced items"),
             ):
                 second = sync_generated_album_folder(data_root, [e1, e2], role_id="role-a")
@@ -265,7 +265,7 @@ class GeneratedAlbumStorageUnitTests(unittest.TestCase):
 
 class ReferenceManagementOpenAlbumFolderTests(unittest.TestCase):
     def _build_manager(self, data_root: Path, pages: dict, *, hidden_ids: set[str] | None = None, role_id: str | None = "role-a"):
-        from companion_v2.references.management import ReferenceMaterialManagement
+        from digital_life_core.references.management import ReferenceMaterialManagement
 
         class FakeGeneratedImages:
             def __init__(self, page_map):
@@ -325,7 +325,7 @@ class ReferenceManagementOpenAlbumFolderTests(unittest.TestCase):
             def fake_launch(arg, *_args, **_kwargs):
                 opened_targets.append(arg if isinstance(arg, str) else arg[-1])
 
-            with patch(f"companion_v2.references.management.{launcher_attr}", side_effect=fake_launch):
+            with patch(f"digital_life_core.references.management.{launcher_attr}", side_effect=fake_launch):
                 first = manager.open_album_folder(SimpleNamespace(), context, at="2026-10-12T05:00:00+00:00")
                 second = manager.open_album_folder(SimpleNamespace(), context, at="2026-10-12T05:01:00+00:00")
 
@@ -352,7 +352,7 @@ class ReferenceManagementOpenAlbumFolderTests(unittest.TestCase):
 
             manager._admit = lambda operator, context, at: "owner-2"
             generated_images.page_map = {None: {"items": (), "next_cursor": None}}
-            with patch(f"companion_v2.references.management.{launcher_attr}", side_effect=fake_launch):
+            with patch(f"digital_life_core.references.management.{launcher_attr}", side_effect=fake_launch):
                 separate = manager.open_album_folder(SimpleNamespace(), context, at="2026-10-12T05:00:00+00:00")
             self.assertNotEqual(separate["path"], first["path"])
             self.assertEqual(list(Path(separate["path"]).iterdir()), [])
@@ -372,7 +372,7 @@ class ReferenceManagementOpenAlbumFolderTests(unittest.TestCase):
             def fake_launch(arg, *_args, **_kwargs):
                 opened.append(arg if isinstance(arg, str) else arg[-1])
 
-            with patch(f"companion_v2.references.management.{launcher_attr}", side_effect=fake_launch):
+            with patch(f"digital_life_core.references.management.{launcher_attr}", side_effect=fake_launch):
                 result = manager.open_album_folder(SimpleNamespace(), context, at="2026-10-12T05:00:00+00:00")
                 root_fallback = manager.open_album_folder(
                     SimpleNamespace(), context, at="2026-10-12T05:00:00+00:00", role_id="",
@@ -399,14 +399,14 @@ class ReferenceManagementOpenAlbumFolderTests(unittest.TestCase):
 
             # Missing role_binding (backward-compat omitted role) opens generated-album root.
             no_role_manager, no_role_ctx, _ = self._build_manager(data_root, pages, role_id=None)
-            with patch(f"companion_v2.references.management.{launcher_attr}", side_effect=fake_launch):
+            with patch(f"digital_life_core.references.management.{launcher_attr}", side_effect=fake_launch):
                 compat = no_role_manager.open_album_folder(SimpleNamespace(), no_role_ctx, at="2026-10-12T05:00:00+00:00")
             self.assertEqual(compat["path"], str(album_base))
             self.assertEqual(compat["total_count"], 0)
 
             # OS launch failure preserves generated_album_open_failed code.
             with patch(
-                f"companion_v2.references.management.{launcher_attr}",
+                f"digital_life_core.references.management.{launcher_attr}",
                 side_effect=OSError("no display"),
             ):
                 with self.assertRaises(TaskError) as open_error:
@@ -438,10 +438,10 @@ from types import SimpleNamespace as NS
 from unittest.mock import patch
 from PIL import Image
 from astrbot.api.web import PluginMultiDict
-from companion_v2.conversation.media.generated import GeneratedAlbumImage
-from companion_v2.conversation.media.models import ImageDescriptor
-from companion_v2.storage.generated_album import role_album_dir
-from companion_v2.storage.image_payloads import image_root, store_image
+from digital_life_core.conversation.media.generated import GeneratedAlbumImage
+from digital_life_core.conversation.media.models import ImageDescriptor
+from digital_life_core.storage.generated_album import role_album_dir
+from digital_life_core.storage.image_payloads import image_root, store_image
 from tests.multi_host_support import MultiFixture
 
 
@@ -472,7 +472,7 @@ class OpenFolderRouteTest(MultiFixture, unittest.IsolatedAsyncioTestCase):
             async def read():
                 return json.dumps({} if body is None else body, ensure_ascii=False).encode("utf-8")
             with patch(
-                "astrbot_host.image_material_api.request",
+                "digital_life_host.image_material_api.request",
                 NS(username=username, query=PluginMultiDict([]), body=read),
             ):
                 return await handlers[path]()
@@ -513,7 +513,7 @@ class OpenFolderRouteTest(MultiFixture, unittest.IsolatedAsyncioTestCase):
 
         try:
             with patch.object(app.messages.generated_images, "album_page", side_effect=fake_album_page), \
-                 patch(f"companion_v2.references.management.{launcher_attr}", side_effect=fake_launch):
+                 patch(f"digital_life_core.references.management.{launcher_attr}", side_effect=fake_launch):
                 first_res = await call(first + "/album/open-folder", {})
                 self.assertEqual(first_res["status"], "ok", first_res)
                 payload = first_res["data"]
@@ -579,10 +579,10 @@ unittest.main()
 import hashlib, json, os, sqlite3, unittest
 from pathlib import Path
 from unittest.mock import patch
-from astrbot_host.management_identity import dashboard_operator
-from companion_v2.references.management import ReferenceMaterialManagement
-from companion_v2.storage.generated_album import role_album_dir
-from companion_v2.storage.image_payloads import MARKER_PREFIX, image_root, is_marker, load_image
+from digital_life_host.management_identity import dashboard_operator
+from digital_life_core.references.management import ReferenceMaterialManagement
+from digital_life_core.storage.generated_album import role_album_dir
+from digital_life_core.storage.image_payloads import MARKER_PREFIX, image_root, is_marker, load_image
 from tests.test_conversation_images import image_bytes
 from tests.test_core_reply_images import CoreReplyImagesTests
 
@@ -637,7 +637,7 @@ class RealNativeAlbumFolderTest(CoreReplyImagesTests):
         def fake_launch(arg, *_args, **_kwargs):
             opened.append(arg if isinstance(arg, str) else arg[-1])
 
-        with patch(f"companion_v2.references.management.{launcher_attr}", side_effect=fake_launch):
+        with patch(f"digital_life_core.references.management.{launcher_attr}", side_effect=fake_launch):
             first = manager.open_album_folder(operator, self.context, at=self.clock.now())
             second = manager.open_album_folder(operator, self.context, at=self.clock.now())
 

@@ -5,7 +5,7 @@ from pathlib import Path
 from tempfile import TemporaryDirectory
 import unittest
 
-from companion_v2.foundation.refs import (
+from digital_life_core.foundation.refs import (
     ReferenceValidationError,
     RoleOwnerRef,
     ScopeKind,
@@ -15,8 +15,8 @@ from companion_v2.foundation.refs import (
     SubjectRef,
     VersionRef,
 )
-from companion_v2.role_work.growth import GrowthKind, GrowthState, PersistentRoleGrowthLedger, RoleGrowthRecord
-from companion_v2.storage.runtime import StorageRuntime
+from digital_life_core.role_work.growth import GrowthKind, GrowthState, PersistentRoleGrowthLedger, RoleGrowthRecord
+from digital_life_core.storage.runtime import StorageRuntime
 
 
 INSTALLATION = "growth-installation"

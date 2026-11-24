@@ -4,9 +4,9 @@ import asyncio
 import json
 import unittest
 
-from companion_v2.conversation.flow import ConversationPolicy
-from companion_v2.role_work.journal.models import JournalDraft
-from companion_v2.identity_policy.models import AuthorizationTier
+from digital_life_core.conversation.flow import ConversationPolicy
+from digital_life_core.role_work.journal.models import JournalDraft
+from digital_life_core.identity_policy.models import AuthorizationTier
 from tests.test_management_access import SCOPE
 from tests.test_role_life_runtime import LifeFixture
 from tests.test_role_tool_loop import answered
@@ -111,8 +111,8 @@ class LifeContextHostTests(LifeFixture, unittest.IsolatedAsyncioTestCase):
     async def test_restart_before_next_part_rechecks_corrected_journal_without_replaying(self):
         self.host_instance = await self.start(self.host(policy=ConversationPolicy(0, 0, 180, 3)))
         self.app = self.host_instance.application
-        from companion_v2.role_work.journal.models import JournalContext, JournalKey, JournalKind
-        from companion_v2.foundation.refs import RoleOwnerRef
+        from digital_life_core.role_work.journal.models import JournalContext, JournalKey, JournalKind
+        from digital_life_core.foundation.refs import RoleOwnerRef
         batch = self.host_instance.receive(self.event("seed")).unwrap()
         context = self.context(self.app, batch)
         key = JournalKey(RoleOwnerRef(SCOPE.installation_id, SCOPE.bot_id, context.role_binding.role.subject_id),

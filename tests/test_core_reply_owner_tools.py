@@ -15,13 +15,13 @@ from astrbot.core.message.components import Image
 from astrbot.core.message.message_event_result import MessageChain
 from mcp.types import CallToolResult
 
-from astrbot_host.core_reply import CORE_REPLY_CONTEXT_EXTRA, prepare_core_reply_event
-from astrbot_host.core_reply_tools import inject_core_reply_tools, inject_core_turn_notes, native_tool_name
-from astrbot_host.core_reply_reactions import observe_core_cached_image, observe_core_media_send_returned
-from companion_v2.agenda.models import Schedule
-from companion_v2.conversation.recalls import MessageRecall
-from companion_v2.execution.models import encode, require
-from companion_v2.adapters.astrbot.staging_config import REQUIRED_CAPABILITIES
+from digital_life_host.core_reply import CORE_REPLY_CONTEXT_EXTRA, prepare_core_reply_event
+from digital_life_host.core_reply_tools import inject_core_reply_tools, inject_core_turn_notes, native_tool_name
+from digital_life_host.core_reply_reactions import observe_core_cached_image, observe_core_media_send_returned
+from digital_life_core.agenda.models import Schedule
+from digital_life_core.conversation.recalls import MessageRecall
+from digital_life_core.execution.models import encode, require
+from digital_life_core.adapters.astrbot.staging_config import REQUIRED_CAPABILITIES
 from tests.group_host_support import GroupFixture
 from tests.multi_host_support import MultiFixture, multi_config
 from tests.test_semantic_integration import SemanticPort, animation
@@ -157,7 +157,7 @@ class CoreReplyGroupOwnerToolTests(NativeOwnerCalls, GroupFixture, unittest.Isol
         self.assert_no_reply_work()
 
     async def test_addressed_group_turn_still_offers_and_runs_the_participation_choice(self):
-        # Production called companion_v2_group_participation_choose on every @
+        # Production called digital_life_core_group_participation_choose on every @
         # turn even after 7.0.1 stopped offering it there, so the host answered
         # "tool not found" and the turn was wasted.  The tool must stay in the
         # set so the call the model makes from history runs normally.
@@ -237,7 +237,7 @@ class CoreReplySemanticOwnerToolTests(NativeOwnerCalls, MultiFixture, unittest.I
         self.assertIn(native_tool_name("reaction.search"), [tool[0] for tool in first_tools])
         self.assertIn("本轮不使用图库表情", first.get_extra(CORE_REPLY_CONTEXT_EXTRA)["_turn_notes"]["reactions"])
         inject_core_turn_notes(first, first_request)
-        self.assertTrue(any(getattr(part, "text", "").startswith("<companion_v2_native_reactions>")
+        self.assertTrue(any(getattr(part, "text", "").startswith("<digital_life_core_native_reactions>")
                             for part in first_request.extra_user_content_parts))
         refused = json.loads(await self.invoke(first, first_request, "reaction.search", {"intent": "安慰"}))
         self.assertEqual((refused["state"], refused["code"]), ("failed", "reaction_unavailable"))

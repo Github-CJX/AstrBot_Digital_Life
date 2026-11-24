@@ -5,7 +5,7 @@ from pathlib import Path
 from tempfile import TemporaryDirectory
 import unittest
 
-from companion_v2.conversation.foreground import (
+from digital_life_core.conversation.foreground import (
     ClaimKind,
     ContextContribution,
     ContributionState,
@@ -19,9 +19,9 @@ from companion_v2.conversation.foreground import (
     LeaseState,
     ModelDraft,
 )
-from companion_v2.conversation.models import ExternalEffectCounters, InboundConversationEvent
-from companion_v2.foundation.clock import DeterministicClock
-from companion_v2.foundation.refs import (
+from digital_life_core.conversation.models import ExternalEffectCounters, InboundConversationEvent
+from digital_life_core.foundation.clock import DeterministicClock
+from digital_life_core.foundation.refs import (
     AudienceRef,
     ScopeKind,
     ScopeRef,
@@ -30,13 +30,13 @@ from companion_v2.foundation.refs import (
     SubjectRef,
     VersionRef,
 )
-from companion_v2.identity_policy.directory import IdentityDirectory
-from companion_v2.identity_policy.models import AuthenticatedHostPrincipal, AuthorizationTier, RoleBinding
-from companion_v2.identity_policy.repository import PersistentIdentityDirectory
-from companion_v2.sources.models import SourceRecord
-from companion_v2.sources.repositories import SourceRepository
-from companion_v2.storage.repositories import InboxRepository, OperationRepository
-from companion_v2.storage.runtime import StorageRuntime
+from digital_life_core.identity_policy.directory import IdentityDirectory
+from digital_life_core.identity_policy.models import AuthenticatedHostPrincipal, AuthorizationTier, RoleBinding
+from digital_life_core.identity_policy.repository import PersistentIdentityDirectory
+from digital_life_core.sources.models import SourceRecord
+from digital_life_core.sources.repositories import SourceRepository
+from digital_life_core.storage.repositories import InboxRepository, OperationRepository
+from digital_life_core.storage.runtime import StorageRuntime
 
 
 NOW = datetime(2026, 9, 21, 0, 0, tzinfo=timezone.utc)

@@ -7,16 +7,16 @@ from tempfile import TemporaryDirectory
 from types import SimpleNamespace
 import unittest
 
-from astrbot_host.private_notice import send_group_notice
-from astrbot_host.relay_pending import claim_group, claim_private_receipts
-from astrbot_host.relay_tools import RelayToolPort
-from companion_v2.conversation.external_tools import ExternalToolInvocation
-from companion_v2.execution.models import TaskError, encode
-from companion_v2.foundation.refs import AudienceRef, ScopeKind, ScopeRef, SubjectKind, SubjectRef
-from companion_v2.identity_policy.models import AuthenticatedHostPrincipal, ResolvedIdentity, RoleBinding
-from companion_v2.storage.repositories import OperationRepository
-from companion_v2.storage.runtime import StorageRuntime
-from companion_v2.conversation.relay_tools import SEND_ACTION, tool_descriptors
+from digital_life_host.private_notice import send_group_notice
+from digital_life_host.relay_pending import claim_group, claim_private_receipts
+from digital_life_host.relay_tools import RelayToolPort
+from digital_life_core.conversation.external_tools import ExternalToolInvocation
+from digital_life_core.execution.models import TaskError, encode
+from digital_life_core.foundation.refs import AudienceRef, ScopeKind, ScopeRef, SubjectKind, SubjectRef
+from digital_life_core.identity_policy.models import AuthenticatedHostPrincipal, ResolvedIdentity, RoleBinding
+from digital_life_core.storage.repositories import OperationRepository
+from digital_life_core.storage.runtime import StorageRuntime
+from digital_life_core.conversation.relay_tools import SEND_ACTION, tool_descriptors
 
 
 NOW = datetime(2026, 10, 19, 4, 0, tzinfo=timezone.utc)

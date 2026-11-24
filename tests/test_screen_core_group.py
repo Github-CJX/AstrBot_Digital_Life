@@ -5,13 +5,13 @@ from types import SimpleNamespace
 import unittest
 from unittest.mock import patch
 
-from astrbot_host.native_extensions.screens import ScreenAdopter
-from companion_v2.execution.models import TaskError
-from companion_v2.foundation.outcome import Outcome
-from companion_v2.foundation.refs import (
+from digital_life_host.native_extensions.screens import ScreenAdopter
+from digital_life_core.execution.models import TaskError
+from digital_life_core.foundation.outcome import Outcome
+from digital_life_core.foundation.refs import (
     AssetRef, ScopeKind, ScopeRef, SourceRef, SubjectKind, SubjectRef, VersionRef,
 )
-from companion_v2.screen.models import ScreenCaptureRef
+from digital_life_core.screen.models import ScreenCaptureRef
 from tests.g6_support import INSTALLATION, NOW
 
 
@@ -35,7 +35,7 @@ def reference():
 
 class ScreenCoreGroupAdmissionTests(unittest.TestCase):
     def test_core_admin_group_capture_skips_group_consent_and_checks_binding(self):
-        from companion_v2.screen.repositories import ScreenRepository
+        from digital_life_core.screen.repositories import ScreenRepository
 
         repository = ScreenRepository.__new__(ScreenRepository)
         repository._runtime = object()
@@ -48,12 +48,12 @@ class ScreenCoreGroupAdmissionTests(unittest.TestCase):
             resolve_authenticated=lambda principal, *, observed_at: Outcome.success(RESOLVED),
             authorize=lambda *args, **kwargs: Outcome.failed("authorization_denied", "no window grant"),
         )
-        with patch("companion_v2.screen.repositories.is_core", return_value=True):
+        with patch("digital_life_core.screen.repositories.is_core", return_value=True):
             admitted = repository._admission(reference(), ROLE, RESOLVED, NOW)
         self.assertTrue(admitted.is_success)
 
     def test_non_core_group_capture_still_needs_its_own_consent(self):
-        from companion_v2.screen.repositories import ScreenRepository
+        from digital_life_core.screen.repositories import ScreenRepository
 
         repository = ScreenRepository.__new__(ScreenRepository)
         repository._runtime = object()
@@ -62,7 +62,7 @@ class ScreenCoreGroupAdmissionTests(unittest.TestCase):
             authorize=lambda **_: Outcome.failed("capability_not_authorized", "no group consent"),
         )
         repository._authorizer = SimpleNamespace()
-        with patch("companion_v2.screen.repositories.is_core", return_value=False):
+        with patch("digital_life_core.screen.repositories.is_core", return_value=False):
             admitted = repository._admission(reference(), ROLE, RESOLVED, NOW)
         self.assertFalse(admitted.is_success)
         self.assertEqual(admitted.failure.code, "capability_not_authorized")
@@ -78,9 +78,9 @@ class ScreenCoreGroupAdmissionTests(unittest.TestCase):
             context=SimpleNamespace(scope=GROUP_SCOPE, role_binding=SimpleNamespace(role=ROLE),
                                     actor=SimpleNamespace(subject=CORE)),
         )
-        with patch("astrbot_host.native_extensions.screens.is_core", return_value=True):
+        with patch("digital_life_host.native_extensions.screens.is_core", return_value=True):
             adopter.preflight(invocation)
-        with patch("astrbot_host.native_extensions.screens.is_core", return_value=False):
+        with patch("digital_life_host.native_extensions.screens.is_core", return_value=False):
             with self.assertRaises(TaskError) as caught:
                 adopter.preflight(invocation)
         self.assertEqual(caught.exception.code, "screen_scope_denied")

@@ -4,9 +4,9 @@ from datetime import datetime, timezone
 from types import SimpleNamespace
 import unittest
 
-from companion_v2.foundation.outcome import Outcome
-from companion_v2.foundation.refs import ScopeKind, SubjectKind
-from companion_v2.identity_policy.private_domain import PrivateDomainAccess
+from digital_life_core.foundation.outcome import Outcome
+from digital_life_core.foundation.refs import ScopeKind, SubjectKind
+from digital_life_core.identity_policy.private_domain import PrivateDomainAccess
 
 
 NOW = datetime(2026, 11, 3, tzinfo=timezone.utc)

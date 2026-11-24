@@ -4,16 +4,16 @@ from datetime import timedelta
 import json
 import unittest
 
-from companion_v2.conversation.foreground import BackgroundPromptTrigger
-from companion_v2.conversation.reply_management import ReplyManagement
-from companion_v2.configuration.registry import FieldRegistry
-from companion_v2.execution.models import TaskError
-from companion_v2.model_gateway.routing import configuration_fields
-from companion_v2.proactive.official_alert_events import SOURCE_OWNER, SOURCE_URL
-from companion_v2.proactive.prompts import contact_output
-from companion_v2.proactive.service import plan_profile
-from companion_v2.proactive.weather_alerts import normalize_qweather_alerts
-from companion_v2.role_work.state.management import StateManagement
+from digital_life_core.conversation.foreground import BackgroundPromptTrigger
+from digital_life_core.conversation.reply_management import ReplyManagement
+from digital_life_core.configuration.registry import FieldRegistry
+from digital_life_core.execution.models import TaskError
+from digital_life_core.model_gateway.routing import configuration_fields
+from digital_life_core.proactive.official_alert_events import SOURCE_OWNER, SOURCE_URL
+from digital_life_core.proactive.prompts import contact_output
+from digital_life_core.proactive.service import plan_profile
+from digital_life_core.proactive.weather_alerts import normalize_qweather_alerts
+from digital_life_core.role_work.state.management import StateManagement
 from tests.contact_schedule_support import ContactScheduleFixture
 from tests.test_planning_weather import LOCATION_JSON
 from tests.test_role_tool_loop import answered

@@ -16,24 +16,24 @@ import hashlib
 import json
 import unittest
 
-from companion_v2.capabilities import CapabilityAuthorizationState, CapabilityRepository
-from companion_v2.conversation.flow import ConversationPolicy
-from companion_v2.configuration.models import ConfigLayer, ConfigTarget
-from companion_v2.configuration.registry import FieldRegistry
-from companion_v2.execution.models import TaskError, digest, stamp
-from companion_v2.foundation.refs import (AssetRef, AudienceRef, OperationRef, RoleOwnerRef, SourceRef, VersionRef)
-from companion_v2.identity_policy.models import AuthorizationTier
-from companion_v2.model_gateway.models import Amount, ProviderBinding, LocalProvider, ProviderResponse
-from companion_v2.model_gateway.routing import configuration_fields
-from companion_v2.proactive.configuration import target_for as contact_target_for
-from companion_v2.role_work.journal import JournalContext, JournalKey, JournalKind
-from companion_v2.screen.configuration import GROUP as SCREEN_GROUP
-from companion_v2.screen.interpretation import screen_interpretation_profile
-from companion_v2.screen.models import (SCREEN_EXTENSION, SCREEN_PROCESS, SCREEN_READ, ClockQuality,
+from digital_life_core.capabilities import CapabilityAuthorizationState, CapabilityRepository
+from digital_life_core.conversation.flow import ConversationPolicy
+from digital_life_core.configuration.models import ConfigLayer, ConfigTarget
+from digital_life_core.configuration.registry import FieldRegistry
+from digital_life_core.execution.models import TaskError, digest, stamp
+from digital_life_core.foundation.refs import (AssetRef, AudienceRef, OperationRef, RoleOwnerRef, SourceRef, VersionRef)
+from digital_life_core.identity_policy.models import AuthorizationTier
+from digital_life_core.model_gateway.models import Amount, ProviderBinding, LocalProvider, ProviderResponse
+from digital_life_core.model_gateway.routing import configuration_fields
+from digital_life_core.proactive.configuration import target_for as contact_target_for
+from digital_life_core.role_work.journal import JournalContext, JournalKey, JournalKind
+from digital_life_core.screen.configuration import GROUP as SCREEN_GROUP
+from digital_life_core.screen.interpretation import screen_interpretation_profile
+from digital_life_core.screen.models import (SCREEN_EXTENSION, SCREEN_PROCESS, SCREEN_READ, ClockQuality,
                                         ScreenCapture, ScreenCaptureRef, ScreenCoverage, ScreenMediaKind)
-from companion_v2.screen.originals import ScreenImage
-from companion_v2.screen.peek import KIND as PEEK_KIND
-from companion_v2.storage.repositories import OperationRepository
+from digital_life_core.screen.originals import ScreenImage
+from digital_life_core.screen.peek import KIND as PEEK_KIND
+from digital_life_core.storage.repositories import OperationRepository
 from tests.g6_support import descriptor
 from tests.proactive_support import ContactFixture
 from tests.test_management_access import INSTALLATION, NOW, ROLE, SCOPE

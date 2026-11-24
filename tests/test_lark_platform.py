@@ -4,12 +4,12 @@ import unittest
 from types import SimpleNamespace as NS
 
 from tests import astrbot_data_root  # noqa: F401 - isolate the SDK before import
-from astrbot_host.binding import event_identity
-from astrbot_host.group_admission import group_trigger_facts
-from companion_v2.adapters.astrbot.native import (
+from digital_life_host.binding import event_identity
+from digital_life_host.group_admission import group_trigger_facts
+from digital_life_core.adapters.astrbot.native import (
     event_account_id, native_user_subject_id, supported_platform_name,
 )
-from companion_v2.foundation.refs import ScopeKind
+from digital_life_core.foundation.refs import ScopeKind
 
 
 def lark_event(*, message_type="FriendMessage", self_id="ou_bot", sender="ou_user",
@@ -62,7 +62,7 @@ class LarkPlatformTests(unittest.TestCase):
                           "participant_id": "42"})
 
     def test_default_platforms_stay_qq_only(self):
-        from companion_v2.adapters.astrbot.native import DEFAULT_PLATFORM_NAMES
+        from digital_life_core.adapters.astrbot.native import DEFAULT_PLATFORM_NAMES
         self.assertEqual(DEFAULT_PLATFORM_NAMES,
                          {"aiocqhttp", "qq_official", "qq_official_webhook"})
         self.assertNotIn("lark", DEFAULT_PLATFORM_NAMES)

@@ -18,24 +18,24 @@ from tests.astrbot_data_root import assert_sdk_database_isolated
 from astrbot.api.web import PluginRequest, bind_request_context
 from starlette.requests import Request
 
-from astrbot_host.legacy_api import LegacyMigrationWebAPI
-from astrbot_host.multi_controller import AstrBotMultiController
-from astrbot_host.legacy_config import v1_setting
+from digital_life_host.legacy_api import LegacyMigrationWebAPI
+from digital_life_host.multi_controller import AstrBotMultiController
+from digital_life_host.legacy_config import v1_setting
 from astrbot.core import db_helper
-from companion_v2.adapters.astrbot.staging import NativeAdapterTypes
-from companion_v2.foundation.clock import DeterministicClock
-from companion_v2.foundation.refs import AudienceRef, ScopeKind
-from companion_v2.identity_policy.models import AuthorizationTier
-from companion_v2.execution.models import TaskContext
-from companion_v2.identity_policy.personas import ConversationRoute, PersonaDirectory
-from companion_v2.identity_policy.repository import PersistentIdentityDirectory
-from companion_v2.legacy.data_migration import build_data_plan
-from companion_v2.legacy.archive import verify_v1_archive
-from companion_v2.legacy.memory_archive import build_memory_database_plan
-from companion_v2.legacy.migration import LegacyMigration, plugin_data_path
-from companion_v2.legacy.sqlite_snapshot import open_readonly_sqlite_snapshot
-from companion_v2.legacy.private_memory import build_private_memory_plan
-from companion_v2.memory.legacy_materials import DATABASE_FILENAME, LegacyMemoryMaterials
+from digital_life_core.adapters.astrbot.staging import NativeAdapterTypes
+from digital_life_core.foundation.clock import DeterministicClock
+from digital_life_core.foundation.refs import AudienceRef, ScopeKind
+from digital_life_core.identity_policy.models import AuthorizationTier
+from digital_life_core.execution.models import TaskContext
+from digital_life_core.identity_policy.personas import ConversationRoute, PersonaDirectory
+from digital_life_core.identity_policy.repository import PersistentIdentityDirectory
+from digital_life_core.legacy.data_migration import build_data_plan
+from digital_life_core.legacy.archive import verify_v1_archive
+from digital_life_core.legacy.memory_archive import build_memory_database_plan
+from digital_life_core.legacy.migration import LegacyMigration, plugin_data_path
+from digital_life_core.legacy.sqlite_snapshot import open_readonly_sqlite_snapshot
+from digital_life_core.legacy.private_memory import build_private_memory_plan
+from digital_life_core.memory.legacy_materials import DATABASE_FILENAME, LegacyMemoryMaterials
 from tests.multi_host_support import MultiNativeContext, multi_config
 from tests.native_adapter_support import FakeEvent, FakeProvider, FakeReverseApi
 from tests.test_management_access import NOW

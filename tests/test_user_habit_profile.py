@@ -11,14 +11,14 @@ from datetime import timedelta
 import json
 import unittest
 
-from companion_v2.configuration.models import ConfigLayer, ConfigTarget
-from companion_v2.configuration.owners import SparseConfigurationOwner
-from companion_v2.configuration.registry import FieldRegistry, ValueKind
-from companion_v2.execution.models import TaskError
-from companion_v2.foundation.refs import ScopeKind
-from companion_v2.identity_policy.group_audience import group_audience
-from companion_v2.memory.configuration import configuration_fields as memory_fields
-from companion_v2.memory.habits import (DEFAULTS, GUIDANCE, KIND, LIMITS, MEAL_GUIDANCE, habit_material,
+from digital_life_core.configuration.models import ConfigLayer, ConfigTarget
+from digital_life_core.configuration.owners import SparseConfigurationOwner
+from digital_life_core.configuration.registry import FieldRegistry, ValueKind
+from digital_life_core.execution.models import TaskError
+from digital_life_core.foundation.refs import ScopeKind
+from digital_life_core.identity_policy.group_audience import group_audience
+from digital_life_core.memory.configuration import configuration_fields as memory_fields
+from digital_life_core.memory.habits import (DEFAULTS, GUIDANCE, KIND, LIMITS, MEAL_GUIDANCE, habit_material,
                                         habit_settings, classify_message, natural_line,
                                         qualified_patterns, empty_document, retain_patterns)
 from tests.test_host_application import HostFixture
@@ -209,8 +209,8 @@ class HabitProfileTests(HostFixture, unittest.IsolatedAsyncioTestCase):
         for index in range(3):
             await self.say(app, host, "我还没吃饭，晚点再说", days=0 if index == 0 else 1)
         # A real pinned fact written through the normal writer.
-        from companion_v2.memory.codec import source as decode_source
-        from companion_v2.memory.models import Proposal
+        from digital_life_core.memory.codec import source as decode_source
+        from digital_life_core.memory.models import Proposal
         batch = self.admitted(host, "记住，我不吃香菜")
         context = self.context(app, batch)
         stored = json.loads(app.runtime.read_one("SELECT event_json FROM conversation_inputs WHERE batch_id = ?",
@@ -260,9 +260,9 @@ class HabitProfileTests(HostFixture, unittest.IsolatedAsyncioTestCase):
     def other_subject_context(self, context):
         """The same bot and role, but a different authenticated human subject."""
         from dataclasses import replace
-        from companion_v2.execution.models import TaskContext
-        from companion_v2.foundation.refs import AudienceRef
-        from companion_v2.identity_policy.personas import ConversationRoute
+        from digital_life_core.execution.models import TaskContext
+        from digital_life_core.foundation.refs import AudienceRef
+        from digital_life_core.identity_policy.personas import ConversationRoute
         scope = replace(context.scope, native_scope_id="native-habit-other",
                         conversation_id="conversation-habit-other", session_id="session-habit-other")
         self.personas.register_route(ConversationRoute(scope, user=self.standard.subject), observed_at=NOW)

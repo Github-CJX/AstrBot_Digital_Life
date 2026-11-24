@@ -7,10 +7,10 @@ from types import SimpleNamespace as NS
 import unittest
 from unittest.mock import AsyncMock, patch
 
-from astrbot_host.page_api import DISPLAY_PREFERENCES_FILE, PageWebAPI, PREFIX
+from digital_life_host.page_api import DISPLAY_PREFERENCES_FILE, PageWebAPI, PREFIX
 
 
-PLUGIN_NAME = "astrbot_plugin_private_companion"
+PLUGIN_NAME = "astrbot_plugin_digital_life"
 PREFERENCES = {
     "appearance": {"theme": "walnut", "density": "roomy", "radius": "round",
                    "typeScale": "l", "motion": "low"},
@@ -33,7 +33,7 @@ class DisplayPreferencesApiTests(unittest.IsolatedAsyncioTestCase):
         payload = json.dumps(body or {}, ensure_ascii=False).encode("utf-8")
         request = NS(username=username, plugin_name=plugin_name, query=query or {},
                      body=AsyncMock(return_value=payload))
-        with patch("astrbot_host.page_api.request", request):
+        with patch("digital_life_host.page_api.request", request):
             return await handler()
 
     async def test_preferences_round_trip_to_plugin_data_by_dashboard_account(self):

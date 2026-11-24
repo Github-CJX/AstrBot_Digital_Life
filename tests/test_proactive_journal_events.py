@@ -3,11 +3,11 @@
 import json
 import unittest
 
-from companion_v2.execution.models import TaskError, digest
-from companion_v2.foundation.refs import RoleOwnerRef, SourceRef, VersionRef
-from companion_v2.proactive.journal_events import JOURNAL_SOURCE_OWNER, JournalContactEvents
-from companion_v2.role_work.journal import DreamRecall, JournalContext, JournalDraft, JournalKey, JournalKind
-from companion_v2.sources.models import SourceRecord
+from digital_life_core.execution.models import TaskError, digest
+from digital_life_core.foundation.refs import RoleOwnerRef, SourceRef, VersionRef
+from digital_life_core.proactive.journal_events import JOURNAL_SOURCE_OWNER, JournalContactEvents
+from digital_life_core.role_work.journal import DreamRecall, JournalContext, JournalDraft, JournalKey, JournalKind
+from digital_life_core.sources.models import SourceRecord
 from tests.contact_schedule_support import ContactScheduleFixture
 from tests.test_management_access import SCOPE
 from tests.test_role_tool_loop import answered

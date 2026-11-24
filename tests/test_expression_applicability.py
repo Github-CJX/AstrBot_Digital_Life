@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import unittest
 
-from companion_v2.expression.learning import normalize_applicability
+from digital_life_core.expression.learning import normalize_applicability
 
 
 class ApplicabilityTests(unittest.TestCase):

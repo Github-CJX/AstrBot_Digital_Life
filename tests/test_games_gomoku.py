@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import pytest
 
-from companion_v2.games import BLACK, EMPTY, WHITE, GomokuGame
+from digital_life_core.games import BLACK, EMPTY, WHITE, GomokuGame
 
 
 def test_freestyle_five_or_more_wins() -> None:

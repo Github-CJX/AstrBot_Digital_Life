@@ -1,8 +1,8 @@
 import unittest
 from types import SimpleNamespace
 
-from companion_v2.conversation.media.generated import GeneratedImages
-from companion_v2.execution.models import TaskError
+from digital_life_core.conversation.media.generated import GeneratedImages
+from digital_life_core.execution.models import TaskError
 
 
 class Runtime:

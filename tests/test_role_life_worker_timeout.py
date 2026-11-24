@@ -2,7 +2,7 @@ import asyncio
 from types import SimpleNamespace
 import unittest
 
-from companion_v2.role_work.life.runtime import RoleLifeRuntime
+from digital_life_core.role_work.life.runtime import RoleLifeRuntime
 
 
 class RoleLifeWorkerTimeoutTests(unittest.IsolatedAsyncioTestCase):

@@ -6,16 +6,16 @@ import unittest
 from zoneinfo import ZoneInfo
 from unittest.mock import patch
 
-from companion_v2.conversation.foreground import BackgroundPromptTrigger
-from companion_v2.proactive.configuration import ImportantDate, important_dates, local_time
-from companion_v2.relationships import anniversaries
-from companion_v2.relationships.profile import (
+from digital_life_core.conversation.foreground import BackgroundPromptTrigger
+from digital_life_core.proactive.configuration import ImportantDate, important_dates, local_time
+from digital_life_core.relationships import anniversaries
+from digital_life_core.relationships.profile import (
     GROUP as RELATIONSHIP_PROFILE_GROUP,
     RelationshipProfileConfigurationOwner,
     configuration_fields as relationship_profile_fields,
     target_for as relationship_profile_target_for,
 )
-from companion_v2.role_profile.configuration import (
+from digital_life_core.role_profile.configuration import (
     GROUP as ROLE_PROFILE_GROUP,
     RoleProfileConfigurationOwner,
     configuration_fields as role_profile_fields,
@@ -185,7 +185,7 @@ class DateContactTests(ContactScheduleFixture, unittest.IsolatedAsyncioTestCase)
     async def test_configured_lunar_date_uses_local_day_and_keeps_its_basis(self):
         app = await self.setup_date(dates=LUNAR_JSON)
         self.advance(app, 60)
-        with patch("companion_v2.proactive.date_events.lunar_date_parts",
+        with patch("digital_life_core.proactive.date_events.lunar_date_parts",
                    return_value=(2026, 8, 11, False)):
             await self.automatic_delivery(app)
         request = self.contact_calls()[0].original
@@ -200,7 +200,7 @@ class DateContactTests(ContactScheduleFixture, unittest.IsolatedAsyncioTestCase)
             {"calendar": "lunar", "month": 8, "day": 11, "leap_month": True, "label": "闰八月"},
         ], ensure_ascii=False)
         app = await self.setup_date(dates=dates)
-        with patch("companion_v2.proactive.date_events.lunar_date_parts", return_value=(2026, 8, 11, True)):
+        with patch("digital_life_core.proactive.date_events.lunar_date_parts", return_value=(2026, 8, 11, True)):
             slot = app.contact_schedule.date_events._slot(
                 self.contact_context(), self.preferences(app), self.clock.now() + timedelta(minutes=1))
         self.assertEqual(slot[1]["entries"], [{"basis": "operator_configured_lunar_date",
@@ -208,7 +208,7 @@ class DateContactTests(ContactScheduleFixture, unittest.IsolatedAsyncioTestCase)
 
     async def test_missing_lunar_calendar_never_guesses_a_match(self):
         app = await self.setup_date(dates=LUNAR_JSON)
-        with patch("companion_v2.proactive.date_events.lunar_date_parts", return_value=None):
+        with patch("digital_life_core.proactive.date_events.lunar_date_parts", return_value=None):
             slot = app.contact_schedule.date_events._slot(
                 self.contact_context(), self.preferences(app), self.clock.now() + timedelta(minutes=1))
         self.assertIsNone(slot)
@@ -313,7 +313,7 @@ class DateLookaheadTests(DateContactTests):
 
     def test_the_forward_search_handles_short_months_and_leap_days(self):
         from datetime import date
-        from companion_v2.proactive.date_events import _gregorian_days_until
+        from digital_life_core.proactive.date_events import _gregorian_days_until
         today = date(2026, 12, 28)
         self.assertEqual(_gregorian_days_until(today, 12, 31), 3)
         self.assertEqual(_gregorian_days_until(today, 1, 2), 5)     # crosses the year

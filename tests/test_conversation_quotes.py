@@ -14,14 +14,14 @@ import unittest
 from unittest.mock import patch
 from PIL import Image
 
-from astrbot_host.media import load_native_image
-from companion_v2.adapters.astrbot.model_wire import tool_alias
-from companion_v2.adapters.astrbot.quotes import read_private_quote
-from companion_v2.conversation.quotes.models import QuoteConversationEvent
-from companion_v2.conversation.quotes.service import quote_reference
-from companion_v2.execution.models import TaskError
-from companion_v2.identity_policy.personas import RuntimeIdentity
-from companion_v2.sources.dependencies import key
+from digital_life_host.media import load_native_image
+from digital_life_core.adapters.astrbot.model_wire import tool_alias
+from digital_life_core.adapters.astrbot.quotes import read_private_quote
+from digital_life_core.conversation.quotes.models import QuoteConversationEvent
+from digital_life_core.conversation.quotes.service import quote_reference
+from digital_life_core.execution.models import TaskError
+from digital_life_core.identity_policy.personas import RuntimeIdentity
+from digital_life_core.sources.dependencies import key
 from tests.native_adapter_support import FakeEvent, FakeReverseApi, completion, final_text
 from tests.test_conversation_images import FakeImage, ImageFixture, image_bytes
 

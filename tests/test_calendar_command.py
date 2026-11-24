@@ -2,7 +2,7 @@ import unittest
 from types import SimpleNamespace
 from unittest.mock import AsyncMock, patch
 
-from astrbot_host.calendar_command import (
+from digital_life_host.calendar_command import (
     calendar_error_text,
     calendar_result_text,
     parse_calendar_command,
@@ -46,14 +46,14 @@ class CalendarCommandTests(unittest.TestCase):
 
 class CalendarCommandDispatchTests(unittest.IsolatedAsyncioTestCase):
     async def test_private_command_runs_planner_and_group_text_is_left_alone(self):
-        from astrbot_host.calendar_command import receive_calendar_command
+        from digital_life_host.calendar_command import receive_calendar_command
 
         event = SimpleNamespace(unified_msg_origin="qq:FriendMessage:200", text="刷新日程")
         route = SimpleNamespace(login="100", peer="200")
         session = SimpleNamespace(plan_calendar=AsyncMock(return_value={"state": "succeeded", "saved": 2,
                                                                           "replaced": 1, "rejected": []}))
-        with (patch("astrbot_host.calendar_command.authenticate_notice_route", return_value=route),
-              patch("astrbot_host.calendar_command.send_private_notice", new_callable=AsyncMock,
+        with (patch("digital_life_host.calendar_command.authenticate_notice_route", return_value=route),
+              patch("digital_life_host.calendar_command.send_private_notice", new_callable=AsyncMock,
                     return_value={"state": "delivered"}) as send):
             result = await receive_calendar_command(SimpleNamespace(), event, session)
 

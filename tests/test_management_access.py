@@ -7,18 +7,18 @@ import sqlite3
 from tempfile import TemporaryDirectory
 import unittest
 
-from companion_v2.capabilities import CapabilityAuthorizationState, CapabilityManagementService
-from companion_v2.capabilities.configuration import CapabilityConfigurationOwner
-from companion_v2.configuration.models import ConfigLayer, ConfigTarget
-from companion_v2.configuration.registry import FieldDefinition, FieldRegistry, ValueKind
-from companion_v2.configuration.service import ConfigurationService
-from companion_v2.foundation.refs import OperationRef, ScopeKind, ScopeRef, SubjectKind, SubjectRef, VersionRef
-from companion_v2.identity_policy.models import AuthenticatedHostPrincipal, AuthorizationTier
-from companion_v2.identity_policy.object_access import ObjectAccessPolicy
-from companion_v2.identity_policy.personas import ConversationRoute, PersonaBinding, PersonaDirectory, PersonaSelector, SelectorKind
-from companion_v2.identity_policy.repository import PersistentIdentityDirectory
-from companion_v2.screen.models import SCREEN_EXTENSION, SCREEN_READ
-from companion_v2.storage.runtime import StorageRuntime
+from digital_life_core.capabilities import CapabilityAuthorizationState, CapabilityManagementService
+from digital_life_core.capabilities.configuration import CapabilityConfigurationOwner
+from digital_life_core.configuration.models import ConfigLayer, ConfigTarget
+from digital_life_core.configuration.registry import FieldDefinition, FieldRegistry, ValueKind
+from digital_life_core.configuration.service import ConfigurationService
+from digital_life_core.foundation.refs import OperationRef, ScopeKind, ScopeRef, SubjectKind, SubjectRef, VersionRef
+from digital_life_core.identity_policy.models import AuthenticatedHostPrincipal, AuthorizationTier
+from digital_life_core.identity_policy.object_access import ObjectAccessPolicy
+from digital_life_core.identity_policy.personas import ConversationRoute, PersonaBinding, PersonaDirectory, PersonaSelector, SelectorKind
+from digital_life_core.identity_policy.repository import PersistentIdentityDirectory
+from digital_life_core.screen.models import SCREEN_EXTENSION, SCREEN_READ
+from digital_life_core.storage.runtime import StorageRuntime
 from tests.g6_support import descriptor
 
 

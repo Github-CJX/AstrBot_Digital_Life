@@ -1,11 +1,11 @@
 from dataclasses import replace
 from unittest.mock import patch
 
-from companion_v2.capabilities import (
+from digital_life_core.capabilities import (
     CapabilityAuthorizationState, CapabilityDesiredState, CapabilityRepository, FurnitureAvailability,
 )
-from companion_v2.foundation.refs import ReferenceValidationError, SubjectKind, SubjectRef
-from companion_v2.screen.models import SCREEN_EXTENSION, SCREEN_READ
+from digital_life_core.foundation.refs import ReferenceValidationError, SubjectKind, SubjectRef
+from digital_life_core.screen.models import SCREEN_EXTENSION, SCREEN_READ
 
 from tests.g6_support import G6Fixture, INSTALLATION, NOW, descriptor
 

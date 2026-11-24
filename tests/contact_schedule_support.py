@@ -1,8 +1,8 @@
 """Mixed foreground/background fixture for automatic contact integration."""
 
-from companion_v2.conversation.flow import ConversationPolicy
-from companion_v2.conversation.foreground import BackgroundPromptTrigger
-from companion_v2.execution.models import TERMINAL
+from digital_life_core.conversation.flow import ConversationPolicy
+from digital_life_core.conversation.foreground import BackgroundPromptTrigger
+from digital_life_core.execution.models import TERMINAL
 from tests.proactive_support import ContactFixture
 from tests.test_role_tool_loop import answered
 

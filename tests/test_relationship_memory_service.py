@@ -6,7 +6,7 @@ from pathlib import Path
 from tempfile import TemporaryDirectory
 import unittest
 
-from companion_v2.foundation.refs import (
+from digital_life_core.foundation.refs import (
     AudienceRef,
     ScopeKind,
     ScopeRef,
@@ -15,19 +15,19 @@ from companion_v2.foundation.refs import (
     SubjectRef,
     VersionRef,
 )
-from companion_v2.identity_policy.models import AuthenticatedHostPrincipal, AuthorizationTier
-from companion_v2.identity_policy.object_access import ObjectAccessPolicy
-from companion_v2.identity_policy.personas import ConversationRoute, PersonaBinding, PersonaDirectory, SelectorKind
-from companion_v2.identity_policy.repository import PersistentIdentityDirectory
-from companion_v2.relationships import (
+from digital_life_core.identity_policy.models import AuthenticatedHostPrincipal, AuthorizationTier
+from digital_life_core.identity_policy.object_access import ObjectAccessPolicy
+from digital_life_core.identity_policy.personas import ConversationRoute, PersonaBinding, PersonaDirectory, SelectorKind
+from digital_life_core.identity_policy.repository import PersistentIdentityDirectory
+from digital_life_core.relationships import (
     RelationshipMemory,
     RelationshipMemoryKind,
     RelationshipMemoryService,
     RelationshipMemoryState as State,
 )
-from companion_v2.sources.models import SourceRecord
-from companion_v2.sources.repositories import SourceRepository
-from companion_v2.storage.runtime import StorageRuntime
+from digital_life_core.sources.models import SourceRecord
+from digital_life_core.sources.repositories import SourceRepository
+from digital_life_core.storage.runtime import StorageRuntime
 
 
 NOW = datetime(2026, 9, 23, 4, 0, tzinfo=timezone.utc)
@@ -85,7 +85,7 @@ class RelationshipMemoryServiceTests(unittest.TestCase):
 
     @staticmethod
     def owner():
-        from companion_v2.foundation.refs import RoleOwnerRef
+        from digital_life_core.foundation.refs import RoleOwnerRef
         return RoleOwnerRef(INSTALLATION, SCOPE.bot_id, ROLE.subject_id)
 
     def test_review_adoption_revision_and_retraction_record_the_real_reviewer(self):

@@ -4,12 +4,12 @@ import unittest
 from unittest.mock import Mock, patch
 
 from astrbot.core.provider.entities import ProviderRequest
-from astrbot_host.core_reply import CORE_REPLY_CONTEXT_EXTRA, inject_core_reply_prompt
-from astrbot_host.core_reply_telemetry import prepare_core_reply_telemetry
-from companion_v2.configuration.models import ConfigLayer, ConfigTarget
-from companion_v2.execution.models import digest
-from companion_v2.knowledge.catalog import EntryDocument, KnowledgeCatalog, MemberEntry, SourceBinding
-from companion_v2.knowledge.configuration import KnowledgeConfigurationOwner, configuration_fields, target_for
+from digital_life_host.core_reply import CORE_REPLY_CONTEXT_EXTRA, inject_core_reply_prompt
+from digital_life_host.core_reply_telemetry import prepare_core_reply_telemetry
+from digital_life_core.configuration.models import ConfigLayer, ConfigTarget
+from digital_life_core.execution.models import digest
+from digital_life_core.knowledge.catalog import EntryDocument, KnowledgeCatalog, MemberEntry, SourceBinding
+from digital_life_core.knowledge.configuration import KnowledgeConfigurationOwner, configuration_fields, target_for
 from tests.group_host_support import GroupFixture
 
 
@@ -122,7 +122,7 @@ class CoreReplyKnowledgeTests(GroupFixture, unittest.IsolatedAsyncioTestCase):
         self.assert_core_only()
 
     async def test_v1_learning_profile_and_impression_reach_a_native_reply_without_name_trigger(self):
-        from companion_v2.legacy.data_migration import _member_profiles, map_legacy_worldbook
+        from digital_life_core.legacy.data_migration import _member_profiles, map_legacy_worldbook
         from types import SimpleNamespace
 
         profiles, _ = _member_profiles({"worldbook_member_profiles": {"200": {

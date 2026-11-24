@@ -5,10 +5,10 @@ from tempfile import TemporaryDirectory
 from types import SimpleNamespace as NS
 import unittest
 
-from companion_v2.execution.models import TaskError
-from companion_v2.foundation.refs import ScopeKind, SubjectKind
-from companion_v2.relationships.account_links import PrivateAccountLinks, member_for
-from companion_v2.storage.runtime import StorageRuntime
+from digital_life_core.execution.models import TaskError
+from digital_life_core.foundation.refs import ScopeKind, SubjectKind
+from digital_life_core.relationships.account_links import PrivateAccountLinks, member_for
+from digital_life_core.storage.runtime import StorageRuntime
 
 NOW = datetime(2026, 11, 15, tzinfo=timezone.utc)
 
@@ -22,7 +22,7 @@ def context(name, *, role="role-a", kind=ScopeKind.PRIVATE, installation="links-
 
 class AccountLinkPersonaTests(unittest.TestCase):
     def test_only_one_explicit_same_role_persona_is_resolved(self):
-        from companion_v2.relationships.account_link_context import persona_for
+        from digital_life_core.relationships.account_link_context import persona_for
         member = member_for(context("a"))
         def settings(*ids):
             return NS(personas=[NS(bot_id="bot-a", role_id="role-a", persona_id=i) for i in ids])
@@ -31,7 +31,7 @@ class AccountLinkPersonaTests(unittest.TestCase):
             self.assertIsNone(persona_for(settings(*ids), member))
 
     def test_legacy_takeover_cannot_be_mistaken_for_original_route_sharing(self):
-        from companion_v2.relationships.account_link_context import persona_for
+        from digital_life_core.relationships.account_link_context import persona_for
         settings = NS(personas=[NS(bot_id="bot-a", role_id="role-a", persona_id="original")],
             window_links=[NS(mode="primary", primary_target_id="primary", alias_target_ids=("alias",))],
             private_target=lambda *args: NS(target_id="alias"))

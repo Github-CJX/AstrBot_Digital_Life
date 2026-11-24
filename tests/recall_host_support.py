@@ -7,8 +7,8 @@ from uuid import uuid4
 # This fixture redirects AstrBot's import-time data root before importing the SDK.
 from tests import test_astrbot_staging_host as sdk_environment
 from aiocqhttp import Event
-from companion_v2.execution.models import TaskContext
-from companion_v2.memory import codec
+from digital_life_core.execution.models import TaskContext
+from digital_life_core.memory import codec
 from tests.staging_bootstrap_support import wait_for_batch
 
 

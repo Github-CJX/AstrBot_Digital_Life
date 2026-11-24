@@ -9,15 +9,15 @@ from astrbot.core.message.message_event_result import MessageChain
 from astrbot.core.platform.sources.aiocqhttp.aiocqhttp_message_event import AiocqhttpMessageEvent
 from types import SimpleNamespace as NS
 
-from astrbot_host.core_reply import CORE_REPLY_CONTEXT_EXTRA, activate_core_reply_delivery_guard, prepare_core_reply_event
-from astrbot_host.core_reply_reaction_delivery import (
+from digital_life_host.core_reply import CORE_REPLY_CONTEXT_EXTRA, activate_core_reply_delivery_guard, prepare_core_reply_event
+from digital_life_host.core_reply_reaction_delivery import (
     capture_core_reaction_intent, observe_core_reaction_response, prepare_core_reaction_message,
 )
-from astrbot_host.core_reply_tools import inject_core_reply_tools
-from companion_v2.execution.models import TaskError, require
-from companion_v2.conversation.voice_reply import VoiceReplyPolicy
-from companion_v2.expression.reply_intent import authored_reply_decision, extract_reply_intent
-from companion_v2.foundation.outcome import Outcome
+from digital_life_host.core_reply_tools import inject_core_reply_tools
+from digital_life_core.execution.models import TaskError, require
+from digital_life_core.conversation.voice_reply import VoiceReplyPolicy
+from digital_life_core.expression.reply_intent import authored_reply_decision, extract_reply_intent
+from digital_life_core.foundation.outcome import Outcome
 from tests.multi_host_support import MultiFixture
 from tests.test_semantic_integration import SemanticPort, animation
 
@@ -112,7 +112,7 @@ class CoreReplyReactionDeliveryTests(MultiFixture, unittest.IsolatedAsyncioTestC
         self.assertEqual(self.native.provider.client.state.calls, [])
 
     async def test_separate_after_reaction_does_not_prepare_before_last_text_segment(self):
-        from astrbot_host.core_reply_media_delivery import native_reply_messages
+        from digital_life_host.core_reply_media_delivery import native_reply_messages
 
         event, _ = await self.prepare()
         core = event.get_extra(CORE_REPLY_CONTEXT_EXTRA)
@@ -180,7 +180,7 @@ class CoreReplyReactionDeliveryTests(MultiFixture, unittest.IsolatedAsyncioTestC
         self.assertEqual(len(sent), 2)
 
     async def test_voice_and_sticker_share_the_native_reply_without_duplicate_text(self):
-        from astrbot_host.core_reply_voice import prepare_core_reply_voice_message
+        from digital_life_host.core_reply_voice import prepare_core_reply_voice_message
         event, message = await self.prepare()
         core = event.get_extra(CORE_REPLY_CONTEXT_EXTRA)
         core["prepared"]["voice_reply_policy"] = VoiceReplyPolicy(position="after_text")

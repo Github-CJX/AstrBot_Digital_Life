@@ -5,22 +5,22 @@ from pathlib import Path
 from tempfile import TemporaryDirectory
 import unittest
 
-from companion_v2.configuration.registry import FieldRegistry
-from companion_v2.conversation.private_debounce import quiet_seconds
-from companion_v2.conversation.reply_settings import (
+from digital_life_core.configuration.registry import FieldRegistry
+from digital_life_core.conversation.private_debounce import quiet_seconds
+from digital_life_core.conversation.reply_settings import (
     GROUP, ReplyConfigurationOwner, configuration_fields, private_debounce_settings, validate,
     voice_policy, voice_settings,
 )
-from companion_v2.configuration.models import ConfigLayer, ConfigTarget
-from companion_v2.foundation.refs import ScopeKind, ScopeRef, SubjectKind, SubjectRef
-from companion_v2.storage.runtime import StorageRuntime
+from digital_life_core.configuration.models import ConfigLayer, ConfigTarget
+from digital_life_core.foundation.refs import ScopeKind, ScopeRef, SubjectKind, SubjectRef
+from digital_life_core.storage.runtime import StorageRuntime
 from tests.test_management_access import NOW
-from companion_v2.conversation.segmentation import SegmentationPolicy
-from companion_v2.conversation.voice_reply import VoiceReplyPolicy, eligible
-from companion_v2.legacy.configuration_migration import (
+from digital_life_core.conversation.segmentation import SegmentationPolicy
+from digital_life_core.conversation.voice_reply import VoiceReplyPolicy, eligible
+from digital_life_core.legacy.configuration_migration import (
     convert_configuration, convert_plugin_configuration, unmapped_configuration_differences,
 )
-from companion_v2.model_gateway.budget import SOFT_FIELDS
+from digital_life_core.model_gateway.budget import SOFT_FIELDS
 
 
 def reply_registry():

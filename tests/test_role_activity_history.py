@@ -5,12 +5,12 @@ from dataclasses import replace
 import sqlite3
 from unittest.mock import patch
 
-from companion_v2.execution.models import encode
-from companion_v2.foundation.refs import ReferenceValidationError
-from companion_v2.role_work.ledger import PersistentRoleLifeLedger
-from companion_v2.role_work.models import RoleActivity, RoleActivityState as State
-from companion_v2.storage.runtime import StorageOpenError, StorageRuntime
-from companion_v2.storage.schema import (SCHEMA_VERSION_V22, SCHEMA_VERSION_V23, MIGRATION_V22_TO_V23_ID,
+from digital_life_core.execution.models import encode
+from digital_life_core.foundation.refs import ReferenceValidationError
+from digital_life_core.role_work.ledger import PersistentRoleLifeLedger
+from digital_life_core.role_work.models import RoleActivity, RoleActivityState as State
+from digital_life_core.storage.runtime import StorageOpenError, StorageRuntime
+from digital_life_core.storage.schema import (SCHEMA_VERSION_V22, SCHEMA_VERSION_V23, MIGRATION_V22_TO_V23_ID,
     MIGRATION_V22_TO_V23_FINGERPRINT, V22_REQUIRED_TABLES, V23_MIGRATION_STATEMENTS)
 from tests.execution_support import remove_v23
 from tests.test_management_access import ManagementFixture, INSTALLATION, NOW, SCOPE
@@ -107,7 +107,7 @@ class RoleActivityHistoryTests(ManagementFixture):
 
     def test_ddl_failure_and_tampered_migration_receipt_are_rejected(self):
         self.downgrade()
-        with patch("companion_v2.storage.runtime.V23_MIGRATION_STATEMENTS", V23_MIGRATION_STATEMENTS + ("INVALID MIGRATION",)):
+        with patch("digital_life_core.storage.runtime.V23_MIGRATION_STATEMENTS", V23_MIGRATION_STATEMENTS + ("INVALID MIGRATION",)):
             with self.assertRaises(StorageOpenError):
                 StorageRuntime.open(data_root=self.root, installation_id=INSTALLATION)
         self.assert_upgrade_rolled_back()

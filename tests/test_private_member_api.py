@@ -9,21 +9,21 @@ from unittest.mock import patch
 
 from tests.multi_host_support import MultiFixture, multi_config
 from tests.test_person_authorization import _Query, _body
-from astrbot_host.acquaintance_api import AcquaintanceWebAPI, _group_target_access, _persona_metadata
-from astrbot_host.management_identity import dashboard_operator
-from companion_v2.identity_policy.models import AuthorizationTier
-from companion_v2.identity_policy.object_access import ObjectAccessPolicy
-from companion_v2.memory.person.access import owner_key
-from companion_v2.proactive.management import ContactManagement
-from companion_v2.configuration.management import AcquaintanceManagement, ProactiveContactManagement
-from companion_v2.configuration.models import ConfigLayer
-from companion_v2.expression.configuration import read_settings as expression_settings
-from companion_v2.agenda.models import AgendaTarget
-from companion_v2.agenda.service import AgendaService
-from companion_v2.foundation.refs import OperationRef, VersionRef
-from companion_v2.proactive.configuration import target_for
-from companion_v2.proactive.rhythm_configuration import relationship_target_for
-from companion_v2.conversation.reply_management import ReplyManagement
+from digital_life_host.acquaintance_api import AcquaintanceWebAPI, _group_target_access, _persona_metadata
+from digital_life_host.management_identity import dashboard_operator
+from digital_life_core.identity_policy.models import AuthorizationTier
+from digital_life_core.identity_policy.object_access import ObjectAccessPolicy
+from digital_life_core.memory.person.access import owner_key
+from digital_life_core.proactive.management import ContactManagement
+from digital_life_core.configuration.management import AcquaintanceManagement, ProactiveContactManagement
+from digital_life_core.configuration.models import ConfigLayer
+from digital_life_core.expression.configuration import read_settings as expression_settings
+from digital_life_core.agenda.models import AgendaTarget
+from digital_life_core.agenda.service import AgendaService
+from digital_life_core.foundation.refs import OperationRef, VersionRef
+from digital_life_core.proactive.configuration import target_for
+from digital_life_core.proactive.rhythm_configuration import relationship_target_for
+from digital_life_core.conversation.reply_management import ReplyManagement
 
 
 class AcquaintancePersonaMetadataTests(unittest.TestCase):
@@ -86,7 +86,7 @@ class PrivateMemberTests(MultiFixture, unittest.IsolatedAsyncioTestCase):
         query = "&".join(key + "=" + value for key, value in
                          {"subject_id": person["subject_id"], **person["route"]}.items()) if command is None else ""
         payload = json.dumps(command or {}, ensure_ascii=False).encode("utf-8")
-        with patch("astrbot_host.acquaintance_api.request",
+        with patch("digital_life_host.acquaintance_api.request",
                    NS(username=username, query=_Query(query), body=_body(payload))):
             return await getattr(self.api, action)()
 
@@ -116,8 +116,8 @@ class PrivateMemberTests(MultiFixture, unittest.IsolatedAsyncioTestCase):
             def status(self, operator):
                 raise RuntimeError("simulated corrupt growth configuration")
 
-        with patch.dict("companion_v2.relationships.private_management.EDITORS", {"growth": BrokenGrowth}):
-            with self.assertLogs("companion_v2.relationships.private_management", level="ERROR") as captured:
+        with patch.dict("digital_life_core.relationships.private_management.EDITORS", {"growth": BrokenGrowth}):
+            with self.assertLogs("digital_life_core.relationships.private_management", level="ERROR") as captured:
                 result = await self.send("member_settings")
 
         self.assertEqual(result["status"], "ok", result)
@@ -205,8 +205,8 @@ class PrivateMemberTests(MultiFixture, unittest.IsolatedAsyncioTestCase):
 
     async def test_legacy_window_acquaintance_overrides_remain_private_and_resettable(self):
         app = await self.ready()
-        from companion_v2.configuration.owners import SparseConfigurationOwner
-        from companion_v2.memory.person.configuration import legacy_window_fields, legacy_window_target_for
+        from digital_life_core.configuration.owners import SparseConfigurationOwner
+        from digital_life_core.memory.person.configuration import legacy_window_fields, legacy_window_target_for
         context = self.controller.authority.context("first", "role-a")
         owner = SparseConfigurationOwner(app.runtime)
         fields = legacy_window_fields()
@@ -412,7 +412,7 @@ class PrivateMemberTests(MultiFixture, unittest.IsolatedAsyncioTestCase):
             "note": "这一位用户的单独偏好", "pause_until": (self.clock.now() + timedelta(hours=1)).isoformat(),
             "important_dates": '[{"calendar":"gregorian","month":3,"day":8,"label":"个人日期"}]',
         }}
-        with patch.dict("companion_v2.relationships.private_management.EDITORS", {"contact": OldRelationshipContact}):
+        with patch.dict("digital_life_core.relationships.private_management.EDITORS", {"contact": OldRelationshipContact}):
             original = await self.settings()
             saved = await self.configure(changes, key="old-relationship-contact", snapshots=original)
         self.assertEqual(saved["status"], "ok", saved)
@@ -423,7 +423,7 @@ class PrivateMemberTests(MultiFixture, unittest.IsolatedAsyncioTestCase):
         self.assertTrue(replay["data"]["results"]["contact"]["replayed"])
         self.assertEqual(replay["data"]["results"]["contact"]["operation_id"], legacy_operation)
         self.assertEqual(app.runtime.read_one("SELECT COUNT(*) AS n FROM configuration_changes", ())["n"], count)
-        with patch.dict("companion_v2.relationships.private_management.EDITORS", {"contact": OldRelationshipContact}):
+        with patch.dict("digital_life_core.relationships.private_management.EDITORS", {"contact": OldRelationshipContact}):
             quota_write = await self.configure({"contact": {"max_contacts_24h": 5}},
                                                 key="relationship-contact-quota", snapshots=await self.settings())
         self.assertEqual(quota_write["status"], "error", quota_write)
@@ -502,7 +502,7 @@ class PrivateMemberTests(MultiFixture, unittest.IsolatedAsyncioTestCase):
     async def test_configured_members_are_selectable_before_cards_exist(self):
         await self.start_host()
         self.api = AcquaintanceWebAPI(self.controller)
-        with patch("astrbot_host.acquaintance_api.request", NS(username="member-admin", query=_Query(), body=_body(b""))):
+        with patch("digital_life_host.acquaintance_api.request", NS(username="member-admin", query=_Query(), body=_body(b""))):
             result = await self.api.directory()
         self.assertEqual(result["status"], "ok", result)
         persons = result["data"]["persons"]
@@ -523,7 +523,7 @@ class PrivateMemberTests(MultiFixture, unittest.IsolatedAsyncioTestCase):
         self.controller.settings = replace(self.controller.settings, targets=tuple(
             replace(target, participant_id="*") for target in self.controller.settings.targets))
         self.controller.authority.settings = self.controller.settings
-        with patch("astrbot_host.acquaintance_api.request", NS(username="member-admin", query=_Query(), body=_body(b""))):
+        with patch("digital_life_host.acquaintance_api.request", NS(username="member-admin", query=_Query(), body=_body(b""))):
             result = await self.api.directory()
         self.assertEqual(result["status"], "ok", result)
         persons = result["data"]["persons"]
@@ -593,7 +593,7 @@ class PrivateMemberTests(MultiFixture, unittest.IsolatedAsyncioTestCase):
         result = await self.send("configure_member", command={**self.person(), "operation_key": "bad-route",
             "route": {**self.person()["route"], "bot_id": "unconfigured"}, "sections": {}})
         self.assertEqual(result["data"]["code"], "acquaintance_route_unknown")
-        with patch("astrbot_host.acquaintance_api.request", NS(username="member-admin",
+        with patch("digital_life_host.acquaintance_api.request", NS(username="member-admin",
                 query=_Query("subject_id=" + self.person()["subject_id"]), body=_body(b""))):
             self.assertEqual((await self.api.authorization())["data"]["code"], "acquaintance_route_required")
 

@@ -7,12 +7,12 @@ from types import SimpleNamespace as NS
 from unittest.mock import AsyncMock, patch
 import unittest
 
-from astrbot_host.legacy_api import LegacyMigrationWebAPI
-from companion_v2.foundation.outcome import Outcome
-from companion_v2.legacy.migration import LegacyMigration
-from companion_v2.legacy.private_contacts import private_contacts
-from companion_v2.legacy.relationship_profiles import relationship_profiles
-from companion_v2.relationships.profile import (
+from digital_life_host.legacy_api import LegacyMigrationWebAPI
+from digital_life_core.foundation.outcome import Outcome
+from digital_life_core.legacy.migration import LegacyMigration
+from digital_life_core.legacy.private_contacts import private_contacts
+from digital_life_core.legacy.relationship_profiles import relationship_profiles
+from digital_life_core.relationships.profile import (
     FIELD_LIMITS,
     GROUP,
     RelationshipProfileConfigurationOwner,
@@ -127,12 +127,12 @@ class RelationshipProfileMigrationTests(MultiFixture, unittest.IsolatedAsyncioTe
         self.addCleanup(temporary.cleanup)
         host = Path(temporary.name)
         (host / "config").mkdir()
-        (host / "plugin_data" / "astrbot_plugin_private_companion").mkdir(parents=True)
-        (host / "config" / "astrbot_plugin_private_companion_config.json").write_text(
+        (host / "plugin_data" / "astrbot_plugin_digital_life").mkdir(parents=True)
+        (host / "config" / "astrbot_plugin_digital_life_config.json").write_text(
             json.dumps({"basic_config": {"target_user_ids": [user_id]},
                         "life_schedule_config": {"roleplay_user_profile_prompt": prompt}},
                        ensure_ascii=False), encoding="utf-8", newline="\n")
-        return host / "plugin_data" / "astrbot_plugin_private_companion"
+        return host / "plugin_data" / "astrbot_plugin_digital_life"
 
     def profile_values(self, context, fields=PROFILE_FIELDS):
         owner = RelationshipProfileConfigurationOwner(self.controller.runtime)

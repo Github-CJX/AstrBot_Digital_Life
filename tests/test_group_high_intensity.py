@@ -3,7 +3,7 @@
 from datetime import datetime, timedelta, timezone
 import unittest
 
-from companion_v2.conversation import group_high_intensity
+from digital_life_core.conversation import group_high_intensity
 
 
 AT = datetime(2026, 10, 25, 12, 0, tzinfo=timezone.utc)

@@ -3,7 +3,7 @@
 import unittest
 from unittest import mock
 
-from astrbot_host.huawei_health.vendor import hw_auth
+from digital_life_host.huawei_health.vendor import hw_auth
 
 
 class BrowserDetectionTests(unittest.TestCase):

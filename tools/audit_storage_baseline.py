@@ -73,7 +73,7 @@
 
 不依赖 AstrBot 运行实例
 -----------------------
-只用标准库（`sqlite3` / `pathlib`），不导入 `companion_v2` 或 `astrbot_host`，
+只用标准库（`sqlite3` / `pathlib`），不导入 `digital_life_core` 或 `digital_life_host`，
 所以 AstrBot 没在跑、甚至没装，也能对着一份数据目录跑。数据根来源有两种：
 `--data-root` 显式指定，或按 AstrBot 的目录约定自动发现（见 default_data_root）。
 
@@ -97,7 +97,7 @@ import sqlite3
 import sys
 import unicodedata
 
-# 本插件目录：…/data/plugins/astrbot_plugin_private_companion
+# 本插件目录：…/data/plugins/astrbot_plugin_digital_life
 PLUGIN_ROOT = pathlib.Path(__file__).resolve().parents[1]
 
 MAIN_DATABASE = "companion-v2.sqlite3"

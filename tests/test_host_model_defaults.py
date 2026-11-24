@@ -4,15 +4,15 @@ from dataclasses import replace
 from types import SimpleNamespace as NS
 import unittest
 
-from astrbot_host.model_settings import conversation_provider_resolver
-from companion_v2.configuration.models import ConfigLayer, ConfigTarget
-from companion_v2.configuration.registry import FieldRegistry
-from companion_v2.configuration.service import ConfigurationService
-from companion_v2.execution.models import TaskError
-from companion_v2.foundation.refs import ScopeKind
-from companion_v2.model_gateway.routing import ModelRouter, configuration_fields
-from companion_v2.model_gateway.models import Amount, ProviderResponse
-from companion_v2.model_gateway.service import LocalModelGateway
+from digital_life_host.model_settings import conversation_provider_resolver
+from digital_life_core.configuration.models import ConfigLayer, ConfigTarget
+from digital_life_core.configuration.registry import FieldRegistry
+from digital_life_core.configuration.service import ConfigurationService
+from digital_life_core.execution.models import TaskError
+from digital_life_core.foundation.refs import ScopeKind
+from digital_life_core.model_gateway.routing import ModelRouter, configuration_fields
+from digital_life_core.model_gateway.models import Amount, ProviderResponse
+from digital_life_core.model_gateway.service import LocalModelGateway
 from tests.test_model_gateway import ModelFixture
 
 

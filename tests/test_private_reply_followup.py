@@ -3,7 +3,7 @@
 from datetime import datetime, timezone, timedelta
 import unittest
 
-from astrbot_host.private_reply_followup import PrivateReplyFollowUps
+from digital_life_host.private_reply_followup import PrivateReplyFollowUps
 
 
 def event(text, seconds=0, origin="private:session-1"):

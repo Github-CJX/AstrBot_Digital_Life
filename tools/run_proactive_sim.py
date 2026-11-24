@@ -39,7 +39,7 @@ from tempfile import TemporaryDirectory
 from time import monotonic
 
 ROOT = Path(__file__).resolve().parents[1]
-# 让脚本在只有 PYTHONPATH 指向插件目录时也能跑：插件目录提供 companion_v2/astrbot_host，
+# 让脚本在只有 PYTHONPATH 指向插件目录时也能跑：插件目录提供 digital_life_core/digital_life_host，
 # 仓库根再保证 tests/ 里的夹具可复用。
 for entry in (str(ROOT.parent), str(ROOT)):
     if entry not in sys.path:
@@ -78,8 +78,8 @@ class FixtureNewsPort:
 
     def __init__(self, manifest, alignment):
         self.manifest, self.alignment, self.calls = manifest, alignment, 0
-        from astrbot_host.news import DEFAULT_AI_NEWS_FEED_LABEL
-        from astrbot_host.news_parsing import parse_rss_news
+        from digital_life_host.news import DEFAULT_AI_NEWS_FEED_LABEL
+        from digital_life_host.news_parsing import parse_rss_news
 
         self.source_label = manifest.get("source_label") or DEFAULT_AI_NEWS_FEED_LABEL
         self.fingerprint = "run-proactive-sim-fixture-v1"
@@ -88,7 +88,7 @@ class FixtureNewsPort:
 
     async def fetch(self):
         self.calls += 1
-        from companion_v2.proactive.external_materials import ParseBatch
+        from digital_life_core.proactive.external_materials import ParseBatch
 
         batch = self._parse(self._bytes, source_label=self.source_label)
         shift = self.alignment - datetime.fromisoformat(self.manifest["recorded_at"])
@@ -125,12 +125,12 @@ class RecordingSender:
         self.rejections = []
 
     def local_sender(self):
-        from companion_v2.delivery.models import LocalSender
+        from digital_life_core.delivery.models import LocalSender
 
         return LocalSender(self.binding, self.send, supports_images=self.supports_images)
 
     def receipt(self, envelope, status):
-        from companion_v2.delivery.models import DeliveryReceipt
+        from digital_life_core.delivery.models import DeliveryReceipt
 
         # 回执时间取"派发之后"的当前读数，与生产 sender 的 now() 语义一致。
         at = self.now()
@@ -142,8 +142,8 @@ class RecordingSender:
             at if status == "delivered" else None)
 
     def render(self, envelope):
-        from companion_v2.delivery.components import build_component_plan
-        from companion_v2.delivery.media import ImageDeliveryEnvelope
+        from digital_life_core.delivery.components import build_component_plan
+        from digital_life_core.delivery.media import ImageDeliveryEnvelope
 
         images = envelope.images if isinstance(envelope, ImageDeliveryEnvelope) else ()
         position = envelope.image_position if isinstance(envelope, ImageDeliveryEnvelope) else "after_text"
@@ -165,7 +165,7 @@ class RecordingSender:
                                for component in plan.components]}
 
     def document(self, envelope):
-        from companion_v2.delivery.media import ImageDeliveryEnvelope, image_manifest
+        from digital_life_core.delivery.media import ImageDeliveryEnvelope, image_manifest
 
         images = envelope.images if isinstance(envelope, ImageDeliveryEnvelope) else ()
         scope = envelope.context.scope
@@ -227,8 +227,8 @@ def record_fixture(*, url=None, user_agent="CompanionV2FixtureRecorder/1.0", qui
     """重新录制一份真实样本。原始响应体与归一化清单一起落盘。"""
     import urllib.request
 
-    from astrbot_host.news import DEFAULT_AI_NEWS_FEED_LABEL, DEFAULT_AI_NEWS_FEED_URL
-    from astrbot_host.news_parsing import parse_rss_news
+    from digital_life_host.news import DEFAULT_AI_NEWS_FEED_LABEL, DEFAULT_AI_NEWS_FEED_URL
+    from digital_life_host.news_parsing import parse_rss_news
 
     target = url or DEFAULT_AI_NEWS_FEED_URL
     request = urllib.request.Request(target, headers={"User-Agent": user_agent})
@@ -297,14 +297,14 @@ class PendingSender:
 
 def _host_kwargs(binding, runtime, generate):
     """合成宿主的装配参数：真注册表、真 provider 契约、只换模型回答与 sender。"""
-    from companion_v2.conversation.flow import ConversationPolicy
-    from companion_v2.conversation.messages import REPLY_KIND
-    from companion_v2.configuration.registry import FieldRegistry
-    from companion_v2.execution.models import Lane, ProviderBinding, SupervisorLimits
-    from companion_v2.identity_policy.personas import RuntimeIdentity
-    from companion_v2.model_gateway.models import Amount, BudgetPolicy, LocalProvider, ModelTaskProfile
-    from companion_v2.model_gateway.routing import configuration_fields
-    from companion_v2.proactive.service import contact_profile
+    from digital_life_core.conversation.flow import ConversationPolicy
+    from digital_life_core.conversation.messages import REPLY_KIND
+    from digital_life_core.configuration.registry import FieldRegistry
+    from digital_life_core.execution.models import Lane, ProviderBinding, SupervisorLimits
+    from digital_life_core.identity_policy.personas import RuntimeIdentity
+    from digital_life_core.model_gateway.models import Amount, BudgetPolicy, LocalProvider, ModelTaskProfile
+    from digital_life_core.model_gateway.routing import configuration_fields
+    from digital_life_core.proactive.service import contact_profile
 
     profiles = (ModelTaskProfile(REPLY_KIND, Lane.FOREGROUND, "primary", "补充任务提示",
                                  max_output_tokens=100),
@@ -328,18 +328,18 @@ def _host_kwargs(binding, runtime, generate):
 
 async def run_simulation(args):
     """跑一次链路，返回 (envelope 文档, 链路状态, 提示信息)。"""
-    from companion_v2.adapters.astrbot.application import AstrBotCompanionHost
-    from astrbot_host.news import configured_news_port
-    from companion_v2.execution.models import ProviderBinding, TaskContext, digest
-    from companion_v2.foundation.refs import AudienceRef, ScopeKind, ScopeRef
-    from companion_v2.foundation.refs import SubjectKind, SubjectRef
-    from companion_v2.identity_policy.models import AuthenticatedHostPrincipal, AuthorizationTier
-    from companion_v2.identity_policy.object_access import ObjectAccessPolicy
-    from companion_v2.identity_policy.personas import ConversationRoute, PersonaBinding, PersonaDirectory, PersonaSelector, SelectorKind
-    from companion_v2.identity_policy.repository import PersistentIdentityDirectory
-    from companion_v2.proactive.configuration import GROUP, target_for
-    from companion_v2.storage.runtime import StorageRuntime
-    from companion_v2.model_gateway.models import ProviderResponse, Amount
+    from digital_life_core.adapters.astrbot.application import AstrBotCompanionHost
+    from digital_life_host.news import configured_news_port
+    from digital_life_core.execution.models import ProviderBinding, TaskContext, digest
+    from digital_life_core.foundation.refs import AudienceRef, ScopeKind, ScopeRef
+    from digital_life_core.foundation.refs import SubjectKind, SubjectRef
+    from digital_life_core.identity_policy.models import AuthenticatedHostPrincipal, AuthorizationTier
+    from digital_life_core.identity_policy.object_access import ObjectAccessPolicy
+    from digital_life_core.identity_policy.personas import ConversationRoute, PersonaBinding, PersonaDirectory, PersonaSelector, SelectorKind
+    from digital_life_core.identity_policy.repository import PersistentIdentityDirectory
+    from digital_life_core.proactive.configuration import GROUP, target_for
+    from digital_life_core.storage.runtime import StorageRuntime
+    from digital_life_core.model_gateway.models import ProviderResponse, Amount
 
     notes = []
     # 用真时钟：这条链的门槛（idle_seconds、机会窗口、投递回执区间）都是"按秒"的，
@@ -378,7 +378,7 @@ async def run_simulation(args):
 
         async def route_model(envelope):
             """一轮对话走普通回复，主动消息走封存草稿；两条都由同一个 provider 提供。"""
-            from companion_v2.conversation.foreground import BackgroundPromptTrigger, ModelDraft
+            from digital_life_core.conversation.foreground import BackgroundPromptTrigger, ModelDraft
 
             if isinstance(envelope.original.event, BackgroundPromptTrigger):
                 return ProviderResponse("generated", draft=ModelDraft(json.dumps(
@@ -391,8 +391,8 @@ async def run_simulation(args):
                                     usage=Amount(15, 40), receipt_ref="sim-reply")
 
         kwargs = _host_kwargs(binding, runtime, route_model)
-        from companion_v2.model_gateway.models import Lane
-        from companion_v2.conversation.messages import REPLY_KIND
+        from digital_life_core.model_gateway.models import Lane
+        from digital_life_core.conversation.messages import REPLY_KIND
 
         class Ports:
             """宿主端口：只做合成事件到 V2 输入的字段映射，不做任何外部调用。"""
@@ -406,7 +406,7 @@ async def run_simulation(args):
             def conversation_route(self, event):
                 return ConversationRoute(event["scope"], user=event["actor"].subject)
             def authenticated_principal(self, event):
-                from companion_v2.foundation.outcome import Outcome
+                from digital_life_core.foundation.outcome import Outcome
                 return Outcome.success(event["actor"].principal)
             def role_instruction(self, event, context): return event["prompt"]
 
@@ -540,7 +540,7 @@ async def run_simulation(args):
 
 def _operation(target, *, owner):
     """配置操作的身份：作用域取自目标，owner 取自该配置组自己的 owner_id。"""
-    from companion_v2.foundation.refs import OperationRef, VersionRef
+    from digital_life_core.foundation.refs import OperationRef, VersionRef
 
     identifier = "sim-operation"
     return OperationRef(identifier, owner, target.authorization_scope,

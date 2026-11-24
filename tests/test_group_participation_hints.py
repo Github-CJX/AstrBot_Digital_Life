@@ -4,10 +4,10 @@ from datetime import datetime, timedelta, timezone
 from types import SimpleNamespace as NS
 import unittest
 
-from companion_v2.conversation.group_timing import short_input_wait
-from companion_v2.conversation.participation_prompts import group_hints
-from companion_v2.conversation.native_participation import speaker_history_instruction
-from companion_v2.foundation.refs import ScopeKind
+from digital_life_core.conversation.group_timing import short_input_wait
+from digital_life_core.conversation.participation_prompts import group_hints
+from digital_life_core.conversation.native_participation import speaker_history_instruction
+from digital_life_core.foundation.refs import ScopeKind
 
 
 NOW = datetime(2026, 9, 27, 10, tzinfo=timezone.utc)

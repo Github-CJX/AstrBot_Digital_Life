@@ -7,15 +7,15 @@ const {pathToFileURL}=require("node:url");
 const {chromium}=require("playwright");
 
 function syntheticBridge(){
-  const host="astrbot_plugin_private_companion";
+  const host="astrbot_plugin_digital_life";
   window.AstrBotPluginPage={
     ready:async()=>({pluginName:host}),
     onContext:()=>()=>{},
     apiGet:async endpoint=>{
       if(endpoint==="integration/manifest")return {extensions:[
-        {capability_id:"together",extension_id:"together",owner:"companion_v2",label:"共处",integration_state:"connected",enabled:true,runtime_ready:true,assembled:true,version:"2.0",description:"一起活动",reason:"状态正常"},
-        {capability_id:"game",extension_id:"game",owner:"companion_v2",label:"游戏",integration_state:"unassembled",enabled:false,runtime_ready:false,assembled:false,version:"2.0",description:"棋类和游戏",reason:"V2 拓展尚未装配"},
-        {capability_id:"reality",extension_id:"reality",owner:"companion_v2",label:"现实触及",integration_state:"degraded",enabled:true,runtime_ready:false,assembled:true,version:"2.0",description:"设备",reason:"等待设备授权"},
+        {capability_id:"together",extension_id:"together",owner:"digital_life_core",label:"共处",integration_state:"connected",enabled:true,runtime_ready:true,assembled:true,version:"2.0",description:"一起活动",reason:"状态正常"},
+        {capability_id:"game",extension_id:"game",owner:"digital_life_core",label:"游戏",integration_state:"unassembled",enabled:false,runtime_ready:false,assembled:false,version:"2.0",description:"棋类和游戏",reason:"V2 拓展尚未装配"},
+        {capability_id:"reality",extension_id:"reality",owner:"digital_life_core",label:"现实触及",integration_state:"degraded",enabled:true,runtime_ready:false,assembled:true,version:"2.0",description:"设备",reason:"等待设备授权"},
       ],providers:[],summary:{connected_count:1,extension_ready_count:1,unassembled_extension_count:1,provider_count:0}};
       if(endpoint==="extensions")return {extensions:{reality:{revision:"qa-native",settings:{enabled:true},
         schema:{enabled:{type:"bool",description:"启用能力",default:true}},runtime:{state:"running"}}}};

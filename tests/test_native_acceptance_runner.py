@@ -34,7 +34,7 @@ class NativeAcceptanceRunnerTests(unittest.TestCase):
         return report
 
     def test_static_legacy_dependency_prevents_worker_and_still_cleans_installation(self):
-        (self.source / "main.py").write_text("import astrbot_plugin_private_companion\n", encoding="utf-8")
+        (self.source / "main.py").write_text("import astrbot_plugin_digital_life\n", encoding="utf-8")
         with patch("tools.native_acceptance.subprocess.run") as child:
             report = self.invoke()
         child.assert_not_called()

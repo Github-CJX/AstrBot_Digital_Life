@@ -24,7 +24,7 @@
 
 高级区默认填入通用模板（`GET {{baseUrl}}/user/balance`，读取 `response.balance`，单位 USD）。通用模板用 `response.is_active !== false` 保留明确的账户无效状态，避免 `|| true` 将 false 覆盖。
 
-内置预设下拉框提供「通用 / newapi / sub2api」，选定后点击「载入」才会替换脚本；「恢复默认」固定恢复通用模板。两种操作都只更新草稿脚本，保留地址、凭据和代理，不自动保存。所有模板的 User-Agent 使用插件标识 `astrbot_plugin_private_companion`。
+内置预设下拉框提供「通用 / newapi / sub2api」，选定后点击「载入」才会替换脚本；「恢复默认」固定恢复通用模板。两种操作都只更新草稿脚本，保留地址、凭据和代理，不自动保存。所有模板的 User-Agent 使用插件标识 `astrbot_plugin_digital_life`。
 
 参考 CC Switch 的同步 `request + extractor(response)` 对象表达式，整体保留括号：
 

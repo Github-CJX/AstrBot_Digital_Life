@@ -3,7 +3,7 @@ from __future__ import annotations
 import json
 import unittest
 
-from companion_v2.legacy.reality_migration import merge_legacy_runtime_state
+from digital_life_core.legacy.reality_migration import merge_legacy_runtime_state
 
 
 def legacy_state():

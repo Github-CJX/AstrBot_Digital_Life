@@ -9,8 +9,8 @@ const vm = require("node:vm");
 const rootDir = path.resolve(__dirname, "..");
 const panelSource = fs.readFileSync(path.join(rootDir, "pages/陪伴小屋/native-extension-panel.js"), "utf8");
 const managementSource = fs.readFileSync(path.join(rootDir, "pages/陪伴小屋/native-extension-management.js"), "utf8");
-const gameDefaults = JSON.parse(fs.readFileSync(path.join(rootDir, "astrbot_host/native_extensions/game/settings-defaults.json"), "utf8"));
-const gameSchema = JSON.parse(fs.readFileSync(path.join(rootDir, "astrbot_host/native_extensions/game/settings-schema.json"), "utf8"));
+const gameDefaults = JSON.parse(fs.readFileSync(path.join(rootDir, "digital_life_host/native_extensions/game/settings-defaults.json"), "utf8"));
+const gameSchema = JSON.parse(fs.readFileSync(path.join(rootDir, "digital_life_host/native_extensions/game/settings-schema.json"), "utf8"));
 
 const settle = async () => {
   for (let i = 0; i < 10; i += 1) await new Promise(resolve => setImmediate(resolve));
@@ -180,7 +180,7 @@ test("game 面板导出 syncRuntime 并与 CompanionGameAccess 双向联动刷�
       }),
     },
     CompanionProduct: {
-      extension: () => ({owner: "companion_v2", assembled: true, desired_state: "active", installed_revision: 3}),
+      extension: () => ({owner: "digital_life_core", assembled: true, desired_state: "active", installed_revision: 3}),
       errorLabel: () => "",
       refreshIntegrations: async () => {},
       manageExtension: async () => {},

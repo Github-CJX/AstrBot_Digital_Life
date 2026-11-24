@@ -22,21 +22,21 @@ import unittest
 from unittest.mock import patch
 import zlib
 
-from astrbot_host.native_extensions.image_native.store import (
+from digital_life_host.native_extensions.image_native.store import (
     NATIVE_IMAGE_FILE_MARKER,
     ImageStore,
     migrate_native_image_store_at,
 )
-from astrbot_host.pricing_inventory import collect_usage_consumption
-from astrbot_host.storage_api import StorageWebAPI
-from companion_v2.conversation import native_history
-from companion_v2.conversation.messages import ConversationMessages
-from companion_v2.conversation.native_observations import (
+from digital_life_host.pricing_inventory import collect_usage_consumption
+from digital_life_host.storage_api import StorageWebAPI
+from digital_life_core.conversation import native_history
+from digital_life_core.conversation.messages import ConversationMessages
+from digital_life_core.conversation.native_observations import (
     NativeConversationObservations,
     input_rows_for_context,
     rows_for_context,
 )
-from companion_v2.conversation.native_turns import (
+from digital_life_core.conversation.native_turns import (
     NativeConversationTurns,
     context_rows,
     latest,
@@ -44,31 +44,31 @@ from companion_v2.conversation.native_turns import (
     latest_role_contexts,
     latest_scope,
 )
-from companion_v2.conversation.scope_family import group_scope_keys, private_scope_keys
-from companion_v2.execution.models import TaskContext, TaskError, digest, encode, stamp
-from companion_v2.expression.private_scope import private_people
-from companion_v2.foundation.outcome import Outcome
-from companion_v2.foundation.refs import (
+from digital_life_core.conversation.scope_family import group_scope_keys, private_scope_keys
+from digital_life_core.execution.models import TaskContext, TaskError, digest, encode, stamp
+from digital_life_core.expression.private_scope import private_people
+from digital_life_core.foundation.outcome import Outcome
+from digital_life_core.foundation.refs import (
     AudienceRef,
     ScopeKind,
     ScopeRef,
     SubjectKind,
     SubjectRef,
 )
-from companion_v2.identity_policy.models import (
+from digital_life_core.identity_policy.models import (
     AuthenticatedHostPrincipal,
     ResolvedIdentity,
     RoleBinding,
 )
-from companion_v2.model_gateway.core_observations import (
+from digital_life_core.model_gateway.core_observations import (
     observations_for_role,
     record_observation,
     role_key as core_role_key,
 )
-from companion_v2.model_gateway.maintenance_cache import runtime_maintenance_cache
-from companion_v2.model_gateway.usage import CORE_CHAIN_KIND
-from companion_v2.storage.compaction import compact_and_slim_databases, database_health_report
-from companion_v2.storage.native_dedup import (
+from digital_life_core.model_gateway.maintenance_cache import runtime_maintenance_cache
+from digital_life_core.model_gateway.usage import CORE_CHAIN_KIND
+from digital_life_core.storage.compaction import compact_and_slim_databases, database_health_report
+from digital_life_core.storage.native_dedup import (
     CONTEXT_REF_PREFIX,
     ROLE_BLOB_PREFIX,
     clear_dedup_caches,
@@ -77,9 +77,9 @@ from companion_v2.storage.native_dedup import (
     is_role_blob_ref,
     resolve_context_json,
 )
-from companion_v2.storage.runtime import StorageRuntime
-from companion_v2.storage.semantic import REACTION_FILE_MARKER, SemanticStore
-from companion_v2.storage.telemetry_archive import (
+from digital_life_core.storage.runtime import StorageRuntime
+from digital_life_core.storage.semantic import REACTION_FILE_MARKER, SemanticStore
+from digital_life_core.storage.telemetry_archive import (
     TelemetryArchiveStore,
     archive_cold_telemetry,
 )
@@ -329,7 +329,7 @@ class NativeDedupTests(unittest.TestCase):
                 runtime.close()
 
     def test_native_reply_diagnostics_uses_covering_indexes_across_mixed_legacy_and_deduped_rows(self):
-        from companion_v2.conversation.native_reply_diagnostics import recent as native_recent
+        from digital_life_core.conversation.native_reply_diagnostics import recent as native_recent
 
         with TemporaryDirectory(prefix="pr03-diag-idx-") as tmp:
             runtime = StorageRuntime.open(data_root=Path(tmp) / "v2", installation_id=INSTALLATION_ID)
@@ -928,10 +928,10 @@ class MediaOffloadVacuumBatcherAndApiTests(unittest.IsolatedAsyncioTestCase):
                 req = _DummyRequest()
                 # Check registered routes include /health and /compact.
                 route_paths = {r[0] for r in api.routes()}
-                self.assertIn("/astrbot_plugin_private_companion/storage/health", route_paths)
-                self.assertIn("/astrbot_plugin_private_companion/storage/compact", route_paths)
+                self.assertIn("/astrbot_plugin_digital_life/storage/health", route_paths)
+                self.assertIn("/astrbot_plugin_digital_life/storage/compact", route_paths)
 
-                with patch("astrbot_host.storage_api.request", req):
+                with patch("digital_life_host.storage_api.request", req):
                     health_resp = await api.health()
                 self.assertEqual(health_resp["status"], "ok")
                 health_data = health_resp["data"]
@@ -943,7 +943,7 @@ class MediaOffloadVacuumBatcherAndApiTests(unittest.IsolatedAsyncioTestCase):
 
                 # Invoke one-click compaction via POST /storage/compact.
                 req.payload = json.dumps({"ttl_days": 14, "vacuum": True}).encode("utf-8")
-                with patch("astrbot_host.storage_api.request", req):
+                with patch("digital_life_host.storage_api.request", req):
                     compact_resp = await api.compact()
                 self.assertEqual(compact_resp["status"], "ok")
                 cdata = compact_resp["data"]
@@ -959,13 +959,13 @@ class MediaOffloadVacuumBatcherAndApiTests(unittest.IsolatedAsyncioTestCase):
 
                 # Also verify POST /storage with action="compact" and invalid option rejection.
                 req.payload = json.dumps({"action": "compact", "ttl_days": 14}).encode("utf-8")
-                with patch("astrbot_host.storage_api.request", req):
+                with patch("digital_life_host.storage_api.request", req):
                     action_resp = await api.update()
                 self.assertEqual(action_resp["status"], "ok")
                 self.assertIn("compact_result", action_resp["data"])
 
                 req.payload = json.dumps({"ttl_days": 0}).encode("utf-8")
-                with patch("astrbot_host.storage_api.request", req):
+                with patch("digital_life_host.storage_api.request", req):
                     bad_resp = await api.compact()
                 self.assertEqual(bad_resp["status"], "error")
             finally:

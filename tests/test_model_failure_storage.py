@@ -3,10 +3,10 @@ import sqlite3
 import unittest
 from unittest.mock import patch
 
-from companion_v2.execution.models import TaskError, TaskResult
-from companion_v2.model_gateway.models import Amount, ProviderResponse
-from companion_v2.storage.runtime import StorageOpenError, StorageRuntime
-from companion_v2.storage.schema import (
+from digital_life_core.execution.models import TaskError, TaskResult
+from digital_life_core.model_gateway.models import Amount, ProviderResponse
+from digital_life_core.storage.runtime import StorageOpenError, StorageRuntime
+from digital_life_core.storage.schema import (
     MIGRATION_V13_TO_V14_ID, MIGRATION_V13_TO_V14_FINGERPRINT,
     MIGRATION_V14_TO_V15_ID, MIGRATION_V14_TO_V15_FINGERPRINT,
     MIGRATION_V35_TO_V36_ID, MIGRATION_V35_TO_V36_FINGERPRINT,
@@ -77,7 +77,7 @@ class ModelFailureStorageTests(ModelFixture, unittest.IsolatedAsyncioTestCase):
 
     async def test_failed_v36_upgrade_keeps_old_rows_and_retries(self):
         old_call, _ = self.populated_v35()
-        with patch("companion_v2.storage.runtime.V36_MIGRATION_STATEMENTS",
+        with patch("digital_life_core.storage.runtime.V36_MIGRATION_STATEMENTS",
                    V36_MIGRATION_STATEMENTS[:2] + ("INVALID V36 MIGRATION",)):
             with self.assertRaises(StorageOpenError):
                 StorageRuntime.open(data_root=self.root, installation_id=INSTALLATION)
@@ -106,7 +106,7 @@ class ModelFailureStorageTests(ModelFixture, unittest.IsolatedAsyncioTestCase):
         self.assertEqual(len(self.called), 2)
 
     async def test_failed_upgrade_rolls_back_and_can_retry_without_replaying_calls(self):
-        with patch("companion_v2.storage.runtime.V15_MIGRATION_STATEMENTS", V15_MIGRATION_STATEMENTS + ("INVALID UPGRADE",)):
+        with patch("digital_life_core.storage.runtime.V15_MIGRATION_STATEMENTS", V15_MIGRATION_STATEMENTS + ("INVALID UPGRADE",)):
             with self.assertRaises(StorageOpenError):
                 StorageRuntime.open(data_root=self.root, installation_id=INSTALLATION)
         self.assertEqual(self.version(), SCHEMA_VERSION_V14)

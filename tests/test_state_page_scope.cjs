@@ -11,14 +11,14 @@ function harness(windowKind="none",section="state") {
   const targets=[
     {target_id:"representative",bot_id:"bot-1",scope_kind:"private"},
     {target_id:"selected",bot_id:windowKind==="other_bot"?"bot-2":"bot-1",scope_kind:windowKind==="group"?"group":"private"},
-  ].map(target=>({...target,roles:[{role_id:"role-1",state_api:`/astrbot_plugin_private_companion/state/${target.target_id}`}]}));
+  ].map(target=>({...target,roles:[{role_id:"role-1",state_api:`/astrbot_plugin_digital_life/state/${target.target_id}`}]}));
   const status={state:{values:{energy:70}},settings:{enabled:true,presence_enabled:true,online_status_enabled:false,
     typing_enabled:true,typing_refresh_seconds:7},sleep_schedule:{},role_edit_token:"role-edit",edit_token:"window-edit",
     effective:{typing_enabled:{allowed:true},presence_enabled:{allowed:true}},
     presentation_diagnostics:{typing:{state:"refreshing"},custom_status:{state:"idle"}},
     presentation:{"typing:representative":{state:"accepted"},"presence:bot-1":{state:"accepted"}},
     contact:{settings:{label:"private-only"}}};
-  const bridge={ready:async()=>({pluginName:"astrbot_plugin_private_companion"}),
+  const bridge={ready:async()=>({pluginName:"astrbot_plugin_digital_life"}),
     apiGet:async route=>{requests.push(route);return {status:"ok",data:status};}};
   const window={CompanionProduct:{hosted:()=>true,scopeKey:()=>`${windowKind}:role-1`,bridgeNow:()=>bridge,
     directory:()=>({installation_id:"install",operator_id:"operator",targets}),

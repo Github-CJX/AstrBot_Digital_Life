@@ -3,7 +3,7 @@
 import unittest
 from types import SimpleNamespace
 
-from astrbot_host.multi_controller import AstrBotMultiController
+from digital_life_host.multi_controller import AstrBotMultiController
 
 
 def persona(name, role="role"):

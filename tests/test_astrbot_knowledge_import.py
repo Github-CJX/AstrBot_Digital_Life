@@ -9,19 +9,19 @@ from tempfile import TemporaryDirectory
 import unittest
 from unittest.mock import patch
 
-from astrbot_host.knowledge_sources import (
+from digital_life_host.knowledge_sources import (
     import_configured_sources_at_startup,
     import_plan,
 )
-from companion_v2.configuration.models import ConfigLayer, ConfigTarget
-from companion_v2.knowledge.catalog import KnowledgeCatalog, SourceBinding
-from companion_v2.knowledge.configuration import (
+from digital_life_core.configuration.models import ConfigLayer, ConfigTarget
+from digital_life_core.knowledge.catalog import KnowledgeCatalog, SourceBinding
+from digital_life_core.knowledge.configuration import (
     KnowledgeConfigurationOwner,
     configuration_fields,
     read_installation_settings,
 )
-from companion_v2.knowledge.importer import ImportStatus
-from companion_v2.storage.runtime import StorageRuntime
+from digital_life_core.knowledge.importer import ImportStatus
+from digital_life_core.storage.runtime import StorageRuntime
 from tests.multi_host_support import MultiFixture
 from tests.test_management_access import INSTALLATION, NOW
 
@@ -131,7 +131,7 @@ class StartupKnowledgeImportTests(unittest.TestCase):
     def test_absent_default_worldbooks_start_without_material(self):
         self.configure({"knowledge.import_enabled": True})
 
-        with self.assertLogs("astrbot_host.knowledge_sources", level="INFO") as captured:
+        with self.assertLogs("digital_life_host.knowledge_sources", level="INFO") as captured:
             results = self.import_at_startup()
 
         self.assertEqual([item.status for item in results], [ImportStatus.MISSING] * 2)
@@ -173,7 +173,7 @@ class StartupKnowledgeImportTests(unittest.TestCase):
     def test_switched_off_import_reads_nothing(self):
         self.worldbook_file(entry("rain", "雨天适合沿河散步"))
 
-        with self.assertLogs("astrbot_host.knowledge_sources", level="INFO") as captured:
+        with self.assertLogs("digital_life_host.knowledge_sources", level="INFO") as captured:
             results = self.import_at_startup()
 
         self.assertEqual(results, ())
@@ -195,9 +195,9 @@ class StartupKnowledgeImportTests(unittest.TestCase):
     def test_a_storage_failure_does_not_break_the_start(self):
         self.configure({"knowledge.import_enabled": True})
 
-        with patch("astrbot_host.knowledge_sources.import_configured_sources",
+        with patch("digital_life_host.knowledge_sources.import_configured_sources",
                    side_effect=RuntimeError("storage down")):
-            with self.assertLogs("astrbot_host.knowledge_sources", level="WARNING") as captured:
+            with self.assertLogs("digital_life_host.knowledge_sources", level="WARNING") as captured:
                 results = self.import_at_startup()
 
         self.assertEqual(results, ())
@@ -206,7 +206,7 @@ class StartupKnowledgeImportTests(unittest.TestCase):
 
 class StartupImportWiringTests(MultiFixture, unittest.IsolatedAsyncioTestCase):
     async def test_host_start_refreshes_configured_knowledge_once(self):
-        with patch("astrbot_host.knowledge_sources"
+        with patch("digital_life_host.knowledge_sources"
                    ".import_configured_sources_at_startup") as refresh:
             application = await self.start_host()
 

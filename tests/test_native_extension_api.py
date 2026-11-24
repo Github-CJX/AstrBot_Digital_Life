@@ -11,8 +11,8 @@ from unittest.mock import AsyncMock, patch
 from tests import test_astrbot_staging_host as support
 from astrbot.api.web import PluginRequest, bind_request_context
 from starlette.requests import Request
-from astrbot_host.native_extension_api import PREFIX
-from companion_v2.capabilities import CapabilityRepository
+from digital_life_host.native_extension_api import PREFIX
+from digital_life_core.capabilities import CapabilityRepository
 
 
 class NativeExtensionAPITests(unittest.IsolatedAsyncioTestCase):
@@ -76,7 +76,7 @@ class NativeExtensionAPITests(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(result["data"]["code"], "native_service_not_running")
 
     async def test_mobile_pairing_token_enables_gateway_and_only_returns_new_secret_to_dashboard(self):
-        from astrbot_host.native_extensions.reality import activity_methods
+        from digital_life_host.native_extensions.reality import activity_methods
 
         service = await self.enable("reality")
         denied = await self.call(PREFIX + "/action", body={"extension_id": "reality",
@@ -303,8 +303,8 @@ class NativeExtensionAPITests(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(unknown["status"], "error")
 
     async def test_management_errors_keep_codes_for_message_only_dashboard_bridge(self):
-        from astrbot_host.perception_api import PREFIX as perception_prefix
-        from astrbot_host.integration_api import PREFIX as integration_prefix
+        from digital_life_host.perception_api import PREFIX as perception_prefix
+        from digital_life_host.integration_api import PREFIX as integration_prefix
 
         for path in (perception_prefix, integration_prefix + "/integration/manifest"):
             for username in (None, "", "api_key:synthetic"):

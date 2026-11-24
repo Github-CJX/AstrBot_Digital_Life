@@ -11,7 +11,7 @@ from pathlib import Path
 import unittest
 
 ROOT = Path(__file__).resolve().parents[1]
-EXTENSION = ROOT / "astrbot_host" / "native_extensions" / "together"
+EXTENSION = ROOT / "digital_life_host" / "native_extensions" / "together"
 
 
 def load(name):

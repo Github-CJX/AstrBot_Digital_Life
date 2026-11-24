@@ -14,9 +14,9 @@ import unittest
 from unittest.mock import patch
 from uuid import uuid4
 
-from companion_v2.memory.models import AtomRef
-from companion_v2.memory.query import MemoryQuery
-from companion_v2.memory.writer import MemoryWriter
+from digital_life_core.memory.models import AtomRef
+from digital_life_core.memory.query import MemoryQuery
+from digital_life_core.memory.writer import MemoryWriter
 from tests.memory_support import MemoryFixture
 
 

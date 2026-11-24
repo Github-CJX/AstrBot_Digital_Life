@@ -52,7 +52,7 @@ const frameBridge = `<script>
     const id=++sequence;pending.set(id,{resolve,reject});
     parent.postMessage({channel:"test-plugin-request",id,method,endpoint,params},"*");
   });
-  window.AstrBotPluginPage={ready:async()=>({pluginName:"astrbot_plugin_private_companion",pageName:"陪伴小屋"}),
+  window.AstrBotPluginPage={ready:async()=>({pluginName:"astrbot_plugin_digital_life",pageName:"陪伴小屋"}),
     apiGet:(endpoint,params)=>request("GET",endpoint,params),apiPost:(endpoint,params)=>request("POST",endpoint,params),onContext:()=>()=>{}};
 })();
 </script>`;

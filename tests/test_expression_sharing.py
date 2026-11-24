@@ -1,11 +1,11 @@
 import json
 import unittest
 
-from companion_v2.execution.models import TaskContext
-from companion_v2.expression.sharing import build_pack, normalize_pack
-from companion_v2.foundation.refs import AudienceRef
-from companion_v2.expression.style_management import ExpressionStyleManagement
-from astrbot_host.reply_api import ReplyWebAPI
+from digital_life_core.execution.models import TaskContext
+from digital_life_core.expression.sharing import build_pack, normalize_pack
+from digital_life_core.foundation.refs import AudienceRef
+from digital_life_core.expression.style_management import ExpressionStyleManagement
+from digital_life_host.reply_api import ReplyWebAPI
 from tests.test_management_access import SCOPE
 from tests.test_host_application import HostFixture
 
@@ -13,9 +13,9 @@ from tests.test_host_application import HostFixture
 class ExpressionSharePackTests(unittest.TestCase):
     def test_import_export_routes_are_registered_under_reply(self):
         paths = {route[0] for route in ReplyWebAPI(None).routes()}
-        self.assertIn("/astrbot_plugin_private_companion/reply/style/export", paths)
-        self.assertIn("/astrbot_plugin_private_companion/reply/style/import/preview", paths)
-        self.assertIn("/astrbot_plugin_private_companion/reply/style/import/apply", paths)
+        self.assertIn("/astrbot_plugin_digital_life/reply/style/export", paths)
+        self.assertIn("/astrbot_plugin_digital_life/reply/style/import/preview", paths)
+        self.assertIn("/astrbot_plugin_digital_life/reply/style/import/apply", paths)
 
     def test_v1_pack_is_reduced_to_abstract_bounded_rules(self):
         raw = {

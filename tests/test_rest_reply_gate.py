@@ -12,16 +12,16 @@ from __future__ import annotations
 from datetime import datetime, timedelta
 import unittest
 
-from companion_v2.configuration.models import ConfigLayer
-from companion_v2.configuration.registry import FieldRegistry, ValueKind
-from companion_v2.configuration.service import ConfigurationService
-from companion_v2.conversation.flow import ConversationPolicy
-from companion_v2.execution.models import TaskContext
-from companion_v2.foundation.refs import AudienceRef
-from companion_v2.role_work.life import configuration as life_configuration
-from companion_v2.role_work.life import rest_gate
-from companion_v2.role_work.life.configuration import LifeConfigurationOwner
-from companion_v2.role_work.life.rest_gate import Settings
+from digital_life_core.configuration.models import ConfigLayer
+from digital_life_core.configuration.registry import FieldRegistry, ValueKind
+from digital_life_core.configuration.service import ConfigurationService
+from digital_life_core.conversation.flow import ConversationPolicy
+from digital_life_core.execution.models import TaskContext
+from digital_life_core.foundation.refs import AudienceRef
+from digital_life_core.role_work.life import configuration as life_configuration
+from digital_life_core.role_work.life import rest_gate
+from digital_life_core.role_work.life.configuration import LifeConfigurationOwner
+from digital_life_core.role_work.life.rest_gate import Settings
 from tests.test_host_application import HostFixture
 from tests.test_management_access import NOW, SCOPE
 
@@ -259,9 +259,9 @@ class RestGateHostTests(HostFixture, unittest.IsolatedAsyncioTestCase):
         return routine.start_sleep(request, minutes)
 
     def source(self, app, context, identifier, body):
-        from companion_v2.execution.models import digest
-        from companion_v2.foundation.refs import SourceRef, VersionRef
-        from companion_v2.sources.models import SourceRecord
+        from digital_life_core.execution.models import digest
+        from digital_life_core.foundation.refs import SourceRef, VersionRef
+        from digital_life_core.sources.models import SourceRecord
         reference = SourceRef(identifier, "conversation.host_input", context.scope,
                               VersionRef(identifier, 1), self.clock.now())
         app.messages.sources.publish(SourceRecord(reference, AudienceRef(context.scope, (context.actor.subject,)),
@@ -269,8 +269,8 @@ class RestGateHostTests(HostFixture, unittest.IsolatedAsyncioTestCase):
         return reference
 
     def accept(self, app, context, *, defer, identifier, text=NEUTRAL, reference=None):
-        from companion_v2.conversation.models import InboundConversationEvent
-        from companion_v2.execution.models import digest
+        from digital_life_core.conversation.models import InboundConversationEvent
+        from digital_life_core.execution.models import digest
         reference = reference or self.source(app, context, identifier, text)
         event = InboundConversationEvent(identifier, context.actor.principal, context.scope, reference,
                                         "text", digest(text), self.clock.now())

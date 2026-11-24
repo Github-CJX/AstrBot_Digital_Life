@@ -10,7 +10,7 @@ from astrbot.core.provider.sources.openai_source import ProviderOpenAIOfficial
 from openai.resources.chat.completions import AsyncCompletions
 from openai.types.chat import ChatCompletion, ChatCompletionChunk
 
-from companion_v2.adapters.astrbot.provider import AstrBotTextProvider, UsageTariff
+from digital_life_core.adapters.astrbot.provider import AstrBotTextProvider, UsageTariff
 from tests.native_adapter_support import NativeFixture, final_text
 
 

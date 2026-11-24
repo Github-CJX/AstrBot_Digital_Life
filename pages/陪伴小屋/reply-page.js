@@ -8,7 +8,7 @@
    tts, ...}，不带外层 sections。 */
 "use strict";
 window.CompanionReplyPage = (() => {
-  const PREFIX = "/astrbot_plugin_private_companion/";
+  const PREFIX = "/astrbot_plugin_digital_life/";
   const GROUP = "conversation.presentation";
 
   /* 枚举选项：注册表里这些字段是 TEXT，约束在 reply_settings.validate 里。

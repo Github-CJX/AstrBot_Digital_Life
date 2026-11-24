@@ -5,9 +5,9 @@ import json
 from pathlib import Path
 import unittest
 
-from companion_v2.foundation.refs import ScopeKind, ScopeRef, SubjectKind, SubjectRef
-from companion_v2.identity_policy.directory import IdentityDirectory
-from companion_v2.identity_policy.models import (
+from digital_life_core.foundation.refs import ScopeKind, ScopeRef, SubjectKind, SubjectRef
+from digital_life_core.identity_policy.directory import IdentityDirectory
+from digital_life_core.identity_policy.models import (
     AuthenticatedHostPrincipal,
     AuthorizationTier,
     FailureCode,

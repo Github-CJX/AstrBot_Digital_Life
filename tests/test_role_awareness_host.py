@@ -4,7 +4,7 @@ from datetime import timedelta
 import json
 import unittest
 
-from companion_v2.execution.models import TaskContext
+from digital_life_core.execution.models import TaskContext
 from tests.group_host_support import GroupFixture
 from tests.staging_bootstrap_support import wait_for_batch
 

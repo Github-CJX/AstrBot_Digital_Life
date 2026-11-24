@@ -6,11 +6,11 @@ import struct
 import unittest
 from unittest.mock import AsyncMock, patch
 
-from astrbot_host.audio.decoder import inspect_audio, wave_bytes
-from astrbot_host.audio.loader import decode_audio, load_native_audio
-from companion_v2.adapters.astrbot.native import NativeAudioLocator
-from companion_v2.conversation.media.audio.models import MAX_AUDIO_BYTES, CapturedAudio, fits_audio_budget
-from companion_v2.execution.models import TaskError
+from digital_life_host.audio.decoder import inspect_audio, wave_bytes
+from digital_life_host.audio.loader import decode_audio, load_native_audio
+from digital_life_core.adapters.astrbot.native import NativeAudioLocator
+from digital_life_core.conversation.media.audio.models import MAX_AUDIO_BYTES, CapturedAudio, fits_audio_budget
+from digital_life_core.execution.models import TaskError
 from tests.audio_support import audio_bytes, silk_bytes
 
 
@@ -62,7 +62,7 @@ class AudioDecoderTests(unittest.IsolatedAsyncioTestCase):
             CapturedAudio(one, b"changed", b"changed")
 
     async def test_remote_bytes_share_existing_public_dns_and_redirect_checks(self):
-        with patch("astrbot_host.audio.loader.fetch_public_attachment", AsyncMock(return_value=audio_bytes())) as fetch:
+        with patch("digital_life_host.audio.loader.fetch_public_attachment", AsyncMock(return_value=audio_bytes())) as fetch:
             result = await load_native_audio(NativeAudioLocator(1, "https://attachment.example/voice"))
             self.assertEqual(result.descriptor.position, 1)
             fetch.assert_awaited_once()
@@ -72,7 +72,7 @@ class AudioDecoderTests(unittest.IsolatedAsyncioTestCase):
             self.assertEqual(caught.exception.code, "host_audio_location_invalid")
 
     async def test_oversized_base64_does_not_spawn_decoder(self):
-        with patch("astrbot_host.audio.loader.decode_audio", AsyncMock()) as decode:
+        with patch("digital_life_host.audio.loader.decode_audio", AsyncMock()) as decode:
             with self.assertRaises(TaskError):
                 await load_native_audio(NativeAudioLocator(0, "base64://" + "A" * ((MAX_AUDIO_BYTES + 2) // 3 * 4 + 1)))
             decode.assert_not_awaited()
@@ -92,8 +92,8 @@ class AudioDecoderTests(unittest.IsolatedAsyncioTestCase):
                 self.killed, self.returncode = True, -1
         for cancel in (False, True):
             entered, process = asyncio.Event(), HeldProcess()
-            with patch("astrbot_host.audio.loader.asyncio.create_subprocess_exec", AsyncMock(return_value=process)), \
-                    patch("astrbot_host.audio.loader.DECODE_TIMEOUT", 0.03):
+            with patch("digital_life_host.audio.loader.asyncio.create_subprocess_exec", AsyncMock(return_value=process)), \
+                    patch("digital_life_host.audio.loader.DECODE_TIMEOUT", 0.03):
                 task = asyncio.create_task(decode_audio(audio_bytes(), 0))
                 await entered.wait()
                 if cancel:

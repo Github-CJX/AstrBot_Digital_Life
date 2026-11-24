@@ -6,9 +6,9 @@ const path = require("node:path");
 const test = require("node:test");
 const vm = require("node:vm");
 
-const source = fs.readFileSync(path.join(__dirname, "../astrbot_host/native_extensions/game/web/native.js"), "utf8");
-const gomokuSource = fs.readFileSync(path.join(__dirname, "../astrbot_host/native_extensions/game/web/native-gomoku.js"), "utf8");
-const inputSource = fs.readFileSync(path.join(__dirname, "../astrbot_host/native_extensions/game/web/native-gomoku-input.js"), "utf8");
+const source = fs.readFileSync(path.join(__dirname, "../digital_life_host/native_extensions/game/web/native.js"), "utf8");
+const gomokuSource = fs.readFileSync(path.join(__dirname, "../digital_life_host/native_extensions/game/web/native-gomoku.js"), "utf8");
+const inputSource = fs.readFileSync(path.join(__dirname, "../digital_life_host/native_extensions/game/web/native-gomoku-input.js"), "utf8");
 
 class Element {
   constructor(tag = "div") {
@@ -389,7 +389,7 @@ test("井字棋仍显示圈叉，并按棋子标记区分双方", async () => {
 });
 
 test("原生页面 Brand 不再指向无效旧根路径", () => {
-  const html = fs.readFileSync(path.join(__dirname, "../astrbot_host/native_extensions/game/web/native.html"), "utf8");
+  const html = fs.readFileSync(path.join(__dirname, "../digital_life_host/native_extensions/game/web/native.html"), "utf8");
   assert.doesNotMatch(html, /class="game-brand"[^>]*href="\/"/);
   assert.match(html, /<div class="game-brand"[\s>]/);
 });

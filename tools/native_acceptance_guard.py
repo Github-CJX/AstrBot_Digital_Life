@@ -19,7 +19,7 @@ import threading
 from urllib.parse import unquote, urlsplit
 from unittest.mock import patch
 
-LEGACY_IDS = frozenset({"astrbot_plugin_private_companion", "astrbot_plugin_remember_you"})
+LEGACY_IDS = frozenset({"astrbot_plugin_digital_life", "astrbot_plugin_remember_you"})
 LEGACY_ALIASES = LEGACY_IDS | {"privatecompanion", "privatecompanionplugin"}
 LEGACY_FILES = frozenset({"companions.json", "memory_companion.db", "creative_state.json"})
 

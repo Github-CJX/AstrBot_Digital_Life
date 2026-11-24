@@ -9,13 +9,13 @@ import tempfile
 from types import SimpleNamespace
 import unittest
 
-from companion_v2.capabilities.native import parse_manifest, parse_result
-from companion_v2.execution.models import SideEffect
-from astrbot_host.native_extensions import together_execution_binding
-from companion_v2.conversation.voice_reply import VoiceReplyPolicy
-from companion_v2.product import PRODUCT_VERSION
-from companion_v2.reality import provider as REALITY
-from companion_v2.together import provider as TOGETHER
+from digital_life_core.capabilities.native import parse_manifest, parse_result
+from digital_life_core.execution.models import SideEffect
+from digital_life_host.native_extensions import together_execution_binding
+from digital_life_core.conversation.voice_reply import VoiceReplyPolicy
+from digital_life_core.product import PRODUCT_VERSION
+from digital_life_core.reality import provider as REALITY
+from digital_life_core.together import provider as TOGETHER
 from tests.native_internal_support import internal_registry
 
 

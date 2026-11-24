@@ -15,11 +15,11 @@ from tests.test_astrbot_staging_host import WebContext, host_config
 from tests.native_adapter_support import FakeEvent, FakeProvider, FakeReverseApi
 from tests.test_management_access import NOW
 from tests.group_host_support import GroupFixture
-from astrbot_host.account_session_api import AccountSessionWebAPI
-from astrbot_host.controller import AstrBotStagingController
-from astrbot_host import native as native_host
-from companion_v2.adapters.astrbot.staging import NativeAdapterTypes
-from companion_v2.execution.models import TaskError
+from digital_life_host.account_session_api import AccountSessionWebAPI
+from digital_life_host.controller import AstrBotStagingController
+from digital_life_host import native as native_host
+from digital_life_core.adapters.astrbot.staging import NativeAdapterTypes
+from digital_life_core.execution.models import TaskError
 
 
 class SessionTopologyTests(unittest.IsolatedAsyncioTestCase):
@@ -66,8 +66,8 @@ class SessionTopologyTests(unittest.IsolatedAsyncioTestCase):
                                         personas={"original": {}, "second": {}},
                                         personas_v3=[{"name": "original"}, {"name": "second"}])
         self.addCleanup(patch.stopall)
-        patch("astrbot_host.native.sp.get_async", preferences_get).start()
-        patch("astrbot_host.account_session_api.sp.put_async", preferences_put).start()
+        patch("digital_life_host.native.sp.get_async", preferences_get).start()
+        patch("digital_life_host.account_session_api.sp.put_async", preferences_put).start()
 
     async def asyncTearDown(self):
         await self.controller.terminate()
@@ -75,8 +75,8 @@ class SessionTopologyTests(unittest.IsolatedAsyncioTestCase):
 
     async def call(self, method, body=None, username="admin"):
         request = NS(username=username, query={}, body=AsyncMock(return_value=json.dumps(body or {}).encode("utf-8")))
-        with patch("astrbot_host.account_session_api.request", request), patch("astrbot_host.setup_api.request", request), \
-                patch("astrbot_host.setup_api.display_names", return_value=NS(targets=AsyncMock(side_effect=lambda rows: rows))):
+        with patch("digital_life_host.account_session_api.request", request), patch("digital_life_host.setup_api.request", request), \
+                patch("digital_life_host.setup_api.display_names", return_value=NS(targets=AsyncMock(side_effect=lambda rows: rows))):
             return await getattr(self.api, method)()
 
     def group_event(self, *, unique=False):
@@ -114,7 +114,7 @@ class SessionTopologyTests(unittest.IsolatedAsyncioTestCase):
             await asyncio.Event().wait()
 
         with patch.object(self.native.conversation_manager.db, "get_session_conversations", blocked), \
-                patch("companion_v2.adapters.astrbot.native.NATIVE_LOOKUP_TIMEOUT_SECONDS", 0.01):
+                patch("digital_life_core.adapters.astrbot.native.NATIVE_LOOKUP_TIMEOUT_SECONDS", 0.01):
             response = await self.call("get")
         self.assertEqual(response["status"], "ok", response)
         discovered = response["data"]["discovered"]
@@ -133,7 +133,7 @@ class SessionTopologyTests(unittest.IsolatedAsyncioTestCase):
             return {}
 
         with patch.object(self.controller.session_topology, "services", services), \
-                patch("companion_v2.adapters.astrbot.native.NATIVE_LOOKUP_TIMEOUT_SECONDS", 0.01):
+                patch("digital_life_core.adapters.astrbot.native.NATIVE_LOOKUP_TIMEOUT_SECONDS", 0.01):
             report = await self.controller.session_topology.inventory_report()
         self.assertFalse(report["complete"])
         self.assertIn("host_native_lookup_timeout__session_settings", {item["code"] for item in report["issues"]})
@@ -166,7 +166,7 @@ class SessionTopologyTests(unittest.IsolatedAsyncioTestCase):
         stored = json.loads(self.controller.session_topology.path.read_text(encoding="utf-8"))
         self.assertEqual(len(stored), 1)
         self.assertNotIn("message", json.dumps(stored))
-        from astrbot_host.session_topology import SessionTopology
+        from digital_life_host.session_topology import SessionTopology
         self.controller.session_topology = SessionTopology(self.controller)
         rows = await self.controller.session_topology.inventory()
         row = next(row for row in rows if row.get("unified_msg_origin") == event.unified_msg_origin)
@@ -176,7 +176,7 @@ class SessionTopologyTests(unittest.IsolatedAsyncioTestCase):
         self.assertFalse(any(row.get("unified_msg_origin") == event.unified_msg_origin for row in rows))
 
     async def test_group_name_upgrade_replaces_id_and_survives_missing_metadata_and_reload(self):
-        from astrbot_host.session_topology import SessionTopology
+        from digital_life_host.session_topology import SessionTopology
         event = self.group_event()
         event.message_obj.sender.nickname = "发言人的名字"
         event.message_obj.group = NS(group_name="300")
@@ -210,7 +210,7 @@ class SessionTopologyTests(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(row["display_name"], "改名后的群")
 
     async def test_observed_group_names_are_account_scoped_even_when_native_reads_fail(self):
-        from astrbot_host.session_topology import SessionTopology
+        from digital_life_host.session_topology import SessionTopology
         self.native.platform.client._wsr_api_clients["101"] = object()
         umo = "qq-main:GroupMessage:300"
         observed = {umo: [dict(unified_msg_origin=umo, account_id=account,
@@ -227,7 +227,7 @@ class SessionTopologyTests(unittest.IsolatedAsyncioTestCase):
         self.assertEqual({row["account_id"]: row["display_name"] for row in rows}, names)
 
     async def test_stored_group_names_keep_platform_account_and_latest_valid_name(self):
-        from astrbot_host.session_topology import SessionTopology
+        from digital_life_host.session_topology import SessionTopology
         topology = self.controller.session_topology
         rows = [
             ("qq-main:GroupMessage:300", "100", "旧群名", "2026-01-01"),
@@ -308,7 +308,7 @@ class SessionTopologyTests(unittest.IsolatedAsyncioTestCase):
             await asyncio.Event().wait()
 
         with patch.object(self.native.conversation_manager, "get_curr_conversation_id", blocked), \
-                patch("companion_v2.adapters.astrbot.native.NATIVE_LOOKUP_TIMEOUT_SECONDS", 0.01):
+                patch("digital_life_core.adapters.astrbot.native.NATIVE_LOOKUP_TIMEOUT_SECONDS", 0.01):
             pending = topology.schedule_observe(self.group_event())
             await asyncio.wait_for(topology.close(), 2)
 
@@ -392,8 +392,8 @@ class SharedTopologyBindingTests(GroupFixture, unittest.IsolatedAsyncioTestCase)
 
     async def call(self, body):
         request = NS(username="admin", query={}, body=AsyncMock(return_value=json.dumps(body).encode("utf-8")))
-        with patch("astrbot_host.account_session_api.request", request), patch("astrbot_host.setup_api.request", request), \
-                patch("astrbot_host.setup_api.display_names", return_value=NS(targets=AsyncMock(side_effect=lambda rows: rows))):
+        with patch("digital_life_host.account_session_api.request", request), patch("digital_life_host.setup_api.request", request), \
+                patch("digital_life_host.setup_api.display_names", return_value=NS(targets=AsyncMock(side_effect=lambda rows: rows))):
             return await self.api.save()
 
     async def test_native_private_and_group_personas_share_their_mapped_role(self):
@@ -542,7 +542,7 @@ class SharedTopologyBindingTests(GroupFixture, unittest.IsolatedAsyncioTestCase)
         self.assertEqual(snapshot["selection_source"], "configured")
 
     def test_accounts_keep_registered_bot_ids_without_any_window(self):
-        from companion_v2.adapters.astrbot.native import HostAccount
+        from digital_life_core.adapters.astrbot.native import HostAccount
 
         self.native.platforms["qq-main"].client._wsr_api_clients = {"100": object()}
         self.native.platforms["qq-second"].client._wsr_api_clients = {"101": object()}
@@ -660,7 +660,7 @@ class SharedTopologyBindingTests(GroupFixture, unittest.IsolatedAsyncioTestCase)
         self.assertEqual(settings_targets[1][1], "*")
         self.assertTrue(all(row["bot_id"] == "bot-a" for row in saved["personas"]))
         native_host.remember_session_settings(unmapped.unified_msg_origin, {"persona_id": "second"})
-        with patch("astrbot_host.native.sp.get_async", AsyncMock(return_value={})):
+        with patch("digital_life_host.native.sp.get_async", AsyncMock(return_value={})):
             rows = [row for row in await self.controller.session_topology.inventory() if row["native"]]
         self.assertTrue(next(row for row in rows if row["unified_msg_origin"] == private.unified_msg_origin)["managed"])
         self.assertTrue(next(row for row in rows if row["unified_msg_origin"] == group.unified_msg_origin)["managed"])
@@ -709,7 +709,7 @@ class SharedTopologyBindingTests(GroupFixture, unittest.IsolatedAsyncioTestCase)
         self.assertEqual(self.native.provider.client.state.calls, [])
 
     async def test_saved_mapping_receipt_does_not_fail_when_the_following_directory_read_fails(self):
-        from companion_v2.execution.models import TaskError
+        from digital_life_core.execution.models import TaskError
         original = self.controller.config["multi_host"]
         discovered = {"accounts": self.controller.session_topology.accounts(),
                       "personas": original["personas"], "targets": []}
@@ -790,7 +790,7 @@ class SharedTopologyBindingTests(GroupFixture, unittest.IsolatedAsyncioTestCase)
         native group: the account page then rejected that group with
         ``account_group_target_unavailable`` even though AstrBot had the session.
         """
-        from astrbot_host.setup_api import SetupWebAPI
+        from digital_life_host.setup_api import SetupWebAPI
         from tests.multi_host_support import multi_config
 
         # The post-upgrade shape: one migrated private target, no group target.
@@ -813,8 +813,8 @@ class SharedTopologyBindingTests(GroupFixture, unittest.IsolatedAsyncioTestCase)
         request = NS(username="admin", query={})
         with patch.object(self.controller.session_topology, "services",
                           AsyncMock(return_value={})), \
-                patch("astrbot_host.setup_api.request", request), \
-                patch("astrbot_host.setup_api.display_names",
+                patch("digital_life_host.setup_api.request", request), \
+                patch("digital_life_host.setup_api.display_names",
                       return_value=NS(targets=AsyncMock(side_effect=lambda rows: rows))):
             response = await api.api_targets()
 
@@ -832,7 +832,7 @@ class SharedTopologyBindingTests(GroupFixture, unittest.IsolatedAsyncioTestCase)
 
         with patch.object(self.native.conversation_manager, "db",
                           NS(get_session_conversations=blocked), create=True), \
-                patch("companion_v2.adapters.astrbot.native.NATIVE_LOOKUP_TIMEOUT_SECONDS", 0.01):
+                patch("digital_life_core.adapters.astrbot.native.NATIVE_LOOKUP_TIMEOUT_SECONDS", 0.01):
             report = await self.controller.session_topology.inventory_report()
 
         groups = [row for row in report["targets"] if row.get("scope_kind") == "group"]
@@ -853,7 +853,7 @@ class SharedTopologyBindingTests(GroupFixture, unittest.IsolatedAsyncioTestCase)
         self.assertEqual(self.controller.config, before)
 
     async def test_failed_save_rolls_back_the_manifest_and_releases_a_runtime_opened_for_editing(self):
-        from astrbot_host.multi_authority import MANIFEST
+        from digital_life_host.multi_authority import MANIFEST
         (await self.controller.initialize_profile()).unwrap()
         original = deepcopy(self.controller.config)
         manifest = self.controller.authority.read(MANIFEST)

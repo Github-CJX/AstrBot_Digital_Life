@@ -7,15 +7,15 @@ from types import SimpleNamespace as NS
 import unittest
 from unittest.mock import patch
 
-from astrbot_host.multi_settings import MultiHostSettings
-from companion_v2.adapters.astrbot.provider import UsageTariff
-from companion_v2.conversation.foreground import PromptMaterial, SealedForegroundContext
-from companion_v2.execution.models import TaskError, TaskResult
-from companion_v2.model_gateway.failures import ModelFailure
-from companion_v2.model_gateway.models import Amount, CapturedModelOutput, ProviderResponse, ToolCall, ToolExchange, ToolSpec
-from companion_v2.model_gateway.replacement_rules import checked_rules, match_route
-from companion_v2.model_gateway.routing import ModelRouter
-from companion_v2.model_gateway.service import LocalModelGateway
+from digital_life_host.multi_settings import MultiHostSettings
+from digital_life_core.adapters.astrbot.provider import UsageTariff
+from digital_life_core.conversation.foreground import PromptMaterial, SealedForegroundContext
+from digital_life_core.execution.models import TaskError, TaskResult
+from digital_life_core.model_gateway.failures import ModelFailure
+from digital_life_core.model_gateway.models import Amount, CapturedModelOutput, ProviderResponse, ToolCall, ToolExchange, ToolSpec
+from digital_life_core.model_gateway.replacement_rules import checked_rules, match_route
+from digital_life_core.model_gateway.routing import ModelRouter
+from digital_life_core.model_gateway.service import LocalModelGateway
 from tests.multi_host_support import MultiFixture, multi_config
 from tests.native_adapter_support import FakeProvider, NativeFixture, completion
 from tests.test_model_gateway import ModelFixture

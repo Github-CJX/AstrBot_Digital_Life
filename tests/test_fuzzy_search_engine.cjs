@@ -268,7 +268,7 @@ function createAllFeaturesHarness(extraSections = {}) {
       },
       CompanionProduct: {
         scopeKey: () => "role-1",
-        role: () => ({ config_api: "/astrbot_plugin_private_companion/host/r1/config" }),
+        role: () => ({ config_api: "/astrbot_plugin_digital_life/host/r1/config" }),
         target: () => ({ scope_kind: "private" }),
         request: async () => ({ sections: {} }),
       },
@@ -278,7 +278,7 @@ function createAllFeaturesHarness(extraSections = {}) {
       querySelectorAll: () => [],
     },
     product: {
-      role: () => ({ config_api: "/astrbot_plugin_private_companion/host/r1/config" }),
+      role: () => ({ config_api: "/astrbot_plugin_digital_life/host/r1/config" }),
       target: () => ({ scope_kind: "private" }),
     },
     manageTab: "all",
@@ -693,14 +693,14 @@ test("Setup guide keeps 陪伴通用模型 editable after initialization and sav
     addEventListener() {},
     removeEventListener() {},
     CompanionProduct: {
-      role: () => ({ model_api: "/astrbot_plugin_private_companion/host/r1/models" }),
+      role: () => ({ model_api: "/astrbot_plugin_digital_life/host/r1/models" }),
       targets: () => [],
       accounts: () => [],
       personas: () => [],
       scopeKey: () => "r1",
       hosted: () => true,
       unwrap: response => response,
-      relative: address => address.replace(/^\/astrbot_plugin_private_companion\//, ""),
+      relative: address => address.replace(/^\/astrbot_plugin_digital_life\//, ""),
       refreshDirectory: async () => {},
       request: async (method, endpoint, body) => {
         apiCalls.push({ method, endpoint, body });

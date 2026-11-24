@@ -3,12 +3,12 @@ from contextlib import contextmanager
 import sqlite3
 from unittest.mock import patch
 
-from companion_v2.execution.models import require, stamp
-from companion_v2.foundation.outcome import Outcome
-from companion_v2.memory.service import MemoryService
-from companion_v2.memory.subscriptions import MemorySubscriptions
-from companion_v2.memory.stream_consumer import MemoryReferenceConsumer
-from companion_v2.memory.stream_store import LIMITS
+from digital_life_core.execution.models import require, stamp
+from digital_life_core.foundation.outcome import Outcome
+from digital_life_core.memory.service import MemoryService
+from digital_life_core.memory.subscriptions import MemorySubscriptions
+from digital_life_core.memory.stream_consumer import MemoryReferenceConsumer
+from digital_life_core.memory.stream_store import LIMITS
 from tests.memory_support import MemoryFixture
 from tests.test_memory_wire import runtime_scope
 
@@ -36,7 +36,7 @@ class StreamFixture(MemoryFixture):
     def setUp(self):
         super().setUp()
         self.service = MemoryService(self.tasks)
-        self.streams = MemorySubscriptions(self.service, provider_id="companion_v2.memory", provider_generation="stream-1",
+        self.streams = MemorySubscriptions(self.service, provider_id="digital_life_core.memory", provider_generation="stream-1",
             scope_for_context=runtime_scope, require_running=lambda: require(self.tasks.check_generation()))
         self.consumer = MemoryReferenceConsumer(self.streams)
 

@@ -5,14 +5,14 @@ from datetime import timedelta
 import json
 import unittest
 
-from companion_v2.conversation.native_observations import ASSISTANT_OWNER, INPUT_OWNER
-from companion_v2.conversation.native_history import dialogue
-from companion_v2.conversation.recalls import MessageRecall
-from companion_v2.execution.models import require, stamp
-from companion_v2.foundation.refs import RoleOwnerRef
-from companion_v2.memory.episodes import recent_dialogue_lines
-from companion_v2.memory.models import Proposal
-from companion_v2.role_work.journal.models import JournalContext, JournalKey, JournalKind
+from digital_life_core.conversation.native_observations import ASSISTANT_OWNER, INPUT_OWNER
+from digital_life_core.conversation.native_history import dialogue
+from digital_life_core.conversation.recalls import MessageRecall
+from digital_life_core.execution.models import require, stamp
+from digital_life_core.foundation.refs import RoleOwnerRef
+from digital_life_core.memory.episodes import recent_dialogue_lines
+from digital_life_core.memory.models import Proposal
+from digital_life_core.role_work.journal.models import JournalContext, JournalKey, JournalKind
 from tests.multi_host_support import MultiFixture
 
 

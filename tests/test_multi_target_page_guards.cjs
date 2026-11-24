@@ -19,7 +19,7 @@ const fs = require("node:fs");
 const path = require("node:path");
 
 const ROOT = path.join(__dirname, "..");
-const HOST = path.join(ROOT, "astrbot_host");
+const HOST = path.join(ROOT, "digital_life_host");
 const PAGE = path.join(ROOT, "pages", "陪伴小屋");
 
 const read = file => fs.readFileSync(file, "utf8");

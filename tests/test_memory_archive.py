@@ -12,13 +12,13 @@ from types import SimpleNamespace
 import unittest
 from unittest.mock import Mock
 
-from companion_v2.execution.models import TaskContext, TaskError
-from companion_v2.foundation.refs import AudienceRef
-from companion_v2.foundation.outcome import Outcome
+from digital_life_core.execution.models import TaskContext, TaskError
+from digital_life_core.foundation.refs import AudienceRef
+from digital_life_core.foundation.outcome import Outcome
 from tests.test_management_access import SCOPE, ManagementFixture
-from companion_v2.memory.archive import (BUNDLE_FORMAT, DEFAULT_IDLE_DAYS, MAX_BUNDLE_ATOMS,
+from digital_life_core.memory.archive import (BUNDLE_FORMAT, DEFAULT_IDLE_DAYS, MAX_BUNDLE_ATOMS,
     ArchiveDecision, MemoryArchive, _idle_days)
-from companion_v2.memory.service import MemoryService
+from digital_life_core.memory.service import MemoryService
 from tests.memory_support import MemoryFixture
 
 

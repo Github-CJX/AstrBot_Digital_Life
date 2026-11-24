@@ -11,7 +11,7 @@ from astrbot.core.message.components import At, Image, Plain, Record, Reply
 from astrbot.core.message.message_event_result import MessageChain
 from astrbot.core.platform.sources.aiocqhttp.aiocqhttp_message_event import AiocqhttpMessageEvent
 
-from astrbot_host.core_reply_media_delivery import native_reply_messages
+from digital_life_host.core_reply_media_delivery import native_reply_messages
 
 
 class _Event:
@@ -132,11 +132,11 @@ class NativeReplyMessagesTests(unittest.TestCase):
 class QqVoiceTextSendPacingTests(unittest.IsolatedAsyncioTestCase):
     @staticmethod
     def _make_event(platform="aiocqhttp"):
-        from astrbot_host.core_reply import (
+        from digital_life_host.core_reply import (
             activate_core_reply_delivery_guard,
             prepare_core_reply_event,
         )
-        from companion_v2.foundation.outcome import Outcome
+        from digital_life_core.foundation.outcome import Outcome
 
         sent = []
 
@@ -168,7 +168,7 @@ class QqVoiceTextSendPacingTests(unittest.IsolatedAsyncioTestCase):
 
     async def test_qq_split_record_and_plain_inserts_brief_inter_part_pace(self):
         from unittest.mock import AsyncMock, patch
-        from astrbot_host.core_reply import QQ_RECORD_PART_PACE_SECONDS
+        from digital_life_host.core_reply import QQ_RECORD_PART_PACE_SECONDS
 
         self.assertGreaterEqual(QQ_RECORD_PART_PACE_SECONDS, 0.6)
         self.assertLessEqual(QQ_RECORD_PART_PACE_SECONDS, 1.0)
@@ -177,8 +177,8 @@ class QqVoiceTextSendPacingTests(unittest.IsolatedAsyncioTestCase):
         chain = MessageChain(chain=[Record(file=silent_wav(), text="你好"), Plain("你好")])
         now = [100.0]
 
-        with patch("astrbot_host.core_reply.time.monotonic", side_effect=lambda: now[0]), \
-                patch("astrbot_host.core_reply.asyncio.sleep", new=AsyncMock()) as sleep_mock:
+        with patch("digital_life_host.core_reply.time.monotonic", side_effect=lambda: now[0]), \
+                patch("digital_life_host.core_reply.asyncio.sleep", new=AsyncMock()) as sleep_mock:
             await event.send(chain)
 
         self.assertEqual(len(sent), 2)
@@ -187,7 +187,7 @@ class QqVoiceTextSendPacingTests(unittest.IsolatedAsyncioTestCase):
 
     async def test_qq_separate_event_send_calls_pace_record_to_plain_and_skip_plain_to_plain(self):
         from unittest.mock import AsyncMock, patch
-        from astrbot_host.core_reply import QQ_RECORD_PART_PACE_SECONDS
+        from digital_life_host.core_reply import QQ_RECORD_PART_PACE_SECONDS
 
         # Two separate event.send() calls (AstrBot RespondStage path: [Record] then [Plain]).
         event, sent = self._make_event("aiocqhttp")
@@ -198,8 +198,8 @@ class QqVoiceTextSendPacingTests(unittest.IsolatedAsyncioTestCase):
             sleeps.append(seconds)
             now[0] += seconds
 
-        with patch("astrbot_host.core_reply.time.monotonic", side_effect=lambda: now[0]), \
-                patch("astrbot_host.core_reply.asyncio.sleep", side_effect=fake_sleep):
+        with patch("digital_life_host.core_reply.time.monotonic", side_effect=lambda: now[0]), \
+                patch("digital_life_host.core_reply.asyncio.sleep", side_effect=fake_sleep):
             await event.send(MessageChain(chain=[Record(file=silent_wav(), text="第一句")]))
             # 0.25s elapsed before second send -> only remaining pace is awaited.
             now[0] += 0.25
@@ -219,7 +219,7 @@ class QqVoiceTextSendPacingTests(unittest.IsolatedAsyncioTestCase):
 
         # Pure Plain -> Plain on QQ never sleeps.
         event_plain, sent_plain = self._make_event("aiocqhttp")
-        with patch("astrbot_host.core_reply.asyncio.sleep", new=AsyncMock()) as sleep_mock:
+        with patch("digital_life_host.core_reply.asyncio.sleep", new=AsyncMock()) as sleep_mock:
             await event_plain.send(MessageChain(chain=[Plain("纯文字一")]))
             await event_plain.send(MessageChain(chain=[Plain("纯文字二")]))
         self.assertEqual(len(sent_plain), 2)
@@ -227,7 +227,7 @@ class QqVoiceTextSendPacingTests(unittest.IsolatedAsyncioTestCase):
 
         # Non-QQ platform never sleeps across Record -> Plain.
         event_tg, sent_tg = self._make_event("telegram")
-        with patch("astrbot_host.core_reply.asyncio.sleep", new=AsyncMock()) as sleep_mock:
+        with patch("digital_life_host.core_reply.asyncio.sleep", new=AsyncMock()) as sleep_mock:
             await event_tg.send(MessageChain(chain=[Record(file=silent_wav(), text="hi")]))
             await event_tg.send(MessageChain(chain=[Plain("hi")]))
         self.assertEqual(len(sent_tg), 2)

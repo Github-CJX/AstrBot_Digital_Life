@@ -8,18 +8,18 @@ from pathlib import Path
 from tempfile import TemporaryDirectory
 from types import SimpleNamespace as NS
 
-from companion_v2.adapters.astrbot.native import HostPersona, persona_instruction
-from companion_v2.adapters.astrbot.provider import UsageTariff, provider_fingerprint
-from companion_v2.adapters.astrbot.staging import NativeAdapterTypes
-from companion_v2.adapters.astrbot.staging_bootstrap import AstrBotStagingBootstrap
-from companion_v2.adapters.astrbot.staging_config import REQUIRED_CAPABILITIES, StagingConfiguration
-from companion_v2.conversation.flow import ConversationPolicy
-from companion_v2.execution.models import digest
-from companion_v2.foundation.clock import DeterministicClock
-from companion_v2.foundation.refs import ScopeKind, ScopeRef, SubjectKind, SubjectRef
-from companion_v2.model_gateway.models import Amount, BudgetPolicy
-from companion_v2.storage.runtime import StorageRuntime
-from companion_v2.storage.schema import REQUIRED_TABLES
+from digital_life_core.adapters.astrbot.native import HostPersona, persona_instruction
+from digital_life_core.adapters.astrbot.provider import UsageTariff, provider_fingerprint
+from digital_life_core.adapters.astrbot.staging import NativeAdapterTypes
+from digital_life_core.adapters.astrbot.staging_bootstrap import AstrBotStagingBootstrap
+from digital_life_core.adapters.astrbot.staging_config import REQUIRED_CAPABILITIES, StagingConfiguration
+from digital_life_core.conversation.flow import ConversationPolicy
+from digital_life_core.execution.models import digest
+from digital_life_core.foundation.clock import DeterministicClock
+from digital_life_core.foundation.refs import ScopeKind, ScopeRef, SubjectKind, SubjectRef
+from digital_life_core.model_gateway.models import Amount, BudgetPolicy
+from digital_life_core.storage.runtime import StorageRuntime
+from digital_life_core.storage.schema import REQUIRED_TABLES
 from tests.native_adapter_support import FakeEvent, FakeHostContext, FakeProvider, FakeReverseApi
 from tests.test_management_access import INSTALLATION, NOW, ROLE
 

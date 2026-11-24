@@ -20,19 +20,19 @@ if _previous_astrbot_root is None:
     _astrbot_import_root = TemporaryDirectory(prefix="companion-v2-host-import-")
     os.environ["ASTRBOT_ROOT"] = _astrbot_import_root.name
 
-from astrbot_host.controller import AstrBotStagingController
-from astrbot_host.management_identity import dashboard_operator
-from astrbot_host.host_options_api import HostOptionsWebAPI
-from astrbot_host.native_extensions.builtins import BundledNativeLease
-from astrbot_host.native_extensions.screen_provider import NativeScreenProvider, PLUGIN_ID as SCREEN_PACKAGE_ID
-from astrbot_host.web_api import API_PREFIX
-from companion_v2.adapters.astrbot.staging import NativeAdapterTypes
-from companion_v2.capabilities import CapabilityAuthorizationState, CapabilityRepository
-from companion_v2.capabilities.models import FurnitureDescriptor
-from companion_v2.conversation.generation import MODEL_FAILURE_NOTICE
-from companion_v2.execution.models import TaskError
-from companion_v2.capabilities.screen_access import ScreenAccess
-from companion_v2.screen import SCREEN_EXTENSION, SCREEN_PROCESS, SCREEN_READ
+from digital_life_host.controller import AstrBotStagingController
+from digital_life_host.management_identity import dashboard_operator
+from digital_life_host.host_options_api import HostOptionsWebAPI
+from digital_life_host.native_extensions.builtins import BundledNativeLease
+from digital_life_host.native_extensions.screen_provider import NativeScreenProvider, PLUGIN_ID as SCREEN_PACKAGE_ID
+from digital_life_host.web_api import API_PREFIX
+from digital_life_core.adapters.astrbot.staging import NativeAdapterTypes
+from digital_life_core.capabilities import CapabilityAuthorizationState, CapabilityRepository
+from digital_life_core.capabilities.models import FurnitureDescriptor
+from digital_life_core.conversation.generation import MODEL_FAILURE_NOTICE
+from digital_life_core.execution.models import TaskError
+from digital_life_core.capabilities.screen_access import ScreenAccess
+from digital_life_core.screen import SCREEN_EXTENSION, SCREEN_PROCESS, SCREEN_READ
 from tests.native_adapter_support import completion, FakeEvent, FakeHostContext, FakeProvider, FakeReverseApi
 from tests.staging_bootstrap_support import database_contents, wait_for_batch
 from tests.test_management_access import NOW
@@ -120,21 +120,21 @@ class AstrBotStagingHostTests(unittest.IsolatedAsyncioTestCase):
         self.controller.register_routes()
         routes = {route for route, _, _, _ in self.native.registered_web_apis}
         self.assertTrue({
-            "/astrbot_plugin_private_companion/host-options",
-            "/astrbot_plugin_private_companion/host-options/voice",
-            "/astrbot_plugin_private_companion/host-options/poke",
-            "/astrbot_plugin_private_companion/host-options/forward_intake",
-            "/astrbot_plugin_private_companion/host-options/balance",
-            "/astrbot_plugin_private_companion/storage",
-            "/astrbot_plugin_private_companion/logs",
+            "/astrbot_plugin_digital_life/host-options",
+            "/astrbot_plugin_digital_life/host-options/voice",
+            "/astrbot_plugin_digital_life/host-options/poke",
+            "/astrbot_plugin_digital_life/host-options/forward_intake",
+            "/astrbot_plugin_digital_life/host-options/balance",
+            "/astrbot_plugin_digital_life/storage",
+            "/astrbot_plugin_digital_life/logs",
         }.issubset(routes))
         storage_methods = {tuple(methods) for route, _, methods, _ in self.native.registered_web_apis
-                           if route == "/astrbot_plugin_private_companion/storage"}
+                           if route == "/astrbot_plugin_digital_life/storage"}
         self.assertEqual(storage_methods, {("GET",), ("POST",)})
         self.controller.unregister_routes()
-        self.assertFalse(any(route.startswith("/astrbot_plugin_private_companion/host-options")
+        self.assertFalse(any(route.startswith("/astrbot_plugin_digital_life/host-options")
                              for route, _, _, _ in self.native.registered_web_apis))
-        self.assertFalse(any(route == "/astrbot_plugin_private_companion/storage"
+        self.assertFalse(any(route == "/astrbot_plugin_digital_life/storage"
                              for route, _, _, _ in self.native.registered_web_apis))
 
     async def asyncTearDown(self):
@@ -152,14 +152,14 @@ class AstrBotStagingHostTests(unittest.IsolatedAsyncioTestCase):
         provider = NativeScreenProvider(self.root / "screen-native", version=version,
             capture=lambda: b"unused", now=lambda: NOW)
         # Exercise the bundled provider with an explicit synthetic release version.
-        with patch("astrbot_host.native_extensions.builtins.PRODUCT_VERSION", version):
+        with patch("digital_life_host.native_extensions.builtins.PRODUCT_VERSION", version):
             lease = BundledNativeLease(SCREEN_PACKAGE_ID, provider,
                 furniture=FurnitureDescriptor("screen", SCREEN_EXTENSION, "屏幕台", "screen"))
         self.addCleanup(lease.close)
         previous_patch = getattr(self, "_screen_fixture_patch", None)
         if previous_patch is not None:
             previous_patch.stop()
-        self._screen_fixture_patch = patch("astrbot_host.controller.create_bundled_extensions",
+        self._screen_fixture_patch = patch("digital_life_host.controller.create_bundled_extensions",
             return_value=((lease,), ()))
         self._screen_fixture_patch.start()
         self.addCleanup(self._screen_fixture_patch.stop)
@@ -170,7 +170,7 @@ class AstrBotStagingHostTests(unittest.IsolatedAsyncioTestCase):
         self.controller.register_routes()
         handler = next(handler for route, handler, _, _ in self.native.registered_web_apis
                        if route == API_PREFIX + "/prepare-screen")
-        with patch("astrbot_host.web_api.request", NS(username="admin", query={})):
+        with patch("digital_life_host.web_api.request", NS(username="admin", query={})):
             self.assertEqual((await handler())["data"]["code"], "staging_not_initialized")
             (await self.controller.initialize_profile()).unwrap()
             first = await handler()
@@ -267,7 +267,7 @@ class AstrBotStagingHostTests(unittest.IsolatedAsyncioTestCase):
                 "previous_hash": previous.artifact_hash,
                 "expected_revision": previous.revision}).encode("utf-8")
 
-        with patch("astrbot_host.web_api.request", NS(username="admin", query={}, body=body)):
+        with patch("digital_life_host.web_api.request", NS(username="admin", query={}, body=body)):
             response = await handler()
         self.assertEqual(response["status"], "ok", response)
         upgraded = response["data"]
@@ -360,11 +360,11 @@ class AstrBotStagingHostTests(unittest.IsolatedAsyncioTestCase):
         self.controller.register_routes()
         routes = {route.removeprefix(API_PREFIX): handler
                   for route, handler, _, _ in self.native.registered_web_apis}
-        with patch("astrbot_host.web_api.request", NS(username="admin", query={})), \
-             patch("astrbot_host.web_api.display_names",
+        with patch("digital_life_host.web_api.request", NS(username="admin", query={})), \
+             patch("digital_life_host.web_api.display_names",
                    return_value=NS(targets=AsyncMock(side_effect=lambda rows: rows))):
             self.assertFalse((await routes["/status"]())["data"]["accepting"])
-        with patch("astrbot_host.web_api.request", NS(username="admin", query={})):
+        with patch("digital_life_host.web_api.request", NS(username="admin", query={})):
             self.assertEqual((await routes["/probe"]())["status"], "ok")
             for route in ("/authorize-delivery", "/revoke-delivery"):
                 response = await routes[route]()
@@ -373,14 +373,14 @@ class AstrBotStagingHostTests(unittest.IsolatedAsyncioTestCase):
             self.assertEqual((await routes["/start"]())["status"], "ok")
         batch = (await self.controller.receive_claimed(FakeEvent(self.native))).unwrap()
         await wait_for_batch(self.controller.session, batch)
-        with patch("astrbot_host.web_api.request", NS(username="admin", query={"batch_id": batch})):
+        with patch("digital_life_host.web_api.request", NS(username="admin", query={"batch_id": batch})):
             preview = await routes["/preview"]()
             report = await routes["/inspect"]()
         self.assertEqual(preview["status"], "error")
         self.assertEqual(preview["data"]["code"], "staging_preview_disabled")
         self.assertTrue(report["data"]["confirmed_delivery"])
         self.assertEqual(report["data"]["delivery_receipts"][0]["state"], "delivered")
-        with patch("astrbot_host.web_api.request", NS(username="admin", query={})):
+        with patch("digital_life_host.web_api.request", NS(username="admin", query={})):
             stopped = await routes["/stop"]()
         self.assertEqual(stopped["data"]["state"], "stopped")
         self.assertEqual(stopped["data"]["pending_handles"], [])
@@ -459,7 +459,7 @@ class AstrBotStagingHostTests(unittest.IsolatedAsyncioTestCase):
         await wait_for_batch(self.controller.session, batch)
         handler = next(handler for route, handler, _, _ in self.native.registered_web_apis
                        if route == API_PREFIX + "/inspect")
-        with patch("astrbot_host.web_api.request", NS(username="admin", query={"batch_id": batch})):
+        with patch("digital_life_host.web_api.request", NS(username="admin", query={"batch_id": batch})):
             response = await handler()
         self.assertEqual(response["status"], "ok")
         call = response["data"]["model"]["calls"][0]
@@ -599,7 +599,7 @@ class AstrBotStagingHostTests(unittest.IsolatedAsyncioTestCase):
         new_handlers = {route: id(handler) for route, handler, _, _ in self.native.registered_web_apis}
         self.assertEqual(set(old_handlers), set(new_handlers))
         self.assertTrue(all(old_handlers[route] != new_handlers[route] for route in old_handlers))
-        self.assertTrue(all(route.startswith("/astrbot_plugin_private_companion/") for route in new_handlers))
+        self.assertTrue(all(route.startswith("/astrbot_plugin_digital_life/") for route in new_handlers))
 
         old.unregister_routes()
         self.assertEqual(

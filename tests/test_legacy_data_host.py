@@ -14,16 +14,16 @@ from types import SimpleNamespace
 import unittest
 from unittest.mock import patch
 
-from astrbot_host.legacy_api import LegacyMigrationWebAPI
-from astrbot_host.multi_controller import AstrBotMultiController
-from companion_v2.adapters.astrbot.staging import NativeAdapterTypes
-from companion_v2.execution.models import TaskError
-from companion_v2.foundation.clock import DeterministicClock
-from companion_v2.foundation.refs import RoleOwnerRef
-from companion_v2.legacy.archive import verify_v1_archive
-from companion_v2.legacy.data_migration import build_data_plan
-from companion_v2.legacy.migration import LegacyMigration
-from companion_v2.role_work.journal import JournalKey, JournalKind
+from digital_life_host.legacy_api import LegacyMigrationWebAPI
+from digital_life_host.multi_controller import AstrBotMultiController
+from digital_life_core.adapters.astrbot.staging import NativeAdapterTypes
+from digital_life_core.execution.models import TaskError
+from digital_life_core.foundation.clock import DeterministicClock
+from digital_life_core.foundation.refs import RoleOwnerRef
+from digital_life_core.legacy.archive import verify_v1_archive
+from digital_life_core.legacy.data_migration import build_data_plan
+from digital_life_core.legacy.migration import LegacyMigration
+from digital_life_core.role_work.journal import JournalKey, JournalKind
 from tests.multi_host_support import MultiNativeContext, multi_config
 from tests.native_adapter_support import FakeEvent, FakeProvider, FakeReverseApi
 from tests.test_management_access import NOW
@@ -57,8 +57,8 @@ class LegacyDataPlanTokenTests(unittest.TestCase):
 
 class LegacyJournalMigrationHostTests(unittest.IsolatedAsyncioTestCase):
     async def test_data_plan_sync_inventory_runs_off_the_event_loop(self):
-        import astrbot_host.legacy_api as legacy_api_module
-        from companion_v2.foundation.outcome import Outcome
+        import digital_life_host.legacy_api as legacy_api_module
+        from digital_life_core.foundation.outcome import Outcome
 
         class EmptyQuery(dict):
             def getlist(self, key):
@@ -166,7 +166,7 @@ class LegacyJournalMigrationHostTests(unittest.IsolatedAsyncioTestCase):
                 reference_slots_available=24, reference_bytes_available=24 * 20 * 1024 * 1024,
                 wardrobe_slots_available=24).unwrap()
             self.assertEqual(preview["wardrobe_items"]["image_count"], 1)
-            from astrbot_host.management_identity import dashboard_operator
+            from digital_life_host.management_identity import dashboard_operator
             api._operator = lambda: dashboard_operator(
                 controller.runtime, "migration-test-admin", at=clock.now())
 
@@ -238,7 +238,7 @@ class LegacyJournalMigrationHostTests(unittest.IsolatedAsyncioTestCase):
                 reference_slots_available=24, reference_bytes_available=24 * 20 * 1024 * 1024,
                 wardrobe_slots_available=24).unwrap()
             self.assertEqual(preview["reference_images"]["batch_count"], 1)
-            from astrbot_host.management_identity import dashboard_operator
+            from digital_life_host.management_identity import dashboard_operator
             api._operator = lambda: dashboard_operator(
                 controller.runtime, "migration-test-admin", at=clock.now())
 
@@ -266,7 +266,7 @@ class LegacyJournalMigrationHostTests(unittest.IsolatedAsyncioTestCase):
         self.addCleanup(source.cleanup)
         self.addCleanup(target.cleanup)
         base = Path(source.name)
-        v1_root = base / "astrbot_plugin_private_companion"
+        v1_root = base / "astrbot_plugin_digital_life"
         v1_root.mkdir()
         (v1_root / "companions.json").write_text("{}\n", encoding="utf-8", newline="\n")
         memory_dir = base / "astrbot_plugin_memory_companion"

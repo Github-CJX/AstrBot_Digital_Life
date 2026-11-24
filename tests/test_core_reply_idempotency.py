@@ -21,17 +21,17 @@ from tests import astrbot_data_root  # noqa: F401  (message components need the 
 from astrbot.core.message.components import At, Image, Plain, Record, Reply
 from astrbot.core.message.message_event_result import MessageChain
 
-from astrbot_host.core_reply import (
+from digital_life_host.core_reply import (
     CORE_REPLY_CONTEXT_EXTRA, activate_core_reply_delivery_guard, prepare_core_reply_event,
     restore_core_reply_event,
 )
-from astrbot_host.core_reply_idempotency import (
+from digital_life_host.core_reply_idempotency import (
     begin_core_reply_delivery_turn, remember_native_tool_message,
     should_drop_core_reply_duplicate, should_drop_native_tool_duplicate,
     should_drop_native_tool_response,
 )
-from companion_v2.execution.models import TaskError
-from companion_v2.foundation.outcome import Outcome
+from digital_life_core.execution.models import TaskError
+from digital_life_core.foundation.outcome import Outcome
 
 BODY = "我先看看这事的来龙去脉。"
 OTHER = "其实我刚查了，是服务器在维护。"

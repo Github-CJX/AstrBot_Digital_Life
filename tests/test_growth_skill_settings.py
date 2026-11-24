@@ -7,15 +7,15 @@ from pathlib import Path
 from types import SimpleNamespace
 import unittest
 
-from companion_v2.configuration.models import ConfigLayer, ConfigTarget
-from companion_v2.configuration.owners import SparseConfigurationOwner
-from companion_v2.configuration.registry import FieldRegistry
-from companion_v2.foundation.refs import ScopeKind, ScopeRef, SubjectKind, SubjectRef
-from companion_v2.role_work.growth.configuration import (INFLUENCE_NOTES, SKILL_FIELDS, SKILLS_GROUP,
+from digital_life_core.configuration.models import ConfigLayer, ConfigTarget
+from digital_life_core.configuration.owners import SparseConfigurationOwner
+from digital_life_core.configuration.registry import FieldRegistry
+from digital_life_core.foundation.refs import ScopeKind, ScopeRef, SubjectKind, SubjectRef
+from digital_life_core.role_work.growth.configuration import (INFLUENCE_NOTES, SKILL_FIELDS, SKILLS_GROUP,
                                                          SkillConfigurationOwner, configuration_fields,
                                                          custom_skills, skill_configuration_fields,
                                                          migrate_legacy_skill_values, skill_settings)
-from companion_v2.storage.runtime import StorageRuntime
+from digital_life_core.storage.runtime import StorageRuntime
 from tests.test_management_access import INSTALLATION, NOW
 
 SCOPE = ScopeRef(INSTALLATION, "onebot", ScopeKind.PRIVATE, "native-a", "bot-a", "login-a",

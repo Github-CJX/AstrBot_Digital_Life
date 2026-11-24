@@ -8,7 +8,7 @@ from types import SimpleNamespace as NS
 import unittest
 from unittest.mock import AsyncMock
 
-from astrbot_host.knowledge_sources import (
+from digital_life_host.knowledge_sources import (
     AstrBotKnowledgeSources,
     attach_official_knowledge,
     clean_retrieval_query,
@@ -233,7 +233,7 @@ class AstrBotKnowledgeSourcesTests(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(clean_retrieval_query("<提及自己>"), "")
         self.assertEqual(clean_retrieval_query("  <attachment>  [图片]  "), "")
         self.assertEqual(
-            clean_retrieval_query("<companion_v2_context>{\"a\":1}</companion_v2_context> <提及自己> 问一下设定"),
+            clean_retrieval_query("<digital_life_core_context>{\"a\":1}</digital_life_core_context> <提及自己> 问一下设定"),
             "问一下设定",
         )
 
@@ -277,7 +277,7 @@ class AstrBotKnowledgeSourcesTests(unittest.IsolatedAsyncioTestCase):
         # Raising retrieve -> logs warning and returns None so caller falls back.
         self.sources.manager.retrieve = AsyncMock(side_effect=RuntimeError("embedding down"))
         self.sources.manager.helper.kb = self.sources.manager.kb
-        with self.assertLogs("astrbot_host.knowledge_sources", level="WARNING"):
+        with self.assertLogs("digital_life_host.knowledge_sources", level="WARNING"):
             self.assertIsNone(await self.sources.retrieve("米拉", ["kb:kb-1"]))
 
         # Broken helper init_error -> returns None so caller falls back.
@@ -291,8 +291,8 @@ class AstrBotKnowledgeSourcesTests(unittest.IsolatedAsyncioTestCase):
 
     async def test_retrieve_sync_bridges_worker_thread_and_prepare_official_hits_respects_flag(self):
         import asyncio
-        from companion_v2.knowledge.configuration import KnowledgeSettings
-        from companion_v2.knowledge.context import KnowledgeContext
+        from digital_life_core.knowledge.configuration import KnowledgeSettings
+        from digital_life_core.knowledge.context import KnowledgeContext
 
         retrieve_mock = AsyncMock(return_value={
             "results": [{

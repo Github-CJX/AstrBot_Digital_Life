@@ -7,14 +7,14 @@ from types import SimpleNamespace as NS
 import unittest
 from unittest.mock import patch
 
-from astrbot_host.group_authority import GroupAuthority
-from companion_v2.adapters.astrbot.model_wire import tool_alias
-from companion_v2.configuration.models import ConfigurationError
-from companion_v2.conversation.participation import ACTION, INSTRUCTION, SKIPPED
-from companion_v2.conversation.reply_settings import (
+from digital_life_host.group_authority import GroupAuthority
+from digital_life_core.adapters.astrbot.model_wire import tool_alias
+from digital_life_core.configuration.models import ConfigurationError
+from digital_life_core.conversation.participation import ACTION, INSTRUCTION, SKIPPED
+from digital_life_core.conversation.reply_settings import (
     GROUP_AIR_DEFAULTS, GROUP_WAKEUP_DEFAULTS, GROUP_WAKEUP_LEGACY_FIELDS,
     GROUP_WAKEUP_PREVIOUS_FIELDS, GROUP_WAKEUP_PROMPT_FIELDS, validate as validate_reply_settings)
-from companion_v2.execution.models import TaskContext, TaskError, encode
+from digital_life_core.execution.models import TaskContext, TaskError, encode
 from tests.group_host_support import GroupFixture, group_config
 from tests.group_media_support import GroupMediaFixture, Plain, sdk_image
 from tests.native_adapter_support import completion, final_text

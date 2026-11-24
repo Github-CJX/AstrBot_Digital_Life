@@ -3,8 +3,8 @@
 from types import SimpleNamespace as NS
 import unittest
 
-from companion_v2.adapters.astrbot.provider import AstrBotTextProvider, UsageTariff
-from companion_v2.execution.models import ProviderBinding, TaskError
+from digital_life_core.adapters.astrbot.provider import AstrBotTextProvider, UsageTariff
+from digital_life_core.execution.models import ProviderBinding, TaskError
 
 
 class StubProvider:
@@ -162,13 +162,13 @@ class GeminiStructuredJsonMimeTests(unittest.IsolatedAsyncioTestCase):
     def _envelope(*, tools=()):
         import json
         from datetime import datetime, timezone
-        from companion_v2.conversation.content.authoring import CREATE_SCHEMA
-        from companion_v2.conversation.foreground import (
+        from digital_life_core.conversation.content.authoring import CREATE_SCHEMA
+        from digital_life_core.conversation.foreground import (
             BackgroundPromptTrigger, PromptRequest, SealedForegroundContext,
         )
-        from companion_v2.foundation.refs import ScopeKind, ScopeRef, SubjectKind, SubjectRef
-        from companion_v2.identity_policy.models import AuthenticatedHostPrincipal, RoleBinding
-        from companion_v2.model_gateway.models import ModelEnvelope
+        from digital_life_core.foundation.refs import ScopeKind, ScopeRef, SubjectKind, SubjectRef
+        from digital_life_core.identity_policy.models import AuthenticatedHostPrincipal, RoleBinding
+        from digital_life_core.model_gateway.models import ModelEnvelope
 
         scope = ScopeRef("inst-1", "onebot", ScopeKind.PRIVATE, "u-1", "bot-1", "acc-1", "c-1", "s-1")
         principal = AuthenticatedHostPrincipal("inst-1", "host-1", "onebot", "u-1", "bot-1", "acc-1")

@@ -6,7 +6,7 @@ from pathlib import Path
 from tempfile import TemporaryDirectory
 import unittest
 
-from companion_v2.foundation.refs import (
+from digital_life_core.foundation.refs import (
     AssetRef,
     AudienceRef,
     ReferenceValidationError,
@@ -17,22 +17,22 @@ from companion_v2.foundation.refs import (
     SubjectRef,
     VersionRef,
 )
-from companion_v2.identity_policy.directory import IdentityDirectory
-from companion_v2.identity_policy.models import AuthenticatedHostPrincipal, AuthorizationTier
-from companion_v2.proactive.models import EvidenceSnapshot, Opportunity, Thought, ThoughtKind
-from companion_v2.proactive.planner import ProactivePlanner
-from companion_v2.role_work.models import (
+from digital_life_core.identity_policy.directory import IdentityDirectory
+from digital_life_core.identity_policy.models import AuthenticatedHostPrincipal, AuthorizationTier
+from digital_life_core.proactive.models import EvidenceSnapshot, Opportunity, Thought, ThoughtKind
+from digital_life_core.proactive.planner import ProactivePlanner
+from digital_life_core.role_work.models import (
     RoleActivity,
     RoleActivityState,
     RoleArtifact,
     RoleArtifactKind,
     RoleLifeLedger,
 )
-from companion_v2.sharing.models import ShareMaterial, ShareMaterialKind
-from companion_v2.sharing.planner import ShareCatalog, SharePlanner
-from companion_v2.sources.models import AssetRecord, SourceRecord
-from companion_v2.sources.repositories import AssetRepository, SourceRepository
-from companion_v2.storage.runtime import StorageRuntime
+from digital_life_core.sharing.models import ShareMaterial, ShareMaterialKind
+from digital_life_core.sharing.planner import ShareCatalog, SharePlanner
+from digital_life_core.sources.models import AssetRecord, SourceRecord
+from digital_life_core.sources.repositories import AssetRepository, SourceRepository
+from digital_life_core.storage.runtime import StorageRuntime
 
 
 NOW = datetime(2026, 9, 21, 0, 0, tzinfo=timezone.utc)

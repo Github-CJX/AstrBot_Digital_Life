@@ -136,8 +136,8 @@ class LegacyDataAcceptanceProcessTests(unittest.IsolatedAsyncioTestCase):
             source_hashes = {}
             for target_id, account_offset, image_color in (
                     ("first", 1000, "green"), ("second", 2000, "blue")):
-                root = base / f"v1-{target_id}" / "astrbot_plugin_private_companion"
-                config_path = base / f"v1-{target_id}" / "astrbot_plugin_private_companion_config.json"
+                root = base / f"v1-{target_id}" / "astrbot_plugin_digital_life"
+                config_path = base / f"v1-{target_id}" / "astrbot_plugin_digital_life_config.json"
                 self._write_source(root, config_path, target_label=target_id,
                     account_offset=account_offset, image_color=image_color)
                 target_sources[target_id] = (root, config_path)

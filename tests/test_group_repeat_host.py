@@ -8,14 +8,14 @@ from unittest.mock import patch
 
 from PIL import Image as PillowImage
 
-from astrbot_host.core_reply import CORE_REPLY_CONTEXT_EXTRA
-from companion_v2.configuration.models import ConfigLayer, ConfigTarget, ConfigurationError
-from companion_v2.conversation.participation import (
+from digital_life_host.core_reply import CORE_REPLY_CONTEXT_EXTRA
+from digital_life_core.configuration.models import ConfigLayer, ConfigTarget, ConfigurationError
+from digital_life_core.conversation.participation import (
     CONFIG_DEFAULTS, CONFIG_GROUP, GroupParticipationConfigurationOwner, configuration_fields,
 )
-from companion_v2.conversation.repeat_actions import GroupRepeatActions
-from companion_v2.conversation.group_timing import repeat_burst, repeat_signature
-from companion_v2.foundation.outcome import Outcome
+from digital_life_core.conversation.repeat_actions import GroupRepeatActions
+from digital_life_core.conversation.group_timing import repeat_burst, repeat_signature
+from digital_life_core.foundation.outcome import Outcome
 from tests.group_host_support import GroupFixture, group_config
 from tests.test_main_no_reply import ENTRY
 
@@ -83,7 +83,7 @@ class GroupRepeatHostTests(GroupFixture, unittest.IsolatedAsyncioTestCase):
         return self.event(text, target=target)
 
     async def act(self, event, *, roll=.5):
-        with patch("companion_v2.conversation.repeat_actions.random.random", return_value=roll):
+        with patch("digital_life_core.conversation.repeat_actions.random.random", return_value=roll):
             await self.plugin.receive_companion_message(event)
         self.assertFalse(event.stopped)
         self.assertTrue(event.call_llm)  # AstrBot's flag suppresses the default model fallback.
@@ -103,7 +103,7 @@ class GroupRepeatHostTests(GroupFixture, unittest.IsolatedAsyncioTestCase):
 
     async def test_follow_sends_only_the_original_line_without_building_model_context(self):
         event = await self.warm("星渊没有变成妹妹！")
-        with patch("astrbot_host.core_reply_context.build_core_reply_prompt") as build:
+        with patch("digital_life_host.core_reply_context.build_core_reply_prompt") as build:
             await self.act(event)
         build.assert_not_called()
         self.assertEqual(self.sent_text(event), "星渊没有变成妹妹！")
@@ -137,7 +137,7 @@ class GroupRepeatHostTests(GroupFixture, unittest.IsolatedAsyncioTestCase):
 
     async def test_a_missed_draw_and_a_repeated_event_never_fall_back_to_normal_reply(self):
         event = await self.warm()
-        with patch("companion_v2.conversation.repeat_actions.random.random", return_value=.99) as draw:
+        with patch("digital_life_core.conversation.repeat_actions.random.random", return_value=.99) as draw:
             await self.plugin.receive_companion_message(event)
             await self.plugin.receive_companion_message(event)
         self.assertEqual(draw.call_count, 1)
@@ -153,7 +153,7 @@ class GroupRepeatHostTests(GroupFixture, unittest.IsolatedAsyncioTestCase):
     async def test_each_burst_acts_once_and_concurrent_handlers_send_once(self):
         event = await self.warm()
         admission = (await self.controller.group_reply_candidate(event)).unwrap()
-        with patch("companion_v2.conversation.repeat_actions.random.random", return_value=.5):
+        with patch("digital_life_core.conversation.repeat_actions.random.random", return_value=.5):
             results = await asyncio.gather(*(self.controller.receive_group_repeat(event, admission) for _ in range(2)))
         self.assertTrue(all(result.is_success for result in results))
         self.assertEqual(self.sent_text(event), "星渊没有变成妹妹")

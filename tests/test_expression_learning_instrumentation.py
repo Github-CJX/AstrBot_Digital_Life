@@ -21,22 +21,22 @@ import json
 import unittest
 from unittest.mock import patch
 
-from companion_v2.configuration.models import ConfigLayer, ConfigTarget
-from companion_v2.configuration.registry import FieldRegistry
-from companion_v2.execution.models import TaskError, digest, stamp
-from companion_v2.expression.style_management import ExpressionStyleManagement
-from companion_v2.expression.style_service import KIND, LEARN_LEASE_SECONDS
-from companion_v2.model_gateway.models import Amount, CapturedModelOutput, ProviderResponse
-from companion_v2.model_gateway.routing import configuration_fields
-from companion_v2.storage.models import OperationState
-from companion_v2.storage.repositories import OperationRepository
+from digital_life_core.configuration.models import ConfigLayer, ConfigTarget
+from digital_life_core.configuration.registry import FieldRegistry
+from digital_life_core.execution.models import TaskError, digest, stamp
+from digital_life_core.expression.style_management import ExpressionStyleManagement
+from digital_life_core.expression.style_service import KIND, LEARN_LEASE_SECONDS
+from digital_life_core.model_gateway.models import Amount, CapturedModelOutput, ProviderResponse
+from digital_life_core.model_gateway.routing import configuration_fields
+from digital_life_core.storage.models import OperationState
+from digital_life_core.storage.repositories import OperationRepository
 from tests import test_expression_v1_pipeline as pipeline
 from tests.test_expression_v1_pipeline import ExpressionFixture, RULE
 from tests.test_host_application import HostFixture
 from tests.test_role_tool_loop import answered
 
 
-LOGGER = "companion_v2.expression.style_service"
+LOGGER = "digital_life_core.expression.style_service"
 USER_MARKER = "嗯哼"
 PERSONA_MARKER = "原角色人格提示"
 

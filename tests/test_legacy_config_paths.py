@@ -5,14 +5,14 @@ from pathlib import Path
 from tempfile import TemporaryDirectory
 import unittest
 
-from astrbot_host.legacy_config import (
+from digital_life_host.legacy_config import (
     V1_HOST_CONFIG_NAME,
     V1_PLUGIN_DATA_NAME,
     find_v1_data_root,
     v1_host_config_path,
     v1_plugin_config_path,
 )
-from astrbot_host.upgrade_source import preserve_before_schema
+from digital_life_host.upgrade_source import preserve_before_schema
 
 
 class LegacyConfigPathTests(unittest.TestCase):
@@ -67,7 +67,7 @@ class LegacyConfigArchiveTests(unittest.TestCase):
             saved = preserve_before_schema(host_config.parent)
             self.assertIsNotNone(saved)
             saved.write_text("{}", encoding="utf-8")  # archive no longer verifies
-            with self.assertLogs("astrbot_host.upgrade_source", level="WARNING"):
+            with self.assertLogs("digital_life_host.upgrade_source", level="WARNING"):
                 self.assertEqual(v1_host_config_path(runtime), host_config)
 
     def test_intact_archive_still_wins_over_a_pruned_live_file(self):

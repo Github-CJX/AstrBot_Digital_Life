@@ -3,12 +3,12 @@
 import unittest
 from dataclasses import replace
 
-from companion_v2.configuration.models import ConfigLayer, ConfigTarget, encode
-from companion_v2.execution.models import TaskError
-from companion_v2.foundation.refs import AudienceRef
-from companion_v2.identity_policy.models import AuthorizationTier
-from companion_v2.identity_policy.personas import ConversationRoute
-from companion_v2.role_work.state.configuration import (DEFAULTS, EXPRESSION_PROMPTS, GROUP, OWNER,
+from digital_life_core.configuration.models import ConfigLayer, ConfigTarget, encode
+from digital_life_core.execution.models import TaskError
+from digital_life_core.foundation.refs import AudienceRef
+from digital_life_core.identity_policy.models import AuthorizationTier
+from digital_life_core.identity_policy.personas import ConversationRoute
+from digital_life_core.role_work.state.configuration import (DEFAULTS, EXPRESSION_PROMPTS, GROUP, OWNER,
     configuration_fields, ensure_window_presentation_grants, ensure_role_state_grants,
     migrate_presence_to_role, role_target_for, target_for, validate_expression_prompts,
     validate_grant_scope)

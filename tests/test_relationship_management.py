@@ -4,12 +4,12 @@ from datetime import timedelta
 import json
 import unittest
 
-from companion_v2.foundation.refs import SubjectKind, SubjectRef
-from companion_v2.identity_policy.models import AuthorizationTier
-from companion_v2.relationships.codec import memory_from_json, memory_json
-from companion_v2.relationships.management import RelationshipMemoryManagement
-from companion_v2.relationships.models import RelationshipMemoryState as State
-from companion_v2.relationships.service import RelationshipMemoryService
+from digital_life_core.foundation.refs import SubjectKind, SubjectRef
+from digital_life_core.identity_policy.models import AuthorizationTier
+from digital_life_core.relationships.codec import memory_from_json, memory_json
+from digital_life_core.relationships.management import RelationshipMemoryManagement
+from digital_life_core.relationships.models import RelationshipMemoryState as State
+from digital_life_core.relationships.service import RelationshipMemoryService
 from tests.test_conversation_messages import MessageFixture
 from tests.test_management_access import INSTALLATION, NOW, SCOPE
 from tests.test_relationship_context import remember

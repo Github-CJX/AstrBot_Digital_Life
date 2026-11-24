@@ -2,7 +2,7 @@
 
 import unittest
 
-from astrbot_host.core_reply_perception import _POLICY
+from digital_life_host.core_reply_perception import _POLICY
 
 
 class PerceptionEmojiPolicyTests(unittest.TestCase):

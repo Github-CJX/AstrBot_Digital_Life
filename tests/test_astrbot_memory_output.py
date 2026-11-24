@@ -2,9 +2,9 @@ from dataclasses import replace
 import json
 import unittest
 
-from companion_v2.execution.models import encode
-from companion_v2.memory.reflection_output import REFLECTION_SCHEMA
-from companion_v2.model_gateway.models import Amount
+from digital_life_core.execution.models import encode
+from digital_life_core.memory.reflection_output import REFLECTION_SCHEMA
+from digital_life_core.model_gateway.models import Amount
 from tests.native_adapter_support import NativeFixture, completion
 
 

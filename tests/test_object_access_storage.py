@@ -10,15 +10,15 @@ from tempfile import TemporaryDirectory
 import unittest
 from unittest.mock import patch
 
-from companion_v2.agenda.models import AgendaTarget, Frequency, Memo, Reminder, Schedule, encode as agenda_encode
-from companion_v2.agenda.service import AgendaService
+from digital_life_core.agenda.models import AgendaTarget, Frequency, Memo, Reminder, Schedule, encode as agenda_encode
+from digital_life_core.agenda.service import AgendaService
 
-from companion_v2.foundation.refs import ScopeKind, ScopeRef, SubjectKind, SubjectRef
-from companion_v2.identity_policy.models import AuthenticatedHostPrincipal, AuthorizationTier, IdentityBinding, ResolvedIdentity
-from companion_v2.identity_policy.object_access import ObjectAccessPolicy
-from companion_v2.identity_policy.repository import PersistentIdentityDirectory
-from companion_v2.storage.runtime import StorageOpenError, StorageRuntime
-from companion_v2.storage.schema import (
+from digital_life_core.foundation.refs import ScopeKind, ScopeRef, SubjectKind, SubjectRef
+from digital_life_core.identity_policy.models import AuthenticatedHostPrincipal, AuthorizationTier, IdentityBinding, ResolvedIdentity
+from digital_life_core.identity_policy.object_access import ObjectAccessPolicy
+from digital_life_core.identity_policy.repository import PersistentIdentityDirectory
+from digital_life_core.storage.runtime import StorageOpenError, StorageRuntime
+from digital_life_core.storage.schema import (
     migration_count,
     MIGRATION_V1_TO_V2_ID, MIGRATION_V1_TO_V2_FINGERPRINT,
     MIGRATION_V2_TO_V3_ID, MIGRATION_V2_TO_V3_FINGERPRINT,
@@ -126,7 +126,7 @@ class ObjectAccessStorageTests(unittest.TestCase):
                          AuthorizationTier.IMPORTANT)
 
     def test_failed_v5_ddl_rolls_back_and_nonempty_v4_can_retry(self):
-        with patch("companion_v2.storage.runtime.V5_MIGRATION_STATEMENTS", (*V5_MIGRATION_STATEMENTS[:5], "INVALID DDL")):
+        with patch("digital_life_core.storage.runtime.V5_MIGRATION_STATEMENTS", (*V5_MIGRATION_STATEMENTS[:5], "INVALID DDL")):
             with self.assertRaises(StorageOpenError):
                 self.open_runtime()
         self.assert_v4_unchanged()

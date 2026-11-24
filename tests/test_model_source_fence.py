@@ -4,12 +4,12 @@ import asyncio
 from dataclasses import replace
 import unittest
 
-from companion_v2.conversation.foreground import ModelDraft, PromptMaterial
-from companion_v2.execution.models import TaskError, digest
-from companion_v2.foundation.refs import SourceRef, VersionRef
-from companion_v2.model_gateway.models import Amount, ProviderResponse
-from companion_v2.sources.models import SourceRecord
-from companion_v2.sources.repositories import SourceRepository
+from digital_life_core.conversation.foreground import ModelDraft, PromptMaterial
+from digital_life_core.execution.models import TaskError, digest
+from digital_life_core.foundation.refs import SourceRef, VersionRef
+from digital_life_core.model_gateway.models import Amount, ProviderResponse
+from digital_life_core.sources.models import SourceRecord
+from digital_life_core.sources.repositories import SourceRepository
 from tests.test_management_access import NOW
 from tests.test_model_gateway import ModelFixture
 

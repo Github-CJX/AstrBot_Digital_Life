@@ -4,8 +4,8 @@ import unittest
 from datetime import datetime, timezone
 
 from tests import astrbot_data_root  # noqa: F401 - isolate the SDK before import
-from astrbot_host.nmc_alerts import CHINA_TZ, normalize_nmc_alerts
-from companion_v2.agenda.planning_config import WeatherLocation
+from digital_life_host.nmc_alerts import CHINA_TZ, normalize_nmc_alerts
+from digital_life_core.agenda.planning_config import WeatherLocation
 
 
 def payload(*titles):

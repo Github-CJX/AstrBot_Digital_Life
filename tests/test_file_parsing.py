@@ -7,8 +7,8 @@ import io
 import unittest
 import zipfile
 
-from astrbot_host.files.parsing import extract_document, parser_availability
-from companion_v2.execution.models import TaskError
+from digital_life_host.files.parsing import extract_document, parser_availability
+from digital_life_core.execution.models import TaskError
 
 
 def has(module: str) -> bool:

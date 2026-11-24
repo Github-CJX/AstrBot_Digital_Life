@@ -4,11 +4,11 @@ import json
 import unittest
 from datetime import timedelta
 
-from companion_v2.agenda.models import AgendaTarget
-from companion_v2.conversation.flow import ConversationPolicy
-from companion_v2.execution.models import stamp
-from companion_v2.foundation.refs import OperationRef, VersionRef
-from companion_v2.storage.repositories import OperationRepository
+from digital_life_core.agenda.models import AgendaTarget
+from digital_life_core.conversation.flow import ConversationPolicy
+from digital_life_core.execution.models import stamp
+from digital_life_core.foundation.refs import OperationRef, VersionRef
+from digital_life_core.storage.repositories import OperationRepository
 from tests.contact_schedule_support import ContactScheduleFixture
 from tests.test_role_tool_loop import answered
 

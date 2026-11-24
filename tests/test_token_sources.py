@@ -3,7 +3,7 @@ import types
 import unittest
 from unittest.mock import Mock, call, patch
 
-from astrbot_host.token_sources import _bucket, read_token_sources
+from digital_life_host.token_sources import _bucket, read_token_sources
 
 
 class TokenSourceTests(unittest.TestCase):

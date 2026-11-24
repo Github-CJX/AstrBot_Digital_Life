@@ -2,7 +2,7 @@ from dataclasses import replace
 import json
 import unittest
 
-from companion_v2.conversation.segmentation import SegmentationPolicy, LLM_SEGMENT_MARKER as MARKER
+from digital_life_core.conversation.segmentation import SegmentationPolicy, LLM_SEGMENT_MARKER as MARKER
 
 
 class ReplySegmentationTests(unittest.TestCase):
@@ -205,7 +205,7 @@ class ReplySegmentationTests(unittest.TestCase):
         self.assertIn("那句“", quoted, parts)
 
     def test_default_split_words_do_not_split_inside_a_quote(self):
-        from companion_v2.conversation.segmentation import DEFAULT_SPLIT_WORDS
+        from digital_life_core.conversation.segmentation import DEFAULT_SPLIT_WORDS
         self.assertNotIn("“", DEFAULT_SPLIT_WORDS)
         self.assertNotIn(".", DEFAULT_SPLIT_WORDS)
         self.assertNotIn("）", DEFAULT_SPLIT_WORDS)
@@ -218,7 +218,7 @@ class ReplySegmentationTests(unittest.TestCase):
         self.assertIn("什么”", quoted, parts)
 
     def test_legacy_default_word_list_migrates_but_custom_dots_are_kept(self):
-        from companion_v2.conversation.segmentation import (
+        from digital_life_core.conversation.segmentation import (
             DEFAULT_SPLIT_WORDS, LEGACY_DEFAULT_SPLIT_WORDS,
         )
         legacy = SegmentationPolicy(split_words=json.dumps(LEGACY_DEFAULT_SPLIT_WORDS, ensure_ascii=False))

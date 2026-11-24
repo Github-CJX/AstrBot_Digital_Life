@@ -10,10 +10,10 @@ from tests.image_delivery_support import attach_originals
 from tests.staging_bootstrap_support import database_contents, wait_for_batch
 from tests.test_conversation_images import image_bytes
 from astrbot.core.message.components import Image, Plain
-from astrbot_host.media import load_native_image
-from companion_v2.conversation.messages import event_from_document
-from companion_v2.execution.models import TaskContext
-from companion_v2.execution.service import TaskSupervisor
+from digital_life_host.media import load_native_image
+from digital_life_core.conversation.messages import event_from_document
+from digital_life_core.execution.models import TaskContext
+from digital_life_core.execution.service import TaskSupervisor
 
 
 class MultiPreviewRecoveryTests(MultiFixture, unittest.IsolatedAsyncioTestCase):

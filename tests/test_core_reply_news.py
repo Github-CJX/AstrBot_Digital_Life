@@ -13,9 +13,9 @@ from astrbot.core.astr_agent_tool_exec import FunctionToolExecutor
 from astrbot.core.pipeline.process_stage.follow_up import _ACTIVE_AGENT_RUNNERS
 from astrbot.core.provider.entities import LLMResponse, ProviderRequest
 
-from astrbot_host.core_reply_tool_dispatch import observe_core_tool_dispatch_begin, restore_core_tool_dispatch
-from astrbot_host.core_reply_tools import native_tool_name
-from companion_v2.proactive.external_materials import parse_news_response
+from digital_life_host.core_reply_tool_dispatch import observe_core_tool_dispatch_begin, restore_core_tool_dispatch
+from digital_life_host.core_reply_tools import native_tool_name
+from digital_life_core.proactive.external_materials import parse_news_response
 from tests.multi_host_support import MultiFixture
 from tests.test_core_reply_owner_tools import NativeOwnerCalls
 

@@ -8,10 +8,10 @@ import unittest
 
 from PIL import Image
 
-from astrbot_host.native_extensions.images import image_result_handler
-from companion_v2.capabilities.native import NativeArtifact, NativeResult
-from companion_v2.execution.models import ProviderBinding, TaskError, encode
-from companion_v2.foundation.refs import AudienceRef, SourceRef, VersionRef
+from digital_life_host.native_extensions.images import image_result_handler
+from digital_life_core.capabilities.native import NativeArtifact, NativeResult
+from digital_life_core.execution.models import ProviderBinding, TaskError, encode
+from digital_life_core.foundation.refs import AudienceRef, SourceRef, VersionRef
 from tests.animation_support import animation_bytes
 from tests.test_conversation_images import image_bytes
 from tests.test_management_access import NOW, ROLE, SCOPE

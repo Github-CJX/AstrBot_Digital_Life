@@ -21,7 +21,7 @@ const JS = fs.readFileSync(path.join(PAGE_DIR, "contact-page.js"), "utf8");
 const CSS = fs.readFileSync(path.join(PAGE_DIR, "contact-page.css"), "utf8");
 const CLEAN_CSS = CSS.replace(/\/\*[\s\S]*?\*\//g, "");
 
-const HOST = "astrbot_plugin_private_companion";
+const HOST = "astrbot_plugin_digital_life";
 const flush = () => new Promise(resolve => setImmediate(resolve));
 const settle = async () => { for (let i = 0; i < 6; i++) await flush(); };
 

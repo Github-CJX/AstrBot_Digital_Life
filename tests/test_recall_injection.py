@@ -10,8 +10,8 @@ try:
 except ImportError:  # pragma: no cover - the real host installs AstrBot
     HAS_ASTRBOT = False
 
-from astrbot_host.core_reply import CORE_REPLY_CONTEXT_EXTRA
-from astrbot_host.core_reply_perception import inject_core_reply_perception_context
+from digital_life_host.core_reply import CORE_REPLY_CONTEXT_EXTRA
+from digital_life_host.core_reply_perception import inject_core_reply_perception_context
 
 
 class _Outcome:
@@ -41,7 +41,7 @@ class RecallInjectionTests(unittest.IsolatedAsyncioTestCase):
         request = NS(extra_user_content_parts=[], prompt="刚才撤回了什么", system_prompt="", model=None)
         application = NS(role_attention=None, tasks=NS(now=lambda: None), messages=NS())
 
-        with patch("companion_v2.conversation.recall_management.RecallManagement", _Manager):
+        with patch("digital_life_core.conversation.recall_management.RecallManagement", _Manager):
             await inject_core_reply_perception_context(event, request, application=application)
 
         text = request.extra_user_content_parts[0].text

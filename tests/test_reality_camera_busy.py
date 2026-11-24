@@ -3,7 +3,7 @@
 import asyncio
 import unittest
 
-from astrbot_host.native_extensions.reality.reality_touch_camera import RealityTouchCameraMixin
+from digital_life_host.native_extensions.reality.reality_touch_camera import RealityTouchCameraMixin
 
 
 class CameraBusyTests(unittest.IsolatedAsyncioTestCase):

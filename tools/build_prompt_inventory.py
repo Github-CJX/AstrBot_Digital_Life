@@ -22,7 +22,7 @@ from openpyxl.styles import Alignment, Font, PatternFill
 from openpyxl.utils import get_column_letter
 
 ROOT = pathlib.Path(__file__).resolve().parents[1]
-SOURCES = ("companion_v2", "astrbot_host")
+SOURCES = ("digital_life_core", "digital_life_host")
 DOC = ROOT / "docs" / "PROMPTS_INVENTORY_20261018.md"
 OUTPUT = ROOT / "docs" / "PROMPTS_INVENTORY_20261018.xlsx"
 CJK = re.compile(r"[\u4e00-\u9fff]")
@@ -120,13 +120,13 @@ CURATED = {
         "周期方案变体的说明", "cycle_enabled 且 variation_enabled", "system"),
     ("role_work/journal/self_review.py", "INSTRUCTION"): (
         "自评候选的完整指令", "无生产引用；实际用 self_review_service.PROMPT", "—"),
-    ("astrbot_host/core_reply_perception.py", "_POLICY"): (
+    ("digital_life_host/core_reply_perception.py", "_POLICY"): (
         "感知与自然表达的固定策略", "每次核心请求（有 prepared 且幂等去重）", "system"),
-    ("astrbot_host/core_reply_context.py", "CURRENT_TIME_INSTRUCTION"): (
+    ("digital_life_host/core_reply_context.py", "CURRENT_TIME_INSTRUCTION"): (
         "本轮时间口径与报时边界", "每次构建感知（附在表达指引里）", "user 上下文"),
-    ("astrbot_host/core_reply_context.py", "SENT_CONTINUATION_INSTRUCTION"): (
+    ("digital_life_host/core_reply_context.py", "SENT_CONTINUATION_INSTRUCTION"): (
         "已发主动消息的承接口径", "私聊且有投递记录", "system"),
-    ("astrbot_host/fish_audio.py", "DRAMA_DIRECTION"): (
+    ("digital_life_host/fish_audio.py", "DRAMA_DIRECTION"): (
         "Drama 3 表演与语气指令", "fishaudio Provider 且模型 drama-3", "system"),
     ("native_extensions/together/common.py", "BASE_REALTIME_PROMPT"): (
         "实时共处的基础说话规则", "together 房间内任一轮对话", "system"),
@@ -224,7 +224,7 @@ CURATED = {
         "生理周期默认可选不适类型列表", "周期配置初始化与默认候选读取时", "配置常量"),
     ("screen/pipeline.py", "SCREEN_INSTRUCTION"): (
         "识屏管线对屏幕原件的解读范围与反馈意图（attention/silence）边界", "识屏管线带屏幕材料进入对话/判断时", "system"),
-    ("astrbot_host/binding.py", "BIND_COMMAND"): (
+    ("digital_life_host/binding.py", "BIND_COMMAND"): (
         "触发私聊伴侣绑定的口令文案", "用户在聊天窗口发送绑定命令时", "命令匹配文案"),
     ("native_extensions/reality/common.py", "MANAGED_PAGE_MESSAGE"): (
         "现实触及能力引导至陪伴小屋的提示文案", "旧入口或未托管页面访问现实触及功能时", "用户提示文案"),
@@ -244,13 +244,13 @@ CURATED = {
         "起床闹钟动态生成模式的界面说明文案", "管理端展示闹钟动态文案配置项时", "界面提示文案"),
     ("native_extensions/reality/wakeup_alarm.py", "_REALITY_TOUCH_CONFIRMATION_TEXT"): (
         "现实触及闹钟授权确认口令文案", "管理员开启现实触及能力二次确认时", "授权确认文案"),
-    ("astrbot_host/news.py", "DEFAULT_AI_NEWS_FEED_LABEL"): (
+    ("digital_life_host/news.py", "DEFAULT_AI_NEWS_FEED_LABEL"): (
         "默认 AI 资讯源显示名称", "资讯源未自定义名称时展示", "默认标签文案"),
-    ("astrbot_host/qzone_client.py", "_MANUAL_INVALID"): (
+    ("digital_life_host/qzone_client.py", "_MANUAL_INVALID"): (
         "手动配置 QZone Cookie 格式无效的错误提示", "QZone 客户端校验手动 Cookie 失败时", "错误提示文案"),
-    ("astrbot_host/qzone_client.py", "_NO_CONNECTION"): (
+    ("digital_life_host/qzone_client.py", "_NO_CONNECTION"): (
         "缺少可用 OneBot 连接且无手动 Cookie 的错误提示", "QZone 客户端获取凭据无可用连接时", "错误提示文案"),
-    ("astrbot_host/qzone_client.py", "_RUNTIME_MISSING"): (
+    ("digital_life_host/qzone_client.py", "_RUNTIME_MISSING"): (
         "OneBot 未返回有效 QZone 凭据的错误提示模板", "QZone 客户端从 OneBot 取回凭据缺失字段时", "错误提示文案"),
 }
 
@@ -489,11 +489,11 @@ def curated_for(row: dict) -> tuple | None:
 
 def domain_of(rel_path: str) -> str:
     parts = pathlib.PurePosixPath(rel_path).parts
-    if parts[0] == "astrbot_host":
+    if parts[0] == "digital_life_host":
         if len(parts) > 2 and parts[1] == "native_extensions":
             return "宿主·" + parts[2]
         return "宿主"
-    return parts[1] if len(parts) > 2 else "companion_v2"
+    return parts[1] if len(parts) > 2 else "digital_life_core"
 
 
 def classify(name: str) -> str:
@@ -520,7 +520,7 @@ def infer_position(row: dict) -> str:
     )):
         return "独立任务 system"
     if "core_reply_context.py" in rel:
-        return "user <companion_v2_context>"
+        return "user <digital_life_core_context>"
     return "system"
 
 
@@ -576,7 +576,7 @@ def main() -> None:
     about_rows = [
         ("项目", "内容"),
         ("生成时间", "2026-10-18"),
-        ("数据来源", "companion_v2/、astrbot_host/ 源码；docs/PROMPTS_INVENTORY_20261018.md；人工复核的条件表"),
+        ("数据来源", "digital_life_core/、digital_life_host/ 源码；docs/PROMPTS_INVENTORY_20261018.md；人工复核的条件表"),
         ("提示词常量", f"{len(constants_rows)} 条含中文的字符串常量（含少量用户可见文案、正则与标记，已分类）"),
         ("任务档", f"{len(task_rows)} 个 ModelTaskProfile"),
         ("可配置字段", "29 个页面/配置字段（含默认全文）"),

@@ -28,41 +28,41 @@ WORD_LIST_DECLARATION = re.compile(r"([A-Za-z_][A-Za-z0-9_]*)\s*:\s*\"word-list\
 
 # 分区 → 注册表所在模块。**加分区时这里也要加**，否则该组完全不参与自检。
 MODULES = {
-    "quota": "companion_v2.conversation.media.quota",
-    "image_review": "companion_v2.conversation.media.review",
-    "busy_gate": "companion_v2.conversation.busy_gate",
-    "reaction": "companion_v2.expression.reaction_configuration",
-    "budget": "companion_v2.model_gateway.budget",
-    "recall": "companion_v2.conversation.recall_settings",
-    "screen": "companion_v2.screen.configuration",
-    "person": "companion_v2.memory.person.configuration",
-    "person.learning": "companion_v2.memory.person.configuration:learning_configuration_fields",
+    "quota": "digital_life_core.conversation.media.quota",
+    "image_review": "digital_life_core.conversation.media.review",
+    "busy_gate": "digital_life_core.conversation.busy_gate",
+    "reaction": "digital_life_core.expression.reaction_configuration",
+    "budget": "digital_life_core.model_gateway.budget",
+    "recall": "digital_life_core.conversation.recall_settings",
+    "screen": "digital_life_core.screen.configuration",
+    "person": "digital_life_core.memory.person.configuration",
+    "person.learning": "digital_life_core.memory.person.configuration:learning_configuration_fields",
     # 私聊用户权限的默认值与拒绝文案；按人的权限本身是 grant，不在这张表里。
-    "private_access": "companion_v2.relationships.private_access",
-    "role_growth": "companion_v2.role_work.growth.configuration",
+    "private_access": "digital_life_core.relationships.private_access",
+    "role_growth": "digital_life_core.role_work.growth.configuration",
     # 拆分出来的技能组要单列，而且必须指到它自己的字段提供函数：该模块的
     # `configuration_fields()` 只返回权限组，用它比对会把两个权限开关当成
     # 技能字段，报出一串并不存在的「缺控件」。
-    "role.growth.skills": "companion_v2.role_work.growth.configuration:skill_configuration_fields",
-    "knowledge": "companion_v2.knowledge.configuration",
-    "life": "companion_v2.role_work.life.configuration",
-    "library": "companion_v2.library.configuration",
-    "wardrobe": "companion_v2.references.wardrobe",
-    "photo.reference": "companion_v2.references.configuration",
+    "role.growth.skills": "digital_life_core.role_work.growth.configuration:skill_configuration_fields",
+    "knowledge": "digital_life_core.knowledge.configuration",
+    "life": "digital_life_core.role_work.life.configuration",
+    "library": "digital_life_core.library.configuration",
+    "wardrobe": "digital_life_core.references.wardrobe",
+    "photo.reference": "digital_life_core.references.configuration",
     # QQ 空间拓展的角色级开关与节流；安装与逐会话同意不在这张表里（归能力安装路由）。
-    "qzone": "companion_v2.qzone.configuration",
-    "group_participation": "companion_v2.conversation.participation",
+    "qzone": "digital_life_core.qzone.configuration",
+    "group_participation": "digital_life_core.conversation.participation",
     # 唯一一个四层组（安装/角色/关系/窗口），160 个字段；此前不在表里，
     # 于是整组不参与自检——92 项没有控件的字段也一直是「通过」。
-    "proactive.contact": "companion_v2.proactive.configuration",
+    "proactive.contact": "digital_life_core.proactive.configuration",
     # 以下六个分区此前有 spec、却不在表里，等于整组没有断言：漏了控件也不会变红。
-    "image.output": "companion_v2.conversation.media.output_settings",
-    "expression.learning": "companion_v2.expression.configuration",
-    "role_profile": "companion_v2.role_profile.configuration",
-    "relationship_profile": "companion_v2.relationships.profile",
+    "image.output": "digital_life_core.conversation.media.output_settings",
+    "expression.learning": "digital_life_core.expression.configuration",
+    "role_profile": "digital_life_core.role_profile.configuration",
+    "relationship_profile": "digital_life_core.relationships.profile",
     # 这一组的字段分在两个模块里：正文方向在 authoring_service，封面选项在
     # cover_assets。只指一个模块会漏掉另一半，所以用 cover_assets 的整组访问器。
-    "content.authoring": "companion_v2.conversation.content.cover_assets:group_fields",
+    "content.authoring": "digital_life_core.conversation.content.cover_assets:group_fields",
 }
 
 # 控件不在 config-editor 的 spec 里、而由各页面自己的字段表渲染的分区。
@@ -70,28 +70,28 @@ MODULES = {
 # 会变红，但受限于各页面的动态拼名，不做逐字段断言（逐字段的现状见
 # docs/CONFIG_SURFACE_GAPS_20261017.md）。
 DEDICATED_EDITORS = {
-    "memory": {"module": "companion_v2.memory.configuration",
+    "memory": {"module": "digital_life_core.memory.configuration",
                "pages": ("pages/陪伴小屋/memory-settings-section.js",)},
-    "conversation.presentation": {"module": "companion_v2.conversation.reply_settings",
+    "conversation.presentation": {"module": "digital_life_core.conversation.reply_settings",
                                   "pages": ("pages/陪伴小屋/reply-page.js",)},
-    "conversation.perception": {"module": "companion_v2.conversation.perception_settings",
+    "conversation.perception": {"module": "digital_life_core.conversation.perception_settings",
                                 "pages": ("pages/陪伴小屋/perception-native-page.js",)},
-    "role.state": {"module": "companion_v2.role_work.state.configuration",
+    "role.state": {"module": "digital_life_core.role_work.state.configuration",
                    "pages": ("pages/陪伴小屋/state-maintenance.js",
                              "pages/陪伴小屋/state-editor.js",
                              "pages/陪伴小屋/state-page.js")},
-    "expression.learning.group": {"module": "companion_v2.expression.configuration:group_configuration_fields",
+    "expression.learning.group": {"module": "digital_life_core.expression.configuration:group_configuration_fields",
                                   "pages": ("pages/陪伴小屋/expression-page.js",)},
-    "expression.learning.private": {"module": "companion_v2.expression.configuration:private_configuration_fields",
+    "expression.learning.private": {"module": "digital_life_core.expression.configuration:private_configuration_fields",
                                     "pages": ("pages/陪伴小屋/expression-page.js",)},
-    "expression.learning.role": {"module": "companion_v2.expression.configuration:role_scope_configuration_fields",
+    "expression.learning.role": {"module": "digital_life_core.expression.configuration:role_scope_configuration_fields",
                                  "pages": ("pages/陪伴小屋/config-editor.js",),
                                  # 页面把这一组落成带 expression_ 前缀的同名控件
                                  # （expression_private_source_mode …），按前缀放行。
                                  "prefixes": ("expression_",)},
-    "role.growth": {"module": "companion_v2.role_work.growth.configuration",
+    "role.growth": {"module": "digital_life_core.role_work.growth.configuration",
                     "pages": ("pages/陪伴小屋/learning-page.js",)},
-    "person.learning": {"module": "companion_v2.memory.person.configuration:learning_configuration_fields",
+    "person.learning": {"module": "digital_life_core.memory.person.configuration:learning_configuration_fields",
                         "pages": ("pages/关系与权限/member-editor.js",)},
 }
 
@@ -165,9 +165,9 @@ def backend_fields(module_name):
     except TypeError:
         # reply_settings 的字段随分段策略与流式开关变化，必须传参才能展开；
         # 这里用出厂默认值取全量，和 tools/audit_configuration_scopes.py 一致。
-        if target != "companion_v2.conversation.reply_settings":
+        if target != "digital_life_core.conversation.reply_settings":
             raise
-        from companion_v2.conversation.segmentation import SegmentationPolicy
+        from digital_life_core.conversation.segmentation import SegmentationPolicy
         fields = getattr(module, factory)(SegmentationPolicy(), False, 0.5)
         if isinstance(fields, tuple) and fields and not hasattr(fields[0], "field_id"):
             fields = fields[0]

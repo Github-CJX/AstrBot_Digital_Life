@@ -5,18 +5,18 @@ from datetime import timedelta
 import json
 import unittest
 
-from companion_v2.agenda.models import AgendaError
-from companion_v2.agenda.service import AgendaService
-from companion_v2.conversation.agenda_tools import AgendaRoleSession, TOOL_FIELDS
-from companion_v2.conversation.foreground import (
+from digital_life_core.agenda.models import AgendaError
+from digital_life_core.agenda.service import AgendaService
+from digital_life_core.conversation.agenda_tools import AgendaRoleSession, TOOL_FIELDS
+from digital_life_core.conversation.foreground import (
     ClaimKind, DraftClaim, EvidencePromptCompiler, ForegroundContextAssembler, ModelDraft, PromptMaterial,
 )
-from companion_v2.conversation.models import InboundConversationEvent
-from companion_v2.foundation.clock import DeterministicClock
-from companion_v2.foundation.refs import AudienceRef, ScopeKind, ScopeRef, SourceRef, SubjectKind, SubjectRef, VersionRef
-from companion_v2.identity_policy.models import AuthorizationTier
-from companion_v2.sources.models import SourceRecord
-from companion_v2.sources.repositories import SourceRepository
+from digital_life_core.conversation.models import InboundConversationEvent
+from digital_life_core.foundation.clock import DeterministicClock
+from digital_life_core.foundation.refs import AudienceRef, ScopeKind, ScopeRef, SourceRef, SubjectKind, SubjectRef, VersionRef
+from digital_life_core.identity_policy.models import AuthorizationTier
+from digital_life_core.sources.models import SourceRecord
+from digital_life_core.sources.repositories import SourceRepository
 from tests import test_agenda as agenda_fixture
 from tests.test_agenda import INSTALLATION, NOW, PRINCIPAL, ROLE, SCOPE, TARGET, USER
 
@@ -252,7 +252,7 @@ if __name__ == "__main__":
 
 class AgendaToolSchemaTests(unittest.TestCase):
     def test_reminder_create_schema_declares_absolute_schedule_and_message(self):
-        from companion_v2.conversation.tool_loop import specification
+        from digital_life_core.conversation.tool_loop import specification
 
         spec = specification("reminder.create", *TOOL_FIELDS["reminder.create"])
         schema = json.loads(spec.parameters_json)
@@ -273,7 +273,7 @@ class AgendaToolSchemaTests(unittest.TestCase):
         self.assertIn("memo_id and expected_memo_revision together", spec.description)
 
     def test_schedule_fold_stays_a_bounded_integer_instead_of_an_enum(self):
-        from companion_v2.conversation.tool_loop import specification
+        from digital_life_core.conversation.tool_loop import specification
 
         schedule = json.loads(specification(
             "reminder.create", *TOOL_FIELDS["reminder.create"]).parameters_json)["properties"]["schedule"]
@@ -291,7 +291,7 @@ class AgendaToolSchemaTests(unittest.TestCase):
         self.assertEqual(schedule["properties"]["gap_policy"]["enum"], ["reject", "shift_forward"])
 
     def test_reminder_instruction_forbids_memo_substitution(self):
-        from companion_v2.conversation.tool_loop import TOOL_INSTRUCTION
+        from digital_life_core.conversation.tool_loop import TOOL_INSTRUCTION
 
         self.assertIn("reminder.create", TOOL_INSTRUCTION)
         self.assertIn("memo.create", TOOL_INSTRUCTION)

@@ -7,9 +7,9 @@ from tempfile import TemporaryDirectory
 import unittest
 from unittest.mock import patch
 
-from companion_v2.storage.runtime import StorageOpenError, StorageRuntime
+from digital_life_core.storage.runtime import StorageOpenError, StorageRuntime
 from tests.execution_support import remove_v9
-from companion_v2.storage.schema import (
+from digital_life_core.storage.schema import (
     MIGRATION_V6_TO_V7_FINGERPRINT, MIGRATION_V6_TO_V7_ID, SCHEMA_VERSION, SCHEMA_VERSION_V6,
 )
 
@@ -55,7 +55,7 @@ class PersonaStorageTests(unittest.TestCase):
         StorageRuntime.open(data_root=self.root, installation_id=INSTALLATION).close()
 
     def test_failed_upgrade_rolls_back_and_can_retry(self):
-        with patch("companion_v2.storage.runtime.V7_MIGRATION_STATEMENTS",
+        with patch("digital_life_core.storage.runtime.V7_MIGRATION_STATEMENTS",
                    ("CREATE TABLE conversation_routes(scope_key TEXT)", "INVALID PERSONA MIGRATION")):
             with self.assertRaises(StorageOpenError):
                 StorageRuntime.open(data_root=self.root, installation_id=INSTALLATION)

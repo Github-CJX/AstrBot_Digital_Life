@@ -5,13 +5,13 @@ from types import SimpleNamespace as NS
 import unittest
 from unittest.mock import ANY, AsyncMock, Mock
 
-from companion_v2.execution.models import TaskError, digest
-from companion_v2.foundation.outcome import Outcome
-from companion_v2.foundation.refs import ScopeKind, ScopeRef, SourceRef, VersionRef
-from companion_v2.proactive.contact_models import ContactIntent
-from companion_v2.proactive.models import EvidenceSnapshot, Opportunity, Thought, ThoughtKind
-from companion_v2.proactive.official_alert_events import NO_CURRENT_ALERT
-from companion_v2.proactive.scheduling import ContactSchedule
+from digital_life_core.execution.models import TaskError, digest
+from digital_life_core.foundation.outcome import Outcome
+from digital_life_core.foundation.refs import ScopeKind, ScopeRef, SourceRef, VersionRef
+from digital_life_core.proactive.contact_models import ContactIntent
+from digital_life_core.proactive.models import EvidenceSnapshot, Opportunity, Thought, ThoughtKind
+from digital_life_core.proactive.official_alert_events import NO_CURRENT_ALERT
+from digital_life_core.proactive.scheduling import ContactSchedule
 from tests.test_management_access import NOW
 
 

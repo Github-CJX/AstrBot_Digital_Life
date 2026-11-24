@@ -4,13 +4,13 @@ import unittest
 from types import SimpleNamespace as NS
 from unittest.mock import AsyncMock, Mock
 
-from astrbot_host.calendar_command import receive_calendar_command
-from astrbot_host.multi_session import MultiPrivateBridge
-from astrbot_host.recalls import authenticate_notice_route
-from companion_v2.adapters.astrbot.native import HostAccount, HostPersona, persona_instruction
-from companion_v2.execution.models import TaskError, digest
-from companion_v2.foundation.refs import ScopeKind
-from companion_v2.identity_policy.models import AuthenticatedHostPrincipal
+from digital_life_host.calendar_command import receive_calendar_command
+from digital_life_host.multi_session import MultiPrivateBridge
+from digital_life_host.recalls import authenticate_notice_route
+from digital_life_core.adapters.astrbot.native import HostAccount, HostPersona, persona_instruction
+from digital_life_core.execution.models import TaskError, digest
+from digital_life_core.foundation.refs import ScopeKind
+from digital_life_core.identity_policy.models import AuthenticatedHostPrincipal
 from tests.native_adapter_support import FakeEvent, FakePlatform, NativeFixture
 from tests.test_management_access import INSTALLATION, NOW, ROLE
 

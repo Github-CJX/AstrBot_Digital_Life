@@ -4,11 +4,11 @@ from datetime import timedelta
 import json
 import unittest
 
-from companion_v2.conversation.foreground import BackgroundPromptTrigger
-from companion_v2.agenda.planning_config import WeatherLocation
-from companion_v2.proactive.external_materials import WeatherSnapshot
-from companion_v2.proactive.weather_change_events import SOURCE_OWNER, significant_change
-from companion_v2.role_work.state.management import StateManagement
+from digital_life_core.conversation.foreground import BackgroundPromptTrigger
+from digital_life_core.agenda.planning_config import WeatherLocation
+from digital_life_core.proactive.external_materials import WeatherSnapshot
+from digital_life_core.proactive.weather_change_events import SOURCE_OWNER, significant_change
+from digital_life_core.role_work.state.management import StateManagement
 from tests.contact_schedule_support import ContactScheduleFixture
 from tests.test_planning_weather import LOCATION_JSON
 from tests.test_role_tool_loop import answered

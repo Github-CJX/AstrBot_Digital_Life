@@ -9,8 +9,8 @@ from tests.multi_host_support import MultiFixture
 from tests.native_adapter_support import completion
 from astrbot.api.web import PluginRequest, bind_request_context
 from starlette.requests import Request
-from companion_v2.identity_policy.models import AuthorizationTier
-from companion_v2.adapters.astrbot.native import persona_instruction
+from digital_life_core.identity_policy.models import AuthorizationTier
+from digital_life_core.adapters.astrbot.native import persona_instruction
 
 
 class MemoryJobsMultiHostTests(MultiFixture, unittest.IsolatedAsyncioTestCase):

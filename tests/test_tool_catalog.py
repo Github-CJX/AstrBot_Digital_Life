@@ -5,10 +5,10 @@ import json
 from types import SimpleNamespace
 import unittest
 
-from companion_v2.conversation.agenda_tools import TOOL_FIELDS
-from companion_v2.conversation.tool_loop import LocalRoleTools, specification
-from companion_v2.execution.models import TaskError
-from companion_v2.model_gateway.models import MAX_TOOL_CATALOG
+from digital_life_core.conversation.agenda_tools import TOOL_FIELDS
+from digital_life_core.conversation.tool_loop import LocalRoleTools, specification
+from digital_life_core.execution.models import TaskError
+from digital_life_core.model_gateway.models import MAX_TOOL_CATALOG
 from tests.test_conversation_messages import MessageFixture
 from tests.test_role_tool_loop import ToolLoopFixture
 

@@ -11,38 +11,38 @@ import unittest
 from astrbot.core.agent.message import Message, ToolCall
 from astrbot.core.astr_agent_tool_exec import call_local_llm_tool
 
-from astrbot_host.core_reply import CORE_REPLY_CONTEXT_EXTRA, prepare_core_reply_event
-from astrbot_host.core_reply_context import GROUP_INSTRUCTION, build_core_reply_prompt
-from astrbot_host.core_reply_media_prompt import core_media_request_diagnostics, finalize_core_reply_media_prompt
-from astrbot_host.core_reply_reaction_delivery import inject_core_reaction_instruction
-from astrbot_host.core_reply_telemetry import _request_signature, _signature
-from astrbot_host.core_reply_tools import (
+from digital_life_host.core_reply import CORE_REPLY_CONTEXT_EXTRA, prepare_core_reply_event
+from digital_life_host.core_reply_context import GROUP_INSTRUCTION, build_core_reply_prompt
+from digital_life_host.core_reply_media_prompt import core_media_request_diagnostics, finalize_core_reply_media_prompt
+from digital_life_host.core_reply_reaction_delivery import inject_core_reaction_instruction
+from digital_life_host.core_reply_telemetry import _request_signature, _signature
+from digital_life_host.core_reply_tools import (
     close_core_reply_tools, inject_core_reply_tools, inject_core_turn_notes, native_tool_name,
 )
-from companion_v2.capabilities.models import CapabilityPackageDescriptor
-from companion_v2.capabilities.reality_access import (
+from digital_life_core.capabilities.models import CapabilityPackageDescriptor
+from digital_life_core.capabilities.reality_access import (
     ACTION as REALITY_SNAPSHOT_ACTION, EXTENSION as REALITY_EXTENSION, PACKAGE_ID as REALITY_PACKAGE_ID,
     RealitySnapshotAccess,
 )
-from companion_v2.capabilities.repositories import CapabilityRepository
-from companion_v2.capabilities.screen_access import (
+from digital_life_core.capabilities.repositories import CapabilityRepository
+from digital_life_core.capabilities.screen_access import (
     ACTION as SCREEN_ACTION, CAPABILITIES as SCREEN_CAPABILITIES, EXTENSION as SCREEN_EXTENSION,
     PACKAGE_ID as SCREEN_PACKAGE_ID, PROVIDER as SCREEN_PROVIDER, ScreenAccess,
 )
-from companion_v2.conversation.external_tools import (
+from digital_life_core.conversation.external_tools import (
     ExtensionToolDescriptor, ExternalToolExecutor, ExternalToolProvider, ExternalToolResponse,
 )
-from companion_v2.conversation.foreground import ContextContribution, ContributionState
-from companion_v2.conversation.tool_loop import LocalRoleTools
-from companion_v2.conversation.voice_reply import VoiceReplyPolicy
-from companion_v2.execution.models import ProviderBinding, SideEffect, TaskContext, TaskError, digest, encode, require
-from companion_v2.expression.reply_intent import INSTRUCTION as REACTION_INSTRUCTION
-from companion_v2.foundation.outcome import Outcome
-from companion_v2.foundation.refs import ScopeKind, SourceRef, VersionRef
-from companion_v2.identity_policy.group_audience import group_audience
-from companion_v2.identity_policy.personas import ConversationRoute
-from companion_v2.model_gateway.models import ToolSpec
-from companion_v2.sources.models import SourceRecord
+from digital_life_core.conversation.foreground import ContextContribution, ContributionState
+from digital_life_core.conversation.tool_loop import LocalRoleTools
+from digital_life_core.conversation.voice_reply import VoiceReplyPolicy
+from digital_life_core.execution.models import ProviderBinding, SideEffect, TaskContext, TaskError, digest, encode, require
+from digital_life_core.expression.reply_intent import INSTRUCTION as REACTION_INSTRUCTION
+from digital_life_core.foundation.outcome import Outcome
+from digital_life_core.foundation.refs import ScopeKind, SourceRef, VersionRef
+from digital_life_core.identity_policy.group_audience import group_audience
+from digital_life_core.identity_policy.personas import ConversationRoute
+from digital_life_core.model_gateway.models import ToolSpec
+from digital_life_core.sources.models import SourceRecord
 from tests.test_astrbot_core_reply import FakeEvent
 from tests.test_conversation_messages import MessageFixture
 from tests.test_management_access import NOW, SCOPE

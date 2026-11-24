@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import pytest
 
-from companion_v2.games import PigDiceGame
+from digital_life_core.games import PigDiceGame
 
 
 def test_roll_accumulates_until_player_holds() -> None:

@@ -5,14 +5,14 @@ from datetime import timedelta
 import json
 import unittest
 
-from companion_v2.execution.models import TaskError, encode
-from companion_v2.foundation.refs import AudienceRef, SubjectKind, SubjectRef
-from companion_v2.identity_policy.models import AuthorizationTier
-from companion_v2.role_work.growth import GrowthKind, PersistentRoleGrowthLedger, RoleGrowthContextReader, RoleGrowthRecord
-from companion_v2.role_work.journal.models import JournalKind, DreamRecall
-from companion_v2.role_work.models import RoleActivityState as State
-from companion_v2.role_work.timeline import RoleTimeline
-from companion_v2.role_work.work_models import RoleWorkSpec
+from digital_life_core.execution.models import TaskError, encode
+from digital_life_core.foundation.refs import AudienceRef, SubjectKind, SubjectRef
+from digital_life_core.identity_policy.models import AuthorizationTier
+from digital_life_core.role_work.growth import GrowthKind, PersistentRoleGrowthLedger, RoleGrowthContextReader, RoleGrowthRecord
+from digital_life_core.role_work.journal.models import JournalKind, DreamRecall
+from digital_life_core.role_work.models import RoleActivityState as State
+from digital_life_core.role_work.timeline import RoleTimeline
+from digital_life_core.role_work.work_models import RoleWorkSpec
 from tests.test_role_life_context import LifeContextFixture
 from tests.test_management_access import NOW, SCOPE
 

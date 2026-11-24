@@ -4,14 +4,14 @@ from datetime import timedelta
 import unittest
 from unittest.mock import patch
 
-from companion_v2.configuration.registry import FieldRegistry
-from companion_v2.configuration.service import ConfigurationService
-from companion_v2.memory.configuration import configuration_fields
-from companion_v2.memory.management import MemoryManagement
-from companion_v2.memory.service import MemoryService
-from companion_v2.memory.subscriptions import MemorySubscriptions
-from companion_v2.memory.stream_consumer import MemoryReferenceConsumer
-from companion_v2.memory.stream_store import CLIENT_PREFIX, PREFIX
+from digital_life_core.configuration.registry import FieldRegistry
+from digital_life_core.configuration.service import ConfigurationService
+from digital_life_core.memory.configuration import configuration_fields
+from digital_life_core.memory.management import MemoryManagement
+from digital_life_core.memory.service import MemoryService
+from digital_life_core.memory.subscriptions import MemorySubscriptions
+from digital_life_core.memory.stream_consumer import MemoryReferenceConsumer
+from digital_life_core.memory.stream_store import CLIENT_PREFIX, PREFIX
 from tests.memory_stream_support import StreamFixture, commit_fault
 
 

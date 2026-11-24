@@ -7,19 +7,19 @@ from pathlib import Path
 from types import SimpleNamespace
 import unittest
 
-from companion_v2.configuration.models import ConfigLayer, ConfigTarget
-from companion_v2.configuration.owners import SparseConfigurationOwner
-from companion_v2.execution.models import TaskError
-from companion_v2.expression.configuration import (GROUP, ExpressionConfigurationOwner,
+from digital_life_core.configuration.models import ConfigLayer, ConfigTarget
+from digital_life_core.configuration.owners import SparseConfigurationOwner
+from digital_life_core.execution.models import TaskError
+from digital_life_core.expression.configuration import (GROUP, ExpressionConfigurationOwner,
     application_subject_allowed, configuration_fields, main_companion_subject,
     migrate_legacy_policy_values, read_role_scope_settings, read_settings,
     source_subject_allowed, target_for)
-from companion_v2.expression.style_service import ExpressionStyleService
-from companion_v2.foundation.refs import ScopeKind, ScopeRef, SubjectKind, SubjectRef
-from companion_v2.role_profile.configuration import (GROUP as ROLE_PROFILE_GROUP,
+from digital_life_core.expression.style_service import ExpressionStyleService
+from digital_life_core.foundation.refs import ScopeKind, ScopeRef, SubjectKind, SubjectRef
+from digital_life_core.role_profile.configuration import (GROUP as ROLE_PROFILE_GROUP,
     RoleProfileConfigurationOwner, configuration_fields as role_profile_fields,
     target_for as role_profile_target_for)
-from companion_v2.storage.runtime import StorageRuntime
+from digital_life_core.storage.runtime import StorageRuntime
 from tests.test_management_access import INSTALLATION
 
 

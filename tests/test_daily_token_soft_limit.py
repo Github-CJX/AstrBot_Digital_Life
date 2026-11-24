@@ -9,14 +9,14 @@ pinned daily account.
 from dataclasses import replace
 import unittest
 
-from companion_v2.agenda.planning import KIND as CALENDAR_PLANNING_KIND
-from companion_v2.configuration.models import ApplyMode, ConfigLayer, ConfigTarget
-from companion_v2.configuration.registry import FieldRegistry, ValueKind
-from companion_v2.execution.models import TaskError, digest
-from companion_v2.model_gateway.budget import (DEFAULT_SOFT_DEFER_KINDS, GROUP, SOFT_FIELDS, BudgetLedger,
+from digital_life_core.agenda.planning import KIND as CALENDAR_PLANNING_KIND
+from digital_life_core.configuration.models import ApplyMode, ConfigLayer, ConfigTarget
+from digital_life_core.configuration.registry import FieldRegistry, ValueKind
+from digital_life_core.execution.models import TaskError, digest
+from digital_life_core.model_gateway.budget import (DEFAULT_SOFT_DEFER_KINDS, GROUP, SOFT_FIELDS, BudgetLedger,
                                               BudgetSoftPolicy, configuration_fields, effective_soft)
-from companion_v2.model_gateway.models import Amount, BudgetPolicy, ProviderResponse
-from companion_v2.conversation.foreground import ModelDraft
+from digital_life_core.model_gateway.models import Amount, BudgetPolicy, ProviderResponse
+from digital_life_core.conversation.foreground import ModelDraft
 from tests.test_model_gateway import ModelFixture
 from tests.test_management_access import NOW
 
@@ -68,7 +68,7 @@ class SoftCeilingResolutionTests(ModelFixture, unittest.TestCase):
                             bot_id=context.scope.bot_id)
 
     def write(self, name, value, *, layer=ConfigLayer.ROLE):
-        from companion_v2.configuration.owners import SparseConfigurationOwner
+        from digital_life_core.configuration.owners import SparseConfigurationOwner
         owner = SparseConfigurationOwner(self.runtime)
         target = self.target(layer)
         return owner.write(target, SOFT_FIELDS, changes={GROUP + "." + name: value}, reset=(),
@@ -119,7 +119,7 @@ class SoftCeilingResolutionTests(ModelFixture, unittest.TestCase):
         self.write("daily_token_soft_limit", 1234)
         policy = effective_soft(self.runtime, self.context, None)
         self.assertEqual(policy.tokens, 1234)
-        from companion_v2.configuration.owners import SparseConfigurationOwner
+        from digital_life_core.configuration.owners import SparseConfigurationOwner
         installation = ConfigTarget(self.context.scope.installation_id, ConfigLayer.INSTALLATION)
         field = SparseConfigurationOwner(self.runtime).read(installation, SOFT_FIELDS).fields
         self.assertIsNone(field[GROUP + ".daily_token_soft_limit"].source)
@@ -139,7 +139,7 @@ class SoftCeilingDeferralTests(ModelFixture, unittest.IsolatedAsyncioTestCase):
         self.ledger = BudgetLedger(self.runtime, BudgetPolicy(*(Amount(10**9, 10**12) for _ in range(5))), self.soft)
 
     def store(self, *, enabled=True, tokens=1):
-        from companion_v2.configuration.owners import SparseConfigurationOwner
+        from digital_life_core.configuration.owners import SparseConfigurationOwner
         owner = SparseConfigurationOwner(self.runtime)
         context = self.context
         target = ConfigTarget(context.scope.installation_id, ConfigLayer.ROLE, context.role_binding.role,

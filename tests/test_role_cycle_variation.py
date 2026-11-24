@@ -5,10 +5,10 @@ from datetime import datetime, timedelta, timezone
 import json
 import unittest
 
-from companion_v2.conversation.state_context import ConversationStateContext
-from companion_v2.execution.models import TaskError, encode
-from companion_v2.role_work.state import cycle
-from companion_v2.role_work.state.cycle_prompts import VARIATION
+from digital_life_core.conversation.state_context import ConversationStateContext
+from digital_life_core.execution.models import TaskError, encode
+from digital_life_core.role_work.state import cycle
+from digital_life_core.role_work.state.cycle_prompts import VARIATION
 from tests.test_management_access import NOW
 from tests.test_role_cycle import assertion
 from tests.test_role_cycle_optimization import CycleOptimizationFixture, SETTINGS

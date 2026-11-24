@@ -16,7 +16,7 @@ the ``[%None]`` sentinel, blank strings, and records with no usable identifier.
 import asyncio
 import unittest
 
-from astrbot_host.persona_catalog import available_personas, persona_choices, _name_of
+from digital_life_host.persona_catalog import available_personas, persona_choices, _name_of
 
 
 def list_personas(context):

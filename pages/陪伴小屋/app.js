@@ -102,7 +102,7 @@ const roleName=()=>{
 };
 const capabilityConfig=id=>configSnapshot.capabilities?.[id]||{};
 const capabilitySummary=id=>capabilityConfig(id).summary||'当前插件没有可展示的配置摘要。';
-const HOST='astrbot_plugin_private_companion';
+const HOST='astrbot_plugin_digital_life';
 let hostConnection={state:'checking',label:'陪伴小屋 · 正在连接',detail:'正在读取角色与会话…'};
 let integrationSnapshot=null;
 let hostProbeVersion=0;
@@ -133,7 +133,7 @@ function setProfileAvatar(dataUrl){
   return true;
 }
 /* 24 KiB JPEG 的 base64 长度 + "data:image/jpeg;base64," 前缀。
-   必须与 companion_v2/role_profile/configuration.py 的
+   必须与 digital_life_core/role_profile/configuration.py 的
    MAX_AVATAR_DATA_URL_CHARS 一致；两边任一变化都要同步。 */
 const MAX_ROLE_AVATAR_DATA_URL_CHARS=32791;
 async function compressRoleAvatar(file){
@@ -2643,7 +2643,7 @@ function renderDecisionOriginal(){
   const roleSettings=configEditors('groupParticipationConfigWorkspace',['group_participation'],'群聊参与');
   const gateSettings=configEditors('decisionGateWorkspace',['busy_gate','life'],'沉默策略 · 忙碌与休息');
   const target=product.target?.();
-  if(target?.scope_kind!=='group'||!role.reply_api.startsWith('/astrbot_plugin_private_companion/')
+  if(target?.scope_kind!=='group'||!role.reply_api.startsWith('/astrbot_plugin_digital_life/')
     ||!role.reply_api.endsWith('/reply'))return roleSettings+gateSettings;
   const endpoint=role.reply_api+'/participation';
   return `${roleSettings}${gateSettings}<div data-decision-group-only hidden>
@@ -4355,7 +4355,7 @@ function renderIdentityPageOriginal(){
     [
     ['关系网','统一查看私聊成员、群成员与群内互动。熟人卡在人物资料中维护；成员线索只辅助识别发言者。',`${networkSettings}${renderIdentity()}`,
      'identity-network'],
-    ['访问规则','管理新私聊成员的默认权限；逐人权限可在成员详情中调整。',`${configEditors('privateAccessWorkspace',['private_access'],'私聊默认权限')}${configEditors('strangerAccessWorkspace',['private_access_installation'],'陌生号处理','', '/astrbot_plugin_private_companion/config',true)}${configEditors('relayConfigWorkspace',['relay'],'跨窗口递话')}`,
+    ['访问规则','管理新私聊成员的默认权限；逐人权限可在成员详情中调整。',`${configEditors('privateAccessWorkspace',['private_access'],'私聊默认权限')}${configEditors('strangerAccessWorkspace',['private_access_installation'],'陌生号处理','', '/astrbot_plugin_digital_life/config',true)}${configEditors('relayConfigWorkspace',['relay'],'跨窗口递话')}`,
      'identity-access'],
     ['关系与情感','它对你和对别人的理解，以及它自己的感觉。待确认的先过你这一关才生效。',product.workspace('relationships'),
      'identity-feelings'],
@@ -4420,7 +4420,7 @@ function configEditors(id,kinds,title,note,endpoint='',scoped=false){
   const hint = (text,retry) => `<p class="config-editors-hint">${I('info')}<span>${text}</span></p>${retry?'<div class="dialog-actions"><button class="button small" type="button" data-workspace-retry>重新读取</button></div>':''}`;
   const current=product.role?.();
   if(!scoped&&(typeof endpoint!=='string'||!endpoint))endpoint=roleConfigApi(current);
-  if(typeof endpoint!=='string'||!endpoint.startsWith('/astrbot_plugin_private_companion/')){
+  if(typeof endpoint!=='string'||!endpoint.startsWith('/astrbot_plugin_digital_life/')){
     /* 读不到就说明卡在哪一步：桥没到、目标没选、角色没映射、还是窗口没有该路由。 */
     const reason=product.workspaceHint?.()||`先在账号与会话中完成 Bot 账号与人格映射，${title}才会出现。`;
     return hint(reason,true);
@@ -4927,7 +4927,7 @@ const ALL_FEATURE_NATIVE_EXTENSIONS=[
 ];
 const allFeaturesState={roleKey:'',ticket:0,loading:false,loaded:false,attempted:false,error:'',notice:'',sections:{},endpoints:{},draft:{},extraRows:[],extensionsMeta:[],saving:false,domain:'all',status:'all',query:''};
 function pluginRelativePath(path){
-  const prefix='/astrbot_plugin_private_companion/';
+  const prefix='/astrbot_plugin_digital_life/';
   return typeof path==='string'&&path.startsWith(prefix)?path.slice(prefix.length):'';
 }
 /* 防骚扰接口只在私聊窗口给。
@@ -4938,7 +4938,7 @@ function pluginRelativePath(path){
  *      和表达、参与那几组，从来没有 /harassment。而群聊窗口里
  *      product.role().reply_api 是用群目标换出来的，拼上 /harassment 之后
  *      宿主匹配不到路由，请求根本没进插件——重试、刷新都是同一句话。
- *   2. 路径口径。目录给的是绝对地址（/astrbot_plugin_private_companion/host/…），
+ *   2. 路径口径。目录给的是绝对地址（/astrbot_plugin_digital_life/host/…），
  *      页面桥要的是插件相对路径，宿主会自己补插件名。原样交过去会被拼两次，
  *      同样是「未找到该路由」。切前缀复用同一处实现，不另抄一份。
  * 不适合的作用域返回空串，决策页据此按「不适用」呈现：不露页签、不发请求。 */
@@ -5582,7 +5582,7 @@ function filterAllFeatures(value){
    它们的宿主仍在使用，不要随已清理的旧路由入口一起删除。 */
 /* 2026-09-29 整理：除「首页」与「模型与连接」外，各页内容暂时清空，
    等待按新设计稿逐页重排。原实现整份备份于
-   data/companion_v2_page_backups/20260929-before-page-clear/（插件扫描目录之外）。
+   data/digital_life_core_page_backups/20260929-before-page-clear/（插件扫描目录之外）。
    清空方式：原渲染函数整体更名保留（*Original），页签、manageSubtitles、
    mountConfigEditor 挂载链与页面模块原样保留——恢复时把函数名换回即可。 */
 function clearedConsole(label){
@@ -5700,7 +5700,7 @@ function renderIdentityGroupsPage(){
 function renderIdentityAccessPage(){
   return pageSections('访问规则','管理新私聊成员的默认权限，以及跨窗口与跨群递话。',[
     ['私聊默认权限','新用户进入目录时使用的默认准入规则。',configEditors('privateAccessWorkspace',['private_access'],'私聊默认权限'),'identity-access'],
-    ['陌生号处理','没有绑定的账号使用插件安装全局设置。',configEditors('strangerAccessWorkspace',['private_access_installation'],'陌生号处理','', '/astrbot_plugin_private_companion/config',true),'identity-strangers'],
+    ['陌生号处理','没有绑定的账号使用插件安装全局设置。',configEditors('strangerAccessWorkspace',['private_access_installation'],'陌生号处理','', '/astrbot_plugin_digital_life/config',true),'identity-strangers'],
     ['跨窗口与跨群递话','设置递话目标、确认规则与成员权限。',configEditors('relayConfigWorkspace',['relay'],'跨窗口与跨群递话'),'identity-relay'],
   ],[['identity-access','shield-check','私聊默认权限'],['identity-strangers','user-x','陌生号处理'],
      ['identity-relay','corner-up-right','跨窗口递话']]);
@@ -5712,7 +5712,7 @@ function renderIdentityFeelingsPage(){
 const identitySettingsSpecs={
   person:{title:'用户默认资料',intro:'新用户会从这里继承默认资料；已经登记的用户仍以用户详情里的资料为准。',id:'identityPersonSettingsWorkspace',kinds:['person']},
   'private-access':{title:'私聊用户权限',intro:'这里只设置新私聊用户的默认准入。已有用户的单独权限仍在用户详情中调整。',id:'identityPrivateAccessSettingsWorkspace',kinds:['private_access']},
-  'stranger-access':{title:'陌生号处理',intro:'这组设置对插件安装内所有未绑定的私聊账号生效。',id:'identityStrangerAccessSettingsWorkspace',kinds:['private_access_installation'],endpoint:'/astrbot_plugin_private_companion/config'},
+  'stranger-access':{title:'陌生号处理',intro:'这组设置对插件安装内所有未绑定的私聊账号生效。',id:'identityStrangerAccessSettingsWorkspace',kinds:['private_access_installation'],endpoint:'/astrbot_plugin_digital_life/config'},
   'group-clues':{title:'群成员线索',intro:'为群聊提供已登记成员的线索，辅助理解发言来源，不自动确认身份或授予权限。',id:'identityMemberClueSettingsWorkspace',kinds:['knowledge'],views:{knowledge:{sectionIds:['members'],title:'群聊成员线索',note:'按账号读取群成员的人物描述、相处边界与重要印象；群范围资料只用于对应群。'}}},
 };
 function identitySettingsTarget(kind,field='',section=''){
@@ -5775,7 +5775,7 @@ function learningRoleApi(target,role,key){
 }
 function roleConfigApi(role){
   const direct=role?.config_api;
-  if(typeof direct==='string'&&direct.startsWith('/astrbot_plugin_private_companion/'))return direct;
+  if(typeof direct==='string'&&direct.startsWith('/astrbot_plugin_digital_life/'))return direct;
   return '';
 }
 function matchesCottageRole(target,role){

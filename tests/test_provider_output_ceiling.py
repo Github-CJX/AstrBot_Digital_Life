@@ -17,12 +17,12 @@ import unittest
 from astrbot.core.agent.tool import FunctionTool, ToolSet
 from astrbot.core.provider.sources.openai_source import ProviderOpenAIOfficial
 
-from astrbot_host.model_settings import (PROVIDER_OUTPUT_FLOOR, parse_routing,
+from digital_life_host.model_settings import (PROVIDER_OUTPUT_FLOOR, parse_routing,
                                          provider_output_limit_rows)
-from astrbot_host.multi_settings import MultiHostSettings
-from companion_v2.adapters.astrbot.provider import UsageTariff
-from companion_v2.adapters.astrbot.provider_catalog import TextProviderSettings, assemble_providers
-from companion_v2.model_gateway.models import MAX_MODEL_OUTPUT_TOKENS
+from digital_life_host.multi_settings import MultiHostSettings
+from digital_life_core.adapters.astrbot.provider import UsageTariff
+from digital_life_core.adapters.astrbot.provider_catalog import TextProviderSettings, assemble_providers
+from digital_life_core.model_gateway.models import MAX_MODEL_OUTPUT_TOKENS
 from tests.multi_host_support import multi_config
 from tests.segmentation_stream_support import native_provider
 

@@ -10,11 +10,11 @@ from unittest.mock import AsyncMock, Mock, patch
 from tests import test_astrbot_staging_host as _host_import_root
 from astrbot.api.message_components import Image, Plain
 from astrbot.core.message.message_event_result import MessageChain
-from astrbot_host.native_extensions.live.agent_turn import (
+from digital_life_host.native_extensions.live.agent_turn import (
     is_bili_live_agent_turn, prepare_bili_live_agent_event, run_bili_live_agent_turn,
 )
-from astrbot_host.native_extensions.live.bilibili_live import LiveDanmakuEvent
-from astrbot_host.native_extensions.live.model_methods import LiveModelMethods
+from digital_life_host.native_extensions.live.bilibili_live import LiveDanmakuEvent
+from digital_life_host.native_extensions.live.model_methods import LiveModelMethods
 
 
 class FakeEvent:
@@ -135,12 +135,12 @@ class LiveAgentTurnTests(unittest.IsolatedAsyncioTestCase):
             _record_bili_auto_reply_rate_mark=Mock(),
         )
         event = LiveDanmakuEvent("danmaku", "观众", "你好")
-        with patch("astrbot_host.native_extensions.live.model_methods.run_bili_live_agent_turn",
+        with patch("digital_life_host.native_extensions.live.model_methods.run_bili_live_agent_turn",
                    new=AsyncMock(return_value=[
                        (other, "tool", MessageChain([Plain("工具内容")])),
                        (session, "reply", MessageChain([Plain("最终回复")])),
                    ])) as run_turn, patch(
-                       "astrbot_host.native_extensions.live.model_methods.live_private_persona_prompt",
+                       "digital_life_host.native_extensions.live.model_methods.live_private_persona_prompt",
                        new=AsyncMock(return_value="")):
             handled = await LiveModelMethods._reply_to_bili_live_events_via_framework(live, [event], session)
 
@@ -156,21 +156,21 @@ class LiveAgentTurnTests(unittest.IsolatedAsyncioTestCase):
         live._push_subtitle.assert_awaited_once_with("最终回复", source="bili_live")
 
         context.send_message.reset_mock()
-        with patch("astrbot_host.native_extensions.live.model_methods.run_bili_live_agent_turn",
+        with patch("digital_life_host.native_extensions.live.model_methods.run_bili_live_agent_turn",
                    new=AsyncMock(return_value=[(other, "tool", MessageChain([Plain("仅其他会话")]))])), patch(
-                       "astrbot_host.native_extensions.live.model_methods.live_private_persona_prompt",
+                       "digital_life_host.native_extensions.live.model_methods.live_private_persona_prompt",
                        new=AsyncMock(return_value="")):
             handled = await LiveModelMethods._reply_to_bili_live_events_via_framework(live, [event], session)
         self.assertFalse(handled)
         context.send_message.assert_awaited_once()
 
         context.send_message.reset_mock()
-        with patch("astrbot_host.native_extensions.live.model_methods.run_bili_live_agent_turn",
+        with patch("digital_life_host.native_extensions.live.model_methods.run_bili_live_agent_turn",
                    new=AsyncMock(return_value=[
                        (session, "reply", MessageChain([
                            Image.fromURL("https://example.invalid/live.png"), Plain("图片之后的回复")]))
                    ])), patch(
-                       "astrbot_host.native_extensions.live.model_methods.live_private_persona_prompt",
+                       "digital_life_host.native_extensions.live.model_methods.live_private_persona_prompt",
                        new=AsyncMock(return_value="")):
             handled = await LiveModelMethods._reply_to_bili_live_events_via_framework(live, [event], session)
         self.assertTrue(handled)
@@ -217,9 +217,9 @@ class LiveAgentTurnTests(unittest.IsolatedAsyncioTestCase):
 
         runner = Runner()
         event = LiveDanmakuEvent("danmaku", "观众", "你好")
-        with patch("astrbot_host.native_extensions.live.model_methods.build_main_agent",
+        with patch("digital_life_host.native_extensions.live.model_methods.build_main_agent",
                    new=AsyncMock(return_value=NS(agent_runner=runner))) as builder, patch(
-                       "astrbot_host.native_extensions.live.model_methods.live_private_persona_prompt",
+                       "digital_life_host.native_extensions.live.model_methods.live_private_persona_prompt",
                        new=AsyncMock(return_value="")):
             handled = await LiveModelMethods._reply_to_bili_live_events_via_framework(live, [event], session)
         self.assertTrue(handled)

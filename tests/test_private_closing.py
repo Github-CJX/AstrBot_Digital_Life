@@ -3,8 +3,8 @@
 from datetime import datetime, timedelta, timezone
 import unittest
 
-from companion_v2.configuration.models import ConfigurationError
-from companion_v2.conversation import private_closing as closing
+from digital_life_core.configuration.models import ConfigurationError
+from digital_life_core.conversation import private_closing as closing
 
 
 NOW = datetime(2026, 10, 20, 23, 0, tzinfo=timezone.utc)

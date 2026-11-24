@@ -5,16 +5,16 @@ from datetime import timedelta
 from types import SimpleNamespace as NS
 from unittest.mock import patch
 
-from astrbot_host.image_access import GROUP_IMAGE_CAPABILITIES, IMAGE_CAPABILITIES, ensure_image_access
-from companion_v2.capabilities import CapabilityAuthorizationState, CapabilityPackageDescriptor
-from companion_v2.capabilities.repositories import CapabilityRepository
-from companion_v2.configuration.models import ConfigLayer, ConfigTarget
-from companion_v2.conversation.media.output_settings import (
+from digital_life_host.image_access import GROUP_IMAGE_CAPABILITIES, IMAGE_CAPABILITIES, ensure_image_access
+from digital_life_core.capabilities import CapabilityAuthorizationState, CapabilityPackageDescriptor
+from digital_life_core.capabilities.repositories import CapabilityRepository
+from digital_life_core.configuration.models import ConfigLayer, ConfigTarget
+from digital_life_core.conversation.media.output_settings import (
     GROUP as IMAGE_OUTPUT_GROUP, ImageOutputConfigurationOwner, configuration_fields,
 )
-from companion_v2.foundation.refs import ScopeKind
-from companion_v2.identity_policy.models import AuthorizationTier
-from companion_v2.identity_policy.repository import PersistentIdentityDirectory
+from digital_life_core.foundation.refs import ScopeKind
+from digital_life_core.identity_policy.models import AuthorizationTier
+from digital_life_core.identity_policy.repository import PersistentIdentityDirectory
 from tests.g6_support import G6Fixture, NOW
 
 
@@ -83,7 +83,7 @@ class ImageAccessTests(G6Fixture):
         self.capabilities.set_role_enabled(extension_id="image", role=self.role, bot_id=self.scope.bot_id,
             enabled=False, expected_revision=0, observed_at=NOW).unwrap()
         before = self.records()
-        with self.assertNoLogs("astrbot_host.image_access", level="WARNING"):
+        with self.assertNoLogs("digital_life_host.image_access", level="WARNING"):
             self.ensure()
         self.assertEqual(self.records(), before)
 
@@ -95,7 +95,7 @@ class ImageAccessTests(G6Fixture):
         self.runtime.close()
         self.runtime = self.open_runtime()
         self.capabilities = CapabilityRepository(self.runtime)
-        with self.assertNoLogs("astrbot_host.image_access", level="WARNING"):
+        with self.assertNoLogs("digital_life_host.image_access", level="WARNING"):
             self.ensure()
         self.assertEqual(self.records(), before)
         self.assertEqual(self.consent().failure.code, "capability_consent_revoked")
@@ -129,12 +129,12 @@ class ImageAccessTests(G6Fixture):
         self.set_image_output(group_enabled=False)
         # The turn-level probe runs on every group message; it must not tell the
         # operator that an image request was refused when nobody asked for one.
-        with self.assertNoLogs("astrbot_host.image_access", level="INFO"):
+        with self.assertNoLogs("digital_life_host.image_access", level="INFO"):
             self.ensure(group)
         self.assertEqual(self.consent("image.generate", context=group).failure.code,
                          "capability_consent_missing")
         self.set_image_output(group_enabled=True, request_permission="core_only")
-        with self.assertNoLogs("astrbot_host.image_access", level="INFO"):
+        with self.assertNoLogs("digital_life_host.image_access", level="INFO"):
             self.ensure(group)
         for capability in GROUP_IMAGE_CAPABILITIES:
             self.assertEqual(self.consent(capability, context=group).failure.code,
@@ -194,7 +194,7 @@ class ImageAccessTests(G6Fixture):
     def test_failed_default_write_rolls_back_partial_role_selection(self):
         self.install_image()
         with patch.object(CapabilityRepository, "set_authorization", side_effect=RuntimeError("synthetic")), \
-                self.assertLogs("astrbot_host.image_access", level="WARNING"):
+                self.assertLogs("digital_life_host.image_access", level="WARNING"):
             self.ensure()
         self.assertEqual(self.records(), ((), ()))
 

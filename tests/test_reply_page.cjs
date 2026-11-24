@@ -12,7 +12,7 @@ const flush = () => new Promise(resolve => setImmediate(resolve));
 const drains = async (times = 8) => { for (let index = 0; index < times; index += 1) await flush(); };
 const wait = milliseconds => new Promise(resolve => setTimeout(resolve, milliseconds));
 const TOKEN = 'a'.repeat(64);
-const PREFIX = '/astrbot_plugin_private_companion/';
+const PREFIX = '/astrbot_plugin_digital_life/';
 const plain = value => JSON.parse(JSON.stringify(value));
 
 /* The registered group is window-scoped; these are the fields the page edits. */
@@ -682,7 +682,7 @@ test('word-list chips add and remove entries while saving the existing wire form
 });
 
 test('the registered newline default of the file formats opens as entries and saves clean', async () => {
-  /* 后端注册默认值是多行文本（companion_v2/conversation/media/understanding.py），
+  /* 后端注册默认值是多行文本（digital_life_core/conversation/media/understanding.py），
      不是 JSON 数组。编辑器只认 JSON 的话这里会读成 0 个词条、valid=false，
      整张「文件理解」卡连保存都会被拦。 */
   const registered = '文本\nPDF\nWord（DOCX）\nExcel（XLSX）\nPowerPoint（PPTX）';

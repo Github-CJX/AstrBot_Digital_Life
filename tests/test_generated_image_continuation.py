@@ -3,13 +3,13 @@
 from dataclasses import replace
 import unittest
 
-from companion_v2.conversation.foreground import ModelDraft, PromptMaterial
-from companion_v2.conversation.media.generated import INSTRUCTION
-from companion_v2.conversation.media.models import ImageConversationEvent
-from companion_v2.execution.models import TaskError, TaskResult, encode
-from companion_v2.model_gateway.models import Amount, ProviderResponse, ToolCall, ToolExchange
-from companion_v2.model_gateway.routing import ModelRouter
-from companion_v2.model_gateway.service import LocalModelGateway
+from digital_life_core.conversation.foreground import ModelDraft, PromptMaterial
+from digital_life_core.conversation.media.generated import INSTRUCTION
+from digital_life_core.conversation.media.models import ImageConversationEvent
+from digital_life_core.execution.models import TaskError, TaskResult, encode
+from digital_life_core.model_gateway.models import Amount, ProviderResponse, ToolCall, ToolExchange
+from digital_life_core.model_gateway.routing import ModelRouter
+from digital_life_core.model_gateway.service import LocalModelGateway
 from tests.test_generated_image_sources import GeneratedImageSourceFixture, capture
 from tests.test_management_access import NOW
 

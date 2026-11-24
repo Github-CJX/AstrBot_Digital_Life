@@ -1094,12 +1094,12 @@
   },
   "legacy": {
     "description": "兼容｜从 V1 迁移数据",
-    "hint": "首次从 V1 换到 V2 时用。V1 的数据留在原来的插件数据目录里，这里填它的绝对路径（例如 …/data/plugin_data/astrbot_plugin_private_companion）。留空则按 V2 数据目录的同级目录自动寻找 V1。迁移是只读 V1、单向写入 V2：过程中不会修改或删除 V1 的任何文件，所以可以先试算几遍再决定。实际执行在「陪伴小屋 → 开始使用」的最后一步完成。",
+    "hint": "首次从 V1 换到 V2 时用。V1 的数据留在原来的插件数据目录里，这里填它的绝对路径（例如 …/data/plugin_data/astrbot_plugin_digital_life）。留空则按 V2 数据目录的同级目录自动寻找 V1。迁移是只读 V1、单向写入 V2：过程中不会修改或删除 V1 的任何文件，所以可以先试算几遍再决定。实际执行在「陪伴小屋 → 开始使用」的最后一步完成。",
     "type": "object",
     "items": {
       "v1_root": {
         "description": "V1 数据目录（绝对路径）",
-        "hint": "只在你主动检查并确认迁移时读取。留空时按 …/plugin_data/astrbot_plugin_private_companion 与 V2 数据目录的同级位置查找；V1 只读，迁移结果写入当前 V2 目标。",
+        "hint": "只在你主动检查并确认迁移时读取。留空时按 …/plugin_data/astrbot_plugin_digital_life 与 V2 数据目录的同级位置查找；V1 只读，迁移结果写入当前 V2 目标。",
         "type": "text",
         "default": ""
       }

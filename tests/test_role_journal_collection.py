@@ -6,13 +6,13 @@ import json
 import unittest
 from unittest.mock import patch
 
-from companion_v2.configuration.registry import FieldRegistry
-from companion_v2.execution.models import TaskError, encode
-from companion_v2.model_gateway.routing import configuration_fields
-from companion_v2.role_work import PersistentRoleLifeLedger, RoleArtifact, RoleArtifactJournalMeaning as Meaning, RoleArtifactKind
-from companion_v2.role_work.journal import MaterialKind
-from companion_v2.role_work.journal.material_producer import JournalMaterialPage
-from companion_v2.role_work.journal.writing import writing_profiles
+from digital_life_core.configuration.registry import FieldRegistry
+from digital_life_core.execution.models import TaskError, encode
+from digital_life_core.model_gateway.routing import configuration_fields
+from digital_life_core.role_work import PersistentRoleLifeLedger, RoleArtifact, RoleArtifactJournalMeaning as Meaning, RoleArtifactKind
+from digital_life_core.role_work.journal import MaterialKind
+from digital_life_core.role_work.journal.material_producer import JournalMaterialPage
+from digital_life_core.role_work.journal.writing import writing_profiles
 from tests.test_management_access import NOW, SCOPE
 from tests.test_role_reading import ReadingFixture
 from tests.test_role_tool_loop import answered

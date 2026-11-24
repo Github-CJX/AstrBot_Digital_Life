@@ -22,15 +22,15 @@ import unittest
 from dataclasses import replace
 from unittest.mock import patch
 
-from companion_v2.configuration.registry import FieldRegistry
-from companion_v2.execution.models import ClaimResult, Lane, TaskClaim, TaskContext, TaskResult, digest
-from companion_v2.execution.runner import ExactTaskRunner
-from companion_v2.execution.waiting import BackgroundTaskQueue
-from companion_v2.foundation.outcome import Outcome
-from companion_v2.foundation.refs import AudienceRef, ReferenceValidationError, RoleOwnerRef
-from companion_v2.model_gateway.routing import configuration_fields
-from companion_v2.role_work.journal import JournalContext, JournalKey, JournalKind
-from companion_v2.role_work.journal.writing import writing_profiles
+from digital_life_core.configuration.registry import FieldRegistry
+from digital_life_core.execution.models import ClaimResult, Lane, TaskClaim, TaskContext, TaskResult, digest
+from digital_life_core.execution.runner import ExactTaskRunner
+from digital_life_core.execution.waiting import BackgroundTaskQueue
+from digital_life_core.foundation.outcome import Outcome
+from digital_life_core.foundation.refs import AudienceRef, ReferenceValidationError, RoleOwnerRef
+from digital_life_core.model_gateway.routing import configuration_fields
+from digital_life_core.role_work.journal import JournalContext, JournalKey, JournalKind
+from digital_life_core.role_work.journal.writing import writing_profiles
 from tests.test_execution import ExecutionFixture
 from tests.test_host_application import HostFixture
 from tests.test_management_access import NOW, ROLE, SCOPE

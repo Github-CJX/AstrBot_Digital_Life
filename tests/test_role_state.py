@@ -8,23 +8,23 @@ import unittest
 from unittest.mock import patch
 from zoneinfo import ZoneInfo
 
-from companion_v2.agenda.models import Frequency, Schedule
-from companion_v2.agenda.calendar_access import role_grant_prefix
-from companion_v2.configuration.registry import FieldRegistry
-from companion_v2.conversation.foreground import BackgroundPromptTrigger
-from companion_v2.execution.models import TaskContext, TaskError, encode
-from companion_v2.foundation.refs import AudienceRef, SourceRef, VersionRef
-from companion_v2.model_gateway.routing import configuration_fields
-from companion_v2.model_gateway.models import MAX_TOOL_CATALOG, Amount, BudgetPolicy, ToolCall
-from companion_v2.model_gateway.budget import BudgetLedger
-from companion_v2.identity_policy.models import AuthorizationTier, GrantState
-from companion_v2.identity_policy.personas import ConversationRoute
-from companion_v2.role_work.growth import GrowthKind, GrowthState, RoleGrowthRecord
-from companion_v2.role_work.state.maintenance import (PROMPT as STATE_MAINTENANCE_PROMPT,
+from digital_life_core.agenda.models import Frequency, Schedule
+from digital_life_core.agenda.calendar_access import role_grant_prefix
+from digital_life_core.configuration.registry import FieldRegistry
+from digital_life_core.conversation.foreground import BackgroundPromptTrigger
+from digital_life_core.execution.models import TaskContext, TaskError, encode
+from digital_life_core.foundation.refs import AudienceRef, SourceRef, VersionRef
+from digital_life_core.model_gateway.routing import configuration_fields
+from digital_life_core.model_gateway.models import MAX_TOOL_CATALOG, Amount, BudgetPolicy, ToolCall
+from digital_life_core.model_gateway.budget import BudgetLedger
+from digital_life_core.identity_policy.models import AuthorizationTier, GrantState
+from digital_life_core.identity_policy.personas import ConversationRoute
+from digital_life_core.role_work.growth import GrowthKind, GrowthState, RoleGrowthRecord
+from digital_life_core.role_work.state.maintenance import (PROMPT as STATE_MAINTENANCE_PROMPT,
     STATE_INTERVENTION_INSTRUCTION, state_output_budget, state_profile)
-from companion_v2.role_work.state.management import StateManagement
-from companion_v2.role_work.state.service import FIELDS
-from companion_v2.sources.models import SourceRecord
+from digital_life_core.role_work.state.management import StateManagement
+from digital_life_core.role_work.state.service import FIELDS
+from digital_life_core.sources.models import SourceRecord
 from tests.test_host_application import HostFixture
 from tests.test_management_access import NOW, SCOPE
 from tests.test_role_tool_loop import answered, call, requested
@@ -87,7 +87,7 @@ class StateFixture(HostFixture):
         return source
 
     def revoke_source(self, app, source):
-        from companion_v2.sources.dependencies import revoke_dependants
+        from digital_life_core.sources.dependencies import revoke_dependants
         with self.runtime.transaction() as connection:
             connection.execute("UPDATE sources SET state = 'revoked' WHERE source_id = ?", (source.source_id,))
             revoke_dependants(self.runtime, source, self.clock.now())
@@ -208,7 +208,7 @@ class RoleStateTests(StateFixture, unittest.IsolatedAsyncioTestCase):
         app.role_state.write(context, data=state_data(mood="被这段话触动"), expected_revision=0,
                              operation_key="one", sources=(original,))
         root = app.role_state.records.get(context, "current")["sources"]
-        from companion_v2.identity_policy.private_domain import source_ref
+        from digital_life_core.identity_policy.private_domain import source_ref
         app.role_state.write(context, data=state_data(mood="余韵仍在"), expected_revision=1,
                              operation_key="two", sources=tuple(source_ref(s) for s in root))
         self.revoke_source(app, original)
@@ -408,7 +408,7 @@ class StateMaintenanceTests(StateFixture, unittest.IsolatedAsyncioTestCase):
     async def test_source_conversion_accepts_existing_references_and_stored_mappings(self):
         _, app, context, _ = await self.ready()
         source = self.source(app, context, "maintenance-source-ref")
-        from companion_v2.identity_policy.private_domain import as_source_ref
+        from digital_life_core.identity_policy.private_domain import as_source_ref
 
         self.assertIs(as_source_ref(source), source)
         self.assertEqual(as_source_ref(json.loads(encode(source))), source)
@@ -481,7 +481,7 @@ class StateMaintenanceTests(StateFixture, unittest.IsolatedAsyncioTestCase):
         self.assertEqual(inputs, ["输入 after-state"])
 
     async def test_maintenance_processes_care_dialogue_in_its_authorized_window_once(self):
-        from companion_v2.conversation.native_observations import NativeConversationObservations
+        from digital_life_core.conversation.native_observations import NativeConversationObservations
         _, app, context, _ = await self.ready()
         other_scope = replace(context.scope, native_scope_id="care-window",
                               conversation_id="conversation-care", session_id="session-care")
@@ -516,7 +516,7 @@ class StateMaintenanceTests(StateFixture, unittest.IsolatedAsyncioTestCase):
         self.assertEqual(app.state_maintenance.prepare(other, selected[1], "next-round")["recent_dialogue"], ())
 
     async def test_maintenance_does_not_replay_unsent_or_withdrawn_dialogue(self):
-        from companion_v2.conversation.native_observations import NativeConversationObservations
+        from digital_life_core.conversation.native_observations import NativeConversationObservations
         _, app, context, _ = await self.ready()
         observations = NativeConversationObservations(app.messages)
         reference = observations.capture_together(context, observation_id="care-source", event_id="care-source",
@@ -529,7 +529,7 @@ class StateMaintenanceTests(StateFixture, unittest.IsolatedAsyncioTestCase):
         self.assertEqual(app.state_maintenance.prepare(context, "原角色人格提示", "after-withdrawal")["recent_dialogue"], ())
 
     async def test_bounded_maintenance_dialogue_keeps_the_latest_care_feedback(self):
-        from companion_v2.conversation.native_observations import NativeConversationObservations
+        from digital_life_core.conversation.native_observations import NativeConversationObservations
         _, app, context, _ = await self.ready()
         observations = NativeConversationObservations(app.messages)
         for index in range(8):
@@ -684,7 +684,7 @@ class StateMaintenanceTests(StateFixture, unittest.IsolatedAsyncioTestCase):
         reopened = self.host()
         other = reopened.application
         await self.start(reopened, task_generation=1, model_generation=1)
-        with self.assertLogs("companion_v2.role_work.state.maintenance", level="INFO") as captured:
+        with self.assertLogs("digital_life_core.role_work.state.maintenance", level="INFO") as captured:
             other.state_maintenance.advance()
         self.assertTrue(any("角色状态计划已保留，等待可信运行上下文" in record.getMessage()
                             for record in captured.records))

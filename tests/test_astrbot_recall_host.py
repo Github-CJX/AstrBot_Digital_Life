@@ -12,10 +12,10 @@ from types import SimpleNamespace as NS
 import unittest
 
 from tests.recall_host_support import RecallAssertions, recall_notice, sdk_environment
-from astrbot_host.controller import AstrBotStagingController
-from companion_v2.adapters.astrbot.staging import NativeAdapterTypes
-from companion_v2.conversation.quotes.models import CapturedQuote
-from companion_v2.foundation.clock import DeterministicClock
+from digital_life_host.controller import AstrBotStagingController
+from digital_life_core.adapters.astrbot.staging import NativeAdapterTypes
+from digital_life_core.conversation.quotes.models import CapturedQuote
+from digital_life_core.foundation.clock import DeterministicClock
 from tests.group_host_support import GroupFixture, group_config
 from tests.native_adapter_support import FakeEvent, FakePlatform, FakeProvider, FakeReverseApi, completion, final_text
 from tests.staging_bootstrap_support import database_contents, wait_for_batch
@@ -359,7 +359,7 @@ class StagingRecallTests(RecallAssertions, unittest.IsolatedAsyncioTestCase):
         self.assertEqual((result["withdrawn_inputs"], result["revoked_quotes"]), (0, 1))
         self.assert_withdrawn(app, batch, False)
         context = self.original_context(app, batch)
-        from companion_v2.execution.models import TaskError
+        from digital_life_core.execution.models import TaskError
         with self.assertRaises(TaskError):
             app.messages._request(app.messages.batch(batch), context, self.clock.now())
 

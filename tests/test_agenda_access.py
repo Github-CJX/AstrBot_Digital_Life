@@ -4,11 +4,11 @@ from dataclasses import replace
 from datetime import timedelta
 import unittest
 
-from companion_v2.agenda.models import Schedule
-from companion_v2.agenda.service import AgendaService
-from companion_v2.foundation.refs import ScopeKind, ScopeRef, SubjectKind, SubjectRef
-from companion_v2.identity_policy.models import AuthorizationTier
-from companion_v2.identity_policy.personas import ConversationRoute, PersonaDirectory
+from digital_life_core.agenda.models import Schedule
+from digital_life_core.agenda.service import AgendaService
+from digital_life_core.foundation.refs import ScopeKind, ScopeRef, SubjectKind, SubjectRef
+from digital_life_core.identity_policy.models import AuthorizationTier
+from digital_life_core.identity_policy.personas import ConversationRoute, PersonaDirectory
 from tests import test_agenda as agenda_fixture
 from tests.test_agenda import INSTALLATION, NOW, PRINCIPAL, ROLE, SCOPE, TARGET, USER
 

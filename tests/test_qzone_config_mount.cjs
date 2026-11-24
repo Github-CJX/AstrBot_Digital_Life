@@ -169,13 +169,13 @@ test("插入范围提示保留已有编辑器节点，整体重画仍使旧节�
 
 const ROLE = {
   role_id: "role-first", role_name: "小伴",
-  config_api: "/astrbot_plugin_private_companion/targets/first/roles/role-first/config",
-  reply_api: "/astrbot_plugin_private_companion/targets/first/roles/role-first/reply",
-  state_api: "/astrbot_plugin_private_companion/targets/first/roles/role-first/state",
-  life_api: "/astrbot_plugin_private_companion/targets/first/roles/role-first/life",
-  growth_api: "/astrbot_plugin_private_companion/targets/first/roles/role-first/growth",
-  memory_api: "/astrbot_plugin_private_companion/targets/first/roles/role-first/memory",
-  relationships_api: "/astrbot_plugin_private_companion/targets/first/roles/role-first/relationships",
+  config_api: "/astrbot_plugin_digital_life/targets/first/roles/role-first/config",
+  reply_api: "/astrbot_plugin_digital_life/targets/first/roles/role-first/reply",
+  state_api: "/astrbot_plugin_digital_life/targets/first/roles/role-first/state",
+  life_api: "/astrbot_plugin_digital_life/targets/first/roles/role-first/life",
+  growth_api: "/astrbot_plugin_digital_life/targets/first/roles/role-first/growth",
+  memory_api: "/astrbot_plugin_digital_life/targets/first/roles/role-first/memory",
+  relationships_api: "/astrbot_plugin_digital_life/targets/first/roles/role-first/relationships",
 };
 
 function qzoneStatus() {
@@ -615,7 +615,7 @@ test("选择本地图片只预览，移除和切换角色会清掉图片，动�
   page.run("qzoneClick({dataset:{qzoneAction:'image-remove',qzoneImage:'0'}})");
   assert.equal(page.run('qzoneState.publishImages.length'),0);
   await page.run("qzoneChooseImages([{type:'image/png',name:'test.png',size:100}])");
-  page.product.role=()=>({...ROLE,qzone_extension_api:'/astrbot_plugin_private_companion/targets/other/qzone-extension'});
+  page.product.role=()=>({...ROLE,qzone_extension_api:'/astrbot_plugin_digital_life/targets/other/qzone-extension'});
   page.run('qzoneImageScope()');
   assert.equal(page.run('qzoneState.publishImages.length'),0);
   const markup=page.run("qzonePhotosMarkup([{url:'javascript:alert(1)'},{url:'https://photo.store.qq.com/a/photo'}])");

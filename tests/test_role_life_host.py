@@ -1,7 +1,7 @@
 from datetime import timedelta
 import unittest
 
-from companion_v2.role_work import RoleActivity, RoleActivityState as State
+from digital_life_core.role_work import RoleActivity, RoleActivityState as State
 from tests.test_host_application import HostFixture
 from tests.test_management_access import NOW, ROLE, SCOPE
 

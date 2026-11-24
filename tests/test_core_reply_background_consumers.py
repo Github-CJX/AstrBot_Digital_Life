@@ -6,18 +6,18 @@ from types import SimpleNamespace as NS
 import unittest
 from unittest.mock import patch
 
-from astrbot_host.management_identity import dashboard_operator
-from companion_v2.agenda.planning_inputs import capture as planning_capture
-from companion_v2.conversation.native_history import body, reference, rows
-from companion_v2.conversation.native_turns import NativeConversationTurns, latest
-from companion_v2.conversation.recall_settings import DEFAULTS as RECALL_DEFAULTS
-from companion_v2.conversation.recalls import MessageRecall
-from companion_v2.conversation.reset import ConversationWindow, reset_window
-from companion_v2.execution.models import TaskError, require, stamp
-from companion_v2.identity_policy.models import AuthorizationTier
-from companion_v2.memory.episode_settings import recent_group_lines
-from companion_v2.proactive.material_pool import read_material_pool
-from companion_v2.proactive.external_materials import parse_news_response
+from digital_life_host.management_identity import dashboard_operator
+from digital_life_core.agenda.planning_inputs import capture as planning_capture
+from digital_life_core.conversation.native_history import body, reference, rows
+from digital_life_core.conversation.native_turns import NativeConversationTurns, latest
+from digital_life_core.conversation.recall_settings import DEFAULTS as RECALL_DEFAULTS
+from digital_life_core.conversation.recalls import MessageRecall
+from digital_life_core.conversation.reset import ConversationWindow, reset_window
+from digital_life_core.execution.models import TaskError, require, stamp
+from digital_life_core.identity_policy.models import AuthorizationTier
+from digital_life_core.memory.episode_settings import recent_group_lines
+from digital_life_core.proactive.material_pool import read_material_pool
+from digital_life_core.proactive.external_materials import parse_news_response
 from tests.group_host_support import GroupFixture
 from tests.multi_host_support import MultiFixture
 
@@ -86,7 +86,7 @@ class CoreBackgroundConsumerTests(MultiFixture, unittest.IsolatedAsyncioTestCase
             exclude_reply_part_id=reply["reference"]["observation_id"])
         self.assertEqual(len(history.conversation.read(excluded, context, sent_at)), 1)
         self.assertEqual(len(rows(self.app.runtime, context, start=stamp(sent_at), kind="assistant")), 1)
-        from companion_v2.conversation.native_observations import rows_for_context
+        from digital_life_core.conversation.native_observations import rows_for_context
         episode_rows = rows_for_context(self.app.runtime, context, start=stamp(sent_at))
         self.assertEqual(len(episode_rows), 1)
         self.assertEqual(episode_rows[0]["sent_at"], stamp(sent_at))
@@ -136,8 +136,8 @@ class CoreBackgroundConsumerTests(MultiFixture, unittest.IsolatedAsyncioTestCase
         self.assert_core_only()
 
     async def test_native_habits_and_completed_life_receipts_share_store_without_breaking_recall(self):
-        from companion_v2.role_work.models import RoleActivity, RoleActivityState
-        from astrbot_host.core_reply_context import build_core_reply_prompt
+        from digital_life_core.role_work.models import RoleActivity, RoleActivityState
+        from digital_life_host.core_reply_context import build_core_reply_prompt
 
         prepared = await self.prepared(text="我刚吃完晚饭，今天吃了米饭")
         context = prepared["context"]
@@ -261,7 +261,7 @@ class CoreGroupEpisodeConsumerTests(GroupFixture, unittest.IsolatedAsyncioTestCa
                          ("先查一查天气吧", "今晚一起看星星"))
         sent = rows(self.app.runtime, first["context"], kind="assistant")[0]
         source = self.app.messages.sources
-        from companion_v2.conversation.messages import source_from_document
+        from digital_life_core.conversation.messages import source_from_document
         ref = source_from_document(json.loads(sent["source_json"]))
         original = self.app.runtime.read_one("SELECT governance_revision FROM sources WHERE source_id=?", (ref.source_id,))
         require(source.revoke(ref, expected_governance_revision=original["governance_revision"], observed_at=self.clock.now()))

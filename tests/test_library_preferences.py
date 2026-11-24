@@ -10,13 +10,13 @@ from datetime import timedelta
 from types import SimpleNamespace
 import unittest
 
-from companion_v2.library import preferences as pref
-from companion_v2.library import triggers as gate
-from companion_v2.library.configuration import DEFAULTS as LIBRARY_DEFAULTS
-from companion_v2.library.configuration import configuration_fields as library_fields
-from companion_v2.library.configuration import validate as validate_library
-from companion_v2.configuration.models import ConfigurationError
-from companion_v2.foundation.refs import OperationRef, VersionRef
+from digital_life_core.library import preferences as pref
+from digital_life_core.library import triggers as gate
+from digital_life_core.library.configuration import DEFAULTS as LIBRARY_DEFAULTS
+from digital_life_core.library.configuration import configuration_fields as library_fields
+from digital_life_core.library.configuration import validate as validate_library
+from digital_life_core.configuration.models import ConfigurationError
+from digital_life_core.foundation.refs import OperationRef, VersionRef
 from tests.test_library_provider import NOW, ShelfFixture
 
 
@@ -153,7 +153,7 @@ class ExtendedLibraryConfigurationTests(unittest.TestCase):
         self.assertEqual(len(library_fields()), 12)
 
     def test_probabilities_are_registered_as_fractions(self):
-        from companion_v2.configuration.registry import ValueKind
+        from digital_life_core.configuration.registry import ValueKind
         fields = {field.field_id.split(".")[-1]: field for field in library_fields()}
         for name in ("share_probability", "ask_probability"):
             self.assertIs(fields[name].kind, ValueKind.PROBABILITY, name)

@@ -4,9 +4,9 @@ import asyncio
 from types import SimpleNamespace as NS
 import unittest
 
-from companion_v2.adapters.astrbot.connections import NativeAccountConnections
-from companion_v2.adapters.astrbot.native import HostAccount
-from companion_v2.execution.models import TaskError
+from digital_life_core.adapters.astrbot.connections import NativeAccountConnections
+from digital_life_core.adapters.astrbot.native import HostAccount
+from digital_life_core.execution.models import TaskError
 from tests.native_adapter_support import FakePlatform
 
 

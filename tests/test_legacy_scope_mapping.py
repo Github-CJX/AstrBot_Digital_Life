@@ -6,14 +6,14 @@ from pathlib import Path
 from tempfile import TemporaryDirectory
 import unittest
 
-from companion_v2.foundation.refs import AudienceRef, ScopeKind, ScopeRef, SourceRef, SubjectKind, SubjectRef, VersionRef
-from companion_v2.legacy.scope_mapping import LegacyScopeMapping, LegacyScopeMappingDirectory
-from companion_v2.identity_policy.models import AuthenticatedHostPrincipal
-from companion_v2.identity_policy.personas import ConversationRoute, PersonaDirectory
-from companion_v2.identity_policy.repository import PersistentIdentityDirectory
-from companion_v2.sources.models import SourceRecord
-from companion_v2.sources.repositories import SourceRepository
-from companion_v2.storage.runtime import StorageRuntime
+from digital_life_core.foundation.refs import AudienceRef, ScopeKind, ScopeRef, SourceRef, SubjectKind, SubjectRef, VersionRef
+from digital_life_core.legacy.scope_mapping import LegacyScopeMapping, LegacyScopeMappingDirectory
+from digital_life_core.identity_policy.models import AuthenticatedHostPrincipal
+from digital_life_core.identity_policy.personas import ConversationRoute, PersonaDirectory
+from digital_life_core.identity_policy.repository import PersistentIdentityDirectory
+from digital_life_core.sources.models import SourceRecord
+from digital_life_core.sources.repositories import SourceRepository
+from digital_life_core.storage.runtime import StorageRuntime
 
 
 NOW = datetime(2026, 9, 21, 6, 0, tzinfo=timezone.utc)

@@ -281,7 +281,7 @@ function maintHarness(responses) {
   };
   const window = {
     CompanionProduct: {
-      role: () => ({model_api: "/astrbot_plugin_private_companion/model", config_api: "/astrbot_plugin_private_companion/config", role_id: "role-a"}),
+      role: () => ({model_api: "/astrbot_plugin_digital_life/model", config_api: "/astrbot_plugin_digital_life/config", role_id: "role-a"}),
       bridgeNow: () => bridge,
     },
     lucide: {createIcons() {}},
@@ -315,7 +315,7 @@ function modelsHarness() {
   const window = {
     CompanionProduct: {
       hosted: () => true,
-      role: () => ({model_api: "/astrbot_plugin_private_companion/model"}),
+      role: () => ({model_api: "/astrbot_plugin_digital_life/model"}),
       identity: () => ({installation_id: "inst", operator_id: "operator"}),
       bridgeNow: () => window.AstrBotPluginPage,
       bridgeFor: () => ({then: resolve => resolve(window.AstrBotPluginPage)}),

@@ -2,15 +2,15 @@ from dataclasses import asdict, replace
 import json
 import unittest
 
-from companion_v2.configuration.models import ConfigurationError
-from companion_v2.conversation.reply_preparation import prepare_reply
-from companion_v2.conversation.reply_settings import validate
-from companion_v2.conversation.segmentation import SegmentationPolicy, LLM_SEGMENT_MARKER as MARKER
-from companion_v2.conversation.text_processing import (
+from digital_life_core.configuration.models import ConfigurationError
+from digital_life_core.conversation.reply_preparation import prepare_reply
+from digital_life_core.conversation.reply_settings import validate
+from digital_life_core.conversation.segmentation import SegmentationPolicy, LLM_SEGMENT_MARKER as MARKER
+from digital_life_core.conversation.text_processing import (
     InternalExpressionProtocolFilter, ReplyTextPolicy, TEXT_DEFAULTS,
     strip_internal_expression_protocol,
 )
-from companion_v2.conversation.voice_reply import VoiceReplyPolicy
+from digital_life_core.conversation.voice_reply import VoiceReplyPolicy
 
 
 def policy(**changes):

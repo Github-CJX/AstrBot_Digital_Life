@@ -5,8 +5,8 @@ from types import SimpleNamespace as NS
 from unittest.mock import AsyncMock, patch
 
 from tests import test_astrbot_staging_host as _host_import_root
-from astrbot_host import native
-from astrbot_host.session_topology import SessionTopology
+from digital_life_host import native
+from digital_life_host.session_topology import SessionTopology
 
 
 class NativeSessionSettingsTests(unittest.IsolatedAsyncioTestCase):
@@ -101,7 +101,7 @@ class NativeSessionSettingsTests(unittest.IsolatedAsyncioTestCase):
         try:
             with patch.object(native, "SESSION_SETTINGS_LOOKUP_BUDGET_SECONDS", 0.01), \
                     patch.object(native.sp, "get_async", AsyncMock(side_effect=read_settings)), \
-                    self.assertLogs("astrbot_host.session_topology", level="WARNING") as captured:
+                    self.assertLogs("digital_life_host.session_topology", level="WARNING") as captured:
                 self.assertTrue(await topology.reply_enabled(event))
             self.assertIn("继续 AstrBot 核心回复", "\n".join(captured.output))
             task = native._session_settings_reads[umo]

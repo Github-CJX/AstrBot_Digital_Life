@@ -1,7 +1,7 @@
 import unittest
 from datetime import datetime, timedelta, timezone
 
-from companion_v2.conversation.group_topic_gate import evaluate, score
+from digital_life_core.conversation.group_topic_gate import evaluate, score
 
 
 NOW = datetime(2026, 11, 6, 20, 0, tzinfo=timezone.utc)

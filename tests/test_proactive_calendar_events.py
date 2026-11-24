@@ -5,14 +5,14 @@ import json
 import unittest
 from unittest.mock import patch
 
-from companion_v2.agenda.models import Frequency, Schedule
-from companion_v2.execution.models import TaskError, digest, encode
-from companion_v2.foundation.refs import SourceRef, VersionRef
-from companion_v2.proactive.calendar_events import CalendarContactEvents, SOURCE_OWNER
-from companion_v2.proactive.persona_judge import judge_request
-from companion_v2.proactive.prompts import evidence_materials
-from companion_v2.role_work.state.management import StateManagement
-from companion_v2.sources.models import SourceRecord
+from digital_life_core.agenda.models import Frequency, Schedule
+from digital_life_core.execution.models import TaskError, digest, encode
+from digital_life_core.foundation.refs import SourceRef, VersionRef
+from digital_life_core.proactive.calendar_events import CalendarContactEvents, SOURCE_OWNER
+from digital_life_core.proactive.persona_judge import judge_request
+from digital_life_core.proactive.prompts import evidence_materials
+from digital_life_core.role_work.state.management import StateManagement
+from digital_life_core.sources.models import SourceRecord
 from tests.contact_schedule_support import ContactScheduleFixture
 from tests.test_role_state import calendar_data
 
@@ -67,7 +67,7 @@ class CalendarContactTests(ContactScheduleFixture, unittest.IsolatedAsyncioTestC
             quiet_timezone="UTC", proactive_hour_activity_curve=",".join(["0.05"] + ["1.00"] * 23))
         self.commitment()
         self.accept()
-        with patch("companion_v2.proactive.rhythm.sample", return_value=0.5):
+        with patch("digital_life_core.proactive.rhythm.sample", return_value=0.5):
             self.advance(self.app, 60)
             await self.automatic_delivery(self.app)
         saved = json.loads(self.contacts(self.app)[0]["record_json"])

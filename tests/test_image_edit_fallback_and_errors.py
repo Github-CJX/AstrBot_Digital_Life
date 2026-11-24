@@ -13,22 +13,22 @@ from unittest.mock import patch
 
 from astrbot.core.provider.entities import ProviderRequest
 
-from astrbot_host.core_reply_image_prompt import core_image_tool_contract, inject_core_image_prompt
-from astrbot_host.core_reply_tools import native_tool_name
-from astrbot_host.native_extensions.image_native import output_routing
-from astrbot_host.native_extensions.image_native.adapter import NativeImageProvider, scope_key
-from astrbot_host.native_extensions.image_native.comfyui_workflows import infer_mapping, validate_mapping
-from astrbot_host.native_extensions.image_native.owner import NativeImageOwner
-from astrbot_host.native_extensions.image_native.types import ImageInvocation, NativeImageError, ReferenceImage
-from companion_v2.capabilities.models import CapabilityAuthorizationState
-from companion_v2.capabilities.repositories import CapabilityRepository
-from companion_v2.conversation.media.output_settings import DEFAULTS
-from companion_v2.conversation.tool_failures import failure_guidance, retry_disposition_for
-from companion_v2.execution.models import TaskContext, encode, require
-from companion_v2.foundation.refs import AudienceRef, ScopeKind
-from companion_v2.identity_policy.group_audience import group_audience
-from companion_v2.identity_policy.personas import ConversationRoute
-from companion_v2.model_gateway.models import ToolCall
+from digital_life_host.core_reply_image_prompt import core_image_tool_contract, inject_core_image_prompt
+from digital_life_host.core_reply_tools import native_tool_name
+from digital_life_host.native_extensions.image_native import output_routing
+from digital_life_host.native_extensions.image_native.adapter import NativeImageProvider, scope_key
+from digital_life_host.native_extensions.image_native.comfyui_workflows import infer_mapping, validate_mapping
+from digital_life_host.native_extensions.image_native.owner import NativeImageOwner
+from digital_life_host.native_extensions.image_native.types import ImageInvocation, NativeImageError, ReferenceImage
+from digital_life_core.capabilities.models import CapabilityAuthorizationState
+from digital_life_core.capabilities.repositories import CapabilityRepository
+from digital_life_core.conversation.media.output_settings import DEFAULTS
+from digital_life_core.conversation.tool_failures import failure_guidance, retry_disposition_for
+from digital_life_core.execution.models import TaskContext, encode, require
+from digital_life_core.foundation.refs import AudienceRef, ScopeKind
+from digital_life_core.identity_policy.group_audience import group_audience
+from digital_life_core.identity_policy.personas import ConversationRoute
+from digital_life_core.model_gateway.models import ToolCall
 from tests import test_core_reply_images as _core_images_mod
 from tests import test_native_image_flow as _native_flow_mod
 from tests.native_image_support import NativeImageFixture
@@ -67,8 +67,8 @@ def _comfy_object_info(*, omit=()):
 class ImageEditFallbackAndCoreErrorsTests(NativeImageFixture, HostFixture, unittest.IsolatedAsyncioTestCase):
     def setUp(self):
         super().setUp()
-        from companion_v2.storage.native_conversation_schema import STATEMENTS
-        from companion_v2.capabilities.repositories import CapabilityRepository
+        from digital_life_core.storage.native_conversation_schema import STATEMENTS
+        from digital_life_core.capabilities.repositories import CapabilityRepository
         with self.runtime.transaction() as connection:
             for statement in STATEMENTS:
                 connection.execute(statement)
@@ -173,7 +173,7 @@ class ImageEditFallbackAndCoreErrorsTests(NativeImageFixture, HostFixture, unitt
         for action in ("text", "conversation.reply", "extension.tool.invoke"):
             self.grant(self.standard, other_scope, action)
         package = self.native_registry.declarations()[0].descriptor.package
-        from companion_v2.capabilities.repositories import CapabilityRepository
+        from digital_life_core.capabilities.repositories import CapabilityRepository
         capabilities = CapabilityRepository(self.runtime)
         for capability in package.capabilities:
             require(capabilities.set_authorization(
@@ -457,7 +457,7 @@ class ComfyUIEditWorkflowAndErrorCodeTests(unittest.IsolatedAsyncioTestCase):
         provider = NativeImageProvider(owner)
         ref = self._ref("edit_source")
         context = {"scope": "scope-comfy-role"}
-        from astrbot_host.native_extensions.image_native.adapter import scope_key
+        from digital_life_host.native_extensions.image_native.adapter import scope_key
         inv = ImageInvocation(
             scope_key=scope_key(context), request_id="req-comfy-role", invocation_id="inv-comfy-role",
             origin_key="origin-comfy", operation="edit", prompt="change expression",
@@ -539,7 +539,7 @@ class ComfyUIEditWorkflowAndErrorCodeTests(unittest.IsolatedAsyncioTestCase):
 class StagingBatchImageEditFallbackTests(NativeImageFixture, HostFixture, unittest.IsolatedAsyncioTestCase):
     def setUp(self):
         super().setUp()
-        from companion_v2.capabilities.repositories import CapabilityRepository
+        from digital_life_core.capabilities.repositories import CapabilityRepository
         self.image_directory = self.root.parent / "image-native-v2"
         self.native_registry = self.create_image_port(self.image_directory, self.clock.now)
         self.providers = tuple(replace(p, capabilities=("text", "tools", "image")) for p in self.providers)

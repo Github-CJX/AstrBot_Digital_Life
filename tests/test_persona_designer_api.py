@@ -12,9 +12,9 @@ from unittest.mock import AsyncMock, patch
 
 import tests.astrbot_data_root  # isolate SDK import-time files before loading AstrBot
 from astrbot.api.web import PluginMultiDict
-from astrbot_host.persona_designer_api import PersonaDesignerWebAPI, PREFIX
-from astrbot_host.optional_persona_designer import register_optional_designer
-from companion_v2.execution.models import TaskError
+from digital_life_host.persona_designer_api import PersonaDesignerWebAPI, PREFIX
+from digital_life_host.optional_persona_designer import register_optional_designer
+from digital_life_core.execution.models import TaskError
 from tests.test_persona_designer import response, state
 from tests.test_persona_workshop_api import PersonaWorkshopFixture
 
@@ -49,7 +49,7 @@ class DesignerAPITests(unittest.IsolatedAsyncioTestCase):
         await asyncio.sleep(0)
 
     async def call(self, suffix, *, method="GET", body=None, query=None, username="admin"):
-        with patch("astrbot_host.persona_designer_api.request", request(body, query, username)):
+        with patch("digital_life_host.persona_designer_api.request", request(body, query, username)):
             return await self.routes[(PREFIX + suffix, method)]()
 
     def turn_body(self, **changes):
@@ -86,7 +86,7 @@ class DesignerAPITests(unittest.IsolatedAsyncioTestCase):
         self.context.get_config = lambda **_: {"agent_runner": {"runner_type": "local",
             "config": {"persona": {"persona_id": "conversation-role"}}}}
         self.assertEqual((await self.call("/options"))["data"]["personas"][0]["id"], "conversation-role")
-        with patch("astrbot_host.persona_designer_api.available_personas", AsyncMock(side_effect=OSError("unavailable"))):
+        with patch("digital_life_host.persona_designer_api.available_personas", AsyncMock(side_effect=OSError("unavailable"))):
             result = (await self.call("/options"))["data"]
         self.assertEqual(result["personas"], [])
         self.assertEqual(len(result["models"]), 1)
@@ -155,7 +155,7 @@ class DesignerAPITests(unittest.IsolatedAsyncioTestCase):
     async def test_existing_management_policy_is_enforced_when_runtime_exists(self):
         self.controller.runtime = NS(installation_id="test-installation")
         self.controller.now = lambda: "test-time"
-        with patch("astrbot_host.persona_designer_api.dashboard_operator", side_effect=TaskError("core_access_required", "denied")):
+        with patch("digital_life_host.persona_designer_api.dashboard_operator", side_effect=TaskError("core_access_required", "denied")):
             result = await self.call("/options")
         self.assertEqual(result["message"], "core_access_required")
 
@@ -199,7 +199,7 @@ class DesignerAPITests(unittest.IsolatedAsyncioTestCase):
             return NS(completion_text=response())
         self.provider.text_chat.side_effect = stubborn
         try:
-            with patch("astrbot_host.persona_designer_api.MODEL_TIMEOUT", .01):
+            with patch("digital_life_host.persona_designer_api.MODEL_TIMEOUT", .01):
                 result = await asyncio.wait_for(self.call("/turn", method="POST", body=self.turn_body()), .5)
             self.assertEqual(result["message"], "persona_designer_timeout")
             self.assertEqual(len(self.api.jobs), 1, "uncancelled provider work keeps its concurrency slot")
@@ -241,7 +241,7 @@ class DesignerAPITests(unittest.IsolatedAsyncioTestCase):
         self.provider.text_chat.side_effect = slow
         # The real request proxy is context-local. Direct handler fixtures use
         # the same synthetic identity/body, while owners exercise the job limit.
-        with patch("astrbot_host.persona_designer_api.request", request(self.turn_body())):
+        with patch("digital_life_host.persona_designer_api.request", request(self.turn_body())):
             first = asyncio.create_task(self.api.turn("first"))
             second = asyncio.create_task(self.api.turn("second"))
             await asyncio.sleep(0)
@@ -262,7 +262,7 @@ class ExistingWorkshopDataTests(PersonaWorkshopFixture):
             RoleProfileConfigurationOwner, role_profile_fields, role_profile_target_for, support)
 
         # Create existing data using the original APIs before enabling the designer.
-        with patch("astrbot_host.optional_persona_designer.register_optional_designer", return_value=False):
+        with patch("digital_life_host.optional_persona_designer.register_optional_designer", return_value=False):
             await self.initialize()
         saved = await self.post({"action": "save", "text": "原问卷旧草稿  \n", "note": "原有版本", "expected_current": ""})
         self.assertEqual(saved["status"], "ok", saved)
@@ -282,7 +282,7 @@ class ExistingWorkshopDataTests(PersonaWorkshopFixture):
         api = PersonaDesignerWebAPI(self.controller)
         routes = {(path, methods[0]): handler for path, handler, methods, _ in api.routes()}
         async def call(suffix, method="GET", body=None, query=None):
-            with patch("astrbot_host.persona_designer_api.request", request(body, query)):
+            with patch("digital_life_host.persona_designer_api.request", request(body, query)):
                 return await routes[(PREFIX + suffix, method)]()
         try:
             read = await call("/persona", query={"id": "original"})
@@ -330,7 +330,7 @@ class OptionalRegistrationTests(unittest.TestCase):
             self.context.registered_web_apis.append(route)
             if route[0].endswith("two"):
                 raise RuntimeError("partial registration failure")
-        with patch("astrbot_host.persona_designer_api.PersonaDesignerWebAPI", Optional):
+        with patch("digital_life_host.persona_designer_api.PersonaDesignerWebAPI", Optional):
             self.assertFalse(register_optional_designer(self.owner, register))
         self.assertEqual(self.context.registered_web_apis, [self.core])
         self.assertEqual(self.owner._registered_routes, [self.core[:2]])
@@ -340,7 +340,7 @@ class HostLifecycleTests(unittest.IsolatedAsyncioTestCase):
     async def test_single_and_multi_core_routes_survive_optional_init_failure(self):
         from tests import test_astrbot_staging_host as support
         from tests.multi_host_support import multi_config
-        from astrbot_host.multi_controller import AstrBotMultiController
+        from digital_life_host.multi_controller import AstrBotMultiController
 
         for constructor, config in ((support.AstrBotStagingController, support.host_config()),
                                     (AstrBotMultiController, multi_config())):
@@ -350,12 +350,12 @@ class HostLifecycleTests(unittest.IsolatedAsyncioTestCase):
                                                   NS, NS, support.FakeReverseApi)
                 controller = constructor(native, config, Path(root), native_types=types, now=lambda: support.NOW)
                 try:
-                    with patch("astrbot_host.persona_designer_api.PersonaDesignerWebAPI", side_effect=RuntimeError("optional init failure")):
+                    with patch("digital_life_host.persona_designer_api.PersonaDesignerWebAPI", side_effect=RuntimeError("optional init failure")):
                         controller.register_routes()
                     self.assertTrue(native.registered_web_apis)
                     self.assertFalse(any(path.startswith(PREFIX + "/") for path, *_ in native.registered_web_apis))
                     status = next(handler for path, handler, *_ in native.registered_web_apis if path.endswith("/status"))
-                    with patch("astrbot_host.web_api.request", request()), patch("astrbot_host.multi_api.request", request()):
+                    with patch("digital_life_host.web_api.request", request()), patch("digital_life_host.multi_api.request", request()):
                         self.assertEqual((await status())["status"], "ok")
                 finally:
                     await controller.terminate()

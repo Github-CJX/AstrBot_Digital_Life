@@ -12,9 +12,9 @@ from types import SimpleNamespace
 import unittest
 from unittest.mock import AsyncMock, Mock
 
-from companion_v2.execution.models import TaskError, encode, stamp
-from companion_v2.foundation.refs import ScopeKind
-from companion_v2.role_work.journal.self_review_service import (KIND, OUTCOME_PREFIX, SelfReviewService)
+from digital_life_core.execution.models import TaskError, encode, stamp
+from digital_life_core.foundation.refs import ScopeKind
+from digital_life_core.role_work.journal.self_review_service import (KIND, OUTCOME_PREFIX, SelfReviewService)
 from tests.multi_host_support import MultiFixture, multi_config
 
 INSTRUCTION = "原角色人格提示"

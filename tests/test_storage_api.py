@@ -11,8 +11,8 @@ from types import SimpleNamespace as NS
 import unittest
 from unittest.mock import patch
 
-from astrbot_host.storage_api import PREFIX, StorageWebAPI
-from companion_v2.storage.backup import BACKUP_FORMAT, InstallationBackup, LEGACY_BACKUP_FORMAT
+from digital_life_host.storage_api import PREFIX, StorageWebAPI
+from digital_life_core.storage.backup import BACKUP_FORMAT, InstallationBackup, LEGACY_BACKUP_FORMAT
 
 
 def _write_v1_snapshot(directory, identifier, created_at, installation_id):
@@ -24,7 +24,7 @@ def _write_v1_snapshot(directory, identifier, created_at, installation_id):
     real ``content_hash``. Writing arbitrary bytes under a v1 label would let a
     digest/schema regression pass unnoticed.
     """
-    from companion_v2.storage.schema import SCHEMA_VERSION
+    from digital_life_core.storage.schema import SCHEMA_VERSION
 
     directory = Path(directory)
     directory.mkdir(parents=True, exist_ok=True)
@@ -54,7 +54,7 @@ def _create_v2_bundle(source_root, directory, installation_id):
     the fixture) and the open runtime is returned so the test can ask the product to
     verify the same bytes again after a backup-directory migration.
     """
-    from companion_v2.storage.runtime import StorageRuntime
+    from digital_life_core.storage.runtime import StorageRuntime
 
     runtime = StorageRuntime.open(data_root=Path(source_root), installation_id=installation_id)
     try:
@@ -81,7 +81,7 @@ class StorageApiTests(unittest.IsolatedAsyncioTestCase):
         temporary = TemporaryDirectory(prefix="companion-v2-storage-api-")
         self.addCleanup(temporary.cleanup)
         self.root = Path(temporary.name)
-        self.default_root = self.root / "plugin-data" / "astrbot_plugin_private_companion"
+        self.default_root = self.root / "plugin-data" / "astrbot_plugin_digital_life"
         self.default_root.mkdir(parents=True)
         self.installation_id = "installation-main"
         self.profile_root = self.default_root / "installations" / "main"
@@ -108,7 +108,7 @@ class StorageApiTests(unittest.IsolatedAsyncioTestCase):
 
         self.controller.session = NS(application=Application())
         self.request.payload = json.dumps({"action": "cache"}).encode("utf-8")
-        with patch("astrbot_host.storage_api.request", self.request):
+        with patch("digital_life_host.storage_api.request", self.request):
             response = await self.api.update()
         self.assertEqual(response["status"], "ok")
         self.assertEqual(response["data"]["cache_result"],
@@ -118,12 +118,12 @@ class StorageApiTests(unittest.IsolatedAsyncioTestCase):
     async def test_cache_action_rejects_storage_fields(self):
         self.controller.session = NS(application=NS(clear_caches=lambda: {}))
         self.request.payload = json.dumps({"action": "cache", "path": "D:\\elsewhere"}).encode("utf-8")
-        with patch("astrbot_host.storage_api.request", self.request):
+        with patch("digital_life_host.storage_api.request", self.request):
             response = await self.api.update()
         self.assertEqual(response["status"], "error")
 
     async def test_status_reports_current_usage_and_policy(self):
-        with patch("astrbot_host.storage_api.request", self.request):
+        with patch("digital_life_host.storage_api.request", self.request):
             response = await self.api.status()
         self.assertEqual(response["status"], "ok")
         self.assertEqual(response["data"]["active_root"], str(self.default_root.resolve()))
@@ -134,7 +134,7 @@ class StorageApiTests(unittest.IsolatedAsyncioTestCase):
     async def test_auto_backup_settings_are_bounded_and_preserved_for_old_clients(self):
         base = {"action": "save", "path": "", "backup_path": "",
                 "retention_count": 5, "retention_days": 30}
-        with patch("astrbot_host.storage_api.request", self.request):
+        with patch("digital_life_host.storage_api.request", self.request):
             response = await self.api.status()
             self.assertEqual(response["data"]["auto_backup"], {"auto_backup_enabled": False,
                                                                "auto_backup_interval_minutes": 1440})
@@ -156,7 +156,7 @@ class StorageApiTests(unittest.IsolatedAsyncioTestCase):
         backup = self.root / "E-drive" / "Snapshots"
         self.request.payload = json.dumps({"action": "save", "path": str(selected),
             "backup_path": str(backup), "retention_count": 5, "retention_days": 30}).encode()
-        with patch("astrbot_host.storage_api.request", self.request):
+        with patch("digital_life_host.storage_api.request", self.request):
             response = await self.api.update()
         self.assertEqual(response["status"], "ok")
         self.assertTrue(response["data"]["restart_required"])
@@ -180,7 +180,7 @@ class StorageApiTests(unittest.IsolatedAsyncioTestCase):
         selected = self.root / "external-runtime"
         self.request.payload = json.dumps({"action": "save", "path": str(selected),
             "backup_path": "", "retention_count": 10, "retention_days": 90}).encode()
-        with patch("astrbot_host.storage_api.request", self.request):
+        with patch("digital_life_host.storage_api.request", self.request):
             response = await self.api.update()
 
         self.assertEqual(response["status"], "ok", response)
@@ -192,7 +192,7 @@ class StorageApiTests(unittest.IsolatedAsyncioTestCase):
     async def test_invalid_path_does_not_change_configuration(self):
         self.request.payload = json.dumps({"action": "save", "path": "relative",
             "backup_path": "", "retention_count": 5, "retention_days": 30}).encode()
-        with patch("astrbot_host.storage_api.request", self.request):
+        with patch("digital_life_host.storage_api.request", self.request):
             response = await self.api.update()
         self.assertEqual(response["status"], "error")
         self.assertEqual(self.config["storage"]["path"], "")
@@ -207,7 +207,7 @@ class StorageApiTests(unittest.IsolatedAsyncioTestCase):
         self.config["storage"]["retention_count"] = 1
         self.request.payload = b'{"action":"clean"}'
 
-        with patch("astrbot_host.storage_api.request", self.request):
+        with patch("digital_life_host.storage_api.request", self.request):
             response = await self.api.update()
 
         self.assertEqual(response["status"], "ok")
@@ -225,7 +225,7 @@ class StorageApiTests(unittest.IsolatedAsyncioTestCase):
         self.request.payload = json.dumps({"action": "save", "path": "", "backup_path": str(new),
             "retention_count": 10, "retention_days": 90}).encode()
 
-        with patch("astrbot_host.storage_api.request", self.request):
+        with patch("digital_life_host.storage_api.request", self.request):
             response = await self.api.update()
 
         self.assertEqual(response["status"], "ok")
@@ -251,7 +251,7 @@ class StorageApiTests(unittest.IsolatedAsyncioTestCase):
         # expected inventory count keeps this honest if the minimal runtime grows.
         expected_files = len(manifest["artifacts"]) + 1
 
-        with patch("astrbot_host.storage_api.request", self.request):
+        with patch("digital_life_host.storage_api.request", self.request):
             status = await self.api.status()
         self.assertEqual(status["status"], "ok")
         self.assertEqual(status["data"]["inventory"]["categories"]["backups"]["files"], expected_files)
@@ -261,7 +261,7 @@ class StorageApiTests(unittest.IsolatedAsyncioTestCase):
         external = self.root / "external-snapshots"
         self.request.payload = json.dumps({"action": "save", "path": "", "backup_path": str(external),
             "retention_count": 10, "retention_days": 90}).encode()
-        with patch("astrbot_host.storage_api.request", self.request):
+        with patch("digital_life_host.storage_api.request", self.request):
             response = await self.api.update()
 
         self.assertEqual(response["status"], "ok")
@@ -300,7 +300,7 @@ class StorageApiTests(unittest.IsolatedAsyncioTestCase):
                            datetime(2026, 10, 7, tzinfo=timezone.utc), other_id)
         self.config["storage"].update(backup_path=str(external), retention_count=1)
 
-        with patch("astrbot_host.storage_api.request", self.request):
+        with patch("digital_life_host.storage_api.request", self.request):
             status = await self.api.status()
             self.request.payload = b'{"action":"clean"}'
             response = await self.api.update()
@@ -323,7 +323,7 @@ class StorageApiTests(unittest.IsolatedAsyncioTestCase):
         self.request.payload = json.dumps({"action": "save", "path": "", "backup_path": str(new),
             "retention_count": 10, "retention_days": 90}).encode()
 
-        with patch("astrbot_host.storage_api.request", self.request):
+        with patch("digital_life_host.storage_api.request", self.request):
             response = await self.api.update()
 
         self.assertEqual(response["status"], "error")

@@ -9,14 +9,14 @@ import unittest
 from tests import test_astrbot_staging_host as support
 from astrbot.api.web import PluginRequest, bind_request_context
 from starlette.requests import Request
-from astrbot_host.memory_api import PREFIX
-from companion_v2.execution.models import encode, stamp
-from companion_v2.memory.models import Proposal, owner_key
-from companion_v2.memory.management import MemoryManagement
-from companion_v2.adapters.astrbot.native import persona_instruction
-from companion_v2.conversation.native_observations import NativeConversationObservations
-from companion_v2.identity_policy.models import AuthorizationTier
-from astrbot_host.management_identity import dashboard_operator
+from digital_life_host.memory_api import PREFIX
+from digital_life_core.execution.models import encode, stamp
+from digital_life_core.memory.models import Proposal, owner_key
+from digital_life_core.memory.management import MemoryManagement
+from digital_life_core.adapters.astrbot.native import persona_instruction
+from digital_life_core.conversation.native_observations import NativeConversationObservations
+from digital_life_core.identity_policy.models import AuthorizationTier
+from digital_life_host.management_identity import dashboard_operator
 from tests.native_adapter_support import FakeEvent, FakeProvider, FakeReverseApi, completion
 from tests.test_management_access import NOW
 

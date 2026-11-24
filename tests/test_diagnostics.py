@@ -5,17 +5,17 @@ from datetime import timedelta
 import json
 import unittest
 
-from companion_v2.capabilities import CapabilityAuthorizationState
-from companion_v2.configuration.registry import FieldDefinition, FieldRegistry, ValueKind
-from companion_v2.configuration.service import ConfigurationService
-from companion_v2.diagnostics.models import CheckStatus, DiagnosticContext, DiagnosticMode, DiagnosticQuery, IncidentWindow
-from companion_v2.diagnostics.service import DiagnosticService, report_document
-from companion_v2.foundation.clock import DeterministicClock
-from companion_v2.foundation.refs import AudienceRef, ScopeKind
-from companion_v2.identity_policy.models import AuthorizationTier
-from companion_v2.identity_policy.personas import ConversationRoute
-from companion_v2.screen.models import SCREEN_EXTENSION, SCREEN_READ
-from companion_v2.storage.models import OperationState
+from digital_life_core.capabilities import CapabilityAuthorizationState
+from digital_life_core.configuration.registry import FieldDefinition, FieldRegistry, ValueKind
+from digital_life_core.configuration.service import ConfigurationService
+from digital_life_core.diagnostics.models import CheckStatus, DiagnosticContext, DiagnosticMode, DiagnosticQuery, IncidentWindow
+from digital_life_core.diagnostics.service import DiagnosticService, report_document
+from digital_life_core.foundation.clock import DeterministicClock
+from digital_life_core.foundation.refs import AudienceRef, ScopeKind
+from digital_life_core.identity_policy.models import AuthorizationTier
+from digital_life_core.identity_policy.personas import ConversationRoute
+from digital_life_core.screen.models import SCREEN_EXTENSION, SCREEN_READ
+from digital_life_core.storage.models import OperationState
 from tests.test_management_access import ManagementFixture, NOW, SCOPE
 
 

@@ -8,9 +8,9 @@ import unittest
 from tests.multi_life_support import MultiLifeFixture
 from tests.native_adapter_support import completion
 from tests.test_role_state import state_data
-from astrbot_host.management_identity import dashboard_operator
-from companion_v2.execution.models import encode, stamp
-from companion_v2.role_work.state.management import StateManagement
+from digital_life_host.management_identity import dashboard_operator
+from digital_life_core.execution.models import encode, stamp
+from digital_life_core.role_work.state.management import StateManagement
 
 
 class BackgroundFairnessTests(MultiLifeFixture, unittest.IsolatedAsyncioTestCase):

@@ -24,17 +24,17 @@ from types import SimpleNamespace
 import unittest
 from unittest import mock
 
-from astrbot_host.native_extensions import NativeExtensionRegistry
-from astrbot_host.native_extensions.builtins import BundledNativeLease
-from astrbot_host.native_extensions.image_native import adapter as image_adapter
-from astrbot_host.native_extensions.image_native.adapter import PLUGIN_ID, PROVIDER_ID, SCHEMA, NativeImageProvider
-from astrbot_host.native_extensions.image_native.extension import ImageConfig, ImageExtensionAPI
-from astrbot_host.native_extensions.image_native.output_configuration import (
+from digital_life_host.native_extensions import NativeExtensionRegistry
+from digital_life_host.native_extensions.builtins import BundledNativeLease
+from digital_life_host.native_extensions.image_native import adapter as image_adapter
+from digital_life_host.native_extensions.image_native.adapter import PLUGIN_ID, PROVIDER_ID, SCHEMA, NativeImageProvider
+from digital_life_host.native_extensions.image_native.extension import ImageConfig, ImageExtensionAPI
+from digital_life_host.native_extensions.image_native.output_configuration import (
     MAX_TASK_TIMEOUT_SECONDS, save_configuration, settings as image_settings)
-from astrbot_host.native_extensions.image_native.types import fingerprint
-from companion_v2.capabilities.models import FurnitureDescriptor
-from companion_v2.execution.models import encode
-from companion_v2.product import PRODUCT_VERSION
+from digital_life_host.native_extensions.image_native.types import fingerprint
+from digital_life_core.capabilities.models import FurnitureDescriptor
+from digital_life_core.execution.models import encode
+from digital_life_core.product import PRODUCT_VERSION
 from tests.test_r1_image_protocol import HTTPBackedTest, b64_reply, endpoint, reference
 
 
@@ -261,11 +261,11 @@ class ImageTaskBudgetTests(unittest.IsolatedAsyncioTestCase):
         self.api = ImageExtensionAPI(data_root=self.root / "image", config_path=self.root / "config.json",
                                      version=PRODUCT_VERSION)
         self.addCleanup(self.api.close)
-        lease = BundledNativeLease(PLUGIN_ID, self.api.companion_v2_native(), api=self.api,
+        lease = BundledNativeLease(PLUGIN_ID, self.api.digital_life_core_native(), api=self.api,
                                    furniture=FurnitureDescriptor("image", "image", "画面工作室", "image"))
         self.registry = NativeExtensionRegistry(
             SimpleNamespace(get_all_stars=lambda: ()), bundled_extensions=(lease,))
-        self.provider = self.api.companion_v2_native()
+        self.provider = self.api.digital_life_core_native()
 
     def save_timeout(self, timeout):
         current = self.api.output_configuration()
@@ -356,7 +356,7 @@ class ImageTaskBudgetTests(unittest.IsolatedAsyncioTestCase):
         # The declaration ceiling (1800) must not keep a task waiting longer
         # than the saved configuration; the earlier of the task deadline and the
         # saved budget ends the polling loop.
-        from astrbot_host.native_extensions.image_native.waiting import wait_for_output
+        from digital_life_host.native_extensions.image_native.waiting import wait_for_output
 
         class Owner:
             def __init__(self):

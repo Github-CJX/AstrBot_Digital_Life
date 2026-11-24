@@ -62,17 +62,17 @@ BORROWED_COVERAGE = {
 # value the production assembly passes is the only way to see the fields they
 # register; skipping them silently lost 120 model-routing fields on the first pass.
 def _segmentation_policy():
-    from companion_v2.conversation.segmentation import SegmentationPolicy
+    from digital_life_core.conversation.segmentation import SegmentationPolicy
     return SegmentationPolicy()
 
 
 def _model_profiles():
     """Every task profile the tree constructs, by (kind constant, lane)."""
-    from companion_v2.execution.models import Lane
-    from companion_v2.model_gateway.models import ModelTaskProfile
+    from digital_life_core.execution.models import Lane
+    from digital_life_core.model_gateway.models import ModelTaskProfile
 
     found: set[tuple[str, str]] = set()
-    for path in (ROOT / "companion_v2").rglob("*.py"):
+    for path in (ROOT / "digital_life_core").rglob("*.py"):
         text = path.read_text(encoding="utf-8")
         if "ModelTaskProfile" not in text:
             continue
@@ -93,8 +93,8 @@ def _model_profiles():
 # Keyed by ``module:function``: one module may expose more than one provider, and the
 # key identifies *which* one needs arguments rather than assuming the module has one.
 PARAMETERIZED = {
-    "companion_v2.conversation.reply_settings:configuration_fields": lambda: (_segmentation_policy(), True, 0.0, None),
-    "companion_v2.model_gateway.routing:configuration_fields": lambda: (_model_profiles(),),
+    "digital_life_core.conversation.reply_settings:configuration_fields": lambda: (_segmentation_policy(), True, 0.0, None),
+    "digital_life_core.model_gateway.routing:configuration_fields": lambda: (_model_profiles(),),
 }
 
 
@@ -176,12 +176,12 @@ def load_registry() -> tuple[dict[str, dict], list[str]]:
         import stub_astrbot  # noqa: F401  present only inside the sandbox
     except ImportError:
         pass
-    import companion_v2
+    import digital_life_core
     # Imported here, not at module scope: outside the sandbox this module has to stay
     # importable so the script can report the missing stub instead of failing on import.
     from collections.abc import Iterable
 
-    from companion_v2.configuration.registry import FieldDefinition
+    from digital_life_core.configuration.registry import FieldDefinition
 
     fields: dict[str, dict] = {}
     skipped: list[str] = []
@@ -229,7 +229,7 @@ def load_registry() -> tuple[dict[str, dict], list[str]]:
     # the return type, so an oddly named provider and a second provider inside one module
     # are both picked up without an edit here.
     declared: set[str] = set()
-    for root in (ROOT / "companion_v2", ROOT / "astrbot_host"):
+    for root in (ROOT / "digital_life_core", ROOT / "digital_life_host"):
         for path in root.rglob("*.py"):
             module_name = str(path.relative_to(ROOT).with_suffix("")).replace(os.sep, ".")
             for function_name in _module_functions(path):
@@ -297,7 +297,7 @@ def classify(field_id: str, meta: dict, corpus: dict[str, str]) -> tuple[str, st
 
 def load_routes() -> list[tuple[str, str]]:
     routes = set()
-    for path in sorted((ROOT / "astrbot_host").glob("*.py")):
+    for path in sorted((ROOT / "digital_life_host").glob("*.py")):
         tree = ast.parse(path.read_text(encoding="utf-8"))
         for node in ast.walk(tree):
             if not isinstance(node, (ast.Assign, ast.Return)):
@@ -317,7 +317,7 @@ def load_routes() -> list[tuple[str, str]]:
 
 def load_tables() -> list[str]:
     tables = set()
-    for path in (ROOT / "companion_v2" / "storage").rglob("*.py"):
+    for path in (ROOT / "digital_life_core" / "storage").rglob("*.py"):
         tables |= set(re.findall(r"CREATE TABLE IF NOT EXISTS (\w+)",
                                  path.read_text(encoding="utf-8")))
     return sorted(tables)

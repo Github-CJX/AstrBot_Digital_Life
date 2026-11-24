@@ -2,13 +2,13 @@
 
 from types import SimpleNamespace as NS
 
-from astrbot_host.native_extensions import NativeExtensionRegistry
-from astrbot_host.native_extensions.builtins import MANAGED_EXTENSIONS
-from astrbot_host.native_extensions.images import image_result_handler
-from astrbot_host.native_extensions.image_native.owner import NativeImageOwner
-from astrbot_host.native_extensions.image_native.adapter import NativeImageProvider
-from astrbot_host.native_extensions.image_native.types import BackendResult
-from companion_v2.product import PRODUCT_VERSION
+from digital_life_host.native_extensions import NativeExtensionRegistry
+from digital_life_host.native_extensions.builtins import MANAGED_EXTENSIONS
+from digital_life_host.native_extensions.images import image_result_handler
+from digital_life_host.native_extensions.image_native.owner import NativeImageOwner
+from digital_life_host.native_extensions.image_native.adapter import NativeImageProvider
+from digital_life_host.native_extensions.image_native.types import BackendResult
+from digital_life_core.product import PRODUCT_VERSION
 from tests.test_conversation_images import image_bytes
 from tests.native_internal_support import internal_lease
 

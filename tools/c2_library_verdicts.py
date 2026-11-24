@@ -67,8 +67,8 @@ def verify_carriers() -> list[str]:
     """Return the named carriers that no longer exist, fields or table."""
     if str(ROOT) not in sys.path:
         sys.path.insert(0, str(ROOT))
-    from companion_v2.library.configuration import configuration_fields
-    from companion_v2.storage import schema
+    from digital_life_core.library.configuration import configuration_fields
+    from digital_life_core.storage import schema
     registered = {field.field_id for field in configuration_fields()}
     problems = [name for name in NAMED_FIELDS if name not in registered]
     if TRIGGER_TABLE not in schema.REQUIRED_TABLES:

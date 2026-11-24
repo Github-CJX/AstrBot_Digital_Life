@@ -24,17 +24,17 @@ import json
 from types import SimpleNamespace
 import unittest
 
-from companion_v2.execution.models import ProviderBinding, digest
-from companion_v2.execution.runner import RunResult
-from companion_v2.expression.learning import mode_instruction, signal_limit
-from companion_v2.expression.style_management import ExpressionStyleManagement
-from companion_v2.expression.style_service import (CURSOR_PREFIX, KIND, OUTCOME_PREFIX,
+from digital_life_core.execution.models import ProviderBinding, digest
+from digital_life_core.execution.runner import RunResult
+from digital_life_core.expression.learning import mode_instruction, signal_limit
+from digital_life_core.expression.style_management import ExpressionStyleManagement
+from digital_life_core.expression.style_service import (CURSOR_PREFIX, KIND, OUTCOME_PREFIX,
                                                     ExpressionStyleService, reduced_signal_limit)
-from companion_v2.foundation.outcome import Outcome
-from companion_v2.foundation.refs import ScopeKind, ScopeRef
-from companion_v2.model_gateway.models import (Amount, CapturedModelOutput, LocalProvider,
+from digital_life_core.foundation.outcome import Outcome
+from digital_life_core.foundation.refs import ScopeKind, ScopeRef
+from digital_life_core.model_gateway.models import (Amount, CapturedModelOutput, LocalProvider,
                                                ProviderResponse)
-from companion_v2.storage.models import OperationState
+from digital_life_core.storage.models import OperationState
 from tests import test_expression_v1_pipeline as pipeline
 from tests.test_expression_learning_skip import SkipNoteFixture
 from tests.test_expression_v1_pipeline import ExpressionFixture
@@ -46,7 +46,7 @@ from tests.test_host_application import HostFixture
 LEARNING_TOKENS = 4096
 PROVIDER_OUTPUT_TOKENS = 8192
 TRUNCATED_BODY = '{"summary":"可复用的短句节奏","signals":['
-LOGGER = "companion_v2.expression.style_service"
+LOGGER = "digital_life_core.expression.style_service"
 
 
 class ExpressionLearningTruncationTests(ExpressionFixture, HostFixture, unittest.IsolatedAsyncioTestCase):

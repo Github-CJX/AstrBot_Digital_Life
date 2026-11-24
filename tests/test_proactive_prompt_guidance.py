@@ -2,7 +2,7 @@
 
 import unittest
 
-from companion_v2.proactive.prompts import INSTRUCTION, PURPOSE_INSTRUCTIONS
+from digital_life_core.proactive.prompts import INSTRUCTION, PURPOSE_INSTRUCTIONS
 
 
 class ProactivePromptGuidanceTests(unittest.TestCase):

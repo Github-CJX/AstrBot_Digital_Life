@@ -8,13 +8,13 @@ from types import SimpleNamespace
 import unittest
 from unittest.mock import AsyncMock
 
-from astrbot_host.native_extensions import NativeExtensionRegistry
-from astrbot_host.native_extensions.discovery import discover
-from companion_v2.adapters.astrbot.tools import CompositeAstrBotToolPort, QzoneToolPort, map_tools
-from companion_v2.capabilities.native import MAX_DOCUMENT_BYTES, parse_manifest
-from companion_v2.conversation.external_tools import ExternalToolExecutor
-from companion_v2.model_gateway.models import MAX_TOOL_CATALOG
-from companion_v2.storage.runtime import StorageRuntime
+from digital_life_host.native_extensions import NativeExtensionRegistry
+from digital_life_host.native_extensions.discovery import discover
+from digital_life_core.adapters.astrbot.tools import CompositeAstrBotToolPort, QzoneToolPort, map_tools
+from digital_life_core.capabilities.native import MAX_DOCUMENT_BYTES, parse_manifest
+from digital_life_core.conversation.external_tools import ExternalToolExecutor
+from digital_life_core.model_gateway.models import MAX_TOOL_CATALOG
+from digital_life_core.storage.runtime import StorageRuntime
 from tests.test_native_extensions_registry import Port, Star
 from tests.test_native_provider_contract import manifest
 

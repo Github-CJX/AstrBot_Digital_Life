@@ -5,8 +5,8 @@ from pathlib import Path
 from tempfile import TemporaryDirectory
 import unittest
 
-from companion_v2.execution.models import digest
-from companion_v2.foundation.refs import (
+from digital_life_core.execution.models import digest
+from digital_life_core.foundation.refs import (
     AssetRef,
     AudienceRef,
     ScopeKind,
@@ -16,11 +16,11 @@ from companion_v2.foundation.refs import (
     SubjectRef,
     VersionRef,
 )
-from companion_v2.identity_policy.directory import IdentityDirectory
-from companion_v2.identity_policy.models import AuthenticatedHostPrincipal, AuthorizationTier, FailureCode
-from companion_v2.sources.models import AssetRecord, EvidenceRecord, GovernanceState, SourceRecord
-from companion_v2.sources.repositories import AssetRepository, EvidenceRepository, SourceRepository
-from companion_v2.storage.runtime import StorageRuntime
+from digital_life_core.identity_policy.directory import IdentityDirectory
+from digital_life_core.identity_policy.models import AuthenticatedHostPrincipal, AuthorizationTier, FailureCode
+from digital_life_core.sources.models import AssetRecord, EvidenceRecord, GovernanceState, SourceRecord
+from digital_life_core.sources.repositories import AssetRepository, EvidenceRepository, SourceRepository
+from digital_life_core.storage.runtime import StorageRuntime
 
 
 NOW = datetime(2026, 9, 21, 0, 0, tzinfo=timezone.utc)

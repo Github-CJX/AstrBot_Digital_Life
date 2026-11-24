@@ -7,8 +7,8 @@ from types import SimpleNamespace as NS
 import unittest
 from unittest.mock import AsyncMock
 
-from companion_v2.execution.models import ProviderBinding, TaskError
-from companion_v2.model_gateway.images import IMAGE_PROVIDERS
+from digital_life_core.execution.models import ProviderBinding, TaskError
+from digital_life_core.model_gateway.images import IMAGE_PROVIDERS
 from tests.test_model_gateway import ModelFixture
 
 

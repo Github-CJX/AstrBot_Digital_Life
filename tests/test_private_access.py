@@ -12,7 +12,7 @@
 
 import unittest
 
-from companion_v2.relationships.private_access import (DENIED_REPLY, DIALOGUE_DEFAULT,
+from digital_life_core.relationships.private_access import (DENIED_REPLY, DIALOGUE_DEFAULT,
                                                        NOTICE_COOLDOWN_SECONDS, PROACTIVE_DEFAULT,
                                                        STRANGER_NOTICE_DAILY_CAP, STRANGER_NOTICE_DEFAULT,
                                                        configuration_fields)

@@ -14,9 +14,9 @@ ROOT = pathlib.Path(__file__).resolve().parents[1]
 _ASTRBOT_ROOT = ROOT.parents[2]
 PYTHON = _ASTRBOT_ROOT / "backend" / "python" / "python.exe"
 
-CONTEXT = ROOT / "companion_v2" / "memory" / "context.py"
-SERVICE = ROOT / "companion_v2" / "memory" / "service.py"
-TOOL_LOOP = ROOT / "companion_v2" / "conversation" / "tool_loop.py"
+CONTEXT = ROOT / "digital_life_core" / "memory" / "context.py"
+SERVICE = ROOT / "digital_life_core" / "memory" / "service.py"
+TOOL_LOOP = ROOT / "digital_life_core" / "conversation" / "tool_loop.py"
 PAGE = ROOT / "pages" / "陪伴小屋" / "memory-page.js"
 
 MUTATIONS = (
@@ -26,13 +26,13 @@ MUTATIONS = (
      "        return False"),
     # 探测现在一次交回「判定 + 活句柄」（推送复用同一条发现路径），所以变异体也
     # 跟着走 MemoryOwnerHandle：让「声明在但句柄空」被当成让位（静默降级）。
-    ("M3 让「声明在但句柄空」被当成让位（静默降级）", ROOT / "companion_v2" / "adapters" / "astrbot" / "memory_owner.py",
+    ("M3 让「声明在但句柄空」被当成让位（静默降级）", ROOT / "digital_life_core" / "adapters" / "astrbot" / "memory_owner.py",
      "    if owner is None:\n        return MemoryOwnerHandle(MemoryOwnership(owner=RENDER_SELF, reason=reason_if_none,",
      "    if owner is None:\n        return MemoryOwnerHandle(MemoryOwnership(owner=RENDER_EXTERNAL, reason=REASON_EXTERNAL_ACTIVE,"),
     ("M4 页面徽标改回「V2 独占记忆」的说法", PAGE,
      '"<span></span>V2 记忆库读取正常 <b>V2</b>"',
      '"<span></span>记忆读取正常 <b>V2</b>"'),
-    ("M5 让 V2 自己的默认结论变成「让位」", ROOT / "companion_v2" / "capabilities" / "ownership.py",
+    ("M5 让 V2 自己的默认结论变成「让位」", ROOT / "digital_life_core" / "capabilities" / "ownership.py",
      "        return MemoryOwnership(owner=RENDER_SELF, reason=self.reason)",
      "        return MemoryOwnership(owner=RENDER_EXTERNAL, reason=REASON_EXTERNAL_ACTIVE)"),
 )

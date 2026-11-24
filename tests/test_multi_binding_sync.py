@@ -1,8 +1,8 @@
 import unittest
 from types import SimpleNamespace
 
-from companion_v2.foundation.refs import ScopeKind
-from astrbot_host.multi_session import MultiHostSession, MultiPrivateBridge
+from digital_life_core.foundation.refs import ScopeKind
+from digital_life_host.multi_session import MultiHostSession, MultiPrivateBridge
 
 
 def target(target_id, participant="1001", bot_id="bot-a"):

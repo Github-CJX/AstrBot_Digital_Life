@@ -4,8 +4,8 @@ from types import SimpleNamespace as NS
 import unittest
 from unittest.mock import AsyncMock
 
-from astrbot_host.semantic_models import NativeSemanticModels
-from companion_v2.execution.models import TaskError
+from digital_life_host.semantic_models import NativeSemanticModels
+from digital_life_core.execution.models import TaskError
 
 
 def provider(identifier, modalities):

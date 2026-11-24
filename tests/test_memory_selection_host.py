@@ -5,14 +5,14 @@ from datetime import timedelta
 import json
 import unittest
 
-from companion_v2.configuration.registry import FieldRegistry
-from companion_v2.execution.models import encode, stamp
-from companion_v2.identity_policy.models import AuthorizationTier
-from companion_v2.memory import codec
-from companion_v2.memory.models import Proposal
-from companion_v2.memory.reflection import reflection_profile
-from companion_v2.memory.reflection_management import ReflectionManagement
-from companion_v2.model_gateway.routing import configuration_fields
+from digital_life_core.configuration.registry import FieldRegistry
+from digital_life_core.execution.models import encode, stamp
+from digital_life_core.identity_policy.models import AuthorizationTier
+from digital_life_core.memory import codec
+from digital_life_core.memory.models import Proposal
+from digital_life_core.memory.reflection import reflection_profile
+from digital_life_core.memory.reflection_management import ReflectionManagement
+from digital_life_core.model_gateway.routing import configuration_fields
 from tests import test_memory_recovery as support
 from tests import test_memory_startup_recovery as startup
 from tests.test_host_application import HostFixture

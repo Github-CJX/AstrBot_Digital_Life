@@ -5,18 +5,18 @@ import json
 import unittest
 from unittest.mock import patch
 
-from astrbot_host.weather import ENDPOINT, OpenMeteoWeatherPort, normalize_open_meteo
-from companion_v2.agenda.planning import planning_profile
-from companion_v2.agenda.planning_config import (DEFAULTS as PLANNING_DEFAULTS, MAXIMUMS as PLANNING_MAXIMUMS,
+from digital_life_host.weather import ENDPOINT, OpenMeteoWeatherPort, normalize_open_meteo
+from digital_life_core.agenda.planning import planning_profile
+from digital_life_core.agenda.planning_config import (DEFAULTS as PLANNING_DEFAULTS, MAXIMUMS as PLANNING_MAXIMUMS,
     WEATHER_MAX_AGE_MINIMUM, WeatherLocation, configured_weather_location, configured_weather_max_age)
-from companion_v2.agenda.weather_material import MAX_AGE, planning_weather_material
-from companion_v2.agenda.weather_reading import WeatherReading
-from companion_v2.configuration.models import ConfigurationError
-from companion_v2.configuration.registry import FieldRegistry
-from companion_v2.execution.models import TaskError
-from companion_v2.model_gateway.routing import configuration_fields
-from companion_v2.proactive.external_materials import WeatherSnapshot
-from companion_v2.role_work.state.configuration import configuration_fields as state_configuration_fields
+from digital_life_core.agenda.weather_material import MAX_AGE, planning_weather_material
+from digital_life_core.agenda.weather_reading import WeatherReading
+from digital_life_core.configuration.models import ConfigurationError
+from digital_life_core.configuration.registry import FieldRegistry
+from digital_life_core.execution.models import TaskError
+from digital_life_core.model_gateway.routing import configuration_fields
+from digital_life_core.proactive.external_materials import WeatherSnapshot
+from digital_life_core.role_work.state.configuration import configuration_fields as state_configuration_fields
 from tests.test_management_access import NOW
 from tests.test_role_state import StateFixture
 from tests.test_role_tool_loop import answered
@@ -170,7 +170,7 @@ class OpenMeteoPortTests(unittest.IsolatedAsyncioTestCase):
             async def __aexit__(self, *_):
                 return False
 
-        with patch("astrbot_host.weather.aiohttp.ClientSession", Session):
+        with patch("digital_life_host.weather.aiohttp.ClientSession", Session):
             snapshot = await OpenMeteoWeatherPort().fetch(LOCATION)
         self.assertEqual(request["url"], ENDPOINT)
         self.assertEqual(request["get"]["params"]["latitude"], LOCATION.latitude)

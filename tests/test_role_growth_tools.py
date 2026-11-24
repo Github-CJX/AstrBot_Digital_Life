@@ -5,12 +5,12 @@ import json
 import unittest
 from unittest.mock import patch
 
-from companion_v2.conversation.growth_context import ConversationRoleGrowthContext
-from companion_v2.conversation.foreground import PromptMaterial
-from companion_v2.conversation.tool_loop import LocalRoleTools, ToolSource
-from companion_v2.execution.models import TaskError
-from companion_v2.identity_policy.models import AuthorizationTier
-from companion_v2.role_work.growth import GrowthKind, GrowthState, PersistentRoleGrowthLedger, RoleGrowthContextReader, RoleGrowthRecord
+from digital_life_core.conversation.growth_context import ConversationRoleGrowthContext
+from digital_life_core.conversation.foreground import PromptMaterial
+from digital_life_core.conversation.tool_loop import LocalRoleTools, ToolSource
+from digital_life_core.execution.models import TaskError
+from digital_life_core.identity_policy.models import AuthorizationTier
+from digital_life_core.role_work.growth import GrowthKind, GrowthState, PersistentRoleGrowthLedger, RoleGrowthContextReader, RoleGrowthRecord
 from tests.test_management_access import NOW, SCOPE
 from tests.test_role_tool_loop import ToolLoopFixture, answered, call, requested
 

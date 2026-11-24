@@ -9,23 +9,23 @@ from unittest.mock import patch
 
 from PIL import Image
 
-from companion_v2.capabilities.models import CapabilityAuthorizationState, CapabilityPackageDescriptor
-from companion_v2.capabilities.repositories import CapabilityRepository
-from companion_v2.conversation.external_tools import (
+from digital_life_core.capabilities.models import CapabilityAuthorizationState, CapabilityPackageDescriptor
+from digital_life_core.capabilities.repositories import CapabilityRepository
+from digital_life_core.conversation.external_tools import (
     ExtensionToolDescriptor, ExternalToolExecutor, ExternalToolProvider, ExternalToolResponse,
 )
-from companion_v2.conversation.tool_loop import LocalRoleTools
-from companion_v2.conversation.group_history import _READ_CACHE, _READ_STEPS
-from companion_v2.conversation.media.models import CapturedImage, ImageDescriptor
-from companion_v2.execution.models import ProviderBinding, SideEffect, TaskContext, TaskError, digest, encode
-from companion_v2.execution.runner import TaskRun
-from companion_v2.foundation.refs import AudienceRef, ScopeKind, SourceRef, VersionRef
-from companion_v2.identity_policy.group_audience import group_audience
-from companion_v2.identity_policy.personas import ConversationRoute
-from companion_v2.model_gateway.models import ToolCall, ToolSpec
-from companion_v2.model_gateway.routing import ModelRouter
-from companion_v2.model_gateway.service import LocalModelGateway
-from companion_v2.sources.models import SourceRecord
+from digital_life_core.conversation.tool_loop import LocalRoleTools
+from digital_life_core.conversation.group_history import _READ_CACHE, _READ_STEPS
+from digital_life_core.conversation.media.models import CapturedImage, ImageDescriptor
+from digital_life_core.execution.models import ProviderBinding, SideEffect, TaskContext, TaskError, digest, encode
+from digital_life_core.execution.runner import TaskRun
+from digital_life_core.foundation.refs import AudienceRef, ScopeKind, SourceRef, VersionRef
+from digital_life_core.identity_policy.group_audience import group_audience
+from digital_life_core.identity_policy.personas import ConversationRoute
+from digital_life_core.model_gateway.models import ToolCall, ToolSpec
+from digital_life_core.model_gateway.routing import ModelRouter
+from digital_life_core.model_gateway.service import LocalModelGateway
+from digital_life_core.sources.models import SourceRecord
 from tests.test_conversation_messages import MessageFixture
 from tests.test_management_access import NOW, SCOPE
 from tests.test_role_tool_loop import answered, requested
@@ -103,8 +103,8 @@ class GroupImageToolFixture(MessageFixture):
             expected_revision=revision, observed_at=NOW).unwrap()
 
     def set_image_output(self, **changes):
-        from companion_v2.configuration.models import ConfigLayer, ConfigTarget
-        from companion_v2.conversation.media.output_settings import (
+        from digital_life_core.configuration.models import ConfigLayer, ConfigTarget
+        from digital_life_core.conversation.media.output_settings import (
             GROUP as IMAGE_OUTPUT_GROUP, ImageOutputConfigurationOwner, configuration_fields,
         )
         target = ConfigTarget(self.context.scope.installation_id, ConfigLayer.ROLE,
@@ -324,12 +324,12 @@ class GroupNativeImageToolTests(GroupImageToolFixture, unittest.IsolatedAsyncioT
         saved = json.loads(self.messages.batch(next_batch)["contributions_json"])["group_context"]
         self.assertEqual(len(saved["references"]), 6)
         owner = self.messages.group_context.replies
-        with patch("companion_v2.conversation.group_history.MAX_ANCESTORS", 6):
+        with patch("digital_life_core.conversation.group_history.MAX_ANCESTORS", 6):
             with patch.object(owner, "_reply", wraps=owner._reply) as reads:
                 evidence = owner.source_evidence(saved, other, next_batch, NOW)
             self.assertEqual(reads.call_count, 3)
             self.assertTrue(evidence)
-        with patch("companion_v2.conversation.group_history.MAX_ANCESTORS", 5):
+        with patch("digital_life_core.conversation.group_history.MAX_ANCESTORS", 5):
             with self.assertRaises(TaskError) as error:
                 owner.source_evidence(saved, other, next_batch, NOW)
         self.assertEqual(error.exception.code, "group_history_budget")

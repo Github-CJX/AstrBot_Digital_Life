@@ -7,7 +7,7 @@ const vm = require("node:vm");
 
 const ROOT = path.join(__dirname, "..");
 const PAGE = path.join(ROOT, "pages", "陪伴小屋");
-const HOST = "astrbot_plugin_private_companion";
+const HOST = "astrbot_plugin_digital_life";
 const PREFIX = `/${HOST}/`;
 const reviewSource = fs.readFileSync(path.join(PAGE, "learning-review-page.js"), "utf8");
 const hubCss = fs.readFileSync(path.join(PAGE, "learning-hub.css"), "utf8");

@@ -3,8 +3,8 @@
 import asyncio
 import unittest
 
-from companion_v2.execution.models import Lane, TaskError, TaskResult
-from companion_v2.execution.runner import LocalTaskRunner
+from digital_life_core.execution.models import Lane, TaskError, TaskResult
+from digital_life_core.execution.runner import LocalTaskRunner
 from tests.test_execution import ExecutionFixture
 
 

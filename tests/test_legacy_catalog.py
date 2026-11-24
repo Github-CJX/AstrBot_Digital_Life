@@ -5,15 +5,15 @@ from pathlib import Path
 import tempfile
 import unittest
 
-from companion_v2.legacy.catalog import (
+from digital_life_core.legacy.catalog import (
     CatalogAction,
     LEGACY_COMPATIBILITY_CATALOG,
     V1_PLUGIN_ID,
     V1_SUPPORTED_VERSION,
     V1_SUPPORTED_VERSIONS,
 )
-from companion_v2.legacy.migration import LegacyMigration, MigrationState
-from companion_v2.legacy.surface_ledger import (
+from digital_life_core.legacy.migration import LegacyMigration, MigrationState
+from digital_life_core.legacy.surface_ledger import (
     LEGACY_SURFACE_LEDGER,
     SurfaceClassification,
 )

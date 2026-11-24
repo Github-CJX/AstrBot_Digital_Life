@@ -10,20 +10,20 @@ from astrbot.core.agent.tool import ToolSet
 from astrbot.core.astr_agent_context import AstrAgentContext
 from astrbot.core.provider.entities import ProviderRequest
 from astrbot.core.star.context import Context
-from astrbot_host.core_reply import CORE_REPLY_CONTEXT_EXTRA, prepare_core_reply_event
-from astrbot_host.core_reply_native_send import SendMessageToUserTool, inject_core_reply_send_tool
-from companion_v2.execution.models import TaskError
-from companion_v2.conversation.voice_reply import VoiceReplyPolicy
-from companion_v2.foundation.outcome import Outcome
+from digital_life_host.core_reply import CORE_REPLY_CONTEXT_EXTRA, prepare_core_reply_event
+from digital_life_host.core_reply_native_send import SendMessageToUserTool, inject_core_reply_send_tool
+from digital_life_core.execution.models import TaskError
+from digital_life_core.conversation.voice_reply import VoiceReplyPolicy
+from digital_life_core.foundation.outcome import Outcome
 
 
 class CoreReplyNativeSendTests(unittest.IsolatedAsyncioTestCase):
     async def test_native_tool_missing_speech_uses_current_runner_before_platform_delivery(self):
         from astrbot.core.agent.runners.tool_loop_agent_runner import ToolLoopAgentRunner
         from astrbot.core.message.components import Plain, Record
-        from astrbot_host.core_reply_voice import prepare_core_reply_voice_message
-        from astrbot_host.core_reply_voice_authoring import bind_core_voice_authoring, restore_core_voice_authoring
-        from astrbot_host.core_reply_segmentation import prepare_core_reply_segmentation
+        from digital_life_host.core_reply_voice import prepare_core_reply_voice_message
+        from digital_life_host.core_reply_voice_authoring import bind_core_voice_authoring, restore_core_voice_authoring
+        from digital_life_host.core_reply_segmentation import prepare_core_reply_segmentation
         from tests.test_core_reply_voice_authoring import Provider, voice_plan
         event, wrapper, tool = self.prepare()
         state = event.get_extra(CORE_REPLY_CONTEXT_EXTRA)
@@ -58,7 +58,7 @@ class CoreReplyNativeSendTests(unittest.IsolatedAsyncioTestCase):
 
     async def test_native_tool_voice_is_captured_before_text_replacement_without_response_hook(self):
         from astrbot.core.message.components import Plain, Record
-        from astrbot_host.core_reply_voice import prepare_core_reply_voice_message
+        from digital_life_host.core_reply_voice import prepare_core_reply_voice_message
         event, wrapper, tool = self.prepare()
         state = event.get_extra(CORE_REPLY_CONTEXT_EXTRA)
         state["prepared"].update(voice_reply_policy=VoiceReplyPolicy(generation_mode="model_tag", language="ja",
@@ -100,7 +100,7 @@ class CoreReplyNativeSendTests(unittest.IsolatedAsyncioTestCase):
 
     async def test_real_native_tool_sends_via_core_without_mutating_shared_context(self):
         event, wrapper, tool = self.prepare()
-        with patch("astrbot_host.core_reply_reactions.observe_core_media_send_returned") as media:
+        with patch("digital_life_host.core_reply_reactions.observe_core_media_send_returned") as media:
             result = await tool.call(wrapper, messages=[{"type": "plain", "text": "看我找到的！"}])
         self.assertIn("sent", result.lower())
         self.platform.send_by_session.assert_awaited_once()
@@ -142,9 +142,9 @@ class CoreReplyNativeSendTests(unittest.IsolatedAsyncioTestCase):
     async def test_image_send_tool_sends_only_images_and_normal_reply_keeps_text_and_voice(self):
         from astrbot.core.message.components import Image, Plain, Record
         from astrbot.core.message.message_event_result import MessageEventResult, MessageChain, ResultContentType
-        from astrbot_host.core_reply_voice import observe_core_voice_response, prepare_core_reply_voice_message
-        from astrbot_host.core_reply import activate_core_reply_delivery_guard
-        from astrbot_host.core_reply_segmentation import activate_core_reply_segmentation, prepare_core_reply_segmentation
+        from digital_life_host.core_reply_voice import observe_core_voice_response, prepare_core_reply_voice_message
+        from digital_life_host.core_reply import activate_core_reply_delivery_guard
+        from digital_life_host.core_reply_segmentation import activate_core_reply_segmentation, prepare_core_reply_segmentation
 
         event, wrapper, tool = self.prepare()
         state = event.get_extra(CORE_REPLY_CONTEXT_EXTRA)
@@ -243,14 +243,14 @@ class CoreReplyNativeSendTests(unittest.IsolatedAsyncioTestCase):
 
     async def test_media_observation_failure_does_not_block_core_send(self):
         event, wrapper, tool = self.prepare()
-        with patch("astrbot_host.core_reply_reactions.observe_core_media_send_returned", side_effect=RuntimeError("statistics")):
+        with patch("digital_life_host.core_reply_reactions.observe_core_media_send_returned", side_effect=RuntimeError("statistics")):
             result = await tool.call(wrapper, messages=[{"type": "plain", "text": "你好"}])
         self.assertIn("sent", result.lower())
         self.platform.send_by_session.assert_awaited_once()
         self.assertEqual(event.get_extra(CORE_REPLY_CONTEXT_EXTRA)["send_returns"], 1)
 
     def attach_voice(self, event):
-        from astrbot_host.core_reply_voice import prepare_core_reply_voice_message
+        from digital_life_host.core_reply_voice import prepare_core_reply_voice_message
         state = event.get_extra(CORE_REPLY_CONTEXT_EXTRA)
         state["prepared"]["voice_reply_policy"] = VoiceReplyPolicy()
         render = AsyncMock(return_value={"type": "record", "data": {"file": "base64://YQ=="}})
@@ -275,9 +275,9 @@ class CoreReplyNativeSendTests(unittest.IsolatedAsyncioTestCase):
         from astrbot.core.message.components import Plain
         from astrbot.core.message.message_event_result import MessageEventResult, MessageChain, ResultContentType
         from astrbot.core.provider.entities import LLMResponse
-        from astrbot_host.core_reply import activate_core_reply_delivery_guard
-        from astrbot_host.core_reply_segmentation import activate_core_reply_segmentation, prepare_core_reply_segmentation
-        from astrbot_host.core_reply_voice import observe_core_voice_response, prepare_core_reply_voice_message
+        from digital_life_host.core_reply import activate_core_reply_delivery_guard
+        from digital_life_host.core_reply_segmentation import activate_core_reply_segmentation, prepare_core_reply_segmentation
+        from digital_life_host.core_reply_voice import observe_core_voice_response, prepare_core_reply_voice_message
 
         event, wrapper, tool = self.prepare()
         state = event.get_extra(CORE_REPLY_CONTEXT_EXTRA)
@@ -319,8 +319,8 @@ class CoreReplyNativeSendTests(unittest.IsolatedAsyncioTestCase):
     async def test_different_final_body_keeps_a_segment_matching_the_tool(self):
         from astrbot.core.message.components import Plain
         from astrbot.core.message.message_event_result import MessageEventResult, MessageChain, ResultContentType
-        from astrbot_host.core_reply import activate_core_reply_delivery_guard
-        from astrbot_host.core_reply_segmentation import activate_core_reply_segmentation, prepare_core_reply_segmentation
+        from digital_life_host.core_reply import activate_core_reply_delivery_guard
+        from digital_life_host.core_reply_segmentation import activate_core_reply_segmentation, prepare_core_reply_segmentation
 
         event, wrapper, tool = self.prepare()
         state = event.get_extra(CORE_REPLY_CONTEXT_EXTRA)

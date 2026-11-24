@@ -53,7 +53,7 @@ def load_registry_fields() -> set[str]:
     import importlib
 
     fields: set[str] = set()
-    for path in (ROOT / "companion_v2").rglob("*.py"):
+    for path in (ROOT / "digital_life_core").rglob("*.py"):
         if "def configuration_fields" not in path.read_text(encoding="utf-8"):
             continue
         dotted = str(path.relative_to(ROOT).with_suffix("")).replace("/", ".").replace("\\", ".")
@@ -109,7 +109,7 @@ def load_plugin_leaves() -> set[str]:
 
 def load_tables() -> set[str]:
     tables: set[str] = set()
-    for path in (ROOT / "companion_v2" / "storage").rglob("*.py"):
+    for path in (ROOT / "digital_life_core" / "storage").rglob("*.py"):
         tables |= set(re.findall(r"CREATE TABLE IF NOT EXISTS (\w+)",
                                  path.read_text(encoding="utf-8")))
     return tables

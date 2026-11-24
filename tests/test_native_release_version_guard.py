@@ -19,11 +19,11 @@ from tools.build_v2_release import (
 
 class NativeReleaseVersionGuardTests(unittest.TestCase):
     def test_screen_baseline_covers_remote_transport_and_matches_runtime(self):
-        from astrbot_host.native_extensions.screen_provider import screen_package_hash
+        from digital_life_host.native_extensions.screen_provider import screen_package_hash
         files = native_artifact_source_files(ROOT)
         self.assertEqual(native_artifact_hashes(files)["screen"], screen_package_hash())
         changed = dict(files)
-        name = "astrbot_host/native_extensions/screen_source.py"
+        name = "digital_life_host/native_extensions/screen_source.py"
         changed[name] += b"\n# transport change\n"
         self.assertNotEqual(native_artifact_hashes(changed)["screen"], screen_package_hash())
 
@@ -74,7 +74,7 @@ class NativeReleaseVersionGuardTests(unittest.TestCase):
             root = Path(temporary)
             self.source_tree(root)
             baseline = refresh_native_baseline(root, "7.0.8")
-            image = root / "astrbot_host/native_extensions/image_native/package.py"
+            image = root / "digital_life_host/native_extensions/image_native/package.py"
             image.write_bytes(b"VALUE = 2\n")
             current = native_artifact_hashes(native_artifact_source_files(root))
             self.assertNotEqual(current["image"], baseline["artifact_hashes"]["image"])

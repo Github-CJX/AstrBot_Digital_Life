@@ -4,17 +4,17 @@ from pathlib import Path
 from tempfile import TemporaryDirectory
 import unittest
 
-from companion_v2.foundation.refs import ScopeKind
-from companion_v2.knowledge.catalog import MemberEntry
-from companion_v2.relationships.group_network import (
+from digital_life_core.foundation.refs import ScopeKind
+from digital_life_core.knowledge.catalog import MemberEntry
+from digital_life_core.relationships.group_network import (
     LINK_WINDOW_SECONDS,
     attach_member_clues,
     fold_event,
     project_document,
     route_owner_key,
 )
-from companion_v2.relationships.group_network import GroupRelationshipStore
-from companion_v2.storage.runtime import StorageRuntime
+from digital_life_core.relationships.group_network import GroupRelationshipStore
+from digital_life_core.storage.runtime import StorageRuntime
 
 
 def context():

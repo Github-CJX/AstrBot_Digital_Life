@@ -1,7 +1,7 @@
 import unittest
 
-from astrbot_host.voice import _provider_with_overrides, admin_voice_override, tts_provider_catalog
-from companion_v2.conversation.voice_reply import VoiceReplyPolicy, with_voice_override
+from digital_life_host.voice import _provider_with_overrides, admin_voice_override, tts_provider_catalog
+from digital_life_core.conversation.voice_reply import VoiceReplyPolicy, with_voice_override
 
 
 CATALOG = {"state": "ready", "providers": [

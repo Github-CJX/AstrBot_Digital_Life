@@ -33,7 +33,7 @@ from dataclasses import replace
 import unittest
 from unittest.mock import patch
 
-from companion_v2.execution.models import digest
+from digital_life_core.execution.models import digest
 from tests.test_r2_text_runtime import TextRuntimeFixture, draft
 
 
@@ -131,7 +131,7 @@ class ToolCapabilitySingleSourceTests(TextRuntimeFixture, unittest.IsolatedAsync
         claim = self.tasks.claim(self.tasks.registrations["conversation.reply"].definition.lane).unwrap().claim
         self.tasks.begin(claim).unwrap()
         task = self.tasks.read(self.context, self.messages.batch(batch)["generation_task_id"]).unwrap()
-        from companion_v2.execution.runner import TaskRun
+        from digital_life_core.execution.runner import TaskRun
         run = TaskRun(self.tasks, claim, task)
         request = self.messages.request(run)
 

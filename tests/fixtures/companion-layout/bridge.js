@@ -10,7 +10,7 @@
  * 2400，从而复现“工作区 iframe 2400 + 外层视口 765”的真实几何。
  */
 (function () {
-  const host = "astrbot_plugin_private_companion";
+  const host = "astrbot_plugin_digital_life";
   const requests = [];
   window.__fixtureRequests = requests;
 

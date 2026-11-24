@@ -13,14 +13,14 @@ from tests.animation_support import animation_bytes
 from tests.native_adapter_support import completion, final_text
 from tests.test_conversation_images import image_bytes
 from tests.staging_bootstrap_support import wait_for_batch
-from astrbot_host.media import load_native_image
-from astrbot_host.group_authority import GroupAuthority
-from astrbot_host.native import installed_native_types
-from astrbot_host.quotes import load_native_group_quote
-from companion_v2.adapters.astrbot.group import NativeGroupBridge
-from companion_v2.adapters.astrbot.model_wire import tool_alias
-from companion_v2.conversation.quotes.service import quote_reference
-from companion_v2.execution.models import TaskContext, TaskError, encode
+from digital_life_host.media import load_native_image
+from digital_life_host.group_authority import GroupAuthority
+from digital_life_host.native import installed_native_types
+from digital_life_host.quotes import load_native_group_quote
+from digital_life_core.adapters.astrbot.group import NativeGroupBridge
+from digital_life_core.adapters.astrbot.model_wire import tool_alias
+from digital_life_core.conversation.quotes.service import quote_reference
+from digital_life_core.execution.models import TaskContext, TaskError, encode
 
 
 class GroupMediaTests(GroupMediaFixture, unittest.IsolatedAsyncioTestCase):
@@ -95,7 +95,7 @@ class GroupMediaTests(GroupMediaFixture, unittest.IsolatedAsyncioTestCase):
         event = self.media_event([sdk_image()], identifier="345")
         batch = (await self.controller.receive_claimed(event)).unwrap()
         await wait_for_batch(self.controller.session, batch)
-        from companion_v2.execution.models import TaskContext
+        from digital_life_core.execution.models import TaskContext
         context = TaskContext.restore(json.loads(self.app.messages.batch(batch)["context_json"]))
         original = self.request(context, batch).images
         self.assertEqual(self.app.runtime.read_one("SELECT state FROM conversation_parts WHERE batch_id = ?", (batch,))[0], "unknown")
@@ -159,7 +159,7 @@ class GroupMediaTests(GroupMediaFixture, unittest.IsolatedAsyncioTestCase):
 
     async def test_group_quote_freezes_response_before_loading_its_images(self):
         from functools import partial
-        from companion_v2.adapters.astrbot.group_quotes import read_group_quote
+        from digital_life_core.adapters.astrbot.group_quotes import read_group_quote
         from tests.native_adapter_support import FakeReverseApi
         await self.start_host()
         raw = group_raw(text="原始文字")
@@ -182,7 +182,7 @@ class GroupMediaTests(GroupMediaFixture, unittest.IsolatedAsyncioTestCase):
         async def held(*args, **kwargs):
             await asyncio.Event().wait()
         self.controller.session.bridge.groups.quote_loader = held
-        with patch("companion_v2.adapters.astrbot.group.MEDIA_PREPARE_TIMEOUT", 0.01):
+        with patch("digital_life_core.adapters.astrbot.group.MEDIA_PREPARE_TIMEOUT", 0.01):
             result = await self.controller.receive_claimed(self.media_event([Reply(id="345")], sender="777"))
         self.assertEqual(result.failure.code, "host_media_timeout")
         self.assertEqual(self.app.runtime.read_one("SELECT COUNT(*) FROM conversation_inputs", ())[0], 0)
@@ -208,7 +208,7 @@ class GroupMediaTests(GroupMediaFixture, unittest.IsolatedAsyncioTestCase):
             identifier = part["platform_ref"].split(":")[-1]
             self.records[identifier] = group_raw(message_id=identifier, sender="100", text=part["text"], count=0)
             latest = await self.receive_parts([Reply(id=identifier)], sender="201")
-        with patch("companion_v2.conversation.group_history.MAX_ANCESTORS", 2):
+        with patch("digital_life_core.conversation.group_history.MAX_ANCESTORS", 2):
             with self.assertRaises(TaskError) as caught:
                 self.request(*latest)
         self.assertEqual(caught.exception.code, "group_history_budget")

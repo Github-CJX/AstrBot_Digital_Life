@@ -7,10 +7,10 @@ from types import SimpleNamespace
 import unittest
 from unittest.mock import patch
 
-from companion_v2.capabilities.native import parse_manifest
-from companion_v2.memory.game_ingestion import GAME_ACTIONS
-from companion_v2.games.native import provider as game_provider
-from companion_v2.product import PRODUCT_VERSION
+from digital_life_core.capabilities.native import parse_manifest
+from digital_life_core.memory.game_ingestion import GAME_ACTIONS
+from digital_life_core.games.native import provider as game_provider
+from digital_life_core.product import PRODUCT_VERSION
 from tests.native_internal_support import internal_registry
 
 
@@ -51,7 +51,7 @@ class NativePigDiceTests(unittest.IsolatedAsyncioTestCase):
             game_id = opened["result"]["game"]["game_id"]
             self.assertEqual(opened["result"]["game"]["state"]["turn"], "human")
 
-            with patch("companion_v2.games.pig_dice.secrets.randbelow",
+            with patch("digital_life_core.games.pig_dice.secrets.randbelow",
                        side_effect=[value for _ in range(9) for value in (4, 0)] + [4]) as dice:
                 for turn in range(10):
                     roll = request(provider, game_provider.PIG_ROLL, {"game_id": game_id}, f"roll-{turn}")
@@ -113,7 +113,7 @@ class NativePigDiceTests(unittest.IsolatedAsyncioTestCase):
             game_id = opened["result"]["game"]["game_id"]
             roll = request(provider, game_provider.PIG_ROLL,
                 {"game_id": game_id, "method": "cup"}, "cup-roll")
-            with patch("companion_v2.games.pig_dice.secrets.randbelow", side_effect=[0, 5]) as dice:
+            with patch("digital_life_core.games.pig_dice.secrets.randbelow", side_effect=[0, 5]) as dice:
                 rolled = await provider.execute(roll, before_dispatch=lambda: True)
                 self.assertEqual(rolled["result"]["game"]["state"]["turn_total"], 6)
                 self.assertEqual(rolled["result"]["game"]["events"][-1], ["human", "cup_roll", [1, 6]])

@@ -10,13 +10,13 @@ from tempfile import TemporaryDirectory
 from types import SimpleNamespace
 import unittest
 
-from astrbot_host.native_extensions import together_room_execution
-from companion_v2.conversation.external_tools import ExternalToolInvocation
-from companion_v2.execution.models import TaskContext, encode
-from companion_v2.foundation.refs import AudienceRef, ScopeKind, ScopeRef, SubjectKind, SubjectRef
-from companion_v2.identity_policy.models import AuthenticatedHostPrincipal, ResolvedIdentity, RoleBinding
-from companion_v2.together.mobile.origin import MOBILE_ROOM_CALL
-from companion_v2.together.provider import NativeTogetherError, NativeTogetherProvider
+from digital_life_host.native_extensions import together_room_execution
+from digital_life_core.conversation.external_tools import ExternalToolInvocation
+from digital_life_core.execution.models import TaskContext, encode
+from digital_life_core.foundation.refs import AudienceRef, ScopeKind, ScopeRef, SubjectKind, SubjectRef
+from digital_life_core.identity_policy.models import AuthenticatedHostPrincipal, ResolvedIdentity, RoleBinding
+from digital_life_core.together.mobile.origin import MOBILE_ROOM_CALL
+from digital_life_core.together.provider import NativeTogetherError, NativeTogetherProvider
 from tests.native_internal_support import internal_registry
 
 
@@ -91,7 +91,7 @@ class RoomCreationTests(unittest.TestCase):
         self.assertEqual(plugin.tickets[0]["user_id"], "u1")
 
     def test_mobile_gateway_room_uses_the_already_prepared_local_access(self):
-        from companion_v2.together.mobile.origin import MOBILE_ROOM_CALL
+        from digital_life_core.together.mobile.origin import MOBILE_ROOM_CALL
         plugin = FakePlugin(access={"url": "http://127.0.0.1:6321", "tunnel_started": False,
                                     "tunnel_ready": True, "fixed_public_url": False,
                                     "mobile_gateway": True})
@@ -156,7 +156,7 @@ class TogetherRoomExecutionFallbackTests(unittest.TestCase):
             tts_timeout_seconds=45,
             context=context,
         )
-        with self.assertLogs("astrbot_host.native_extensions", level="WARNING") as captured:
+        with self.assertLogs("digital_life_host.native_extensions", level="WARNING") as captured:
             execution = together_room_execution(self.base_binding, service, context=context)
 
         self.assertEqual(execution["model_provider_id"], "main/chat-model")
@@ -183,7 +183,7 @@ class TogetherRoomExecutionFallbackTests(unittest.TestCase):
         }
         context = SimpleNamespace(get_provider_by_id=providers.get)
         service = SimpleNamespace(chat_provider_id="voice/only-tts", tts_provider_id="")
-        with self.assertLogs("astrbot_host.native_extensions", level="WARNING") as captured:
+        with self.assertLogs("digital_life_host.native_extensions", level="WARNING") as captured:
             execution = together_room_execution(self.base_binding, service, context=context)
 
         self.assertEqual(execution["model_provider_id"], "main/chat-model")
@@ -196,7 +196,7 @@ class TogetherRoomExecutionFallbackTests(unittest.TestCase):
         }
         context = SimpleNamespace(get_provider_by_id=providers.get)
         service = SimpleNamespace(chat_provider_id="room/chat-model", tts_provider_id="room/tts-model")
-        with self.assertNoLogs("astrbot_host.native_extensions", level="WARNING"):
+        with self.assertNoLogs("digital_life_host.native_extensions", level="WARNING"):
             execution = together_room_execution(self.base_binding, service, context=context)
         self.assertEqual(execution["model_provider_id"], "room/chat-model")
         self.assertEqual(execution["tts_provider_id"], "room/tts-model")
@@ -211,21 +211,21 @@ class TogetherRoomExecutionFallbackTests(unittest.TestCase):
             get_all_tts_providers=lambda: [tts_only],
         )
         service_tts = SimpleNamespace(chat_provider_id="room/chat-model", tts_provider_id="tts/from-list")
-        with self.assertNoLogs("astrbot_host.native_extensions", level="WARNING"):
+        with self.assertNoLogs("digital_life_host.native_extensions", level="WARNING"):
             execution_list = together_room_execution(self.base_binding, service_tts, context=list_context)
         self.assertEqual(execution_list["tts_provider_id"], "tts/from-list")
 
     def test_stale_tts_provider_warns_and_falls_back_to_binding_or_default(self):
         context = SimpleNamespace(get_provider_by_id=lambda pid: None, get_all_tts_providers=lambda: [])
         service = SimpleNamespace(chat_provider_id="", tts_provider_id="deleted/tts")
-        with self.assertLogs("astrbot_host.native_extensions", level="WARNING") as captured:
+        with self.assertLogs("digital_life_host.native_extensions", level="WARNING") as captured:
             execution = together_room_execution(self.base_binding, service, context=context)
         self.assertEqual(execution["tts_provider_id"], "main/tts-model")
         self.assertIn("deleted/tts", "\n".join(captured.output))
         self.assertIn("main/tts-model", "\n".join(captured.output))
 
         empty_tts_binding = {**self.base_binding, "tts_provider_id": ""}
-        with self.assertLogs("astrbot_host.native_extensions", level="WARNING") as captured_default:
+        with self.assertLogs("digital_life_host.native_extensions", level="WARNING") as captured_default:
             execution_default = together_room_execution(empty_tts_binding, service, context=context)
         self.assertEqual(execution_default["tts_provider_id"], "")
         self.assertIn("deleted/tts", "\n".join(captured_default.output))
@@ -240,7 +240,7 @@ class TogetherRoomExecutionFallbackTests(unittest.TestCase):
         context = SimpleNamespace(get_provider_by_id=lambda pid: None)
         service = SimpleNamespace(chat_provider_id="deleted/chat", tts_provider_id="")
         empty_main = {**self.base_binding, "model_provider_id": ""}
-        with self.assertLogs("astrbot_host.native_extensions", level="WARNING") as captured:
+        with self.assertLogs("digital_life_host.native_extensions", level="WARNING") as captured:
             execution = together_room_execution(empty_main, service, context=context)
         self.assertEqual(execution["model_provider_id"], "deleted/chat")
         self.assertIn("deleted/chat", "\n".join(captured.output))
@@ -265,7 +265,7 @@ class TogetherRoomExecutionFallbackTests(unittest.TestCase):
             plugin._get_provider_by_id = lambda pid: valid_chat if pid == "main/chat-model" else None
 
             with TemporaryDirectory(prefix="v2-together-fallback-") as temp_dir:
-                from companion_v2.product import PRODUCT_VERSION
+                from digital_life_core.product import PRODUCT_VERSION
                 provider = NativeTogetherProvider(plugin, Path(temp_dir), version=PRODUCT_VERSION)
                 registry = internal_registry(provider)
                 registry.context = context
@@ -315,7 +315,7 @@ class TogetherRoomExecutionFallbackTests(unittest.TestCase):
                 )
                 marker = MOBILE_ROOM_CALL.set(True)
                 try:
-                    with self.assertLogs("astrbot_host.native_extensions", level="WARNING") as captured:
+                    with self.assertLogs("digital_life_host.native_extensions", level="WARNING") as captured:
                         response = await registry.invoke(declaration.host_tool_id, invocation)
                 finally:
                     MOBILE_ROOM_CALL.reset(marker)

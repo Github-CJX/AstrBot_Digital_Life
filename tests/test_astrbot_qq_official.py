@@ -8,29 +8,29 @@ import unittest
 from unittest.mock import AsyncMock, patch
 
 from astrbot.core.message.components import At, Plain
-from astrbot_host.account_session_api import AccountSessionWebAPI
-from astrbot_host.acquaintance_api import AcquaintanceWebAPI
-from astrbot_host.management_identity import dashboard_operator
-from astrbot_host.multi_controller import AstrBotMultiController
-from astrbot_host.group_admission import group_trigger_facts
-from astrbot_host.multi_settings import MultiHostSettings
-from astrbot_host.session_topology import session_route
-from companion_v2.adapters.astrbot.native import (
+from digital_life_host.account_session_api import AccountSessionWebAPI
+from digital_life_host.acquaintance_api import AcquaintanceWebAPI
+from digital_life_host.management_identity import dashboard_operator
+from digital_life_host.multi_controller import AstrBotMultiController
+from digital_life_host.group_admission import group_trigger_facts
+from digital_life_host.multi_settings import MultiHostSettings
+from digital_life_host.session_topology import session_route
+from digital_life_core.adapters.astrbot.native import (
     HostAccount, HostPersona, NativePrivateBridge, event_account_id, event_peer_id,
     persona_instruction, route_id,
 )
-from companion_v2.adapters.astrbot.group import GroupEventRoute, NativeGroupBridge, group_event_route
-from companion_v2.adapters.astrbot.platform_sender import AstrBotPlatformSender
-from companion_v2.execution.models import TaskContext, digest
-from companion_v2.foundation.refs import SubjectKind, SubjectRef
-from companion_v2.identity_policy.models import AuthenticatedHostPrincipal
-from companion_v2.identity_policy.personas import PersonaBinding, PersonaSelector, SelectorKind
-from companion_v2.memory.person.access import owner_key
-from companion_v2.memory.person.admin_names import PersonAcquaintanceNameManagement
+from digital_life_core.adapters.astrbot.group import GroupEventRoute, NativeGroupBridge, group_event_route
+from digital_life_core.adapters.astrbot.platform_sender import AstrBotPlatformSender
+from digital_life_core.execution.models import TaskContext, digest
+from digital_life_core.foundation.refs import SubjectKind, SubjectRef
+from digital_life_core.identity_policy.models import AuthenticatedHostPrincipal
+from digital_life_core.identity_policy.personas import PersonaBinding, PersonaSelector, SelectorKind
+from digital_life_core.memory.person.access import owner_key
+from digital_life_core.memory.person.admin_names import PersonAcquaintanceNameManagement
 from tests.multi_host_support import MultiFixture, multi_config
 from tests.group_host_support import Query
 from tests.staging_bootstrap_support import wait_for_batch
-from astrbot_host.group_settings import GroupTarget
+from digital_life_host.group_settings import GroupTarget
 from tests.native_adapter_support import NativeFixture
 from tests.test_management_access import INSTALLATION, NOW, ROLE
 
@@ -233,7 +233,7 @@ class OfficialAdapterTests(OfficialFixture, unittest.IsolatedAsyncioTestCase):
         self.assertEqual(full.text, captured.text)
 
     async def test_platform_sender_uses_astrbot_session_transport(self):
-        from companion_v2.delivery.models import DeliveryEnvelope
+        from digital_life_core.delivery.models import DeliveryEnvelope
         captured = await self.capture()
         self.personas.register_route(captured.route, observed_at=NOW)
         role = self.personas.resolve(captured.route.scope, observed_at=NOW).unwrap().binding
@@ -254,7 +254,7 @@ class OfficialAdapterTests(OfficialFixture, unittest.IsolatedAsyncioTestCase):
         self.assertEqual(chain.get_plain_text(), "官方回复")
 
     async def test_platform_rebuild_during_voice_does_not_send_the_old_reply(self):
-        from companion_v2.delivery.models import DeliveryEnvelope
+        from digital_life_core.delivery.models import DeliveryEnvelope
         self.native.platform.appid = "fixture-app"
         captured = await self.capture()
         self.personas.register_route(captured.route, observed_at=NOW)
@@ -284,7 +284,7 @@ class OfficialAdapterTests(OfficialFixture, unittest.IsolatedAsyncioTestCase):
 
     def test_production_native_types_use_the_generic_event_base(self):
         from astrbot.api.event import AstrMessageEvent
-        from astrbot_host.native import installed_native_types
+        from digital_life_host.native import installed_native_types
         self.assertIs(installed_native_types().event, AstrMessageEvent)
 
     async def test_dashboard_inline_role_can_register_an_official_account(self):
@@ -310,7 +310,7 @@ class OfficialAdapterTests(OfficialFixture, unittest.IsolatedAsyncioTestCase):
             "platform_id": ACCOUNT, "account_id": ACCOUNT, "bot_id": "bot-test",
             "persona_ids": ["星缘-私聊"], "role_id": "星缘",
         }, ensure_ascii=False).encode("utf-8")))
-        with patch("astrbot_host.account_session_api.request", request):
+        with patch("digital_life_host.account_session_api.request", request):
             result = await api.add_role()
         self.assertEqual(result["status"], "ok", result)
         section = config["multi_host"]
@@ -346,9 +346,9 @@ class OfficialMultiHostTests(MultiFixture, unittest.IsolatedAsyncioTestCase):
         from astrbot.core.agent.message import Message, dump_messages_with_checkpoints
         from astrbot.core.provider.sources.openai_source import ProviderOpenAIOfficial
         from astrbot.core.provider.entities import ProviderRequest
-        from astrbot_host.core_reply import CORE_REPLY_CONTEXT_EXTRA
-        from astrbot_host.core_reply_perception import inject_core_reply_perception_context
-        from astrbot_host.core_reply_decision import core_decision_facts
+        from digital_life_host.core_reply import CORE_REPLY_CONTEXT_EXTRA
+        from digital_life_host.core_reply_perception import inject_core_reply_perception_context
+        from digital_life_host.core_reply_decision import core_decision_facts
         from tests.test_group_mention_positions import official_message
 
         self.config["multi_host"]["group_targets"] = [dict(target_id="official-group",
@@ -396,7 +396,7 @@ class OfficialMultiHostTests(MultiFixture, unittest.IsolatedAsyncioTestCase):
         self.assertEqual(saved[0]["content"][0]["text"], canonical)
         self.assertEqual(saved[1]["tool_calls"][0]["id"], saved[2]["tool_call_id"])
         # The persisted current utterance is independent of temporary perception.
-        self.assertNotIn("companion_v2_context", json.dumps(saved, ensure_ascii=False))
+        self.assertNotIn("digital_life_core_context", json.dumps(saved, ensure_ascii=False))
         restored = Message.model_validate(saved[0])
         self.assertEqual(restored.content[0].text, canonical)
         self.assertEqual(self.native.platform.sent, [])
@@ -477,7 +477,7 @@ class OfficialMultiHostTests(MultiFixture, unittest.IsolatedAsyncioTestCase):
         if group:
             self.native.conversation_manager.session_conversations = {
                 event.unified_msg_origin: self.native.conversations[ACCOUNT]}
-        with patch("astrbot_host.acquaintance_api.request", NS(username="admin", query={})), \
+        with patch("digital_life_host.acquaintance_api.request", NS(username="admin", query={})), \
                 patch.object(topology, "services", AsyncMock(return_value={})):
             result = await AcquaintanceWebAPI(self.controller).directory()
         self.assertEqual(result["status"], "ok", result)
@@ -503,7 +503,7 @@ class OfficialMultiHostTests(MultiFixture, unittest.IsolatedAsyncioTestCase):
         document = json.loads(card.row(owner_key(context))["document_json"])
         self.assertEqual(document["platform_nickname"], "再次改名")
         self.assertEqual(document["admin_nickname"], "管理员备注")
-        with patch("astrbot_host.acquaintance_api.request", NS(username="admin", query=Query(read_mode="stored"))), \
+        with patch("digital_life_host.acquaintance_api.request", NS(username="admin", query=Query(read_mode="stored"))), \
                 patch.object(topology, "inventory", AsyncMock(
                     side_effect=AssertionError("stored names must not query native sessions"))) as inventory:
             result = await AcquaintanceWebAPI(self.controller).directory()
@@ -555,9 +555,9 @@ class OfficialMultiHostTests(MultiFixture, unittest.IsolatedAsyncioTestCase):
                         config["multi_host"]["targets"] = []
                     controller = self.make_controller(config)
                     before = deepcopy(controller.config)
-                    with patch("astrbot_host.account_session_api.request", request), \
-                            patch("astrbot_host.setup_api.request", request), \
-                            patch("astrbot_host.setup_api.display_names",
+                    with patch("digital_life_host.account_session_api.request", request), \
+                            patch("digital_life_host.setup_api.request", request), \
+                            patch("digital_life_host.setup_api.display_names",
                                   return_value=NS(targets=AsyncMock(side_effect=lambda items: items))), \
                             patch.object(controller.session_topology, "services", AsyncMock(return_value={})):
                         response = await AccountSessionWebAPI(controller).get()
@@ -582,7 +582,7 @@ class OfficialMultiHostTests(MultiFixture, unittest.IsolatedAsyncioTestCase):
         self.assertEqual(self.native.platform.sent, [])
 
     async def test_fresh_public_plugin_data_root_can_open_installations_storage(self):
-        public = self.root / "astrbot-data" / "plugin_data" / "astrbot_plugin_private_companion"
+        public = self.root / "astrbot-data" / "plugin_data" / "astrbot_plugin_digital_life"
         public.mkdir(parents=True)
         controller = AstrBotMultiController(
             self.native, self.config, public, native_types=self.types, now=self.clock.now)

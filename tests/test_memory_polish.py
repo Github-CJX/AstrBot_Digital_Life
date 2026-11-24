@@ -5,11 +5,11 @@ from contextlib import closing
 from unittest.mock import patch
 import sqlite3
 
-from companion_v2.execution.models import digest, encode
-from companion_v2.memory.models import AtomRef, Proposal, MemoryPolicy
-from companion_v2.memory.management import MemoryManagement
-from companion_v2.memory.service import MemoryService
-from companion_v2.sources.privacy import redact_text, REDACTED
+from digital_life_core.execution.models import digest, encode
+from digital_life_core.memory.models import AtomRef, Proposal, MemoryPolicy
+from digital_life_core.memory.management import MemoryManagement
+from digital_life_core.memory.service import MemoryService
+from digital_life_core.sources.privacy import redact_text, REDACTED
 from tests.memory_support import MemoryFixture
 from tests.test_host_application import HostFixture
 from tests.test_role_tool_loop import answered, requested, call
@@ -240,7 +240,7 @@ class CoreMemoryTests(MemoryFixture, unittest.IsolatedAsyncioTestCase):
         self.query(kind="all").unwrap()
         args = dict(expected_revision_token=self.manager.preview_clear(self.context).unwrap()["revision_token"],
                     operation_key="cleanup-cache-failure")
-        with patch("companion_v2.memory.search.SearchIndex.remove_owner", side_effect=sqlite3.OperationalError()):
+        with patch("digital_life_core.memory.search.SearchIndex.remove_owner", side_effect=sqlite3.OperationalError()):
             result = self.manager.clear(self.context, **args).unwrap()
         self.assertEqual(result["forgotten_count"], 1)
         self.assertEqual(result["search_projection"], "cleanup_pending")

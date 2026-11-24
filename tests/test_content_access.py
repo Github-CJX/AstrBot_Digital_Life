@@ -9,36 +9,36 @@ from types import SimpleNamespace as NS
 import unittest
 from unittest.mock import patch
 
-from astrbot_host.content_access import (
+from digital_life_host.content_access import (
     CONTENT_CAPABILITIES,
     CONTENT_EXTENSION,
     content_authorization_status,
     ensure_content_access,
 )
-from companion_v2.agenda.planning import planning_profile
-from companion_v2.agenda.planning_inputs import capture
-from companion_v2.agenda.planning_output import INSTRUCTION as PLANNING_INSTRUCTION
-from companion_v2.capabilities import CapabilityAuthorizationState, CapabilityPackageDescriptor
-from companion_v2.capabilities.repositories import CapabilityRepository
-from companion_v2.configuration.management import ContentAuthoringManagement
-from companion_v2.configuration.models import ConfigLayer, ConfigTarget
-from companion_v2.configuration.owners import SparseConfigurationOwner
-from companion_v2.configuration.registry import FieldRegistry
-from companion_v2.content.catalogue import content_database
-from companion_v2.content.models import Call, Chapter, JsonObject, Origin, WorkOwner
-from companion_v2.content.repository import ContentRepository
-from companion_v2.content.service import ContentService
-from companion_v2.conversation.content.access import document, owner_for
-from companion_v2.conversation.content.authoring_service import (
+from digital_life_core.agenda.planning import planning_profile
+from digital_life_core.agenda.planning_inputs import capture
+from digital_life_core.agenda.planning_output import INSTRUCTION as PLANNING_INSTRUCTION
+from digital_life_core.capabilities import CapabilityAuthorizationState, CapabilityPackageDescriptor
+from digital_life_core.capabilities.repositories import CapabilityRepository
+from digital_life_core.configuration.management import ContentAuthoringManagement
+from digital_life_core.configuration.models import ConfigLayer, ConfigTarget
+from digital_life_core.configuration.owners import SparseConfigurationOwner
+from digital_life_core.configuration.registry import FieldRegistry
+from digital_life_core.content.catalogue import content_database
+from digital_life_core.content.models import Call, Chapter, JsonObject, Origin, WorkOwner
+from digital_life_core.content.repository import ContentRepository
+from digital_life_core.content.service import ContentService
+from digital_life_core.conversation.content.access import document, owner_for
+from digital_life_core.conversation.content.authoring_service import (
     FIELDS as AUTHORING_FIELDS,
     GROUP as AUTHORING_GROUP,
 )
-from companion_v2.execution.models import TaskContext
-from companion_v2.foundation.refs import AudienceRef, ScopeKind
-from companion_v2.identity_policy.models import AuthorizationTier
-from companion_v2.identity_policy.object_access import ObjectAccessPolicy
-from companion_v2.identity_policy.repository import PersistentIdentityDirectory
-from companion_v2.model_gateway.routing import configuration_fields
+from digital_life_core.execution.models import TaskContext
+from digital_life_core.foundation.refs import AudienceRef, ScopeKind
+from digital_life_core.identity_policy.models import AuthorizationTier
+from digital_life_core.identity_policy.object_access import ObjectAccessPolicy
+from digital_life_core.identity_policy.repository import PersistentIdentityDirectory
+from digital_life_core.model_gateway.routing import configuration_fields
 from tests.g6_support import G6Fixture, NOW
 from tests.test_management_access import SCOPE
 from tests.test_role_state import StateFixture
@@ -61,7 +61,7 @@ class ContentAccessProvisioningTests(G6Fixture):
         )
         self.package = CapabilityPackageDescriptor(
             CONTENT_EXTENSION,
-            "astrbot_plugin_private_companion.content",
+            "astrbot_plugin_digital_life.content",
             "companion",
             "1",
             "content-hash",
@@ -182,7 +182,7 @@ class ContentAccessProvisioningTests(G6Fixture):
             observed_at=NOW,
         ).unwrap()
         before = self.records()
-        with self.assertNoLogs("astrbot_host.content_access", level="WARNING"):
+        with self.assertNoLogs("digital_life_host.content_access", level="WARNING"):
             self.assertFalse(self.ensure())
         self.assertEqual(self.records(), before)
 
@@ -261,7 +261,7 @@ class ContentAccessProvisioningTests(G6Fixture):
         self.install_content()
         with patch.object(
             CapabilityRepository, "set_authorization", side_effect=RuntimeError("synthetic")
-        ), self.assertLogs("astrbot_host.content_access", level="WARNING"):
+        ), self.assertLogs("digital_life_host.content_access", level="WARNING"):
             self.assertFalse(self.ensure())
         self.assertEqual(self.records(), ((), ()))
 
@@ -372,7 +372,7 @@ class ContentAuthoringManagementAndPlanningTests(StateFixture, unittest.Isolated
         repo = CapabilityRepository(app.runtime)
         package = CapabilityPackageDescriptor(
             CONTENT_EXTENSION,
-            "astrbot_plugin_private_companion.content",
+            "astrbot_plugin_digital_life.content",
             "companion",
             "1",
             "content-hash",
@@ -511,7 +511,7 @@ class ContentAuthoringManagementAndPlanningTests(StateFixture, unittest.Isolated
         audience_doc = JsonObject.capture(document(context_with_bot.audience))
 
         with patch(
-            "companion_v2.content.service._now",
+            "digital_life_core.content.service._now",
             return_value=(NOW - timedelta(days=5)).isoformat(),
         ):
             service.create(
@@ -533,7 +533,7 @@ class ContentAuthoringManagementAndPlanningTests(StateFixture, unittest.Isolated
                 contributor=contributor,
             )
         with patch(
-            "companion_v2.content.service._now",
+            "digital_life_core.content.service._now",
             return_value=(NOW - timedelta(days=2)).isoformat(),
         ):
             service.create(

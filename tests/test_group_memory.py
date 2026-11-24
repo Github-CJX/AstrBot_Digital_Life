@@ -5,11 +5,11 @@ from types import SimpleNamespace as NS
 import unittest
 from unittest.mock import patch
 
-from astrbot_host.group_authority import GroupAuthority
-from companion_v2.adapters.astrbot.model_wire import tool_alias
-from companion_v2.execution.models import TaskContext, TaskError, encode
-from companion_v2.memory.group.access import owner_key
-from companion_v2.memory.group.service import KIND
+from digital_life_host.group_authority import GroupAuthority
+from digital_life_core.adapters.astrbot.model_wire import tool_alias
+from digital_life_core.execution.models import TaskContext, TaskError, encode
+from digital_life_core.memory.group.access import owner_key
+from digital_life_core.memory.group.service import KIND
 from tests.group_host_support import GroupFixture, group_config
 from tests.native_adapter_support import completion, final_text
 from tests.staging_bootstrap_support import wait_for_batch
@@ -297,7 +297,7 @@ class GroupMemoryTests(GroupFixture, unittest.IsolatedAsyncioTestCase):
 
     async def test_failed_source_publication_rolls_back_group_memory_and_receipt(self):
         await self.start_host()
-        from companion_v2.foundation.outcome import Outcome
+        from digital_life_core.foundation.outcome import Outcome
         original = self.memory.sources.publish
         def failing(record, **kwargs):
             if record.reference.owner == "memory.group":

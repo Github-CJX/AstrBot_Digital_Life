@@ -3,7 +3,7 @@
 import base64
 import unittest
 
-from astrbot_host.native_extensions.reality.mihome_web_api import _build_qr_data_uri
+from digital_life_host.native_extensions.reality.mihome_web_api import _build_qr_data_uri
 
 
 class MiHomeQrTests(unittest.TestCase):

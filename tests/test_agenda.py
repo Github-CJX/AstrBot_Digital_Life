@@ -12,11 +12,11 @@ import unittest
 from unittest.mock import patch
 from zoneinfo import ZoneInfo
 
-from companion_v2.agenda.models import AgendaError, AgendaTarget, Frequency, GapPolicy, MemoCursor, Schedule
-from companion_v2.agenda.service import AgendaService
-from companion_v2.foundation.refs import OperationRef, ScopeKind, ScopeRef, SubjectKind, SubjectRef, VersionRef
-from companion_v2.identity_policy.models import AuthenticatedHostPrincipal, AuthorizationTier
-from companion_v2.storage.runtime import StorageRuntime
+from digital_life_core.agenda.models import AgendaError, AgendaTarget, Frequency, GapPolicy, MemoCursor, Schedule
+from digital_life_core.agenda.service import AgendaService
+from digital_life_core.foundation.refs import OperationRef, ScopeKind, ScopeRef, SubjectKind, SubjectRef, VersionRef
+from digital_life_core.identity_policy.models import AuthenticatedHostPrincipal, AuthorizationTier
+from digital_life_core.storage.runtime import StorageRuntime
 
 
 NOW = datetime(2028, 1, 31, 1, tzinfo=timezone.utc)
@@ -467,8 +467,8 @@ class AgendaTests(unittest.TestCase):
         self.runtime.close()
         script = """
 import json, sys
-from companion_v2.agenda.service import AgendaService
-from companion_v2.storage.runtime import StorageRuntime
+from digital_life_core.agenda.service import AgendaService
+from digital_life_core.storage.runtime import StorageRuntime
 from tests.test_agenda import INSTALLATION, NOW
 with StorageRuntime.open(data_root=sys.argv[1], installation_id=INSTALLATION) as runtime:
     service = AgendaService(runtime)

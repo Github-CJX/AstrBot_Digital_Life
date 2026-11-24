@@ -1,8 +1,8 @@
 """Probability contracts keep UI percentages and stored fractions consistent."""
 import unittest
-from companion_v2.conversation.reply_settings import configuration_fields
-from companion_v2.conversation.segmentation import SegmentationPolicy
-from companion_v2.conversation.voice_reply import VoiceReplyPolicy
+from digital_life_core.conversation.reply_settings import configuration_fields
+from digital_life_core.conversation.segmentation import SegmentationPolicy
+from digital_life_core.conversation.voice_reply import VoiceReplyPolicy
 
 
 class VoiceProbabilityContractTests(unittest.TestCase):

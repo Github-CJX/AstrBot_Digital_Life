@@ -16,16 +16,16 @@ import tests.astrbot_data_root  # noqa: F401
 from astrbot.api.web import PluginRequest, bind_request_context
 from starlette.requests import Request
 
-from astrbot_host.browser_preferences import (
+from digital_life_host.browser_preferences import (
     BROWSER_PREFERENCE_MAX_AGE,
     MAX_BROWSER_PREFERENCE_COOKIE_BYTES,
     browser_preference_cookie_name,
     encode_browser_preferences,
 )
-from astrbot_host.page_api import PageWebAPI, PREFIX
+from digital_life_host.page_api import PageWebAPI, PREFIX
 
 
-PLUGIN_NAME = "astrbot_plugin_private_companion"
+PLUGIN_NAME = "astrbot_plugin_digital_life"
 API_PATH = "/api/v1/plugins/extensions" + PREFIX + "/page/browser-preferences"
 SELECTION = {"bot_id": "synthetic-bot", "role_id": "合成角色", "target_id": None}
 POSITION = {"right": 325.5, "bottom": 40}

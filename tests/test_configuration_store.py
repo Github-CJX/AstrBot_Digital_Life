@@ -6,8 +6,8 @@ from tempfile import TemporaryDirectory
 import json
 import unittest
 
-from companion_v2.configuration.store import open_configuration_store
-from companion_v2.storage.runtime import StorageOpenError, StorageRuntime
+from digital_life_core.configuration.store import open_configuration_store
+from digital_life_core.storage.runtime import StorageOpenError, StorageRuntime
 
 
 NOW = datetime(2026, 11, 11, 9, 0, tzinfo=timezone.utc).isoformat()

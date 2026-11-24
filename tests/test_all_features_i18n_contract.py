@@ -1,7 +1,7 @@
 """Cross-stack i18n and catalog contract tests for 「全部功能」 and /config metadata.
 
-Dynamically inspects ``astrbot_host/configuration_api.py`` ``SECTIONS``, the real
-``FieldRegistry`` field definitions from ``companion_v2``, and the frontend
+Dynamically inspects ``digital_life_host/configuration_api.py`` ``SECTIONS``, the real
+``FieldRegistry`` field definitions from ``digital_life_core``, and the frontend
 ``pages/陪伴小屋/{workbench-page,config-editor,app,models-page,maintenance-page}.js``
 files so any newly added config field, boolean switch, management error code, or
 search tab that lacks Chinese metadata fails CI immediately.
@@ -16,15 +16,15 @@ import re
 import subprocess
 import unittest
 
-from companion_v2.configuration import management as mgmt
-from companion_v2.conversation.content.cover_assets import (
+from digital_life_core.configuration import management as mgmt
+from digital_life_core.conversation.content.cover_assets import (
     configuration_fields as content_cover_fields,
 )
-from companion_v2.conversation.media.output_settings import (
+from digital_life_core.conversation.media.output_settings import (
     configuration_fields as image_output_fields,
 )
-from companion_v2.model_gateway.budget import SOFT_FIELDS
-from companion_v2.system_prompts.configuration import (
+from digital_life_core.model_gateway.budget import SOFT_FIELDS
+from digital_life_core.system_prompts.configuration import (
     configuration_fields as system_prompt_fields,
 )
 
@@ -39,8 +39,8 @@ INSTALLATION_SECTIONS = frozenset(
 
 
 def _backend_sections() -> dict[str, str]:
-    """Parse SECTIONS from astrbot_host/configuration_api.py without importing AstrBot."""
-    source = (ROOT / "astrbot_host" / "configuration_api.py").read_text("utf-8")
+    """Parse SECTIONS from digital_life_host/configuration_api.py without importing AstrBot."""
+    source = (ROOT / "digital_life_host" / "configuration_api.py").read_text("utf-8")
     tree = ast.parse(source)
     for node in tree.body:
         if isinstance(node, ast.Assign):
@@ -52,7 +52,7 @@ def _backend_sections() -> dict[str, str]:
                         for key, value in zip(node.value.keys, node.value.values)
                         if isinstance(key, ast.Constant) and isinstance(value, ast.Name)
                     }
-    raise AssertionError("SECTIONS dict not found in astrbot_host/configuration_api.py")
+    raise AssertionError("SECTIONS dict not found in digital_life_host/configuration_api.py")
 
 
 def _field_definitions_by_group():
@@ -334,7 +334,7 @@ class AllFeaturesI18nContractTests(unittest.TestCase):
         wb_errors = self.probe["wbErrors"]
         self.assertEqual(self.probe["ceErrorsCount"], len(wb_errors))
 
-        mgmt_source = (ROOT / "companion_v2" / "configuration" / "management.py").read_text("utf-8")
+        mgmt_source = (ROOT / "digital_life_core" / "configuration" / "management.py").read_text("utf-8")
         prefixes = sorted(set(re.findall(r'error_prefix\s*=\s*"([^"]+)"', mgmt_source)))
         missing = []
         for prefix in prefixes:

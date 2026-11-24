@@ -5,12 +5,12 @@ import json
 from types import SimpleNamespace
 import unittest
 
-from companion_v2.configuration.models import ConfigLayer, ConfigTarget
-from companion_v2.model_gateway.management import ModelManagement
-from companion_v2.proactive.configuration import GROUP
-from companion_v2.proactive.preferences import ContactPreferences
-from companion_v2.proactive.prompts import INSTRUCTION, request_for
-from companion_v2.proactive.prompt_templates import PROMPT_DEFAULTS
+from digital_life_core.configuration.models import ConfigLayer, ConfigTarget
+from digital_life_core.model_gateway.management import ModelManagement
+from digital_life_core.proactive.configuration import GROUP
+from digital_life_core.proactive.preferences import ContactPreferences
+from digital_life_core.proactive.prompts import INSTRUCTION, request_for
+from digital_life_core.proactive.prompt_templates import PROMPT_DEFAULTS
 from tests.proactive_support import ContactFixture
 
 

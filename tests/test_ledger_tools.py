@@ -268,7 +268,7 @@ class InventoryDiscoveryTests(unittest.TestCase):
     """
 
     def test_every_provider_returning_field_definitions_is_in_the_inventory(self):
-        from companion_v2.configuration.registry import FieldDefinition
+        from digital_life_core.configuration.registry import FieldDefinition
         discovered, skipped, _duplicates = INVENTORY.load_registry()
         self.assertEqual(skipped, [], skipped)
         missing = []
@@ -295,7 +295,7 @@ class InventoryDiscoveryTests(unittest.TestCase):
         """Module-level bare-callable functions whose name suggests a field registry."""
         import ast
         root = ROOT
-        for folder in ("companion_v2", "astrbot_host"):
+        for folder in ("digital_life_core", "digital_life_host"):
             for path in sorted((root / folder).rglob("*.py")):
                 try:
                     tree = ast.parse(path.read_text(encoding="utf-8"))

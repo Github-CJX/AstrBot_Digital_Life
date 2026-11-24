@@ -8,10 +8,10 @@ from pathlib import Path
 from tempfile import TemporaryDirectory
 import unittest
 
-from companion_v2.execution.models import TaskError
-from companion_v2.foundation.refs import ScopeKind
-from companion_v2.identity_policy.personas import ConversationRoute
-from companion_v2.memory.legacy_materials import (
+from digital_life_core.execution.models import TaskError
+from digital_life_core.foundation.refs import ScopeKind
+from digital_life_core.identity_policy.personas import ConversationRoute
+from digital_life_core.memory.legacy_materials import (
     DATABASE_FILENAME,
     LegacyMemoryBinding,
     LegacyMemoryMaterials,

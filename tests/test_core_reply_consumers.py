@@ -7,13 +7,13 @@ import json
 import unittest
 from unittest.mock import AsyncMock, patch
 
-from companion_v2.conversation.recalls import MessageRecall
-from companion_v2.execution.models import TaskError, digest, encode, require, stamp
-from companion_v2.expression import feedback, style_rotation
-from companion_v2.expression.configuration import GROUP, ExpressionConfigurationOwner, configuration_fields, target_for
-from companion_v2.expression.style_evidence import INPUT_SAMPLE_SOURCE, sample_document
-from companion_v2.memory.person.access import owner_key as acquaintance_owner
-from companion_v2.memory.person.models import aggregate
+from digital_life_core.conversation.recalls import MessageRecall
+from digital_life_core.execution.models import TaskError, digest, encode, require, stamp
+from digital_life_core.expression import feedback, style_rotation
+from digital_life_core.expression.configuration import GROUP, ExpressionConfigurationOwner, configuration_fields, target_for
+from digital_life_core.expression.style_evidence import INPUT_SAMPLE_SOURCE, sample_document
+from digital_life_core.memory.person.access import owner_key as acquaintance_owner
+from digital_life_core.memory.person.models import aggregate
 from tests.group_host_support import GroupFixture
 from tests.multi_host_support import MultiFixture
 
@@ -33,7 +33,7 @@ class CorePrivateConsumerTests(MultiFixture, unittest.IsolatedAsyncioTestCase):
         return self.app.expression_samples.collect(context, self.clock.now(), source_kind=INPUT_SAMPLE_SOURCE)
 
     def bind_expression_owner(self, context):
-        from companion_v2.role_profile.configuration import (GROUP as PROFILE_GROUP,
+        from digital_life_core.role_profile.configuration import (GROUP as PROFILE_GROUP,
             RoleProfileConfigurationOwner, configuration_fields as role_profile_fields,
             target_for as role_profile_target_for)
         profile = RoleProfileConfigurationOwner(self.app.runtime)
@@ -110,7 +110,7 @@ class CorePrivateConsumerTests(MultiFixture, unittest.IsolatedAsyncioTestCase):
         self.assertEqual(job["catalogue"][0]["text"], prepared["text"])
         original_context = self.app.expression_samples.evidence_context({"context_key": context.key}, context)
         self.assertEqual(original_context, context)
-        from companion_v2.expression.style_management import ExpressionStyleManagement
+        from digital_life_core.expression.style_management import ExpressionStyleManagement
         self.assertEqual(ExpressionStyleManagement(self.app)._evidence_context({"context_key": context.key}, context), context)
         self.assert_core_only()
 
@@ -205,7 +205,7 @@ class CorePrivateConsumerTests(MultiFixture, unittest.IsolatedAsyncioTestCase):
 
         semantic.gateway.port.analyze = analyze
         observer = self.controller.session.core_reply_observations
-        with patch("astrbot_host.core_reply_media.load_native_image", side_effect=load):
+        with patch("digital_life_host.core_reply_media.load_native_image", side_effect=load):
             job = observer.media(event, prepared)
             await asyncio.wait_for(download_started.wait(), timeout=3)
             self.assertFalse(job.done())
@@ -303,7 +303,7 @@ class CoreGroupConsumerTests(GroupFixture, unittest.IsolatedAsyncioTestCase):
             event = self.group_event(identifier="listening-disabled-" + str(enabled), text="")
             event.message_obj.message.append(Image.fromBase64(base64.b64encode(original.content).decode("ascii")))
             with patch.object(participation.admission, "candidate", return_value=""), \
-                    patch("astrbot_host.core_reply_media.load_native_image", new_callable=AsyncMock) as download:
+                    patch("digital_life_host.core_reply_media.load_native_image", new_callable=AsyncMock) as download:
                 result = await self.controller.group_reply_candidate(event)
                 self.assertTrue(result.is_success, result.failure)
                 self.assertFalse(result.unwrap()["admitted"])
@@ -311,7 +311,7 @@ class CoreGroupConsumerTests(GroupFixture, unittest.IsolatedAsyncioTestCase):
                 download.assert_not_awaited()
 
     async def test_native_group_samples_bind_learning_api_and_relationship_graph(self):
-        from astrbot_host.group_reply_api import GroupReplyWebAPI
+        from digital_life_host.group_reply_api import GroupReplyWebAPI
         prepared = await self.prepared("consumer-group-first", "今天一起去看星星")
         self.clock.advance(timedelta(seconds=1))
         second = await self.prepared("consumer-group-second", "好呀，今晚见", sender="201")

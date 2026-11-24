@@ -3,7 +3,7 @@
 import unittest
 from types import SimpleNamespace
 
-from companion_v2.proactive.service import ProactiveContacts
+from digital_life_core.proactive.service import ProactiveContacts
 
 
 def job(last_reply_at="2026-11-01T10:20:05+00:00", last_input_at="2026-11-01T10:19:00+00:00"):

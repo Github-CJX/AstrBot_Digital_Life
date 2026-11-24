@@ -42,20 +42,20 @@ import time
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
 
-from companion_v2.conversation.native_turns import (NativeConversationTurns, context_rows)
-from companion_v2.execution.models import TaskContext, encode, stamp
-from companion_v2.foundation.refs import (AudienceRef, ScopeKind, ScopeRef, SubjectKind,
+from digital_life_core.conversation.native_turns import (NativeConversationTurns, context_rows)
+from digital_life_core.execution.models import TaskContext, encode, stamp
+from digital_life_core.foundation.refs import (AudienceRef, ScopeKind, ScopeRef, SubjectKind,
                                           SubjectRef)
-from companion_v2.identity_policy.models import (AuthenticatedHostPrincipal, ResolvedIdentity,
+from digital_life_core.identity_policy.models import (AuthenticatedHostPrincipal, ResolvedIdentity,
                                                  RoleBinding)
-from companion_v2.storage.native_conversation_schema import OPEN_TURN_STATES, STATEMENTS
-from companion_v2.storage.runtime import StorageRuntime
+from digital_life_core.storage.native_conversation_schema import OPEN_TURN_STATES, STATEMENTS
+from digital_life_core.storage.runtime import StorageRuntime
 
 INSTALLATION_ID = "bench-installation"
 BASE = datetime(2026, 9, 1, tzinfo=timezone.utc)
 NEW_INDEXES = ("conversation_native_scope_idx", "conversation_native_open_turn_idx")
 
-# ``BudgetLedger.reclaim_expired`` 发出的那条候选查询（companion_v2/model_gateway/
+# ``BudgetLedger.reclaim_expired`` 发出的那条候选查询（digital_life_core/model_gateway/
 # budget.py）。原样抄在这里，测的就是线上形状。
 RECLAIM_SELECT = """SELECT c.call_id, c.state, c.started_at, c.finished_at,
         t.kind AS kind, r.created_at AS requested_at

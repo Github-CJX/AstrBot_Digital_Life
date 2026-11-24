@@ -2,12 +2,12 @@
 
 import unittest
 
-from companion_v2.execution.models import TaskError, digest
-from companion_v2.foundation.refs import AudienceRef, SourceRef, VersionRef
-from companion_v2.sources.dependencies import link
-from companion_v2.sources.governance import bind
-from companion_v2.sources.models import SourceRecord
-from companion_v2.sources.repositories import SourceRepository
+from digital_life_core.execution.models import TaskError, digest
+from digital_life_core.foundation.refs import AudienceRef, SourceRef, VersionRef
+from digital_life_core.sources.dependencies import link
+from digital_life_core.sources.governance import bind
+from digital_life_core.sources.models import SourceRecord
+from digital_life_core.sources.repositories import SourceRepository
 from tests.test_management_access import ManagementFixture, NOW, SCOPE
 
 

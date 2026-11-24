@@ -5,9 +5,9 @@ import sqlite3
 import unittest
 from unittest.mock import patch
 
-from companion_v2.storage.models import OperationState
-from companion_v2.storage.runtime import StorageOpenError, StorageRuntime
-from companion_v2.storage.schema import (
+from digital_life_core.storage.models import OperationState
+from digital_life_core.storage.runtime import StorageOpenError, StorageRuntime
+from digital_life_core.storage.schema import (
     MIGRATION_V6_TO_V7_ID, MIGRATION_V7_TO_V8_FINGERPRINT, MIGRATION_V7_TO_V8_ID,
     SCHEMA_VERSION, SCHEMA_VERSION_V7, V7_REQUIRED_TABLES,
 )
@@ -52,7 +52,7 @@ class DiagnosticStorageTests(DiagnosticFixture):
         self.open_runtime().close()
 
     def test_failed_v8_upgrade_rolls_back_without_touching_v7_records_and_can_retry(self):
-        with patch("companion_v2.storage.runtime.V8_MIGRATION_STATEMENTS",
+        with patch("digital_life_core.storage.runtime.V8_MIGRATION_STATEMENTS",
                    ("CREATE TABLE diagnostic_repair_proposals(proposal_id TEXT)", "INVALID DIAGNOSTIC MIGRATION")):
             with self.assertRaises(StorageOpenError):
                 StorageRuntime.open(data_root=self.root, installation_id=INSTALLATION)

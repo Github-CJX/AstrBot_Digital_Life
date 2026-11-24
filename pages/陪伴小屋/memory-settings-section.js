@@ -3,11 +3,11 @@
    档案操作与策略编辑分开呈现，但共用同一领域入口，避免把策略散落在决策页。
 
    接口：mount(element) / unmount()，与表达页、config-editor 的适配层一致。
-   字段名照 companion_v2/memory/configuration.py 的注册表抄——写错的字段名
+   字段名照 digital_life_core/memory/configuration.py 的注册表抄——写错的字段名
    不会报错，只会掉进末尾的兜底分组并显示成原始 id。 */
 "use strict";
 window.CompanionMemorySettingsSection = (() => {
-  const PREFIX = "/astrbot_plugin_private_companion/";
+  const PREFIX = "/astrbot_plugin_digital_life/";
 
   const labels = {
     enabled: "启用整理", automatic_context: "自动注入相关事实",

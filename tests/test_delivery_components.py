@@ -2,7 +2,7 @@
 
 import unittest
 
-from companion_v2.delivery.components import build_component_plan, ordered_components
+from digital_life_core.delivery.components import build_component_plan, ordered_components
 
 
 RECORD = {"type": "record", "data": {"file": "base64://YQ=="}}

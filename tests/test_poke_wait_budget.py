@@ -18,15 +18,15 @@ from __future__ import annotations
 from datetime import datetime, timedelta
 import unittest
 
-from companion_v2.conversation.pokes import (
+from digital_life_core.conversation.pokes import (
     MODEL_REPLY_KIND, POKE_BUDGET_SECONDS, POKE_MARGIN_SECONDS, POKE_PROVIDER_TIMEOUT_SECONDS,
     PokeReplyModel, poke_reply_profile,
 )
-from companion_v2.execution.models import Lane, TaskResult, digest
-from companion_v2.execution.service import TaskSupervisor
-from companion_v2.execution.waiting import BackgroundTaskQueue
-from companion_v2.model_gateway.models import ModelTaskProfile
-from companion_v2.model_gateway.routing import configuration_fields
+from digital_life_core.execution.models import Lane, TaskResult, digest
+from digital_life_core.execution.service import TaskSupervisor
+from digital_life_core.execution.waiting import BackgroundTaskQueue
+from digital_life_core.model_gateway.models import ModelTaskProfile
+from digital_life_core.model_gateway.routing import configuration_fields
 from tests.test_execution import ExecutionFixture
 
 

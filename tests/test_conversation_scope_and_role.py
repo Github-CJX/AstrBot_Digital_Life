@@ -6,19 +6,19 @@ from pathlib import Path
 from tempfile import TemporaryDirectory
 import unittest
 
-from companion_v2.conversation.foreground import (
+from digital_life_core.conversation.foreground import (
     ContextContribution, ContributionState, ForegroundLeaseRegistry, ForegroundStage, ModelDraft,
 )
-from companion_v2.conversation.kernel import IsolatedConversationKernel
-from companion_v2.conversation.models import DeterministicFakeRenderer, ExternalEffectCounters, InboundConversationEvent
-from companion_v2.foundation.clock import DeterministicClock
-from companion_v2.foundation.refs import AudienceRef, ScopeKind, SourceRef, SubjectKind, SubjectRef, VersionRef
-from companion_v2.identity_policy.models import AuthorizationTier
-from companion_v2.identity_policy.repository import PersistentIdentityDirectory
-from companion_v2.sources.models import SourceRecord
-from companion_v2.sources.repositories import SourceRepository
-from companion_v2.storage.repositories import InboxRepository, OperationRepository
-from companion_v2.storage.runtime import StorageRuntime
+from digital_life_core.conversation.kernel import IsolatedConversationKernel
+from digital_life_core.conversation.models import DeterministicFakeRenderer, ExternalEffectCounters, InboundConversationEvent
+from digital_life_core.foundation.clock import DeterministicClock
+from digital_life_core.foundation.refs import AudienceRef, ScopeKind, SourceRef, SubjectKind, SubjectRef, VersionRef
+from digital_life_core.identity_policy.models import AuthorizationTier
+from digital_life_core.identity_policy.repository import PersistentIdentityDirectory
+from digital_life_core.sources.models import SourceRecord
+from digital_life_core.sources.repositories import SourceRepository
+from digital_life_core.storage.repositories import InboxRepository, OperationRepository
+from digital_life_core.storage.runtime import StorageRuntime
 from tests import test_foreground_conversation as fixture
 
 

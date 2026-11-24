@@ -3,9 +3,9 @@
 from dataclasses import replace
 import unittest
 
-from companion_v2.execution.models import TaskError, digest
-from companion_v2.foundation.refs import SourceRef, SubjectKind, SubjectRef, VersionRef
-from companion_v2.sources.models import SourceRecord
+from digital_life_core.execution.models import TaskError, digest
+from digital_life_core.foundation.refs import SourceRef, SubjectKind, SubjectRef, VersionRef
+from digital_life_core.sources.models import SourceRecord
 from tests.test_external_tools import ExternalFixture, tool_call
 
 

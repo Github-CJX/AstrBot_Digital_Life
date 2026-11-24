@@ -10,10 +10,10 @@ import unittest
 from unittest.mock import AsyncMock, Mock, patch
 
 from tests import test_astrbot_staging_host as host_support
-from astrbot_host.native_extensions.live.bilibili_live import LiveDanmakuEvent
-from astrbot_host.native_extensions.live.runtime import LiveRuntime
-from astrbot_host.native_extensions.live.state import LiveStateStore
-from astrbot_host.native_extensions.together.activity_methods import TogetherActivityMethods
+from digital_life_host.native_extensions.live.bilibili_live import LiveDanmakuEvent
+from digital_life_host.native_extensions.live.runtime import LiveRuntime
+from digital_life_host.native_extensions.live.state import LiveStateStore
+from digital_life_host.native_extensions.together.activity_methods import TogetherActivityMethods
 
 
 class LiveNativeMemoryTests(unittest.IsolatedAsyncioTestCase):
@@ -140,7 +140,7 @@ class LiveNativeMemoryTests(unittest.IsolatedAsyncioTestCase):
         self.controller._multi_host = True
         await self.live.put_kv_data("bili_live_reply_session", "qq-main:FriendMessage:200")
         self.live._initialize_runtime = AsyncMock()
-        with patch("astrbot_host.mobile_together.MobileTogetherBridge._target_context",
+        with patch("digital_life_host.mobile_together.MobileTogetherBridge._target_context",
                    return_value=(self.controller.session, application, context)):
             await self.live.initialize()
             profiles = self.live._live_state_store.data["profiles"]
@@ -157,8 +157,8 @@ class LiveNativeMemoryTests(unittest.IsolatedAsyncioTestCase):
         executable = self.root / "extensions" / "screen" / "bin" / ("ffmpeg.exe" if os.name == "nt" else "ffmpeg")
         executable.parent.mkdir(parents=True)
         executable.write_bytes(b"synthetic executable")
-        with patch("astrbot_host.native_extensions.together.activity_methods.shutil.which", return_value=None), \
-             patch("astrbot_host.native_extensions.together.activity_methods.get_astrbot_data_path", return_value=str(self.root / "host")):
+        with patch("digital_life_host.native_extensions.together.activity_methods.shutil.which", return_value=None), \
+             patch("digital_life_host.native_extensions.together.activity_methods.get_astrbot_data_path", return_value=str(self.root / "host")):
             self.assertEqual(TogetherActivityMethods._ffmpeg_path(runtime), executable)
 
 

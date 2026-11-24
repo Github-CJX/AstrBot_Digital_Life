@@ -1,6 +1,6 @@
 """Remove newer tables when constructing historical upgrade fixtures."""
 
-from companion_v2.storage.schema import (
+from digital_life_core.storage.schema import (
     MEMORY_TABLES, V10_MIGRATION_STATEMENTS, V15_MIGRATION_STATEMENTS, V36_MIGRATION_STATEMENTS,
     V56_MIGRATION_STATEMENTS, V59_MIGRATION_STATEMENTS, V61_MIGRATION_STATEMENTS,
 )
@@ -405,7 +405,7 @@ def remove_v25(connection):
 
 def remove_v24(connection):
     remove_v25(connection)
-    from companion_v2.storage.state_schema import STATE_TABLES
+    from digital_life_core.storage.state_schema import STATE_TABLES
     for table in sorted(STATE_TABLES, key=lambda name: name.endswith("_records")):
         connection.execute(f'DROP TABLE IF EXISTS "{table}"')
     connection.execute("DELETE FROM schema_migrations WHERE migration_id = 'companion-v2.storage.v23-to-v24'")

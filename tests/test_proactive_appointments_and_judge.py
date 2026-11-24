@@ -10,16 +10,16 @@ from datetime import datetime, timedelta
 import json
 import unittest
 
-from companion_v2.agenda.models import Frequency, Schedule
-from companion_v2.configuration.models import ConfigurationError
-from companion_v2.configuration.registry import FieldRegistry
-from companion_v2.execution.models import encode
-from companion_v2.model_gateway.routing import configuration_fields as model_fields
-from companion_v2.proactive import persona_judge, prompts
-from companion_v2.proactive.prompts import TOPIC_CONTINUITY_INSTRUCTION
-from companion_v2.proactive.configuration import GROUP, configuration_fields
-from companion_v2.proactive.service import persona_judge_profile
-from companion_v2.role_work.state.management import StateManagement
+from digital_life_core.agenda.models import Frequency, Schedule
+from digital_life_core.configuration.models import ConfigurationError
+from digital_life_core.configuration.registry import FieldRegistry
+from digital_life_core.execution.models import encode
+from digital_life_core.model_gateway.routing import configuration_fields as model_fields
+from digital_life_core.proactive import persona_judge, prompts
+from digital_life_core.proactive.prompts import TOPIC_CONTINUITY_INSTRUCTION
+from digital_life_core.proactive.configuration import GROUP, configuration_fields
+from digital_life_core.proactive.service import persona_judge_profile
+from digital_life_core.role_work.state.management import StateManagement
 from tests.contact_schedule_support import ContactScheduleFixture
 from tests.test_role_state import calendar_data
 from tests.test_role_tool_loop import answered

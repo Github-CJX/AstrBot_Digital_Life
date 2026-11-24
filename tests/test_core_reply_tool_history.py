@@ -2,12 +2,12 @@
 
 import unittest
 
-from astrbot_host.core_reply import repair_tool_call_history
+from digital_life_host.core_reply import repair_tool_call_history
 
 
 def call(identifier):
     return {"id": identifier, "type": "function",
-            "function": {"name": "companion_v2_reaction_search", "arguments": "{}"}}
+            "function": {"name": "digital_life_core_reaction_search", "arguments": "{}"}}
 
 
 class RepairToolCallHistoryTests(unittest.TestCase):

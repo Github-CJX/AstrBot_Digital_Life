@@ -12,9 +12,9 @@ import unittest
 
 from tests import test_account_link_host as fixtures
 from tests.multi_host_support import MultiFixture
-from companion_v2.adapters.astrbot.memory_providers import memory_provider_registry
-from companion_v2.execution.models import stamp
-from companion_v2.relationships.account_link_memory import CONFIRMATION
+from digital_life_core.adapters.astrbot.memory_providers import memory_provider_registry
+from digital_life_core.execution.models import stamp
+from digital_life_core.relationships.account_link_memory import CONFIRMATION
 
 MEMORY = os.environ.get("MEMORY_COMPANION_CHECKOUT")
 
@@ -29,7 +29,7 @@ class LinkedMemoryHostTests(MultiFixture, unittest.IsolatedAsyncioTestCase):
 
     async def asyncSetUp(self):
         await fixtures.AccountLinkHostTests.asyncSetUp(self)
-        from astrbot_host.integration_registry import UnifiedCompanionExtensionAPI
+        from digital_life_host.integration_registry import UnifiedCompanionExtensionAPI
         root = Path(MEMORY).resolve()
         package = ModuleType("astrbot_plugin_memory_companion")
         package.__path__ = [str(root)]
@@ -71,7 +71,7 @@ class LinkedMemoryHostTests(MultiFixture, unittest.IsolatedAsyncioTestCase):
             self.assertIn("SYNTHETIC_LONG_MEMORY_first", prompt)
             self.assertIn("SYNTHETIC_LONG_MEMORY_second", prompt)
             self.assertIn("source_session_id", prompt)
-            from astrbot_host.memory_linkage import read_external_memory_summary
+            from digital_life_host.memory_linkage import read_external_memory_summary
             summary = await read_external_memory_summary(self.controller, prepared["context"])
             self.assertEqual(summary["state"], "ready", summary)
             self.assertEqual(summary["counts"]["total"], 2)
@@ -98,7 +98,7 @@ class LinkedMemoryHostTests(MultiFixture, unittest.IsolatedAsyncioTestCase):
 
 class NativeMemoryIdentityTests(unittest.TestCase):
     def test_wechat_mapping_uses_native_login(self):
-        from astrbot_host.multi_session import MultiHostSession
+        from digital_life_host.multi_session import MultiHostSession
         platform = NS(bot_self_id="native-login", meta=lambda: NS(name="wechat_native"))
         scope = NS(account_id="adapter-alias")
         session = NS(bridge=NS(platform=lambda original: platform if original is scope else None))
@@ -106,8 +106,8 @@ class NativeMemoryIdentityTests(unittest.TestCase):
             {"owner_bot_id": "native-login", "platform_name": "wechat_native"})
 
     def test_unknown_native_login_fails_closed(self):
-        from astrbot_host.multi_session import MultiHostSession
-        from companion_v2.execution.models import TaskError
+        from digital_life_host.multi_session import MultiHostSession
+        from digital_life_core.execution.models import TaskError
         for owner in ("", "self", None):
             platform = NS(bot_self_id=owner, meta=lambda: NS(name="wechat_native"))
             with self.subTest(owner=owner), self.assertRaises(TaskError):

@@ -9,10 +9,10 @@ from tests import test_astrbot_staging_host as _host_import
 import httpx
 import ormsgpack
 from astrbot.core.provider.sources.fishaudio_tts_api_source import ProviderFishAudioTTSAPI
-from astrbot_host.fish_audio import DRAMA_DIRECTION, provider_direction
-from astrbot_host.voice import NativeVoiceReply
-from companion_v2.conversation.voice_reply import VoiceReplyPolicy
-from companion_v2.foundation.refs import ScopeKind
+from digital_life_host.fish_audio import DRAMA_DIRECTION, provider_direction
+from digital_life_host.voice import NativeVoiceReply
+from digital_life_core.conversation.voice_reply import VoiceReplyPolicy
+from digital_life_core.foundation.refs import ScopeKind
 
 
 class FishAudioTests(unittest.IsolatedAsyncioTestCase):
@@ -40,7 +40,7 @@ class FishAudioTests(unittest.IsolatedAsyncioTestCase):
                         transport=httpx.MockTransport(handle)) as client:
                     with patch("astrbot.core.provider.sources.fishaudio_tts_api_source.AsyncClient", return_value=client), \
                             patch("astrbot.core.provider.sources.fishaudio_tts_api_source.get_astrbot_temp_path", return_value=root), \
-                            patch("astrbot_host.voice.get_astrbot_temp_path", return_value=root):
+                            patch("digital_life_host.voice.get_astrbot_temp_path", return_value=root):
                         result = await NativeVoiceReply(context).render(task, speech, provider_id="fish-test")
                 self.assertEqual(result["type"], "record")
                 self.assertEqual(str(sent[0].url), "https://api.fish.audio/v1/tts")

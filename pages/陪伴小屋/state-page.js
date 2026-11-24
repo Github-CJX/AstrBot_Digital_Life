@@ -1,6 +1,6 @@
 "use strict";
 window.CompanionStatePage = (() => {
-  const HOST = "astrbot_plugin_private_companion";
+  const HOST = "astrbot_plugin_digital_life";
   const PREFIX = "/" + HOST + "/";
   const phaseNames = {menstrual:"经期", follicular:"卵泡期", pre_ovulation:"排卵前", ovulation:"排卵期",
     luteal:"黄体期", pms:"经前期", recovery:"恢复期"};

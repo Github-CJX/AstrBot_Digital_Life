@@ -9,14 +9,14 @@ from tempfile import TemporaryDirectory
 from types import SimpleNamespace
 import unittest
 
-from astrbot_host.legacy_api import LegacyMigrationWebAPI
-from companion_v2.execution.models import TaskContext, TaskError
-from companion_v2.expression.legacy_import import import_profile, preview
-from companion_v2.expression.style_management import ExpressionStyleManagement
-from companion_v2.foundation.refs import AudienceRef, ScopeKind
-from companion_v2.legacy.data_migration import build_data_plan
-from companion_v2.legacy.expression_data import expression_profiles, selected_profile
-from companion_v2.legacy.migration import LegacyMigration
+from digital_life_host.legacy_api import LegacyMigrationWebAPI
+from digital_life_core.execution.models import TaskContext, TaskError
+from digital_life_core.expression.legacy_import import import_profile, preview
+from digital_life_core.expression.style_management import ExpressionStyleManagement
+from digital_life_core.foundation.refs import AudienceRef, ScopeKind
+from digital_life_core.legacy.data_migration import build_data_plan
+from digital_life_core.legacy.expression_data import expression_profiles, selected_profile
+from digital_life_core.legacy.migration import LegacyMigration
 from tests.test_host_application import HostFixture
 from tests.test_management_access import NOW, SCOPE
 
@@ -132,8 +132,8 @@ class LegacyExpressionTests(HostFixture, unittest.IsolatedAsyncioTestCase):
         self.assertEqual(captured["references"], [])
 
     async def test_later_samples_merge_without_restoring_a_newer_review(self):
-        from companion_v2.expression.legacy_import import samples
-        from companion_v2.expression.sample_review import ExpressionSampleReviewStore
+        from digital_life_core.expression.legacy_import import samples
+        from digital_life_core.expression.sample_review import ExpressionSampleReviewStore
 
         context = self.context()
         data = legacy_data(context)
@@ -176,7 +176,7 @@ class LegacyExpressionTests(HostFixture, unittest.IsolatedAsyncioTestCase):
         self.assertEqual(expression_profiles(data)[0]["samples"][0]["state"], "rejected")
 
     async def test_group_rule_and_sample_history_stay_in_the_selected_group_and_role(self):
-        from companion_v2.expression.legacy_import import samples
+        from digital_life_core.expression.legacy_import import samples
 
         base = self.context()
         scope = replace(SCOPE, kind=ScopeKind.GROUP, native_scope_id="group-one")

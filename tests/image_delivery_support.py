@@ -2,7 +2,7 @@
 
 import json
 
-from companion_v2.conversation.media.reply import OWNER
+from digital_life_core.conversation.media.reply import OWNER
 from tests.native_adapter_support import completion, final_text
 
 

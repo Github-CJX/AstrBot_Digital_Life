@@ -13,30 +13,30 @@ from tests import test_core_reply_images as image_support
 from astrbot.core.message.components import Image, Plain, Reply
 from PIL import Image as PILImage
 
-from astrbot_host.core_reply import CORE_REPLY_CONTEXT_EXTRA, prepare_core_reply_event
-from astrbot_host.core_reply_media import (
+from digital_life_host.core_reply import CORE_REPLY_CONTEXT_EXTRA, prepare_core_reply_event
+from digital_life_host.core_reply_media import (
     bind_native_quoted_image_sources, capture_native_input_images, direct_image_locators,
     frozen_image_locators,
 )
-from astrbot_host.core_reply_tools import inject_core_reply_tools
-from companion_v2.adapters.astrbot.native import NativeConversationInput
-from companion_v2.capabilities.models import CapabilityAuthorizationState
-from companion_v2.capabilities.repositories import CapabilityRepository
-from companion_v2.conversation.native_tool_sources import native_input_images
-from companion_v2.conversation.recalls import MessageRecall
-from companion_v2.execution.models import TaskContext, digest, require
-from companion_v2.foundation.outcome import Outcome
-from companion_v2.foundation.refs import ScopeKind
-from companion_v2.identity_policy.group_audience import group_audience
-from companion_v2.identity_policy.personas import ConversationRoute
-from companion_v2.references.configuration import (
+from digital_life_host.core_reply_tools import inject_core_reply_tools
+from digital_life_core.adapters.astrbot.native import NativeConversationInput
+from digital_life_core.capabilities.models import CapabilityAuthorizationState
+from digital_life_core.capabilities.repositories import CapabilityRepository
+from digital_life_core.conversation.native_tool_sources import native_input_images
+from digital_life_core.conversation.recalls import MessageRecall
+from digital_life_core.execution.models import TaskContext, digest, require
+from digital_life_core.foundation.outcome import Outcome
+from digital_life_core.foundation.refs import ScopeKind
+from digital_life_core.identity_policy.group_audience import group_audience
+from digital_life_core.identity_policy.personas import ConversationRoute
+from digital_life_core.references.configuration import (
     GROUP as REFERENCE_GROUP, ReferenceConfigurationOwner, configuration_fields, target_for,
 )
-from companion_v2.references.models import (
+from digital_life_core.references.models import (
     ContentDigest, ReferenceAsset, ReferenceKind, ReferenceRole, ReferenceSource,
 )
-from companion_v2.references.repositories import ReferenceAssetRepository
-from companion_v2.references.service import owner_key
+from digital_life_core.references.repositories import ReferenceAssetRepository
+from digital_life_core.references.service import owner_key
 from tests.native_image_support import NativeImageFixture
 from tests.test_astrbot_core_reply import FakeEvent
 from tests.test_conversation_images import image_bytes
@@ -169,7 +169,7 @@ class CoreReplyQuotedImageTests(NativeImageFixture, HostFixture, unittest.Isolat
 
         event, request = self.bind("cached-quote-edit", [
             Reply(id="cached-quote", sender_id=SCOPE.native_scope_id)], dispatch=dispatch)
-        with patch("astrbot_host.core_reply_media.ImageResolver.resolve_for_llm",
+        with patch("digital_life_host.core_reply_media.ImageResolver.resolve_for_llm",
                    AsyncMock(return_value=[str(cached)])) as resolve:
             received = await self.call(event, request, "image.edit", {
                 "prompt": "模仿图一姿势", "reference_indices": [0], "reference_roles": ["pose"]}, "cached-quote-edit")

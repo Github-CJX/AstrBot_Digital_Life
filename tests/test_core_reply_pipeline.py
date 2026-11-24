@@ -18,11 +18,11 @@ from astrbot.core.platform.astrbot_message import AstrBotMessage, MessageMember
 from astrbot.core.platform.message_type import MessageType
 from astrbot.core.provider.entities import ProviderRequest
 from astrbot.core.provider.entities import LLMResponse
-from companion_v2.conversation.segmentation import SegmentationPolicy
-from companion_v2.conversation.voice_reply import VoiceReplyPolicy
-from companion_v2.foundation.outcome import Outcome
-from astrbot_host.core_reply import sent_core_text
-from astrbot_host.voice import singsing_route_available
+from digital_life_core.conversation.segmentation import SegmentationPolicy
+from digital_life_core.conversation.voice_reply import VoiceReplyPolicy
+from digital_life_core.foundation.outcome import Outcome
+from digital_life_host.core_reply import sent_core_text
+from digital_life_host.voice import singsing_route_available
 
 
 class PipelineEvent(AstrMessageEvent):
@@ -64,7 +64,7 @@ class CoreAgentFixture:
             return
         if self.native_tool_text is not None:
             from astrbot.core.message.message_event_result import MessageChain
-            from astrbot_host.core_reply_idempotency import remember_native_tool_message
+            from digital_life_host.core_reply_idempotency import remember_native_tool_message
 
             remember_native_tool_message(event, MessageChain(chain=[Plain(self.native_tool_text),
                                                                Record(file="base64://YQ==")]))

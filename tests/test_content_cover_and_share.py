@@ -2,10 +2,10 @@
 
 import unittest
 
-from companion_v2.conversation.content import cover_assets
-from companion_v2.execution.models import TaskError
-from companion_v2.foundation.refs import ReferenceValidationError
-from companion_v2.sharing.models import ROLE_OWNED_KINDS, ShareMaterial, ShareMaterialKind
+from digital_life_core.conversation.content import cover_assets
+from digital_life_core.execution.models import TaskError
+from digital_life_core.foundation.refs import ReferenceValidationError
+from digital_life_core.sharing.models import ROLE_OWNED_KINDS, ShareMaterial, ShareMaterialKind
 from tests.content_orchestration_support import ContentOrchestrationFixture, NOW
 
 
@@ -125,7 +125,7 @@ class ContentShareMaterialTests(ContentOrchestrationFixture, unittest.TestCase):
             self.material(work_id="  ")
 
     def test_a_cover_may_travel_with_the_material_but_is_never_required(self):
-        from companion_v2.foundation.refs import AssetRef, VersionRef
+        from digital_life_core.foundation.refs import AssetRef, VersionRef
         covered = self.material(asset=AssetRef("asset-1", "image.native", self.context.scope,
                                                VersionRef("asset-1", 1), "a" * 64))
         self.assertEqual(covered.asset.asset_id, "asset-1")

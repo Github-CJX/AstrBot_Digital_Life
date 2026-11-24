@@ -91,7 +91,7 @@ async function run({browser, outputDir, bridgePath}) {
     + "addEventListener('message',async event=>{const frame=document.querySelector('iframe'),m=event.data;"
     + "if(event.source!==frame.contentWindow||m.channel!=='astrbot-plugin-page')return;"
     + "const send=v=>frame.contentWindow.postMessage({channel:'astrbot-plugin-page',...v},location.origin);"
-    + "if(m.kind==='ready'){send({kind:'context',context:{pluginName:'astrbot_plugin_private_companion',pageName:'账号与会话'}});return;}"
+    + "if(m.kind==='ready'){send({kind:'context',context:{pluginName:'astrbot_plugin_digital_life',pageName:'账号与会话'}});return;}"
     + "if(m.kind!=='request')return;try{const r=await fetch('/qa',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(m)});"
     + "send({kind:'response',requestId:m.requestId,ok:true,data:await r.json()});}catch(e){send({kind:'response',requestId:m.requestId,ok:false,error:e.message});}});</script>";
   const serverErrors = [], browserErrors = [], checks = [];

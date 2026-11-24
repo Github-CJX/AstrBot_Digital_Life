@@ -52,21 +52,21 @@ def tearDownModule():
         _astrbot_import_root.cleanup()
 
 
-from astrbot_host.controller import AstrBotStagingController
+from digital_life_host.controller import AstrBotStagingController
 
-from companion_v2.adapters.astrbot.staging import NativeAdapterTypes
-from companion_v2.configuration.registry import FieldRegistry
-from companion_v2.configuration.service import ConfigurationService
-from companion_v2.conversation.messages import REPLY_KIND
-from companion_v2.execution.models import (
+from digital_life_core.adapters.astrbot.staging import NativeAdapterTypes
+from digital_life_core.configuration.registry import FieldRegistry
+from digital_life_core.configuration.service import ConfigurationService
+from digital_life_core.conversation.messages import REPLY_KIND
+from digital_life_core.execution.models import (
     Lane,
     ProviderBinding,
     TaskError,
     TaskRegistration,
     TaskResult,
 )
-from companion_v2.model_gateway.budget import BudgetLedger
-from companion_v2.model_gateway.models import (
+from digital_life_core.model_gateway.budget import BudgetLedger
+from digital_life_core.model_gateway.models import (
     Amount,
     LocalProvider,
     ModelDraft,
@@ -74,8 +74,8 @@ from companion_v2.model_gateway.models import (
     ProviderResponse,
     ToolSpec,
 )
-from companion_v2.model_gateway.routing import ModelRouter, configuration_fields
-from companion_v2.model_gateway.service import LocalModelGateway
+from digital_life_core.model_gateway.routing import ModelRouter, configuration_fields
+from digital_life_core.model_gateway.service import LocalModelGateway
 from tests.multi_host_support import MultiFixture
 from tests.native_adapter_support import FakeEvent, FakeProvider, FakeReverseApi, NativeFixture
 from tests.test_astrbot_staging_host import WebContext, host_config

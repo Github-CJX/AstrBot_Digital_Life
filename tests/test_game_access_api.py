@@ -9,10 +9,10 @@ from astrbot.core.agent.message import Message, ToolCall
 from astrbot.core.provider.entities import ProviderRequest
 from starlette.requests import Request
 
-from astrbot_host.core_reply import prepare_core_reply_event
-from astrbot_host.core_reply_tools import inject_core_reply_tools, native_tool_name
-from companion_v2.games.native.access import GROUPS
-from companion_v2.games.native.provider import GOMOKU_READ
+from digital_life_host.core_reply import prepare_core_reply_event
+from digital_life_host.core_reply_tools import inject_core_reply_tools, native_tool_name
+from digital_life_core.games.native.access import GROUPS
+from digital_life_core.games.native.provider import GOMOKU_READ
 from tests.multi_host_support import MultiFixture
 
 

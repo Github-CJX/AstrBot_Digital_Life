@@ -3,8 +3,8 @@ from datetime import datetime, timezone
 import json
 import unittest
 
-from companion_v2.foundation.refs import ScopeKind
-from astrbot_host.multi_session import MultiHostSession
+from digital_life_core.foundation.refs import ScopeKind
+from digital_life_host.multi_session import MultiHostSession
 
 
 class _Manager:

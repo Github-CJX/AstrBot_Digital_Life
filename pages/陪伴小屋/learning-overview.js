@@ -1,6 +1,6 @@
 "use strict";
 window.CompanionLearningOverviewPage = (() => {
-  const PREFIX = "/astrbot_plugin_private_companion/";
+  const PREFIX = "/astrbot_plugin_digital_life/";
   const STAGES = [
     ["proposed", "提出", "var(--t-text-faint)"],
     ["active", "进行中", "var(--t-accent-solid)"],

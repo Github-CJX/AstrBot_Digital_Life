@@ -5,11 +5,11 @@ from dataclasses import replace
 from functools import partial
 
 from astrbot.api.message_components import Forward
-from astrbot_host.audio.loader import load_native_audio
-from astrbot_host.media import load_native_image
-from astrbot_host.video.loader import load_native_video
-from companion_v2.adapters.astrbot.forwards import read_private_forwards
-from companion_v2.adapters.astrbot.group_forwards import read_group_forwards
+from digital_life_host.audio.loader import load_native_audio
+from digital_life_host.media import load_native_image
+from digital_life_host.video.loader import load_native_video
+from digital_life_core.adapters.astrbot.forwards import read_private_forwards
+from digital_life_core.adapters.astrbot.group_forwards import read_group_forwards
 from tests.audio_support import audio_bytes
 from tests.forward_support import node_raw
 from tests.group_media_support import GroupMediaFixture, group_raw, Plain, Reply, FakeRecord, FakeVideo

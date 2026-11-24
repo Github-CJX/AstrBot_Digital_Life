@@ -5,10 +5,10 @@ from types import SimpleNamespace as NS
 import unittest
 from unittest.mock import AsyncMock, Mock, patch
 
-from companion_v2.conversation.foreground import ContextContribution, ContributionState
-from companion_v2.foundation.outcome import Outcome
-from astrbot_host.core_reply import CORE_REPLY_CONTEXT_EXTRA
-from astrbot_host.core_reply_perception import inject_core_reply_perception_context
+from digital_life_core.conversation.foreground import ContextContribution, ContributionState
+from digital_life_core.foundation.outcome import Outcome
+from digital_life_host.core_reply import CORE_REPLY_CONTEXT_EXTRA
+from digital_life_host.core_reply_perception import inject_core_reply_perception_context
 from tests.group_host_support import GroupFixture, group_config
 from tests.multi_host_support import MultiFixture
 from tests.native_adapter_support import FakeEvent
@@ -169,7 +169,7 @@ class PrivateCoreReplyAdmissionTests(MultiFixture, unittest.IsolatedAsyncioTestC
         self.assertEqual(self.app.runtime.read_all("SELECT batch_id FROM conversation_batches", ()), ())
 
     async def test_configured_expression_preferences_apply_and_disable_without_selecting_v2_route(self):
-        from companion_v2.conversation.reply_settings import GROUP, ReplyConfigurationOwner, target_for
+        from digital_life_core.conversation.reply_settings import GROUP, ReplyConfigurationOwner, target_for
 
         self.app.router._route_selection = Mock(side_effect=AssertionError("expression must not select a V2 model"))
         original = (await self.controller.prepare_core_reply(self.event(identifier="core-style-context"))).unwrap()
@@ -217,10 +217,10 @@ class PrivateCoreReplyAdmissionTests(MultiFixture, unittest.IsolatedAsyncioTestC
         self.assertEqual(self.native.provider.client.state.calls, [])
 
     async def test_reply_page_voice_policy_is_used_when_host_global_voice_is_disabled(self):
-        from companion_v2.conversation.reply_settings import (
+        from digital_life_core.conversation.reply_settings import (
             GROUP, ReplyConfigurationOwner, target_for, voice_settings,
         )
-        from companion_v2.conversation.voice_reply import VoiceReplyPolicy
+        from digital_life_core.conversation.voice_reply import VoiceReplyPolicy
 
         self.assertFalse(self.controller.settings.common.voice_reply_enabled)
         seed = (await self.controller.prepare_core_reply(
@@ -239,7 +239,7 @@ class PrivateCoreReplyAdmissionTests(MultiFixture, unittest.IsolatedAsyncioTestC
             self.event(identifier="core-voice-settings-active", text="Tell me a small story"))).unwrap()
 
         self.assertEqual(prepared["voice_reply_policy"], policy)
-        from astrbot_host.core_reply import CORE_REPLY_CONTEXT_EXTRA, inject_core_reply_prompt
+        from digital_life_host.core_reply import CORE_REPLY_CONTEXT_EXTRA, inject_core_reply_prompt
         from tests.test_core_reply_voice import FakeEvent
 
         event = FakeEvent()
@@ -252,7 +252,7 @@ class PrivateCoreReplyAdmissionTests(MultiFixture, unittest.IsolatedAsyncioTestC
     async def test_global_voice_policy_is_used_when_reply_page_snapshot_fails(self):
         from dataclasses import replace
 
-        from companion_v2.conversation.voice_reply import VoiceReplyPolicy
+        from digital_life_core.conversation.voice_reply import VoiceReplyPolicy
 
         policy = VoiceReplyPolicy(generation_mode="model_tag", provider_id="host-global-tts")
         common = replace(self.controller.settings.common, voice_reply_enabled=True, voice_reply_policy=policy)
@@ -268,8 +268,8 @@ class PrivateCoreReplyAdmissionTests(MultiFixture, unittest.IsolatedAsyncioTestC
 
     async def test_drama_direction_is_prepared_for_the_actual_selected_voice(self):
         from dataclasses import replace
-        from astrbot_host.fish_audio import DRAMA_DIRECTION
-        from companion_v2.conversation.voice_reply import VoiceReplyPolicy
+        from digital_life_host.fish_audio import DRAMA_DIRECTION
+        from digital_life_core.conversation.voice_reply import VoiceReplyPolicy
 
         policy = VoiceReplyPolicy(generation_mode="model_tag", provider_id="fish-selected")
         settings = replace(self.controller.settings, common=replace(self.controller.settings.common,
@@ -285,12 +285,12 @@ class PrivateCoreReplyAdmissionTests(MultiFixture, unittest.IsolatedAsyncioTestC
         self.assertEqual(prepared["voice_provider_instruction"], DRAMA_DIRECTION)
 
     async def test_untriggered_voice_configuration_still_reaches_model_perception(self):
-        from astrbot_host.core_reply import CORE_REPLY_CONTEXT_EXTRA
-        from astrbot_host.core_reply_perception import inject_core_reply_perception_context
-        from companion_v2.conversation.reply_settings import (
+        from digital_life_host.core_reply import CORE_REPLY_CONTEXT_EXTRA
+        from digital_life_host.core_reply_perception import inject_core_reply_perception_context
+        from digital_life_core.conversation.reply_settings import (
             GROUP, ReplyConfigurationOwner, target_for, voice_settings,
         )
-        from companion_v2.conversation.voice_reply import VoiceReplyPolicy
+        from digital_life_core.conversation.voice_reply import VoiceReplyPolicy
         from tests.test_core_reply_perception import perception_payload
 
         seed = (await self.controller.prepare_core_reply(self.event(identifier="voice-perception-seed"))).unwrap()
@@ -345,7 +345,7 @@ class PrivateCoreReplyAdmissionTests(MultiFixture, unittest.IsolatedAsyncioTestC
         self.app.router._route_selection.assert_not_called()
 
     async def test_authorized_background_is_injected_without_replacing_core_history(self):
-        from companion_v2.role_work.life.configuration import LifeConfigurationOwner, configuration_fields, target_for
+        from digital_life_core.role_work.life.configuration import LifeConfigurationOwner, configuration_fields, target_for
 
         context = self.controller.authority.context("first", "role-a")
         owner = LifeConfigurationOwner(self.app.runtime)
@@ -406,8 +406,8 @@ class PrivateCoreReplyAdmissionTests(MultiFixture, unittest.IsolatedAsyncioTestC
         request = NS(prompt="刚才那条在哪看到的", contexts=[], extra_user_content_parts=[])
         await inject_core_reply_perception_context(event, request, application=self.app)
         payload = json.loads(request.extra_user_content_parts[-1].text
-                             .removeprefix("<companion_v2_context>\n")
-                             .removesuffix("\n</companion_v2_context>"))
+                             .removeprefix("<digital_life_core_context>\n")
+                             .removesuffix("\n</digital_life_core_context>"))
         background = payload["companion_background"]
         self.assertIsInstance(background, dict)
         inspiration = next(section for section in background["sections"]
@@ -417,7 +417,7 @@ class PrivateCoreReplyAdmissionTests(MultiFixture, unittest.IsolatedAsyncioTestC
         self.assertNotIn('\\"items\\"', request.extra_user_content_parts[-1].text)
 
     async def test_private_calendar_uses_configured_timezone_without_calling_external_port(self):
-        from companion_v2.conversation.perception_settings import DEFAULTS
+        from digital_life_core.conversation.perception_settings import DEFAULTS
 
         self.app.perception_settings.capture = Mock(return_value={"settings": {
             **DEFAULTS, "calendar_timezone": "UTC", "guidance": "自然地说起当下的时间",
@@ -435,7 +435,7 @@ class PrivateCoreReplyAdmissionTests(MultiFixture, unittest.IsolatedAsyncioTestC
         external.assert_not_called()
 
     async def test_disabled_calendar_keeps_local_time_without_calendar_or_empty_inspirations(self):
-        from companion_v2.conversation.perception_settings import DEFAULTS
+        from digital_life_core.conversation.perception_settings import DEFAULTS
 
         self.app.perception_settings.capture = Mock(return_value={"settings": {**DEFAULTS, "calendar_enabled": False}})
         contribution = Mock(return_value=None)
@@ -548,7 +548,7 @@ class GroupCoreReplyAdmissionTests(GroupFixture, unittest.IsolatedAsyncioTestCas
         self.assertTrue(authorized.is_success, authorized.failure)
 
     async def test_first_group_authorization_uses_the_actor_refreshed_after_provisioning(self):
-        from companion_v2.adapters.astrbot.staging_config import REQUIRED_CAPABILITIES
+        from digital_life_core.adapters.astrbot.staging_config import REQUIRED_CAPABILITIES
 
         event = self.group_event(target="group-b", identifier="first-group-fresh-actor")
         identities = self.controller.authority.identities

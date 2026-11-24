@@ -6,17 +6,17 @@ import json
 import sqlite3
 import unittest
 
-from companion_v2.capabilities.configuration import CapabilityConfigurationOwner
-from companion_v2.configuration.models import ConfigLayer, ConfigTarget
-from companion_v2.configuration.registry import FieldDefinition, FieldRegistry, ValueKind
-from companion_v2.configuration.service import ConfigurationService
-from companion_v2.diagnostics.models import DiagnosticQuery
-from companion_v2.diagnostics.repairs import RepairProposalService
-from companion_v2.diagnostics.service import DiagnosticService
-from companion_v2.foundation.refs import SubjectKind, SubjectRef
-from companion_v2.identity_policy.models import AuthenticatedHostPrincipal, AuthorizationTier
-from companion_v2.identity_policy.personas import ConversationRoute, PersonaBinding, PersonaSelector, SelectorKind
-from companion_v2.screen.models import SCREEN_EXTENSION
+from digital_life_core.capabilities.configuration import CapabilityConfigurationOwner
+from digital_life_core.configuration.models import ConfigLayer, ConfigTarget
+from digital_life_core.configuration.registry import FieldDefinition, FieldRegistry, ValueKind
+from digital_life_core.configuration.service import ConfigurationService
+from digital_life_core.diagnostics.models import DiagnosticQuery
+from digital_life_core.diagnostics.repairs import RepairProposalService
+from digital_life_core.diagnostics.service import DiagnosticService
+from digital_life_core.foundation.refs import SubjectKind, SubjectRef
+from digital_life_core.identity_policy.models import AuthenticatedHostPrincipal, AuthorizationTier
+from digital_life_core.identity_policy.personas import ConversationRoute, PersonaBinding, PersonaSelector, SelectorKind
+from digital_life_core.screen.models import SCREEN_EXTENSION
 from tests.test_diagnostics import DiagnosticFixture
 from tests.test_management_access import INSTALLATION, NOW, SCOPE, ROLE
 

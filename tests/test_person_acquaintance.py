@@ -5,15 +5,15 @@ import unittest
 from pathlib import Path
 from types import SimpleNamespace as NS
 
-from companion_v2.adapters.astrbot.model_wire import tool_alias
-from companion_v2.execution.models import TaskContext, encode
-from companion_v2.foundation.refs import ScopeKind
-from companion_v2.memory.person.access import owner_key
-from companion_v2.memory.person.admin_names import PersonAcquaintanceNameManagement
-from companion_v2.memory.person.configuration import AcquaintanceSettings
-from companion_v2.memory.person.management import PersonAcquaintanceDirectory
-from companion_v2.memory.person.models import KIND, MAX_CONTEXTS, count_input, display_name, empty_document, known_names
-from astrbot_host.management_identity import dashboard_operator
+from digital_life_core.adapters.astrbot.model_wire import tool_alias
+from digital_life_core.execution.models import TaskContext, encode
+from digital_life_core.foundation.refs import ScopeKind
+from digital_life_core.memory.person.access import owner_key
+from digital_life_core.memory.person.admin_names import PersonAcquaintanceNameManagement
+from digital_life_core.memory.person.configuration import AcquaintanceSettings
+from digital_life_core.memory.person.management import PersonAcquaintanceDirectory
+from digital_life_core.memory.person.models import KIND, MAX_CONTEXTS, count_input, display_name, empty_document, known_names
+from digital_life_host.management_identity import dashboard_operator
 from tests.group_host_support import GroupFixture
 from tests.native_adapter_support import completion, final_text
 from tests.staging_bootstrap_support import wait_for_batch
@@ -129,8 +129,8 @@ class PersonAcquaintanceTests(GroupFixture, unittest.IsolatedAsyncioTestCase):
 
     async def test_known_names_include_cards_from_other_groups_without_group_ids(self):
         from types import SimpleNamespace as NS
-        from companion_v2.foundation.refs import ScopeKind
-        from companion_v2.memory.person.models import known_names
+        from digital_life_core.foundation.refs import ScopeKind
+        from digital_life_core.memory.person.models import known_names
         document = empty_document()
         document["platform_nickname"] = "小明"
         document["group_cards"] = {
@@ -320,7 +320,7 @@ class PersonCardModelTests(unittest.TestCase):
         self.assertEqual(display_name(document, group_scope("300")), ("珝环", "platform"))
 
     def test_memory_group_and_top_level_do_not_import_person(self):
-        offenders = [path for root in (Path("companion_v2/memory"), Path("companion_v2/memory/group"))
+        offenders = [path for root in (Path("digital_life_core/memory"), Path("digital_life_core/memory/group"))
                      for path in sorted(root.glob("*.py"))
                      if "memory.person" in path.read_text(encoding="utf-8")]
         self.assertEqual(offenders, [])

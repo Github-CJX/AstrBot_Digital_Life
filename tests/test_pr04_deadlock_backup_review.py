@@ -12,42 +12,42 @@ import threading
 import unittest
 from unittest.mock import patch
 
-from companion_v2.capabilities import CapabilityPackageDescriptor, FurnitureDescriptor
-from companion_v2.capabilities.configuration import CapabilityConfigurationOwner
-from companion_v2.capabilities.repositories import CapabilityRepository
-from companion_v2.configuration.management import DiaryAndRestManagement, PrivateAcquaintanceManagement, RoleGrowthManagement
-from companion_v2.configuration.models import ConfigLayer, ConfigTarget, ConfigurationError
-from companion_v2.configuration.store import open_configuration_store
-from companion_v2.conversation.media.review import KIND as REVIEW_KIND, check_verdict, verdict_document
-from companion_v2.conversation.media.review_service import GroupImageReviewService
-from companion_v2.conversation.participation import (
+from digital_life_core.capabilities import CapabilityPackageDescriptor, FurnitureDescriptor
+from digital_life_core.capabilities.configuration import CapabilityConfigurationOwner
+from digital_life_core.capabilities.repositories import CapabilityRepository
+from digital_life_core.configuration.management import DiaryAndRestManagement, PrivateAcquaintanceManagement, RoleGrowthManagement
+from digital_life_core.configuration.models import ConfigLayer, ConfigTarget, ConfigurationError
+from digital_life_core.configuration.store import open_configuration_store
+from digital_life_core.conversation.media.review import KIND as REVIEW_KIND, check_verdict, verdict_document
+from digital_life_core.conversation.media.review_service import GroupImageReviewService
+from digital_life_core.conversation.participation import (
     CONFIG_GROUP as PARTICIPATION_GROUP,
     GroupParticipationConfigurationOwner,
     configuration_fields as participation_fields,
 )
-from companion_v2.conversation.recall_settings import (
+from digital_life_core.conversation.recall_settings import (
     GROUP as RECALL_GROUP,
     RecallConfigurationOwner,
     configuration_fields as recall_fields,
 )
-from companion_v2.execution.models import TaskError, stamp
-from companion_v2.foundation.refs import OperationRef, ScopeKind, ScopeRef, SubjectKind, SubjectRef, VersionRef
-from companion_v2.model_gateway.pricing import PricingSettingsStore
-from companion_v2.relationships.private_management import PrivateMemberSettings
-from companion_v2.role_work.growth.configuration import (
+from digital_life_core.execution.models import TaskError, stamp
+from digital_life_core.foundation.refs import OperationRef, ScopeKind, ScopeRef, SubjectKind, SubjectRef, VersionRef
+from digital_life_core.model_gateway.pricing import PricingSettingsStore
+from digital_life_core.relationships.private_management import PrivateMemberSettings
+from digital_life_core.role_work.growth.configuration import (
     GROUP as GROWTH_GROUP,
     OWNER as GROWTH_OWNER,
     target_for as growth_target_for,
 )
-from companion_v2.role_work.state.configuration import (
+from digital_life_core.role_work.state.configuration import (
     GROUP as STATE_GROUP,
     OWNER as STATE_OWNER,
     target_for as state_target_for,
 )
-from companion_v2.storage.backup import InstallationBackup, apply_pending, current_schema_version
-from companion_v2.storage.image_payloads import load_image, store_image
-from companion_v2.storage.runtime import StorageRuntime
-from astrbot_host.management_identity import dashboard_operator
+from digital_life_core.storage.backup import InstallationBackup, apply_pending, current_schema_version
+from digital_life_core.storage.image_payloads import load_image, store_image
+from digital_life_core.storage.runtime import StorageRuntime
+from digital_life_host.management_identity import dashboard_operator
 from tests.test_conversation_messages import MessageFixture
 from tests.test_management_access import NOW as MSG_NOW
 from tests.multi_host_support import MultiFixture
@@ -264,8 +264,8 @@ class CrossStoreLockOrderAndConcurrencyTests(MultiFixture, unittest.IsolatedAsyn
                 package_version=selected_desc.package_version, expected_revision=0, observed_at=app.now(),
             ).unwrap()
             cap_owner = CapabilityConfigurationOwner(runtime, extension_id=ext_id)
-            from companion_v2.configuration.registry import FieldRegistry
-            from companion_v2.configuration.service import ConfigurationService
+            from digital_life_core.configuration.registry import FieldRegistry
+            from digital_life_core.configuration.service import ConfigurationService
             cap_svc = ConfigurationService(
                 runtime, FieldRegistry(version="capability-config.v1", fields=cap_owner.fields),
                 store=store, owners=(cap_owner,),
@@ -444,7 +444,7 @@ class BackupMediaAndPricingCoverageTests(unittest.TestCase):
                 reopened.close()
 
     def test_older_policy_snapshot_without_media_and_pricing_restores_without_pruning_them(self):
-        from companion_v2.storage import backup as backup_module
+        from digital_life_core.storage import backup as backup_module
 
         with TemporaryDirectory(prefix="pr04-backup-legacy-policy-", ignore_cleanup_errors=True) as tmp:
             data_root = Path(tmp) / "data"

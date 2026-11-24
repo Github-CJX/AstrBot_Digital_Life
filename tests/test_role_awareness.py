@@ -5,14 +5,14 @@ from datetime import datetime, timedelta, timezone
 import json
 import unittest
 
-from companion_v2.conversation.awareness_context import ConversationAwarenessContext
-from companion_v2.execution.models import AudienceRef, TaskContext, TaskError, encode
-from companion_v2.foundation.outcome import Outcome
-from companion_v2.foundation.refs import ScopeKind, ScopeRef, SourceRef, SubjectKind, SubjectRef, VersionRef
-from companion_v2.identity_policy.models import AuthenticatedHostPrincipal, ResolvedIdentity, RoleBinding
-from companion_v2.role_work.awareness import RoleAwareness
-from companion_v2.role_work.awareness.models import MAX_EVENTS, PREFIX, owner_key
-from astrbot_host.core_reply_context import _cross_window_section
+from digital_life_core.conversation.awareness_context import ConversationAwarenessContext
+from digital_life_core.execution.models import AudienceRef, TaskContext, TaskError, encode
+from digital_life_core.foundation.outcome import Outcome
+from digital_life_core.foundation.refs import ScopeKind, ScopeRef, SourceRef, SubjectKind, SubjectRef, VersionRef
+from digital_life_core.identity_policy.models import AuthenticatedHostPrincipal, ResolvedIdentity, RoleBinding
+from digital_life_core.role_work.awareness import RoleAwareness
+from digital_life_core.role_work.awareness.models import MAX_EVENTS, PREFIX, owner_key
+from digital_life_host.core_reply_context import _cross_window_section
 
 
 INSTALLATION = "awareness-installation"

@@ -11,12 +11,12 @@ import zlib
 
 from PIL import Image
 
-from astrbot_host.media import inspect_image, load_native_image
-from companion_v2.adapters.astrbot.native import NativeImageLocator
-from companion_v2.conversation.media.animation import AnimationDescriptor, CapturedAnimation, MAX_SELECTED_FRAMES
-from companion_v2.conversation.media.codec import image_descriptor
-from companion_v2.conversation.media.models import CapturedImage
-from companion_v2.execution.models import TaskError, encode
+from digital_life_host.media import inspect_image, load_native_image
+from digital_life_core.adapters.astrbot.native import NativeImageLocator
+from digital_life_core.conversation.media.animation import AnimationDescriptor, CapturedAnimation, MAX_SELECTED_FRAMES
+from digital_life_core.conversation.media.codec import image_descriptor
+from digital_life_core.conversation.media.models import CapturedImage
+from digital_life_core.execution.models import TaskError, encode
 from tests.animation_support import animation_bytes, pixels
 from tests.test_conversation_images import FakeImage, image_bytes
 
@@ -103,7 +103,7 @@ class AnimationLoaderTests(unittest.IsolatedAsyncioTestCase):
         with self.assertRaises(TaskError) as caught:
             inspect_image(animation_bytes(count=257, size=(2, 2)), 0)
         self.assertEqual(caught.exception.code, "host_animation_limit")
-        with patch("astrbot_host.animation.MAX_DECODE_PIXELS", 47):
+        with patch("digital_life_host.animation.MAX_DECODE_PIXELS", 47):
             with self.assertRaises(TaskError) as caught:
                 inspect_image(animation_bytes(count=2), 0)
         self.assertEqual(caught.exception.code, "host_animation_limit")
@@ -151,7 +151,7 @@ class AnimationLoaderTests(unittest.IsolatedAsyncioTestCase):
             entered.set()
             release.wait(3)
             return inspect_image(content, position)
-        with patch("astrbot_host.media.inspect_image", side_effect=held):
+        with patch("digital_life_host.media.inspect_image", side_effect=held):
             pending = asyncio.create_task(load_native_image(NativeImageLocator(0, FakeImage(animation_bytes()).file)))
             try:
                 self.assertTrue(await asyncio.to_thread(entered.wait, 2))

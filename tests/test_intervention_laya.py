@@ -6,11 +6,11 @@ from pathlib import Path
 from tempfile import TemporaryDirectory
 import unittest
 
-from astrbot_host.laya_client import LayaDecisionClient
-from companion_v2.decision.prompt import intervention_question, render_intervention_state
-from companion_v2.decision.service import LayaDecisionService
-from companion_v2.decision.store import LayaSettingsStore
-from companion_v2.storage.runtime import StorageRuntime
+from digital_life_host.laya_client import LayaDecisionClient
+from digital_life_core.decision.prompt import intervention_question, render_intervention_state
+from digital_life_core.decision.service import LayaDecisionService
+from digital_life_core.decision.store import LayaSettingsStore
+from digital_life_core.storage.runtime import StorageRuntime
 
 
 class InterventionLayaTests(unittest.TestCase):

@@ -6,7 +6,7 @@ import unittest
 from datetime import datetime
 from types import SimpleNamespace
 
-from astrbot_host.native_extensions.reality.mihome_web_api import MiHomeWebAPI, WebAPIError
+from digital_life_host.native_extensions.reality.mihome_web_api import MiHomeWebAPI, WebAPIError
 
 
 AC_MODEL = "lumi.acpartner.mcn02"

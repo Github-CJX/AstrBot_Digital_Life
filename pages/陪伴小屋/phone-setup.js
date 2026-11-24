@@ -1,6 +1,6 @@
 "use strict";
 window.CompanionPhoneSetup = (() => {
-  const prefix = "/astrbot_plugin_private_companion/";
+  const prefix = "/astrbot_plugin_digital_life/";
   const icon = name => `<i data-lucide="${name}" aria-hidden="true"></i>`;
   const messages = {
     adb_not_found: "这台电脑还需要 Android Platform-Tools。",

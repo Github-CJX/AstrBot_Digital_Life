@@ -8,8 +8,8 @@ from __future__ import annotations
 
 import unittest
 
-from companion_v2.role_profile.configuration import FIELD_LIMITS
-from companion_v2.role_profile.migration import (
+from digital_life_core.role_profile.configuration import FIELD_LIMITS
+from digital_life_core.role_profile.migration import (
     RoleProfileMigrationError,
     map_v1_world_knowledge_role_profile,
 )

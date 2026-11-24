@@ -174,7 +174,7 @@ function harness({ persons, groups = [], group_networks = [], group_access, auth
     parent: {postMessage: (message, origin) => navigations.push({message, origin})},
     AstrBotPluginPage: {
       getContext:()=>pageContext,
-      ready: () => Promise.resolve({ pluginName: "astrbot_plugin_private_companion" }),
+      ready: () => Promise.resolve({ pluginName: "astrbot_plugin_digital_life" }),
       apiGet: (route, params, requestOptions) => new Promise((resolve, reject) => {
         requests.push({ method: "GET", route, params, requestOptions, resolve, reject });
       }),

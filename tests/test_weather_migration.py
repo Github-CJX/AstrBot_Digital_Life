@@ -3,10 +3,10 @@
 import json
 import unittest
 
-from companion_v2.agenda.planning_config import (DEFAULTS as PLANNING_DEFAULTS,
+from digital_life_core.agenda.planning_config import (DEFAULTS as PLANNING_DEFAULTS,
                                                  WEATHER_MAX_AGE_MINUTES, WEATHER_MAX_AGE_MINIMUM,
                                                  configured_weather_location, validate_settings)
-from companion_v2.legacy.weather_migration import (CONTACT, STATE, convert_weather_config,
+from digital_life_core.legacy.weather_migration import (CONTACT, STATE, convert_weather_config,
                                                    severity_for_colour)
 
 

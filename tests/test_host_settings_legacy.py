@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import unittest
 
-from astrbot_host.settings import HostSettings, repair_host_policy_sections
+from digital_life_host.settings import HostSettings, repair_host_policy_sections
 
 
 class LegacyHostSettingsTests(unittest.TestCase):

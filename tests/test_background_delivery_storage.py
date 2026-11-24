@@ -5,8 +5,8 @@ from tempfile import TemporaryDirectory
 import unittest
 from unittest.mock import patch
 
-from companion_v2.storage.runtime import StorageOpenError, StorageRuntime
-from companion_v2.storage.schema import (
+from digital_life_core.storage.runtime import StorageOpenError, StorageRuntime
+from digital_life_core.storage.schema import (
     MIGRATION_V17_TO_V18_FINGERPRINT, MIGRATION_V17_TO_V18_ID,
     MIGRATION_V18_TO_V19_FINGERPRINT, MIGRATION_V18_TO_V19_ID,
     SCHEMA_VERSION_V19, SCHEMA_VERSION_V18, V18_REQUIRED_TABLES, V19_MIGRATION_STATEMENTS,
@@ -52,7 +52,7 @@ class BackgroundDeliveryStorageTests(unittest.TestCase):
         self.assert_preserved(self.open_runtime())
 
     def test_failed_upgrade_rolls_back_tables_version_and_receipt(self):
-        with patch("companion_v2.storage.runtime.V19_MIGRATION_STATEMENTS", V19_MIGRATION_STATEMENTS + ("INVALID UPGRADE",)):
+        with patch("digital_life_core.storage.runtime.V19_MIGRATION_STATEMENTS", V19_MIGRATION_STATEMENTS + ("INVALID UPGRADE",)):
             with self.assertRaises(StorageOpenError):
                 StorageRuntime.open(data_root=self.root, installation_id="background-schema")
         with closing(sqlite3.connect(self.database)) as connection:

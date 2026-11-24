@@ -3,10 +3,10 @@
 from types import SimpleNamespace
 import unittest
 
-from companion_v2.configuration.registry import FieldRegistry
-from companion_v2.role_work.journal.models import JournalKind
-from companion_v2.role_work.journal.prompts import DREAM, dream_instruction, request_for
-from companion_v2.role_work.life.configuration import (AFTERGLOW_MODES, DEFAULTS, configuration_fields, values)
+from digital_life_core.configuration.registry import FieldRegistry
+from digital_life_core.role_work.journal.models import JournalKind
+from digital_life_core.role_work.journal.prompts import DREAM, dream_instruction, request_for
+from digital_life_core.role_work.life.configuration import (AFTERGLOW_MODES, DEFAULTS, configuration_fields, values)
 from tests.test_management_access import ROLE, SCOPE
 
 

@@ -5,12 +5,12 @@ import base64
 import unittest
 from unittest.mock import patch
 
-from companion_v2.adapters.astrbot.model_wire import build_wire
-from companion_v2.configuration.registry import FieldRegistry
-from companion_v2.conversation.media.image_narration import image_narration_profile
-from companion_v2.conversation.foreground import ModelDraft
-from companion_v2.model_gateway.models import Amount, ModelEnvelope, ProviderResponse
-from companion_v2.model_gateway.routing import configuration_fields
+from digital_life_core.adapters.astrbot.model_wire import build_wire
+from digital_life_core.configuration.registry import FieldRegistry
+from digital_life_core.conversation.media.image_narration import image_narration_profile
+from digital_life_core.conversation.foreground import ModelDraft
+from digital_life_core.model_gateway.models import Amount, ModelEnvelope, ProviderResponse
+from digital_life_core.model_gateway.routing import configuration_fields
 from tests.test_conversation_images import ImageFixture, image_bytes
 
 

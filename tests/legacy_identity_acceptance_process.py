@@ -16,16 +16,16 @@ from astrbot.api.web import PluginRequest, bind_request_context
 from astrbot.core import db_helper
 from starlette.requests import Request
 
-from astrbot_host.legacy_api import LegacyMigrationWebAPI
-from astrbot_host.legacy_config import V1_HOST_CONFIG_NAME, v1_setting
-from astrbot_host.legacy_private_memory_api import PrivateMemoryMigrationAPI
-from astrbot_host.multi_controller import AstrBotMultiController
-from astrbot_host.persona_workshop_api import PersonaWorkshopWebAPI
-from companion_v2.adapters.astrbot.staging import NativeAdapterTypes
-from companion_v2.identity_policy.models import AuthorizationTier
-from companion_v2.legacy.migration import LegacyMigration
-from companion_v2.legacy.private_memory import build_private_memory_plan
-from companion_v2.role_profile.configuration import (GROUP, RoleProfileConfigurationOwner,
+from digital_life_host.legacy_api import LegacyMigrationWebAPI
+from digital_life_host.legacy_config import V1_HOST_CONFIG_NAME, v1_setting
+from digital_life_host.legacy_private_memory_api import PrivateMemoryMigrationAPI
+from digital_life_host.multi_controller import AstrBotMultiController
+from digital_life_host.persona_workshop_api import PersonaWorkshopWebAPI
+from digital_life_core.adapters.astrbot.staging import NativeAdapterTypes
+from digital_life_core.identity_policy.models import AuthorizationTier
+from digital_life_core.legacy.migration import LegacyMigration
+from digital_life_core.legacy.private_memory import build_private_memory_plan
+from digital_life_core.role_profile.configuration import (GROUP, RoleProfileConfigurationOwner,
     configuration_fields, target_for)
 from tests.legacy_data_acceptance_process import _require, _role_context
 from tests.multi_host_support import MultiNativeContext, multi_config
@@ -114,11 +114,11 @@ async def run(v1_root: Path, v1_config: Path):
         saved_config = base / "config" / V1_HOST_CONFIG_NAME
         saved_config.parent.mkdir(parents=True)
         saved_config.write_bytes(config_bytes)
-        data_root = base / "plugin_data" / "astrbot_plugin_private_companion" / "companion-7"
+        data_root = base / "plugin_data" / "astrbot_plugin_digital_life" / "companion-7"
         data_root.parent.mkdir(parents=True)
         legacy_marker = data_root.parent / "companions.json"
         legacy_marker.write_bytes(b'{"legacy_layout_sentinel":true}\n')
-        from astrbot_host.storage_location import resolve_data_root
+        from digital_life_host.storage_location import resolve_data_root
         if resolve_data_root(data_root.parent) != data_root.resolve():
             raise RuntimeError("takeover_data_root_not_isolated")
         controller = AstrBotMultiController(native, settings, data_root, native_types=types, now=lambda: NOW)

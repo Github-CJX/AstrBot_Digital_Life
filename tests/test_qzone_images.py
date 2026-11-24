@@ -10,13 +10,13 @@ from unittest.mock import AsyncMock, patch
 
 from PIL import Image
 
-from astrbot_host.qzone_api import QzoneWebAPI
-from astrbot_host.qzone_client import QzoneHttpClient
-from companion_v2.execution.models import TaskError
-from companion_v2.qzone import feed as F, protocol as P, policy as Y
-from companion_v2.qzone.images import PublishImage, image_batch, album_images, candidate_image
-from companion_v2.qzone.service import owner_key
-from companion_v2.qzone.transport import TransportOutcome
+from digital_life_host.qzone_api import QzoneWebAPI
+from digital_life_host.qzone_client import QzoneHttpClient
+from digital_life_core.execution.models import TaskError
+from digital_life_core.qzone import feed as F, protocol as P, policy as Y
+from digital_life_core.qzone.images import PublishImage, image_batch, album_images, candidate_image
+from digital_life_core.qzone.service import owner_key
+from digital_life_core.qzone.transport import TransportOutcome
 from tests.test_qzone_extension import QzoneServiceFixture, FakeTransport, NOW, PUBLISH, COOKIE
 
 
@@ -61,7 +61,7 @@ class ImageTransport(FakeTransport):
 class ImageProtocolTests(unittest.TestCase):
     def test_album_and_prepared_candidates_use_original_bytes_and_recheck_revocation(self):
         from dataclasses import replace
-        from companion_v2.conversation.media.generated import GeneratedImages
+        from digital_life_core.conversation.media.generated import GeneratedImages
         from tests.test_generated_album_share import CandidateTests, album_item, context
         image = picture()
         item = album_item(content_hash=image.content_hash)
@@ -237,7 +237,7 @@ class ImageServiceTests(QzoneServiceFixture):
              patch.object(api, "_context", return_value=self.context), \
              patch.object(api, "_planner", return_value=object()), \
              patch.object(api, "_run", side_effect=run), \
-             patch("astrbot_host.qzone_api.album_images", return_value=((album,), ("candidate",))):
+             patch("digital_life_host.qzone_api.album_images", return_value=((album,), ("candidate",))):
             result = asyncio.run(api.publish())
         self.assertTrue(result["receipt"]["images_verified"])
         sent = [r for r in self.transport.sent if r.description == "image.upload"]

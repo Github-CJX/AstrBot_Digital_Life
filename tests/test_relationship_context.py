@@ -5,19 +5,19 @@ from datetime import timedelta
 import json
 import unittest
 
-from companion_v2.conversation.foreground import ClaimKind, DraftClaim, ModelDraft
-from companion_v2.conversation.messages import ConversationMessages
-from companion_v2.conversation.relationship_context import (
+from digital_life_core.conversation.foreground import ClaimKind, DraftClaim, ModelDraft
+from digital_life_core.conversation.messages import ConversationMessages
+from digital_life_core.conversation.relationship_context import (
     MAX_MEMORIES, MAX_PAYLOAD_CHARS, RELATIONSHIP_INSTRUCTION, RelationshipContext,
 )
-from companion_v2.execution.models import Lane, TaskError
-from companion_v2.foundation.refs import AudienceRef, RoleOwnerRef, SubjectKind, SubjectRef
-from companion_v2.identity_policy.models import AuthorizationTier
-from companion_v2.model_gateway.models import Amount, ProviderResponse
-from companion_v2.relationships.models import (
+from digital_life_core.execution.models import Lane, TaskError
+from digital_life_core.foundation.refs import AudienceRef, RoleOwnerRef, SubjectKind, SubjectRef
+from digital_life_core.identity_policy.models import AuthorizationTier
+from digital_life_core.model_gateway.models import Amount, ProviderResponse
+from digital_life_core.relationships.models import (
     EmotionSubject, RelationshipMemory, RelationshipMemoryKind as Kind, RelationshipMemoryState as State,
 )
-from companion_v2.relationships.service import RelationshipMemoryService
+from digital_life_core.relationships.service import RelationshipMemoryService
 from tests.test_conversation_messages import MessageFixture
 from tests.test_host_application import HostFixture
 from tests.test_management_access import INSTALLATION, NOW, SCOPE

@@ -6,20 +6,20 @@ from dataclasses import replace
 from datetime import timedelta
 from unittest.mock import patch
 
-from companion_v2.configuration.registry import FieldRegistry
-from companion_v2.configuration.service import ConfigurationService
-from companion_v2.conversation.foreground import ModelDraft
-from companion_v2.execution.models import ProviderBinding, TaskError, TaskResult
-from companion_v2.execution.runner import TaskRun
-from companion_v2.model_gateway.budget import BudgetLedger
-from companion_v2.model_gateway.failures import ModelFailure
-from companion_v2.model_gateway.models import (Amount, BudgetPolicy, CapturedModelOutput, LocalProvider,
+from digital_life_core.configuration.registry import FieldRegistry
+from digital_life_core.configuration.service import ConfigurationService
+from digital_life_core.conversation.foreground import ModelDraft
+from digital_life_core.execution.models import ProviderBinding, TaskError, TaskResult
+from digital_life_core.execution.runner import TaskRun
+from digital_life_core.model_gateway.budget import BudgetLedger
+from digital_life_core.model_gateway.failures import ModelFailure
+from digital_life_core.model_gateway.models import (Amount, BudgetPolicy, CapturedModelOutput, LocalProvider,
     ProviderResponse, ToolCall, ToolSpec)
-from companion_v2.model_gateway.routing import ModelRouter, configuration_fields
-from companion_v2.model_gateway.service import LocalModelGateway
+from digital_life_core.model_gateway.routing import ModelRouter, configuration_fields
+from digital_life_core.model_gateway.service import LocalModelGateway
 from tests.test_model_gateway import ModelFixture
 
-LOGGER_NAME = "companion_v2.model_gateway.service"
+LOGGER_NAME = "digital_life_core.model_gateway.service"
 
 
 class CeilingRetryTests(ModelFixture, unittest.IsolatedAsyncioTestCase):

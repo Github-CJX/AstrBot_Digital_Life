@@ -22,7 +22,7 @@ $env:PYTHONPATH = '<AstrBot>/backend/app'
 
 ## 修改边界
 
-- 依赖方向保持为 `main.py → astrbot_host → companion_v2`；领域核心不导入 AstrBot SDK 或 `astrbot_host`。
+- 依赖方向保持为 `main.py → digital_life_host → digital_life_core`；领域核心不导入 AstrBot SDK 或 `digital_life_host`。
 - 页面按各目录的说明修改源文件；关系、账号、生活等嵌入页面的 `workspace.html` 和配套脚本位于对应目录。修改后运行 `python -X utf8 tools/sync_framework_page.py`，并用 `--check` 确认生成页面与清单同步。
 - 不手工维护生成副本、交付包或发布清单；用仓库工具从当前源码构建并验证。
 - 测试夹具只能使用合成、非敏感数据。不要提交生产数据库、聊天记录、图片原件、设备凭据、令牌、个人路径或运行日志。

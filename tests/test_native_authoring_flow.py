@@ -9,20 +9,20 @@ from unittest.mock import patch
 
 from tests import test_astrbot_staging_host as host_support
 from astrbot.core.agent.message import Message, ToolCall as NativeCall
-from astrbot_host.core_reply import prepare_core_reply_event
-from astrbot_host.core_reply_observations import CoreReplyObservations
-from astrbot_host.core_reply_tools import close_core_reply_tools, inject_core_reply_tools, native_tool_name
-from companion_v2.adapters.astrbot.native import NativeConversationInput
-from companion_v2.capabilities.models import CapabilityAuthorizationState
-from companion_v2.capabilities.repositories import CapabilityRepository
-from companion_v2.configuration.registry import FieldRegistry
-from companion_v2.conversation.content.authoring_tasks import DRAFT_KIND, authoring_profiles
-from companion_v2.conversation.native_tool_results import operation_rows
-from companion_v2.execution.models import TaskContext, TaskError, digest, encode, require
-from companion_v2.foundation.refs import AudienceRef
-from companion_v2.identity_policy.personas import ConversationRoute
-from companion_v2.model_gateway.routing import configuration_fields
-from companion_v2.model_gateway.models import ToolCall
+from digital_life_host.core_reply import prepare_core_reply_event
+from digital_life_host.core_reply_observations import CoreReplyObservations
+from digital_life_host.core_reply_tools import close_core_reply_tools, inject_core_reply_tools, native_tool_name
+from digital_life_core.adapters.astrbot.native import NativeConversationInput
+from digital_life_core.capabilities.models import CapabilityAuthorizationState
+from digital_life_core.capabilities.repositories import CapabilityRepository
+from digital_life_core.configuration.registry import FieldRegistry
+from digital_life_core.conversation.content.authoring_tasks import DRAFT_KIND, authoring_profiles
+from digital_life_core.conversation.native_tool_results import operation_rows
+from digital_life_core.execution.models import TaskContext, TaskError, digest, encode, require
+from digital_life_core.foundation.refs import AudienceRef
+from digital_life_core.identity_policy.personas import ConversationRoute
+from digital_life_core.model_gateway.routing import configuration_fields
+from digital_life_core.model_gateway.models import ToolCall
 from tests.test_astrbot_core_reply import FakeEvent
 from tests.native_content_support import NativeContentFixture
 from tests.test_host_application import HostFixture

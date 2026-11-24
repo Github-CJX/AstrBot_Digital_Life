@@ -6,14 +6,14 @@ from datetime import timedelta
 import json
 import unittest
 
-from companion_v2.configuration.models import ConfigurationError
-from companion_v2.execution.models import AudienceRef, TaskContext, TaskError, encode
-from companion_v2.foundation.refs import ScopeRef
-from companion_v2.identity_policy.personas import ConversationRoute
-from companion_v2.identity_policy.private_domain import source_ref
-from companion_v2.role_work.state import mood
-from companion_v2.role_work.state.configuration import DEFAULTS, validate_mood_settings
-from companion_v2.role_work.state.maintenance import state_profile
+from digital_life_core.configuration.models import ConfigurationError
+from digital_life_core.execution.models import AudienceRef, TaskContext, TaskError, encode
+from digital_life_core.foundation.refs import ScopeRef
+from digital_life_core.identity_policy.personas import ConversationRoute
+from digital_life_core.identity_policy.private_domain import source_ref
+from digital_life_core.role_work.state import mood
+from digital_life_core.role_work.state.configuration import DEFAULTS, validate_mood_settings
+from digital_life_core.role_work.state.maintenance import state_profile
 from tests.test_management_access import NOW, SCOPE
 from tests.test_role_state import StateFixture, state_data
 from tests.test_role_tool_loop import answered

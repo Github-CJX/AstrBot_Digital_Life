@@ -4,10 +4,10 @@ from datetime import timedelta
 import unittest
 from unittest.mock import patch
 
-from companion_v2.conversation.flow import ConversationPolicy
-from companion_v2.execution.runner import TaskRun
-from companion_v2.foundation.outcome import Outcome
-from companion_v2.identity_policy.personas import RuntimeIdentity
+from digital_life_core.conversation.flow import ConversationPolicy
+from digital_life_core.execution.runner import TaskRun
+from digital_life_core.foundation.outcome import Outcome
+from digital_life_core.identity_policy.personas import RuntimeIdentity
 from tests.test_host_application import HostFixture
 from tests.test_management_access import NOW
 from tests.test_role_tool_loop import answered

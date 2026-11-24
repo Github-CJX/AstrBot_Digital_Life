@@ -10,14 +10,14 @@ import unittest
 from types import SimpleNamespace
 from pathlib import Path
 
-from companion_v2.configuration.models import ConfigLayer, ConfigTarget, ConfigurationError
-from companion_v2.device.configuration import (
+from digital_life_core.configuration.models import ConfigLayer, ConfigTarget, ConfigurationError
+from digital_life_core.device.configuration import (
     GROUP, PhoneConfigurationOwner, PhoneSettingsReader, configuration_fields, load_settings,
     settings_from_values, validate,
 )
-from companion_v2.foundation.outcome import Outcome
-from companion_v2.foundation.refs import SubjectKind, SubjectRef
-from companion_v2.storage.runtime import StorageRuntime
+from digital_life_core.foundation.outcome import Outcome
+from digital_life_core.foundation.refs import SubjectKind, SubjectRef
+from digital_life_core.storage.runtime import StorageRuntime
 
 NOW = datetime(2026, 11, 21, tzinfo=timezone.utc)
 ROLE = SubjectRef("install", SubjectKind.BOT, "persona-a")
@@ -89,7 +89,7 @@ class PhoneConfigurationTests(unittest.TestCase):
         self.assertEqual(settings.unicode_input, "adbkeyboard")
 
     def test_phone_json_wins_only_until_the_group_has_an_explicit_value(self):
-        from companion_v2.configuration.models import EffectiveValue
+        from digital_life_core.configuration.models import EffectiveValue
 
         fields = self.fields
         root = tempfile.mkdtemp(prefix="phone-fallback-test-")

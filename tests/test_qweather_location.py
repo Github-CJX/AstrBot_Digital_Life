@@ -5,11 +5,11 @@ import unittest
 from datetime import datetime, timezone
 from unittest.mock import patch
 
-from astrbot_host.qweather_alerts import QWeatherAlertPort
-from astrbot_host.qweather_credentials import QWeatherCredentials
-from astrbot_host.qweather_location import resolve_qweather_location
-from astrbot_host.qweather_weather import QWeatherWeatherPort
-from companion_v2.agenda.planning_config import WeatherLocation
+from digital_life_host.qweather_alerts import QWeatherAlertPort
+from digital_life_host.qweather_credentials import QWeatherCredentials
+from digital_life_host.qweather_location import resolve_qweather_location
+from digital_life_host.qweather_weather import QWeatherWeatherPort
+from digital_life_core.agenda.planning_config import WeatherLocation
 
 
 NOW = datetime(2026, 9, 30, 7, 0, tzinfo=timezone.utc)
@@ -65,7 +65,7 @@ class QWeatherLocationTests(unittest.IsolatedAsyncioTestCase):
             "temp": "22", "text": "小雨", "icon": "305", "humidity": "75",
             "windSpeed": "12", "obsTime": "2026-09-30T15:00+08:00"}})], calls)
         port = QWeatherWeatherPort(self.credentials, now=lambda: NOW)
-        with patch("astrbot_host.qweather_weather.aiohttp.ClientSession", return_value=session):
+        with patch("digital_life_host.qweather_weather.aiohttp.ClientSession", return_value=session):
             snapshot = await port.fetch(self.location)
 
         self.assertEqual(snapshot.provider, "qweather")
@@ -85,7 +85,7 @@ class QWeatherLocationTests(unittest.IsolatedAsyncioTestCase):
             "windSpeed": "15", "obsTime": "2026-09-30T09:00+02:00"}})], calls)
         location = WeatherLocation("维也纳", None, None)
         port = QWeatherWeatherPort(self.credentials, now=lambda: NOW)
-        with patch("astrbot_host.qweather_weather.aiohttp.ClientSession", return_value=session):
+        with patch("digital_life_host.qweather_weather.aiohttp.ClientSession", return_value=session):
             snapshot = await port.fetch(location)
 
         self.assertNotIn("range", calls[0][1]["params"])
@@ -116,7 +116,7 @@ class QWeatherLocationTests(unittest.IsolatedAsyncioTestCase):
         calls = []
         session = Session([Reply(GEOCODED), Reply(alerts)], calls)
         port = QWeatherAlertPort(self.credentials, now=lambda: NOW)
-        with patch("astrbot_host.qweather_alerts.aiohttp.ClientSession", return_value=session):
+        with patch("digital_life_host.qweather_alerts.aiohttp.ClientSession", return_value=session):
             observation = await port.fetch(self.location)
 
         self.assertEqual(observation.alerts, ())
@@ -128,7 +128,7 @@ class QWeatherLocationTests(unittest.IsolatedAsyncioTestCase):
         calls = []
         session = Session([Reply({"code": "200", "location": []})], calls)
         port = QWeatherWeatherPort(self.credentials, now=lambda: NOW)
-        with patch("astrbot_host.qweather_weather.aiohttp.ClientSession", return_value=session):
+        with patch("digital_life_host.qweather_weather.aiohttp.ClientSession", return_value=session):
             with self.assertRaisesRegex(ValueError, "could not be resolved"):
                 await port.fetch(self.location)
         self.assertEqual(len(calls), 1)

@@ -1,7 +1,7 @@
 # T52 繁忙回复闸门切片（2026-09-27）
 
 > 缺口清单：`V2_GAP_CLOSING_TASKS_20260927.md` 的 **T52「繁忙回复闸门：忙碌时段回复延迟」**（V1 来源 `enable_busy_reply_gate`、`busy_reply_min_delay_seconds`、`busy_reply_max_delay_seconds`、`busy_reply_proactive_resume_buffer_minutes`）。
-> V1 参考：`../astrbot_plugin_private_companion/busy_reply_gate.py`（460 行，`BusyReplyGateMixin`）。参考设计稿：`CORE_HOST_LIFECYCLE_AND_BATCHING_SLICE.md`。
+> V1 参考：`../astrbot_plugin_digital_life/busy_reply_gate.py`（460 行，`BusyReplyGateMixin`）。参考设计稿：`CORE_HOST_LIFECYCLE_AND_BATCHING_SLICE.md`。
 
 ## 一、V1 参考位置与 V2 落点
 
@@ -18,7 +18,7 @@
 
 **V2 落点与理由**
 
-- 判定与配置放 `companion_v2/conversation/busy_gate.py`：T52 目标位置即 `conversation/`，且「是否延迟」是对话时机的一部分；主动侧的顺延只是消费同一个判定。
+- 判定与配置放 `digital_life_core/conversation/busy_gate.py`：T52 目标位置即 `conversation/`，且「是否延迟」是对话时机的一部分；主动侧的顺延只是消费同一个判定。
 - 唯一的 I/O 是 `calendar_items()`：一次有界只读查询（`LIMIT 64`），按 `versioned_records.owner_key(context)` 读本窗口自己的 `calendar_records`，与 `agenda/calendar.py:230-232` 已采用的直接读取范式一致。它**不授予任何权限**，读失败一律视为「不忙」（`readable_items`）。
 - 不使用 `role_work/state/` 的 `busy` 字段，也不使用任何 QQ 在线状态：`state/maintenance.py`、`conversation/life_context.py` 已明确禁止据此自动拒答或改变回复（口径 6）。日程忙碌只影响**何时**回复，不影响是否回复。
 
@@ -72,20 +72,20 @@
 
 ## 六、宿主侧接线（已由主代理完成并生效）
 
-**A. `companion_v2/host/application.py`（主代理实现，本切片只做说明）**
+**A. `digital_life_core/host/application.py`（主代理实现，本切片只做说明）**
 
-1) import：`from companion_v2.conversation import busy_gate` 以及 `BusyGateConfigurationOwner`、`configuration_fields as busy_gate_configuration_fields`。
+1) import：`from digital_life_core.conversation import busy_gate` 以及 `BusyGateConfigurationOwner`、`configuration_fields as busy_gate_configuration_fields`。
 2) 配置组登记：`busy_gate_configuration_fields()` 已加入 `extra` 元组，`BusyGateConfigurationOwner(runtime)` 已加入 `ConfigurationService(..., owners=(...))`。
 3) accept 路径：`self.flow.accept(..., defer_seconds=self.busy_deferral(context, event))`；`busy_deferral` 仅私聊生效，先 `messages._read_source` 取本轮正文（用于紧急/命令旁路），再调用 `busy_gate.deferral(self.runtime, context, text=text, now=self.now())`，任何异常返回 `0.0`。此路径**不 sleep**：延迟只进入 `due_at`。
 
-**B. `companion_v2/adapters/**`、`delivery/**`、`proactive/service.py`**：无需改动。
+**B. `digital_life_core/adapters/**`、`delivery/**`、`proactive/service.py`**：无需改动。
 **C. `proactive/scheduling.py`**：已由本切片自行完成（`_busy_hold`），不需要宿主接线。
 
 ## 七、测试
 
 ```
-cd C:\Users\99505\.astrbot\data\plugins\astrbot_plugin_private_companion_v2
-$env:PYTHONPATH='C:/Users/99505/.astrbot/backend/app;C:/Users/99505/.astrbot/data/plugins/astrbot_plugin_private_companion_v2/.p4-tmp'
+cd C:\Users\99505\.astrbot\data\plugins\astrbot_plugin_digital_life_legacy
+$env:PYTHONPATH='C:/Users/99505/.astrbot/backend/app;C:/Users/99505/.astrbot/data/plugins/astrbot_plugin_digital_life_legacy/.p4-tmp'
 $env:TEMP='…\.p4-tmp\temp'; $env:TMP=$env:TEMP
 & 'C:/Users/99505/.astrbot/backend/python/python.exe' -X utf8 -m unittest tests.test_busy_reply_gate -q
 ```

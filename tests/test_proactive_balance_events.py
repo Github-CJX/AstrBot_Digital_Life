@@ -11,11 +11,11 @@ import sqlite3
 from tempfile import TemporaryDirectory
 import unittest
 
-from astrbot_host.service_balance import ServiceBalancePort, configured_balance_port
-from companion_v2.proactive.balance_events import (BalanceObservation, SOURCE_OWNER, balance_level,
+from digital_life_host.service_balance import ServiceBalancePort, configured_balance_port
+from digital_life_core.proactive.balance_events import (BalanceObservation, SOURCE_OWNER, balance_level,
                                                     display_amount)
-from companion_v2.storage.runtime import StorageOpenError, StorageRuntime
-from companion_v2.storage.schema import SCHEMA_VERSION, SCHEMA_VERSION_V36
+from digital_life_core.storage.runtime import StorageOpenError, StorageRuntime
+from digital_life_core.storage.schema import SCHEMA_VERSION, SCHEMA_VERSION_V36
 from tests.execution_support import remove_v37
 from tests.contact_schedule_support import ContactScheduleFixture
 
@@ -199,7 +199,7 @@ class BalanceAdapterTests(unittest.TestCase):
             port.parse({"success": False, "message": "unauthorized"}, datetime.now(timezone.utc))
 
     def test_newapi_known_aliases_are_fallback_only_for_the_newapi_provider(self):
-        from astrbot_host.service_balance import _newapi_compatible_urls
+        from digital_life_host.service_balance import _newapi_compatible_urls
 
         self.assertEqual(_newapi_compatible_urls("https://api.syuan.org"), (
             "https://api.syuan.org/api/user/self", "https://ai.syuan.org/api/user/self"))
@@ -269,7 +269,7 @@ class BalanceFetchTests(unittest.IsolatedAsyncioTestCase):
 
         port = ServiceBalancePort(url="https://api.syuan.org/api/user/self", provider="newapi",
                                   balance_path="data.quota", divisor="500000")
-        with patch("astrbot_host.service_balance.aiohttp.ClientSession", Session):
+        with patch("digital_life_host.service_balance.aiohttp.ClientSession", Session):
             observation = await port.fetch()
         self.assertEqual(calls, ["https://api.syuan.org/api/user/self", "https://ai.syuan.org/api/user/self"])
         self.assertEqual(observation.balance, Decimal("8.5"))

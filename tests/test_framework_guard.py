@@ -2,9 +2,9 @@
 
 import unittest
 
-from companion_v2.conversation.reply_preparation import prepare_reply
-from companion_v2.conversation.segmentation import SegmentationPolicy
-from companion_v2.conversation.text_processing import (FRAMEWORK_GUARD_REPLACEMENT, ReplyTextPolicy, text_policy)
+from digital_life_core.conversation.reply_preparation import prepare_reply
+from digital_life_core.conversation.segmentation import SegmentationPolicy
+from digital_life_core.conversation.text_processing import (FRAMEWORK_GUARD_REPLACEMENT, ReplyTextPolicy, text_policy)
 
 TRACEBACK = "Traceback (most recent call last):\n"
 FRAME = '  File "C:/host/app.py", line 10, in run\n'

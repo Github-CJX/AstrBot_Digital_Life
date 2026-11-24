@@ -73,8 +73,8 @@ function harness({windowKind="private",balanceSource=null,runtimeWeatherState="a
     other_injections:otherInjections,
     camera:{state:"available",status:"success",answer_available:true,purpose:"看看我现在在做什么",
       captured_at:"2026-10-01T09:57:00Z",observation:{summary:"桌面上有打开的笔记本电脑。",confidence:0.9}}};
-  const product = {scopeKey:() => "role-1", role:() => ({role_id:"role-1",model_api:"/astrbot_plugin_private_companion/model",
-      perception_native_api:"/astrbot_plugin_private_companion/perception-native", reply_api:"reply"}),
+  const product = {scopeKey:() => "role-1", role:() => ({role_id:"role-1",model_api:"/astrbot_plugin_digital_life/model",
+      perception_native_api:"/astrbot_plugin_digital_life/perception-native", reply_api:"reply"}),
     provider:id => id === "screen" ? {integration_state:"connected",runtime_ready:true,reason:"屏幕扩展运行正常"}
       : {integration_state:"missing",reason:"未安装"},
     statusLabel:value => value, data:{state:{state:{values:{},settings:{}}}},
@@ -164,7 +164,7 @@ for(const windowKind of ["none","group","other_bot"])test(`overview does not rea
 test("role weather failure clears old weather without reporting window records as failed", async () => {
   const h=harness({windowKind:"none"});h.page.mount(h.root);
   await new Promise(resolve=>setImmediate(resolve));
-  h.failRequest("/astrbot_plugin_private_companion/perception-native/runtime");
+  h.failRequest("/astrbot_plugin_digital_life/perception-native/runtime");
   await h.page.refresh();
   assert.doesNotMatch(h.page.preview("env-weather"),/晴 · 22°C|大风蓝色预警/);
   assert.match(h.root.innerHTML,/读取失败/);
@@ -184,7 +184,7 @@ test("late weather responses cannot overwrite the newly selected role", async ()
   await new Promise(resolve=>setImmediate(resolve));
   h.page.unmount();
   const role=h.product.role();
-  h.product.role=()=>({...role,role_id:"role-2",perception_native_api:"/astrbot_plugin_private_companion/role-2/perception-native"});
+  h.product.role=()=>({...role,role_id:"role-2",perception_native_api:"/astrbot_plugin_digital_life/role-2/perception-native"});
   h.product.scopeKey=()=>"role-2";
   h.product.request=request;
   h.runtime.weather={...h.runtime.weather,condition:"雨",temperature_c:15};
@@ -203,12 +203,12 @@ test("overview shows the requested context, live routes, authorized devices and 
   await new Promise(resolve => setImmediate(resolve));
 
   assert.deepEqual(page.requested.sort(), [
-    "/astrbot_plugin_private_companion/model",
-    "/astrbot_plugin_private_companion/model/balance",
-    "/astrbot_plugin_private_companion/model/image",
-    "/astrbot_plugin_private_companion/model/voice",
-    "/astrbot_plugin_private_companion/perception-native/materials",
-    "/astrbot_plugin_private_companion/perception-native/runtime",
+    "/astrbot_plugin_digital_life/model",
+    "/astrbot_plugin_digital_life/model/balance",
+    "/astrbot_plugin_digital_life/model/image",
+    "/astrbot_plugin_digital_life/model/voice",
+    "/astrbot_plugin_digital_life/perception-native/materials",
+    "/astrbot_plugin_digital_life/perception-native/runtime",
     "huawei-health/status",
     "reply/recalls",
   ]);
@@ -394,7 +394,7 @@ test("configured balance is read through the model balance route and failed read
   await new Promise(resolve=>setImmediate(resolve));
   assert.match(page.root.innerHTML,/class="perception-hero is-balance is-ready" id="perception-channel-ext-balance"/);
   assert.match(page.root.innerHTML,/123\.45 额度/);
-  assert.ok(page.requested.includes("/astrbot_plugin_private_companion/model/balance"));
+  assert.ok(page.requested.includes("/astrbot_plugin_digital_life/model/balance"));
   assert.equal(page.bridgeRequests.some(([method,route])=>method==="POST"&&route==="host-options/balance/test"),false,
     "打开仪表盘复用 Token 页的模型余额接口");
   page.page.select("config-balance:perception-detail-balance-source");
@@ -409,7 +409,7 @@ test("configured balance is read through the model balance route and failed read
   await query();
   assert.match(page.root.innerHTML,/最近查询/);
   assert.match(page.root.innerHTML,/123\.45 额度/);
-  page.failRequest("/astrbot_plugin_private_companion/model/balance");
+  page.failRequest("/astrbot_plugin_digital_life/model/balance");
   await query();
   assert.match(page.root.innerHTML,/读取超时/);
   assert.doesNotMatch(page.root.innerHTML,/123\.45/);
@@ -699,9 +699,9 @@ test("failed reads clear stale results, name the failed settings and recover on 
   const page = harness();
   page.page.mount(page.root);
   await new Promise(resolve => setImmediate(resolve));
-  page.failRequest("/astrbot_plugin_private_companion/perception-native/runtime");
-  page.failRequest("/astrbot_plugin_private_companion/model/voice");
-  page.failRequest("/astrbot_plugin_private_companion/model/image");
+  page.failRequest("/astrbot_plugin_digital_life/perception-native/runtime");
+  page.failRequest("/astrbot_plugin_digital_life/model/voice");
+  page.failRequest("/astrbot_plugin_digital_life/model/image");
   page.emit({...page.snapshot, ready:false, loading:false, error:"读取超时", environment:{}, news:{}});
   page.root.handlers.click({target:{closest(selector) {return selector === "[data-context-refresh]" ? {} : null;}}});
   await new Promise(resolve => setImmediate(resolve));
@@ -879,7 +879,7 @@ test("preset selection waits for load and restore default only replaces the scri
   assert.match(page.balanceWorkspace.innerHTML,/value="newapi"/);
   assert.match(page.balanceWorkspace.innerHTML,/value="sub2api"/);
   assert.match(page.balanceWorkspace.innerHTML,/\{\{baseUrl\}\}\/user\/balance/);
-  assert.match(page.balanceWorkspace.innerHTML,/astrbot_plugin_private_companion/);
+  assert.match(page.balanceWorkspace.innerHTML,/astrbot_plugin_digital_life/);
   editBalanceField(page,"advanced_api_key","keep-api-key");
   editBalanceField(page,"advanced_access_token","keep-access-token");
   editBalanceField(page,"advanced_proxy_url","socks5://name:keep-proxy@localhost:1080");

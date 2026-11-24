@@ -8,15 +8,15 @@ import json
 import unittest
 from unittest.mock import patch
 
-from astrbot_host.group_authority import GroupAuthority
-from companion_v2.conversation.media.reply import OWNER
-from companion_v2.delivery.media import manifest_hash
-from companion_v2.delivery.models import DeliveryReceipt, LocalSender
-from companion_v2.delivery.service import DeliveryRequest
-from companion_v2.conversation.media.fallback import OWNER as IMAGE_FALLBACK_OWNER
-from companion_v2.conversation.media.review import DEFAULTS, verdict_document
-from companion_v2.execution.models import TaskContext, TaskError, digest, stamp
-from companion_v2.foundation.refs import ScopeKind
+from digital_life_host.group_authority import GroupAuthority
+from digital_life_core.conversation.media.reply import OWNER
+from digital_life_core.delivery.media import manifest_hash
+from digital_life_core.delivery.models import DeliveryReceipt, LocalSender
+from digital_life_core.delivery.service import DeliveryRequest
+from digital_life_core.conversation.media.fallback import OWNER as IMAGE_FALLBACK_OWNER
+from digital_life_core.conversation.media.review import DEFAULTS, verdict_document
+from digital_life_core.execution.models import TaskContext, TaskError, digest, stamp
+from digital_life_core.foundation.refs import ScopeKind
 from tests.animation_support import animation_bytes
 from tests.group_host_support import group_config
 from tests.group_image_delivery_support import GroupImageDeliveryFixture
@@ -159,7 +159,7 @@ class GroupImageGovernanceTests(GroupImageDeliveryFixture, unittest.IsolatedAsyn
         self.assertEqual([p["state"] for p in self.parts(batch)], ["delivered", "pending"])
         receipt = self.parts(batch)[0]["receipt_ref"]
         await self.restart()
-        with patch("astrbot_host.media.inspect_image", side_effect=AssertionError("recovery must use saved bytes")):
+        with patch("digital_life_host.media.inspect_image", side_effect=AssertionError("recovery must use saved bytes")):
             self.clock.advance(timedelta(seconds=3))
             self.app.notify()
             await self.settle(batch)

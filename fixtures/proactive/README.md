@@ -2,8 +2,8 @@
 
 本目录只保存"真链路"端到端用例与 `tools/run_proactive_sim.py` 需要的外部资讯样本。
 样本本身不是代码：它原样保存一次真实取回的 HTTP 响应体，让用例走**真的**解析器
-（`astrbot_host.news_parsing.parse_rss_news`）和**真的**来源端口
-（`astrbot_host.news.NewsRssPort`），只把网络这一跳换成"回放已录制的字节"。
+（`digital_life_host.news_parsing.parse_rss_news`）和**真的**来源端口
+（`digital_life_host.news.NewsRssPort`），只把网络这一跳换成"回放已录制的字节"。
 
 ## recorded/
 
@@ -14,7 +14,7 @@
 
 ### 录制方式
 
-`astrbot_host/news.py` 的 `NewsJsonPort._read` 用 `aiohttp` 且**不带** `User-Agent`
+`digital_life_host/news.py` 的 `NewsJsonPort._read` 用 `aiohttp` 且**不带** `User-Agent`
 （`headers` 只放显式配置的鉴权头）。该站点对缺少 `User-Agent` 的请求返回 403，
 因此录制脚本显式声明了一个标识性 `User-Agent`：
 
@@ -25,7 +25,7 @@ C:/Users/99505/.astrbot/backend/python/python.exe tools/run_proactive_sim.py --r
 **这是一个已知偏差**：录制用一个自报身份的 `User-Agent` 取回了真实响应体，但生产
 路径发的是没有 `User-Agent` 的请求。也就是说，样本证明的是"真实响应体长什么样、
 真实解析器把它变成什么"，**不**证明"默认 RSS 源在当前网络下可用"。后者由
-`astrbot_host/news.py` 的默认请求头决定，是产品侧的既有行为，本夹具不改动它。
+`digital_life_host/news.py` 的默认请求头决定，是产品侧的既有行为，本夹具不改动它。
 
 ### 时效性
 

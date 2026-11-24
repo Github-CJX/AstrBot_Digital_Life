@@ -14,8 +14,8 @@ from types import SimpleNamespace
 import unittest
 from unittest.mock import patch
 
-from astrbot_host.legacy_api import LegacyMigrationWebAPI, batch_group_receipt_state
-from companion_v2.foundation.outcome import Outcome
+from digital_life_host.legacy_api import LegacyMigrationWebAPI, batch_group_receipt_state
+from digital_life_core.foundation.outcome import Outcome
 
 
 CLASSIFIED = {
@@ -60,7 +60,7 @@ class BatchReceiptStateTests(unittest.IsolatedAsyncioTestCase):
     async def batch(self, response):
         fake = type("FakeGroupImportAPI", (_GroupImportStub,), {"response": response, "arguments": []})
         api = self.api()
-        with patch("astrbot_host.legacy_group_data_api.LegacyGroupDataWebAPI", fake):
+        with patch("digital_life_host.legacy_group_data_api.LegacyGroupDataWebAPI", fake):
             result = await api._batch_apply(
                 object(), Path("."), None,
                 {"token": "scope-token", "personas": [],

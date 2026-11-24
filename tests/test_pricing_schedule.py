@@ -1,4 +1,4 @@
-"""Comprehensive tests for companion_v2.model_gateway.pricing_schedule."""
+"""Comprehensive tests for digital_life_core.model_gateway.pricing_schedule."""
 
 from __future__ import annotations
 
@@ -6,8 +6,8 @@ from datetime import datetime, timezone
 import unittest
 from zoneinfo import ZoneInfo
 
-from companion_v2.model_gateway.pricing import validate_pricing_rule
-from companion_v2.model_gateway.pricing_schedule import (
+from digital_life_core.model_gateway.pricing import validate_pricing_rule
+from digital_life_core.model_gateway.pricing_schedule import (
     MAX_SCHEDULE_PERIODS,
     PricingScheduleError,
     match_schedule_period,

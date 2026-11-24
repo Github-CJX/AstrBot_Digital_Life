@@ -20,15 +20,15 @@ from tempfile import TemporaryDirectory
 import unittest
 from unittest import mock
 
-from companion_v2.conversation.native_turns import (NativeConversationTurns, context_rows,
+from digital_life_core.conversation.native_turns import (NativeConversationTurns, context_rows,
                                                     latest_scope)
-from companion_v2.execution.models import TaskContext, encode, stamp
-from companion_v2.foundation.refs import (AudienceRef, ScopeKind, ScopeRef, SubjectKind,
+from digital_life_core.execution.models import TaskContext, encode, stamp
+from digital_life_core.foundation.refs import (AudienceRef, ScopeKind, ScopeRef, SubjectKind,
                                           SubjectRef)
-from companion_v2.identity_policy.models import (AuthenticatedHostPrincipal, ResolvedIdentity,
+from digital_life_core.identity_policy.models import (AuthenticatedHostPrincipal, ResolvedIdentity,
                                                  RoleBinding)
-from companion_v2.storage.native_conversation_schema import OPEN_TURN_STATES
-from companion_v2.storage.runtime import StorageRuntime
+from digital_life_core.storage.native_conversation_schema import OPEN_TURN_STATES
+from digital_life_core.storage.runtime import StorageRuntime
 
 
 INSTALLATION_ID = "plan-installation"

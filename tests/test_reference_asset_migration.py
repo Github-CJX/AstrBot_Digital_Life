@@ -7,11 +7,11 @@ import tempfile
 from pathlib import Path
 import unittest
 
-from companion_v2.storage import schema
-from companion_v2.storage.reference_asset_schema import (
+from digital_life_core.storage import schema
+from digital_life_core.storage.reference_asset_schema import (
     REFERENCE_ASSET_TABLES, reference_limit,
 )
-from companion_v2.storage.runtime import StorageRuntime
+from digital_life_core.storage.runtime import StorageRuntime
 from tests.execution_support import remove_v51
 
 

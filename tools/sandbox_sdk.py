@@ -1,6 +1,6 @@
 """A minimal AstrBot SDK stand-in, so the host test suite can be collected offline.
 
-``astrbot_host`` imports AstrBot's own modules (``astrbot.core.message.components``,
+``digital_life_host`` imports AstrBot's own modules (``astrbot.core.message.components``,
 ``astrbot.api.web``, ...) at module scope, so without the SDK installed pytest cannot
 even collect most of the suite. The real SDK is not on the path inside an isolated
 sandbox, and pulling it in would drag a whole application with it.

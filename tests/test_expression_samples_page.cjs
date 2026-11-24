@@ -6,7 +6,7 @@ const test = require("node:test");
 const vm = require("node:vm");
 
 const source = fs.readFileSync(path.join(__dirname, "..", "pages", "陪伴小屋", "expression-samples-page.js"), "utf8");
-const HOST = "astrbot_plugin_private_companion";
+const HOST = "astrbot_plugin_digital_life";
 const BASE_TIME = Date.parse("2026-10-08T10:00:00+00:00");
 const CARD_HEIGHT = 120;
 const flush = () => new Promise(resolve => setTimeout(resolve, 0));

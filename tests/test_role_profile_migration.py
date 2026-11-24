@@ -7,16 +7,16 @@ from tempfile import TemporaryDirectory
 from types import SimpleNamespace as NS
 from unittest.mock import patch
 
-from astrbot_host.legacy_config import V1_HOST_CONFIG_NAME
-from astrbot_host.persona_workshop_api import PREFIX
-from companion_v2.role_profile.configuration import (
+from digital_life_host.legacy_config import V1_HOST_CONFIG_NAME
+from digital_life_host.persona_workshop_api import PREFIX
+from digital_life_core.role_profile.configuration import (
     GROUP as ROLE_PROFILE_GROUP,
     RoleProfileConfigurationOwner,
     configuration_fields as role_profile_fields,
     target_for as role_profile_target_for,
 )
 from tests import test_astrbot_staging_host as support
-from companion_v2.role_profile.migration import (
+from digital_life_core.role_profile.migration import (
     RoleProfileMigrationError,
     map_persona_role_profile,
     map_v1_world_knowledge_role_profile,
@@ -195,7 +195,7 @@ class RoleProfileMigrationAPITests(unittest.IsolatedAsyncioTestCase):
 
     def write_persona_profile(self, persona_id, settings):
         """Write one V1 secondary profile into both possible source roots."""
-        roots = (self.data_root, self.data_root.parent / "astrbot_plugin_private_companion")
+        roots = (self.data_root, self.data_root.parent / "astrbot_plugin_digital_life")
         for root in roots:
             (root / "persona_profiles").mkdir(parents=True, exist_ok=True)
             marker = root / "companions.json"
@@ -219,7 +219,7 @@ class RoleProfileMigrationAPITests(unittest.IsolatedAsyncioTestCase):
         async def reader():
             return payload
 
-        with patch("astrbot_host.persona_workshop_api.request",
+        with patch("digital_life_host.persona_workshop_api.request",
                    NS(username=username, query={}, body=reader)):
             return await self.routes[PREFIX + route]()
 
@@ -438,7 +438,7 @@ class RoleProfileMigrationAPITests(unittest.IsolatedAsyncioTestCase):
         self.write_v1_config()
         self.native.persona_manager.personas_v3.append({"name": "default", "prompt": "默认人格"})
         self.write_persona_profile("default", {"schedule_persona_prompt": "姓名：默认角色"})
-        for root in (self.data_root, self.data_root.parent / "astrbot_plugin_private_companion"):
+        for root in (self.data_root, self.data_root.parent / "astrbot_plugin_digital_life"):
             (root / "persona_profiles" / "default.db").write_bytes(b"ambiguous")
         await self.initialize()
 
@@ -455,7 +455,7 @@ class RoleProfileMigrationAPITests(unittest.IsolatedAsyncioTestCase):
         self.write_v1_config()
         self.native.persona_manager.personas_v3.append({"name": "default", "prompt": "默认人格"})
         self.write_persona_profile("default", {"schedule_persona_prompt": "姓名：默认角色"})
-        for root in (self.data_root, self.data_root.parent / "astrbot_plugin_private_companion"):
+        for root in (self.data_root, self.data_root.parent / "astrbot_plugin_digital_life"):
             path = root / "persona_profiles" / "default.json"
             path.unlink()
             path.mkdir(parents=True, exist_ok=True)

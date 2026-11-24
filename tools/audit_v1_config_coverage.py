@@ -24,9 +24,9 @@ from pathlib import Path
 
 _ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(_ROOT))
-DEFAULT_V1_SCHEMA = _ROOT.parent / "astrbot_plugin_private_companion" / "_conf_schema.json"
+DEFAULT_V1_SCHEMA = _ROOT.parent / "astrbot_plugin_digital_life" / "_conf_schema.json"
 LEDGER = _ROOT / "docs/V1_V2_CONFIG_RESOLVED_20260928.csv"
-SOURCE_ROOTS = ("companion_v2", "astrbot_host", "main.py")
+SOURCE_ROOTS = ("digital_life_core", "digital_life_host", "main.py")
 _SPECIALIZED_V2_FIELDS = {
     "basic_config.enable_environment_perception": (
         "conversation.perception.calendar_enabled",
@@ -77,7 +77,7 @@ def source_corpus():
     for root in SOURCE_ROOTS:
         base = _ROOT / root
         for path in ([base] if base.is_file() else base.rglob("*.py")):
-            if "companion_v2/configuration/" in path.as_posix():
+            if "digital_life_core/configuration/" in path.as_posix():
                 continue
             try:
                 chunks.append(path.read_text(encoding="utf-8"))

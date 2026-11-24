@@ -39,7 +39,7 @@ SDK_AVAILABLE = importlib.util.find_spec("astrbot") is not None
 # already-imported ``backup_api.request`` bound to the first one.  The gate logic
 # itself only touches the engine and temporary directories; the SDK is a host
 # wiring requirement, not a network requirement.
-from companion_v2.storage.backup import (
+from digital_life_core.storage.backup import (
     JOURNAL_FORMAT, MAIN_DATABASE, PENDING_FILENAME, RESTORE_FORMAT,
 )
 
@@ -77,7 +77,7 @@ def _write_journal(root: Path, *, name: str = ".restore-aaaaaaaa-11111111",
 
 def _make_original_database(root: Path) -> bytes:
     """Create a real V2 database with a marker row, then return its bytes."""
-    from companion_v2.storage.runtime import StorageRuntime
+    from digital_life_core.storage.runtime import StorageRuntime
 
     runtime = StorageRuntime.open(data_root=root, installation_id=INSTALLATION)
     try:
@@ -123,7 +123,7 @@ def _mapping_controller(*, profile_root: Path, data_root: Path, settings) -> typ
 class RestoreStartupGateTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
-        from astrbot_host import backup_api
+        from digital_life_host import backup_api
         cls.backup_api = backup_api
 
     def setUp(self):
@@ -275,7 +275,7 @@ class RestoreStartupGateTests(unittest.TestCase):
 @unittest.skipUnless(SDK_AVAILABLE, "the full host controller needs the AstrBot SDK")
 class MultiControllerStartupGateTests(unittest.TestCase):
     def setUp(self):
-        from astrbot_host import multi_controller
+        from digital_life_host import multi_controller
 
         self.multi_controller = multi_controller
         temporary = tempfile.TemporaryDirectory(prefix="r3-controller-gate-")

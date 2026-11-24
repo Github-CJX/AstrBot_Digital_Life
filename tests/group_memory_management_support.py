@@ -6,10 +6,10 @@ from types import SimpleNamespace as NS
 from tests.group_host_support import GroupFixture, group_config
 from tests.native_adapter_support import completion, final_text
 from tests.staging_bootstrap_support import wait_for_batch
-from astrbot_host.management_identity import dashboard_operator
-from companion_v2.adapters.astrbot.model_wire import tool_alias
-from companion_v2.execution.models import TaskContext, encode
-from companion_v2.memory.group.management import GroupMemoryManagement, GroupMemoryTarget
+from digital_life_host.management_identity import dashboard_operator
+from digital_life_core.adapters.astrbot.model_wire import tool_alias
+from digital_life_core.execution.models import TaskContext, encode
+from digital_life_core.memory.group.management import GroupMemoryManagement, GroupMemoryTarget
 
 
 class GroupMemoryManagementFixture(GroupFixture):

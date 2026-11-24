@@ -14,13 +14,13 @@ from tests import test_astrbot_staging_host as host_support
 from astrbot.api.web import PluginRequest, bind_request_context
 from starlette.requests import Request
 
-from astrbot_host.growth_api import PREFIX
-from astrbot_host.management_identity import dashboard_operator
-from companion_v2.execution.models import TaskError, digest, encode, stamp
-from companion_v2.identity_policy.models import AuthorizationTier
-from companion_v2.identity_policy.object_access import ObjectAccessPolicy
-from companion_v2.role_work.growth.progress import receipt_fingerprint
-from companion_v2.role_work.models import RoleActivity, RoleActivityState
+from digital_life_host.growth_api import PREFIX
+from digital_life_host.management_identity import dashboard_operator
+from digital_life_core.execution.models import TaskError, digest, encode, stamp
+from digital_life_core.identity_policy.models import AuthorizationTier
+from digital_life_core.identity_policy.object_access import ObjectAccessPolicy
+from digital_life_core.role_work.growth.progress import receipt_fingerprint
+from digital_life_core.role_work.models import RoleActivity, RoleActivityState
 from tests.native_adapter_support import FakeEvent, FakeProvider, FakeReverseApi
 from tests.test_management_access import NOW
 

@@ -8,15 +8,15 @@ import threading
 import unittest
 from unittest.mock import patch
 
-from companion_v2.foundation.refs import OperationRef, ScopeKind, ScopeRef, VersionRef
-from companion_v2.storage.models import OperationState
-from companion_v2.storage.repositories import (
+from digital_life_core.foundation.refs import OperationRef, ScopeKind, ScopeRef, VersionRef
+from digital_life_core.storage.models import OperationState
+from digital_life_core.storage.repositories import (
     InboxRepository,
     MigrationLedger,
     NamespaceRepository,
     OperationRepository,
 )
-from companion_v2.storage.runtime import SCHEMA_VERSION, StorageOpenError, StoragePathError, StorageRuntime
+from digital_life_core.storage.runtime import SCHEMA_VERSION, StorageOpenError, StoragePathError, StorageRuntime
 
 
 NOW = datetime(2026, 9, 21, 0, 0, tzinfo=timezone.utc)
@@ -197,7 +197,7 @@ class StorageRuntimeTests(unittest.TestCase):
             runtime = StorageRuntime.open(data_root=root, installation_id=INSTALLATION_ID)
             runtime.close()
 
-            with patch("companion_v2.storage.runtime._validate_integrity") as integrity_check:
+            with patch("digital_life_core.storage.runtime._validate_integrity") as integrity_check:
                 reopened = StorageRuntime.open(data_root=root, installation_id=INSTALLATION_ID)
             try:
                 integrity_check.assert_not_called()
@@ -212,7 +212,7 @@ class StorageRuntimeTests(unittest.TestCase):
             runtime = StorageRuntime.open(data_root=Path(temporary) / "v2-data", installation_id=INSTALLATION_ID)
             runtime.SLOW_OPERATION_SECONDS = 0
             try:
-                with self.assertLogs("companion_v2.storage.runtime", level="WARNING") as captured:
+                with self.assertLogs("digital_life_core.storage.runtime", level="WARNING") as captured:
                     runtime.read_one("SELECT ? AS value", ("row-value-that-stays-out",))
                 message = captured.output[0]
                 self.assertIn("operation=read_one", message)
@@ -225,13 +225,13 @@ class StorageRuntimeTests(unittest.TestCase):
                 self.assertIn("sql='SELECT ? AS value'", message)
                 self.assertNotIn("row-value-that-stays-out", message)
 
-                with self.assertLogs("companion_v2.storage.runtime", level="WARNING") as captured:
+                with self.assertLogs("digital_life_core.storage.runtime", level="WARNING") as captured:
                     with runtime.read_snapshot():
                         runtime.read_one("SELECT 1", ())
                 self.assertEqual(len(captured.output), 1)
                 self.assertIn("operation=read_one", captured.output[0])
 
-                with self.assertLogs("companion_v2.storage.runtime", level="INFO") as captured:
+                with self.assertLogs("digital_life_core.storage.runtime", level="INFO") as captured:
                     with runtime.transaction():
                         pass
                 self.assertIn("transaction body slow", captured.output[0])
@@ -399,13 +399,13 @@ class StorageRuntimeTests(unittest.TestCase):
                 StorageRuntime.open(data_root=root, installation_id="installation-beta")
             with self.assertRaises(StoragePathError):
                 StorageRuntime.open(
-                    data_root=Path(temporary) / "astrbot_plugin_private_companion",
+                    data_root=Path(temporary) / "astrbot_plugin_digital_life",
                     installation_id=INSTALLATION_ID,
                 )
 
     def test_takeover_child_and_fresh_public_name_can_open_without_touching_legacy_data(self):
         with TemporaryDirectory(prefix="companion-storage-takeover-") as temporary:
-            public = Path(temporary) / "astrbot_plugin_private_companion"
+            public = Path(temporary) / "astrbot_plugin_digital_life"
             public.mkdir()
             source = public / "companions.json"
             source.write_bytes(b'{"legacy":true}\n')
@@ -427,7 +427,7 @@ class StorageRuntimeTests(unittest.TestCase):
 
     def test_fresh_public_name_runtime_is_allowed_without_legacy_markers(self):
         with TemporaryDirectory(prefix="companion-storage-fresh-") as temporary:
-            public = Path(temporary) / "astrbot_plugin_private_companion"
+            public = Path(temporary) / "astrbot_plugin_digital_life"
             public.mkdir()
             runtime = StorageRuntime.open(data_root=public / "runtime",
                                           installation_id=INSTALLATION_ID)
@@ -436,7 +436,7 @@ class StorageRuntimeTests(unittest.TestCase):
 
     def test_plugin_code_directory_cannot_become_the_runtime_root(self):
         with TemporaryDirectory(prefix="companion-storage-code-") as temporary:
-            public = Path(temporary) / "astrbot_plugin_private_companion"
+            public = Path(temporary) / "astrbot_plugin_digital_life"
             public.mkdir()
             (public / "main.py").write_text("", encoding="utf-8")
             with self.assertRaises(StoragePathError):
@@ -444,7 +444,7 @@ class StorageRuntimeTests(unittest.TestCase):
 
     def test_legacy_marker_root_still_rejects_a_direct_runtime_child(self):
         with TemporaryDirectory(prefix="companion-storage-legacy-runtime-") as temporary:
-            public = Path(temporary) / "astrbot_plugin_private_companion"
+            public = Path(temporary) / "astrbot_plugin_digital_life"
             public.mkdir()
             (public / "companions.json").write_bytes(b'{"legacy":true}\n')
             with self.assertRaises(StoragePathError):
@@ -452,7 +452,7 @@ class StorageRuntimeTests(unittest.TestCase):
 
     def test_isolated_child_rejects_legacy_markers_inside_its_boundary(self):
         with TemporaryDirectory(prefix="companion-storage-boundary-") as temporary:
-            public = Path(temporary) / "astrbot_plugin_private_companion"
+            public = Path(temporary) / "astrbot_plugin_digital_life"
             child = public / "companion-7"
             child.mkdir(parents=True)
             (child / "companions.db").write_bytes(b"legacy sentinel")
@@ -464,9 +464,9 @@ class StorageRuntimeTests(unittest.TestCase):
                 StorageRuntime.open(data_root=foreign, installation_id=INSTALLATION_ID)
 
     def test_existing_owned_profiles_allow_parent_legacy_files_but_not_runtime_contamination(self):
-        for marker in (".companion-v2-storage-owner.json", ".companion-v2-storage-location.json"):
+        for marker in (".digital-life-storage-owner.json", ".digital-life-storage-location.json"):
             with self.subTest(marker=marker), TemporaryDirectory() as temporary:
-                public = Path(temporary) / "astrbot_plugin_private_companion"
+                public = Path(temporary) / "astrbot_plugin_digital_life"
                 public.mkdir()
                 source = public / "companions.json"
                 source.write_bytes(b'{"legacy":true}\n')
@@ -497,7 +497,7 @@ class StorageRuntimeTests(unittest.TestCase):
 
     def test_fresh_public_name_installations_runtime_is_allowed(self):
         with TemporaryDirectory(prefix="companion-storage-installations-") as temporary:
-            public = Path(temporary) / "astrbot_plugin_private_companion"
+            public = Path(temporary) / "astrbot_plugin_digital_life"
             public.mkdir()
             root = public / "installations" / "installation-a" / "runtime"
             runtime = StorageRuntime.open(data_root=root, installation_id=INSTALLATION_ID)
@@ -506,7 +506,7 @@ class StorageRuntimeTests(unittest.TestCase):
 
     def test_plugin_code_directory_installations_runtime_is_rejected(self):
         with TemporaryDirectory(prefix="companion-storage-code-installations-") as temporary:
-            public = Path(temporary) / "astrbot_plugin_private_companion"
+            public = Path(temporary) / "astrbot_plugin_digital_life"
             public.mkdir()
             (public / "main.py").write_text("", encoding="utf-8")
             with self.assertRaises(StoragePathError):
@@ -556,7 +556,7 @@ class SlowOperationLogRateLimitTests(unittest.TestCase):
 
     def test_first_line_keeps_original_format_and_later_ones_stay_silent(self) -> None:
         runtime = self._runtime()
-        with self.assertLogs("companion_v2.storage.runtime", level="WARNING") as captured:
+        with self.assertLogs("digital_life_core.storage.runtime", level="WARNING") as captured:
             for _ in range(5):
                 self._record_slow(runtime, "read_one", 2)
                 self._clock[0] += 1.0
@@ -572,7 +572,7 @@ class SlowOperationLogRateLimitTests(unittest.TestCase):
     def test_a_long_statement_is_collapsed_and_truncated_to_one_line(self) -> None:
         runtime = self._runtime()
         statement = "SELECT c.call_id\n    FROM model_calls c\n    WHERE " + "x" * 400
-        with self.assertLogs("companion_v2.storage.runtime", level="WARNING") as captured:
+        with self.assertLogs("digital_life_core.storage.runtime", level="WARNING") as captured:
             runtime._report_slow_operation("read_all", 0.0, 0.0, 0.002, statement=statement)
         line = captured.output[0]
         self.assertEqual(len(captured.output), 1)
@@ -588,12 +588,12 @@ class SlowOperationLogRateLimitTests(unittest.TestCase):
             self._clock[0] += step
             self._record_slow(runtime, "read_all", elapsed)
         # Still inside the 60 s window: the event above is swallowed silently.
-        with self.assertNoLogs("companion_v2.storage.runtime", level="WARNING"):
+        with self.assertNoLogs("digital_life_core.storage.runtime", level="WARNING"):
             self._clock[0] += 1.0
             self._record_slow(runtime, "read_all", 11)
         # Cross the window: the next event reports what the window swallowed.
         self._clock[0] += 60.0
-        with self.assertLogs("companion_v2.storage.runtime", level="WARNING") as captured:
+        with self.assertLogs("digital_life_core.storage.runtime", level="WARNING") as captured:
             self._record_slow(runtime, "read_all", 12)
         self.assertEqual(len(captured.output), 1, captured.output)
         summary = captured.output[0]
@@ -611,12 +611,12 @@ class SlowOperationLogRateLimitTests(unittest.TestCase):
 
         # The summary opened a fresh window: counters must not carry over.
         self._clock[0] += 1.0
-        with self.assertNoLogs("companion_v2.storage.runtime", level="WARNING"):
+        with self.assertNoLogs("digital_life_core.storage.runtime", level="WARNING"):
             self._record_slow(runtime, "read_all", 11)
 
     def test_keys_are_independent_per_operation_and_caller(self) -> None:
         runtime = self._runtime()
-        with self.assertLogs("companion_v2.storage.runtime", level="WARNING") as captured:
+        with self.assertLogs("digital_life_core.storage.runtime", level="WARNING") as captured:
             self._record_slow(runtime, "read_one", 2)              # (read_one, call site A)
             self._record_slow(runtime, "read_one", 3)              # swallowed
             self._record_slow_variant(runtime, "read_one", 2)      # (read_one, call site B)
@@ -637,7 +637,7 @@ class SlowOperationLogRateLimitTests(unittest.TestCase):
     def test_state_is_capped_but_never_loses_a_first_line(self) -> None:
         runtime = self._runtime()
         runtime.SLOW_OPERATION_LOG_MAX_KEYS = 8
-        with self.assertLogs("companion_v2.storage.runtime", level="WARNING") as captured:
+        with self.assertLogs("digital_life_core.storage.runtime", level="WARNING") as captured:
             for index in range(50):
                 self._clock[0] += 0.001
                 # Distinct keys via distinct operation names, all inside one
@@ -661,7 +661,7 @@ class SlowOperationLogRateLimitTests(unittest.TestCase):
             for index in range(per_worker):
                 self._record_slow(runtime, f"op_{index % windows}", 5)
 
-        with self.assertLogs("companion_v2.storage.runtime", level="WARNING") as captured:
+        with self.assertLogs("digital_life_core.storage.runtime", level="WARNING") as captured:
             threads = [threading.Thread(target=hammer) for _ in range(workers)]
             for thread in threads:
                 thread.start()
@@ -719,7 +719,7 @@ class SlowOperationLogRateLimitTests(unittest.TestCase):
                 # recorded is irrelevant; the checkpoint itself must add no key and
                 # emit no warning.
                 runtime._slow_operation_log_state.clear()
-                with self.assertNoLogs("companion_v2.storage.runtime", level="WARNING"):
+                with self.assertNoLogs("digital_life_core.storage.runtime", level="WARNING"):
                     result = runtime.checkpoint_passive()
                 self.assertEqual(len(result), 3)
                 self.assertEqual(runtime._slow_operation_log_state, {})

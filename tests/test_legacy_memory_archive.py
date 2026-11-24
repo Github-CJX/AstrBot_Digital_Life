@@ -7,12 +7,12 @@ from pathlib import Path
 from tempfile import TemporaryDirectory
 import unittest
 
-from companion_v2.legacy.archive import verify_v1_archive
-from companion_v2.legacy.memory_archive import (
+from digital_life_core.legacy.archive import verify_v1_archive
+from digital_life_core.legacy.memory_archive import (
     build_memory_database_plan,
     copy_memory_database_archive,
 )
-from companion_v2.legacy.migration import LegacyMigration, MigrationState
+from digital_life_core.legacy.migration import LegacyMigration, MigrationState
 
 
 class LegacyMemoryArchiveTests(unittest.TestCase):
@@ -34,7 +34,7 @@ class LegacyMemoryArchiveTests(unittest.TestCase):
     def test_discovery_includes_the_separate_plugin_data_database(self):
         with TemporaryDirectory() as temporary:
             base = Path(temporary)
-            v1_root = base / "astrbot_plugin_private_companion"
+            v1_root = base / "astrbot_plugin_digital_life"
             v1_root.mkdir()
             path, connection = self._database(base)
             try:

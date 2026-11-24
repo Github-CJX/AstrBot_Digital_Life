@@ -6,8 +6,8 @@ import unittest
 from datetime import datetime
 from types import SimpleNamespace
 
-from astrbot_host.native_extensions.reality.mihome_web_api import MiHomeWebAPI
-from companion_v2.proactive.care import DeviceObservation, appraise, normalize_settings
+from digital_life_host.native_extensions.reality.mihome_web_api import MiHomeWebAPI
+from digital_life_core.proactive.care import DeviceObservation, appraise, normalize_settings
 
 
 ALIAS = "卧室灯开关"

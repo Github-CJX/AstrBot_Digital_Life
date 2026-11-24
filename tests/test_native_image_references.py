@@ -9,10 +9,10 @@ import unittest
 
 from PIL import Image
 
-from astrbot_host.native_extensions.images import ImageReferenceLease, _inspect_role_reference
-from companion_v2.execution.models import TaskError
-from companion_v2.conversation.external_tools import ExternalToolExecutor
-from companion_v2.foundation.refs import ScopeKind
+from digital_life_host.native_extensions.images import ImageReferenceLease, _inspect_role_reference
+from digital_life_core.execution.models import TaskError
+from digital_life_core.conversation.external_tools import ExternalToolExecutor
+from digital_life_core.foundation.refs import ScopeKind
 
 
 def lease_for(action, arguments, tickets, recheck):
@@ -96,7 +96,7 @@ class NativeImageReferenceTests(unittest.TestCase):
         self.assertEqual(lease.fetch("mask-handle", "b" * 64, role="identity"), b"mask-bytes")
 
     def test_explicit_input_index_rejects_missing_or_duplicate_positions(self):
-        from astrbot_host.native_extensions.image_native.references import (
+        from digital_life_host.native_extensions.image_native.references import (
             ReferenceSelectionError, select_edit_tickets,
         )
         tickets = self.tickets()

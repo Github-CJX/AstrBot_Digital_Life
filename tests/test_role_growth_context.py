@@ -5,15 +5,15 @@ from datetime import datetime, timedelta
 import json
 import unittest
 
-from companion_v2.conversation.growth_context import ConversationRoleGrowthContext, MAX_GROWTH_RECORDS, MAX_PAYLOAD_CHARS
-from companion_v2.conversation.messages import ConversationMessages
-from companion_v2.conversation.foreground import ModelDraft
-from companion_v2.execution.models import TaskError, Lane, digest
-from companion_v2.foundation.refs import AudienceRef, SourceRef, SubjectKind, SubjectRef, VersionRef
-from companion_v2.identity_policy.models import AuthorizationTier
-from companion_v2.model_gateway.models import Amount, ProviderResponse
-from companion_v2.role_work.growth import GrowthKind, GrowthState, PersistentRoleGrowthLedger, RoleGrowthContextReader, RoleGrowthRecord
-from companion_v2.sources.models import SourceRecord
+from digital_life_core.conversation.growth_context import ConversationRoleGrowthContext, MAX_GROWTH_RECORDS, MAX_PAYLOAD_CHARS
+from digital_life_core.conversation.messages import ConversationMessages
+from digital_life_core.conversation.foreground import ModelDraft
+from digital_life_core.execution.models import TaskError, Lane, digest
+from digital_life_core.foundation.refs import AudienceRef, SourceRef, SubjectKind, SubjectRef, VersionRef
+from digital_life_core.identity_policy.models import AuthorizationTier
+from digital_life_core.model_gateway.models import Amount, ProviderResponse
+from digital_life_core.role_work.growth import GrowthKind, GrowthState, PersistentRoleGrowthLedger, RoleGrowthContextReader, RoleGrowthRecord
+from digital_life_core.sources.models import SourceRecord
 from tests.test_conversation_messages import MessageFixture
 from tests.test_management_access import NOW, SCOPE
 
@@ -350,7 +350,7 @@ class GrowthSelectionAndHistoryTests(RoleGrowthContextTests):
         self.assertEqual(len(set(revisions)), len(revisions))
 
     def test_history_is_capped_and_keeps_the_newest_notes(self):
-        from companion_v2.role_work.growth.context import HISTORY_NOTES
+        from digital_life_core.role_work.growth.context import HISTORY_NOTES
         current = self.skill("skill-long", at=NOW)
         for index in range(2, HISTORY_NOTES + 4):
             current = self.revise_note(current, index, f"第{index}次进展。")
@@ -402,7 +402,7 @@ class GrowthSelectionAndHistoryTests(RoleGrowthContextTests):
         self.assertEqual(payload["kind"], "goal")
 
     def test_the_instruction_permits_qualitative_comparison_and_forbids_numbers(self):
-        from companion_v2.conversation.growth_context import ROLE_GROWTH_INSTRUCTION
+        from digital_life_core.conversation.growth_context import ROLE_GROWTH_INSTRUCTION
         for required in ("progress_history", "前后对比", "定性"):
             self.assertIn(required, ROLE_GROWTH_INSTRUCTION)
         for forbidden in ("不得由此推出等级、分数、熟练度数值", "不编造数值熟练度"):

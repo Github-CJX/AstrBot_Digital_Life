@@ -41,7 +41,7 @@
 ### A 档：数据已经在库里、只是没投影出来（零新概念）
 
 相识卡片文档 `person.acquaintance.v1` 里已经存着、而管理页今天没显示的东西。
-**2026-09-30 核实**：`_person()`（`companion_v2/memory/person/management.py:63`）里
+**2026-09-30 核实**：`_person()`（`digital_life_core/memory/person/management.py:63`）里
 `private_attempts` / `nickname_updated_at` / `group_cards` 确实都没投影；`name_basis`
 是写死的 `"platform"`，不是真来源。
 
@@ -54,7 +54,7 @@
 | A5 | **记忆由谁提供**（`GET /page/ownership`） | **路由已实现并已接到记忆页** | 见下 | **已完成** |
 
 **A5 已完成，且不该加到相识详情**：`GET /page/ownership` 已存在
-（`astrbot_host/page_api.py:21`，`PageWebAPI.ownership`），记忆页已渲染它并带三种
+（`digital_life_host/page_api.py:21`，`PageWebAPI.ownership`），记忆页已渲染它并带三种
 兜底文案（让位 / 自己来 / 读不出来）。**它是安装级的**——判定读的是进程里别家插件
 公开的声明，与"哪个人"无关。所以它只能放在**安装级的状态卡**上，放进相识详情反而
 是在暗示"不同的人归属不同"，那是错的。
@@ -89,7 +89,7 @@ group_cards         : []                               ← 空
 | B1 | 相识详情的「**关系记忆/印象卡**」页签 | **只有** `MANAGEMENT_PREFIX + "/command"`（POST，审阅用） | **缺一条按 subject 过滤的只读列表路由**——原表说"`GET /relationships` 列表已存在"是不对的 | ✗ 需新增读路由 |
 | B2 | 相识详情的「**记忆**」页签 | `/memory/query`（**POST**）、`/memory/reflections`（GET）、`/memory/export`（GET）、`/memory/detail`（POST）、`/memory/source`（POST） | 调用既有路由，只读展示；不新增概念 | ✓ 全部存在 |
 | B3 | 相识详情的「**未完话头**」页签 | `conversation` 域的 open-items 概念 | **`open_items` 没有任何宿主路由**——原表当成现成的，实际要新开一条 | ✗ 需新增读路由 |
-| B4 | 相识详情的「**诊断**」页签 | `diagnostics` 域（自检/事故/解释） | **`astrbot_host/` 下没有 diagnostics 路由文件**，要从零加一条按角色+对象过滤的路由 | ✗ 需新增 |
+| B4 | 相识详情的「**诊断**」页签 | `diagnostics` 域（自检/事故/解释） | **`digital_life_host/` 下没有 diagnostics 路由文件**，要从零加一条按角色+对象过滤的路由 | ✗ 需新增 |
 
 **成本修正**：原表说"B1–B3 是纯接线（1–2 天）"，按核实结果，**只有 B2 是纯接线**；
 B1/B3/B4 各要新增一条读路由，合计比原估多。
@@ -110,7 +110,7 @@ B1/B3/B4 各要新增一条读路由，合计比原估多。
 
 ### 3.1 哪些人算"已授权的私聊用户"
 
-授权写在 `identity_grants`（`companion_v2/storage/schema.py:428`），真实运行档里
+授权写在 `identity_grants`（`digital_life_core/storage/schema.py:428`），真实运行档里
 `subject_kind='human'` 的**全部 11 行都属于同一个人**：
 
 ```
@@ -179,16 +179,16 @@ grant、那 grant 的来源账本怎么记"。
 
 ```powershell
 # 投影里已经有什么（person.acquaintance.v1 文档结构）
-python -X utf8 -c "import json,pathlib;print(pathlib.Path('companion_v2/memory/person/models.py').read_text(encoding='utf-8')[:1200])"
+python -X utf8 -c "import json,pathlib;print(pathlib.Path('digital_life_core/memory/person/models.py').read_text(encoding='utf-8')[:1200])"
 # 既有只读路由
-Select-String -Path astrbot_host\memory_api.py,astrbot_host\relationships_api.py -Pattern 'PREFIX \+ "'
+Select-String -Path digital_life_host\memory_api.py,digital_life_host\relationships_api.py -Pattern 'PREFIX \+ "'
 ```
 
 ### 复核本页结论用的命令（2026-09-30 实测过）
 
 ```powershell
 $py='C:/Users/99505/.astrbot/backend/python/python.exe'
-$db='C:/Users/99505/.astrbot/data/plugin_data/astrbot_plugin_private_companion_v2/profiles/qq-v2-stream-20260926/runtime/companion-v2.sqlite3'
+$db='C:/Users/99505/.astrbot/data/plugin_data/astrbot_plugin_digital_life_legacy/profiles/qq-v2-stream-20260926/runtime/companion-v2.sqlite3'
 
 # ① 谁被授权了什么（§3.1 的数据来源）
 & $py -X utf8 -c "import sqlite3;db=sqlite3.connect(r'file:$db?mode=ro',uri=True);[print(r) for r in db.execute('SELECT subject_id,capability,COUNT(*) FROM identity_grants WHERE subject_kind=''human'' GROUP BY 1,2')]"
@@ -197,7 +197,7 @@ $db='C:/Users/99505/.astrbot/data/plugin_data/astrbot_plugin_private_companion_v
 & $py -X utf8 -c "import sqlite3,json;db=sqlite3.connect(r'file:$db?mode=ro',uri=True);d=json.loads(db.execute('SELECT document_json FROM memory_views WHERE kind LIKE ''%acquaint%''').fetchone()[0]);print(sorted(d));print('private_attempts',d['private_attempts']);print('group_cards',d['group_cards'])"
 
 # ③ 归属路由是否还在（§A5 的判据）
-Select-String -Path astrbot_host\page_api.py -Pattern 'page/ownership'
+Select-String -Path digital_life_host\page_api.py -Pattern 'page/ownership'
 ```
 
 **数据根随配置变化**：上例是当前唯一运行档；换档时改 `profiles/<档名>` 那一段。

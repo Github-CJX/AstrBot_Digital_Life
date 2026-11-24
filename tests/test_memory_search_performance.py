@@ -7,10 +7,10 @@ import sqlite3
 import unittest
 from unittest.mock import patch
 
-from companion_v2.memory.query import MemoryQuery
-from companion_v2.memory.models import AtomRef
-from companion_v2.memory.search import SearchIndex
-from companion_v2.memory.service import MemoryService
+from digital_life_core.memory.query import MemoryQuery
+from digital_life_core.memory.models import AtomRef
+from digital_life_core.memory.search import SearchIndex
+from digital_life_core.memory.service import MemoryService
 from tests.memory_support import MemoryFixture
 
 
@@ -20,7 +20,7 @@ def immediate_sqlite():
     connect = sqlite3.connect
     def immediate(*args, **kwargs):
         return connect(*args, **{**kwargs, "timeout": 0})
-    with patch("companion_v2.memory.search.sqlite3.connect", side_effect=immediate):
+    with patch("digital_life_core.memory.search.sqlite3.connect", side_effect=immediate):
         yield
 
 

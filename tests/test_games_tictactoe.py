@@ -4,7 +4,7 @@ import copy
 
 import pytest
 
-from companion_v2.games import EMPTY, NOUGHT, X, TicTacToeGame
+from digital_life_core.games import EMPTY, NOUGHT, X, TicTacToeGame
 
 
 def test_tictactoe_enforces_turns_and_detects_winner() -> None:

@@ -21,7 +21,7 @@ async def receipts():
                 "action": name, "payload": payload})
 
         result = {"initial": await case.call()}
-        prefix = "/astrbot_plugin_private_companion"
+        prefix = "/astrbot_plugin_digital_life"
         result["perception_denied"] = await case.call(prefix + "/perception", username="api_key:synthetic")
         result["manifest_denied"] = await case.call(prefix + "/integration/manifest", username="api_key:synthetic")
         result["perception_invalid"] = await case.call(prefix + "/perception", body={"provider": "reality"})

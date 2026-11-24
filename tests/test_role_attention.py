@@ -3,7 +3,7 @@
 import asyncio
 import unittest
 
-from companion_v2.host.role_attention import AttentionLease, RoleAttention
+from digital_life_core.host.role_attention import AttentionLease, RoleAttention
 from tests.test_role_awareness import GROUP, NOW, PRIVATE, ROLE, FakeSettings, context
 
 

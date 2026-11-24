@@ -9,12 +9,12 @@ from types import SimpleNamespace as NS
 import unittest
 from unittest.mock import patch
 
-from astrbot_host.group_authority import GroupAuthority
-from companion_v2.conversation.group_context import MAX_BYTES, MAX_ITEMS
-from companion_v2.delivery.models import LocalSender
-from companion_v2.adapters.astrbot.model_wire import tool_alias
-from companion_v2.execution.models import TaskContext, TaskError, encode
-from companion_v2.memory.person.access import owner_key
+from digital_life_host.group_authority import GroupAuthority
+from digital_life_core.conversation.group_context import MAX_BYTES, MAX_ITEMS
+from digital_life_core.delivery.models import LocalSender
+from digital_life_core.adapters.astrbot.model_wire import tool_alias
+from digital_life_core.execution.models import TaskContext, TaskError, encode
+from digital_life_core.memory.person.access import owner_key
 from tests.group_host_support import GroupFixture, group_config
 from tests.native_adapter_support import completion, final_text
 from tests.staging_bootstrap_support import wait_for_batch
@@ -320,7 +320,7 @@ class GroupContextTests(GroupFixture, unittest.IsolatedAsyncioTestCase):
     async def test_foreign_captured_metadata_cannot_enter_confirmed_reply_history(self):
         app = await self.setup_delivery()
         original, _ = await self.receive("准备角色资料")
-        from companion_v2.role_profile.configuration import GROUP, target_for
+        from digital_life_core.role_profile.configuration import GROUP, target_for
         profiles = app.messages.role_profile_context
         target = target_for(original)
         current = profiles.owner.read(target, profiles.fields)

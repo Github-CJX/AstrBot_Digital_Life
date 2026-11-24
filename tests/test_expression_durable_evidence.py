@@ -16,17 +16,17 @@ import unittest
 from datetime import datetime, timedelta
 from unittest.mock import patch
 
-from astrbot_host.management_identity import dashboard_operator
-from companion_v2.conversation.native_observations import inbound_event
-from companion_v2.conversation.recalls import MessageRecall
-from companion_v2.conversation.reset import (ConversationWindow, durable_reset_at, reset_window,
+from digital_life_host.management_identity import dashboard_operator
+from digital_life_core.conversation.native_observations import inbound_event
+from digital_life_core.conversation.recalls import MessageRecall
+from digital_life_core.conversation.reset import (ConversationWindow, durable_reset_at, reset_window,
                                              source_current)
-from companion_v2.execution.models import TaskError, digest, encode, require, stamp
-from companion_v2.expression import rule_details
-from companion_v2.expression.style_management import ExpressionStyleManagement
-from companion_v2.foundation.refs import RoleOwnerRef
-from companion_v2.memory.codec import source as decode_source
-from companion_v2.storage.codec import encode_timestamp
+from digital_life_core.execution.models import TaskError, digest, encode, require, stamp
+from digital_life_core.expression import rule_details
+from digital_life_core.expression.style_management import ExpressionStyleManagement
+from digital_life_core.foundation.refs import RoleOwnerRef
+from digital_life_core.memory.codec import source as decode_source
+from digital_life_core.storage.codec import encode_timestamp
 from tests.group_host_support import GroupFixture
 
 

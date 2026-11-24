@@ -7,8 +7,8 @@ const vm = require("node:vm");
 
 const rootPath = path.resolve(__dirname, "..");
 const pageRoot = path.join(rootPath, "pages", "陪伴小屋");
-const schema = JSON.parse(fs.readFileSync(path.join(rootPath, "astrbot_host/native_extensions/reality/settings-schema.json"), "utf8"));
-const settings = JSON.parse(fs.readFileSync(path.join(rootPath, "astrbot_host/native_extensions/reality/settings-defaults.json"), "utf8"));
+const schema = JSON.parse(fs.readFileSync(path.join(rootPath, "digital_life_host/native_extensions/reality/settings-schema.json"), "utf8"));
+const settings = JSON.parse(fs.readFileSync(path.join(rootPath, "digital_life_host/native_extensions/reality/settings-defaults.json"), "utf8"));
 const sources = {
   panel: fs.readFileSync(path.join(pageRoot, "native-extension-panel.js"), "utf8"),
   management: fs.readFileSync(path.join(pageRoot, "native-extension-management.js"), "utf8"),
@@ -72,7 +72,7 @@ test("mobile connection partitions settings into collapsible cards without dropp
     {enabled: true, amap_reverse_geocode_enabled: true, activity_enabled: true});
   window.CompanionProduct = {
     request: async () => ({extensions: {reality: record}}),
-    extension: () => ({owner: "companion_v2", assembled: true, desired_state: "active", installed_revision: 1}),
+    extension: () => ({owner: "digital_life_core", assembled: true, desired_state: "active", installed_revision: 1}),
     errorLabel: () => "", target: () => ({scope_kind: "private", participant_id: "42"}),
     refreshIntegrations: async () => {},
   };
@@ -97,7 +97,7 @@ test("mobile connection page displays a paired device from the management snapsh
   });
   window.CompanionProduct = {
     request: async () => ({extensions: {reality: record}}),
-    extension: () => ({owner: "companion_v2", assembled: true, desired_state: "active", installed_revision: 1}),
+    extension: () => ({owner: "digital_life_core", assembled: true, desired_state: "active", installed_revision: 1}),
     errorLabel: () => "", target: () => ({scope_kind: "private", participant_id: "42"}),
     refreshIntegrations: async () => {},
   };
@@ -119,7 +119,7 @@ test("mobile health reachability is not presented as an active pairing", async (
     });
     window.CompanionProduct = {
       request: async () => ({extensions: {reality: record}}),
-      extension: () => ({owner: "companion_v2", assembled: true, desired_state: "active", installed_revision: 1}),
+      extension: () => ({owner: "digital_life_core", assembled: true, desired_state: "active", installed_revision: 1}),
       errorLabel: () => "", target: () => ({scope_kind: "private", participant_id: "42"}),
       refreshIntegrations: async () => {},
     };

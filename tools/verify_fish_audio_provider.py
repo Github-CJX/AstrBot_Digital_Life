@@ -20,10 +20,10 @@ async def probe(args):
     from astrbot import logger
     from astrbot.core.provider.sources.fishaudio_tts_api_source import ProviderFishAudioTTSAPI
     from astrbot.core.utils.astrbot_path import get_astrbot_temp_path
-    from astrbot_host.fish_audio import provider_direction
-    from astrbot_host.voice import NativeVoiceReply
-    from companion_v2.conversation.voice_reply import VoiceReplyPolicy
-    from companion_v2.foundation.refs import ScopeKind
+    from digital_life_host.fish_audio import provider_direction
+    from digital_life_host.voice import NativeVoiceReply
+    from digital_life_core.conversation.voice_reply import VoiceReplyPolicy
+    from digital_life_core.foundation.refs import ScopeKind
 
     logger.setLevel("WARNING")
     Path(get_astrbot_temp_path()).mkdir(parents=True, exist_ok=True)

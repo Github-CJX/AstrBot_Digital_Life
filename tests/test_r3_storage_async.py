@@ -35,18 +35,18 @@ from types import SimpleNamespace as NS
 import unittest
 from unittest.mock import patch
 
-from astrbot_host import storage_api
-from astrbot_host.backup_api import backup_operation_lock
-from astrbot_host.storage_api import StorageWebAPI
-from companion_v2.storage.backup import LEGACY_BACKUP_FORMAT, PENDING_FILENAME
+from digital_life_host import storage_api
+from digital_life_host.backup_api import backup_operation_lock
+from digital_life_host.storage_api import StorageWebAPI
+from digital_life_core.storage.backup import LEGACY_BACKUP_FORMAT, PENDING_FILENAME
 
-# The routes import ``astrbot_host.web_api`` lazily on their first call.  The host
+# The routes import ``digital_life_host.web_api`` lazily on their first call.  The host
 # itself imports that module when it registers routes, before any storage request;
 # importing it here reproduces that warmed state.  Without it the tick probe below
 # would measure roughly three seconds of module imports (first call only) and call
 # it "blocked event loop", which is neither the disk work under test nor a state
 # production ever reaches.
-import astrbot_host.web_api  # noqa: E402,F401 - warm the route dependency
+import digital_life_host.web_api  # noqa: E402,F401 - warm the route dependency
 
 NOW = datetime(2026, 10, 27, 9, 0, tzinfo=timezone.utc)
 INSTALLATION = "r3-storage-async-installation"
@@ -55,7 +55,7 @@ INSTALLATION = "r3-storage-async-installation"
 def _write_v1_snapshot(directory: Path, identifier: str, created_at: datetime,
                        installation_id: str = INSTALLATION) -> Path:
     """Write a real 7.0.7 snapshot pair: one flat SQLite database plus its sidecar."""
-    from companion_v2.storage.schema import SCHEMA_VERSION
+    from digital_life_core.storage.schema import SCHEMA_VERSION
 
     directory.mkdir(parents=True, exist_ok=True)
     database = directory / f"companion-v2-{identifier}.sqlite3"
@@ -120,7 +120,7 @@ class StorageAsyncTests(unittest.IsolatedAsyncioTestCase):
         temporary = TemporaryDirectory(prefix="r3-storage-async-")
         self.addCleanup(temporary.cleanup)
         self.root = Path(temporary.name)
-        self.default_root = self.root / "plugin-data" / "astrbot_plugin_private_companion"
+        self.default_root = self.root / "plugin-data" / "astrbot_plugin_digital_life"
         self.default_root.mkdir(parents=True)
         self.profile_root = self.default_root / "installations" / "main"
         self.runtime_root = self.profile_root / "runtime"
@@ -153,7 +153,7 @@ class StorageAsyncTests(unittest.IsolatedAsyncioTestCase):
         ticker.start()
         try:
             with patch.object(storage_api, "inventory", new=slow_inventory):
-                with patch("astrbot_host.storage_api.request", self.request):
+                with patch("digital_life_host.storage_api.request", self.request):
                     response = await self.api.status()
         finally:
             await ticker.stop()
@@ -183,7 +183,7 @@ class StorageAsyncTests(unittest.IsolatedAsyncioTestCase):
             return original()
 
         with patch.object(self.api, "_status", new=status_probe):
-            with patch("astrbot_host.storage_api.request", self.request):
+            with patch("digital_life_host.storage_api.request", self.request):
                 response = await self.api.status()
         self.assertEqual(response["status"], "ok", response)
         self.assertIn("locked", observed, "_status was never called")
@@ -208,7 +208,7 @@ class StorageAsyncTests(unittest.IsolatedAsyncioTestCase):
         self.assertTrue(lock.acquire(timeout=1))
         try:
             with patch.object(storage_api, "cleanup_backups", new=cleanup_stub):
-                with patch("astrbot_host.storage_api.request", self.request):
+                with patch("digital_life_host.storage_api.request", self.request):
                     task = asyncio.create_task(self.api.update())
                     await asyncio.sleep(0.25)
                     self.assertFalse(started.is_set(),
@@ -244,7 +244,7 @@ class StorageAsyncTests(unittest.IsolatedAsyncioTestCase):
                     active -= 1
 
         with patch.object(storage_api, "inventory", new=counted):
-            with patch("astrbot_host.storage_api.request", self.request):
+            with patch("digital_life_host.storage_api.request", self.request):
                 first, second = await asyncio.gather(self.api.status(), self.api.status())
         self.assertEqual(first["status"], "ok", first)
         self.assertEqual(second["status"], "ok", second)
@@ -271,7 +271,7 @@ class StorageAsyncTests(unittest.IsolatedAsyncioTestCase):
 
         self.request.payload = b'{"action":"clean"}'
         with patch.object(storage_api, "cleanup_backups", new=cleanup_stub):
-            with patch("astrbot_host.storage_api.request", self.request):
+            with patch("digital_life_host.storage_api.request", self.request):
                 first, second = await asyncio.gather(self.api.update(), self.api.update())
         self.assertEqual(first["status"], "ok", first)
         self.assertEqual(second["status"], "ok", second)
@@ -298,7 +298,7 @@ class StorageAsyncTests(unittest.IsolatedAsyncioTestCase):
         ticker.start()
         try:
             with patch.object(storage_api, "relocate_backup_storage", new=slow_relocate):
-                with patch("astrbot_host.storage_api.request", self.request):
+                with patch("digital_life_host.storage_api.request", self.request):
                     response = await self.api.update()
         finally:
             await ticker.stop()
@@ -327,7 +327,7 @@ class StorageAsyncTests(unittest.IsolatedAsyncioTestCase):
             "content_hash": "0" * 64, "requested_at": NOW.isoformat()}))
         self.config["storage"]["retention_count"] = 1
         self.request.payload = b'{"action":"clean"}'
-        with patch("astrbot_host.storage_api.request", self.request):
+        with patch("digital_life_host.storage_api.request", self.request):
             response = await self.api.update()
         self.assertEqual(response["status"], "ok", response)
         # The policy would delete the older snapshot, but the staged request still
@@ -368,7 +368,7 @@ class StorageAsyncTests(unittest.IsolatedAsyncioTestCase):
         self.assertTrue(lock.acquire(timeout=1))
         try:
             with patch.object(storage_api, "relocate_backup_storage", new=relocate_stub):
-                with patch("astrbot_host.storage_api.request", self.request):
+                with patch("digital_life_host.storage_api.request", self.request):
                     task = asyncio.create_task(self.api.update())
                     await asyncio.sleep(0.25)
                     self.assertFalse(started.is_set(),
@@ -401,7 +401,7 @@ class StorageAsyncTests(unittest.IsolatedAsyncioTestCase):
             "action": "save", "path": "", "backup_path": str(new),
             "retention_count": 10, "retention_days": 90}).encode()
         with patch.object(storage_api, "relocate_backup_storage", new=copy_probe):
-            with patch("astrbot_host.storage_api.request", self.request):
+            with patch("digital_life_host.storage_api.request", self.request):
                 response = await self.api.update()
         self.assertEqual(response["status"], "ok", response)
         self.assertIn("locked", observed, "the backup copy was never called")
@@ -419,7 +419,7 @@ class StorageAsyncTests(unittest.IsolatedAsyncioTestCase):
         Nothing in inventory/retention/relocation opens SQLite itself, so the worker
         threads those routes use never share a connection at all.
         """
-        from companion_v2.storage.runtime import StorageRuntime
+        from digital_life_core.storage.runtime import StorageRuntime
 
         root = self.root / "sqlite-thread"
         opener: list[threading.Thread] = []

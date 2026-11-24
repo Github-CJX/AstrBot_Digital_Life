@@ -5,12 +5,12 @@ import json
 import unittest
 from unittest.mock import patch
 
-from companion_v2.conversation.foreground import BackgroundPromptTrigger
-from companion_v2.conversation.flow import ConversationPolicy
-from companion_v2.conversation.models import InboundConversationEvent
-from companion_v2.execution.models import TaskError, digest, encode, stamp
-from companion_v2.foundation.outcome import Outcome
-from companion_v2.foundation.refs import SourceRef, SubjectKind, SubjectRef, VersionRef
+from digital_life_core.conversation.foreground import BackgroundPromptTrigger
+from digital_life_core.conversation.flow import ConversationPolicy
+from digital_life_core.conversation.models import InboundConversationEvent
+from digital_life_core.execution.models import TaskError, digest, encode, stamp
+from digital_life_core.foundation.outcome import Outcome
+from digital_life_core.foundation.refs import SourceRef, SubjectKind, SubjectRef, VersionRef
 from tests.contact_schedule_support import ContactScheduleFixture
 from tests.test_management_access import INSTALLATION, SCOPE
 from tests.test_role_tool_loop import answered
@@ -92,7 +92,7 @@ class ContactSchedulingTests(ContactScheduleFixture, unittest.IsolatedAsyncioTes
         self.assertEqual(app.contact_schedule._legacy_rows(0), ())
 
     async def test_media_only_latest_turn_anchors_to_the_newest_text_input(self):
-        from companion_v2.conversation.native_turns import NativeConversationTurns
+        from digital_life_core.conversation.native_turns import NativeConversationTurns
 
         host, _ = await self.scheduled(automatic=False)
         app = host.application
@@ -117,7 +117,7 @@ class ContactSchedulingTests(ContactScheduleFixture, unittest.IsolatedAsyncioTes
         event = InboundConversationEvent("native-anchor", context.actor.principal, context.scope,
             source, "text", digest("anchor"), anchor_at)
 
-        with patch("companion_v2.conversation.native_turns.input_event", return_value=event), \
+        with patch("digital_life_core.conversation.native_turns.input_event", return_value=event), \
                 patch.object(app.contact_schedule.messages, "authorize"):
             origin, latest, resolved = app.contact_schedule._origin(
                 context, "core-reply:media-only", at)
@@ -460,7 +460,7 @@ class ContactSchedulingTests(ContactScheduleFixture, unittest.IsolatedAsyncioTes
         app = await self.enabled()
         first_context = self.contact_context()
         second_context = self.other_window_context()
-        from companion_v2.proactive.configuration import target_for
+        from digital_life_core.proactive.configuration import target_for
         self.settings(app, {"enabled": True, "max_contacts_24h": 1}, target=target_for(first_context)).unwrap()
         self.settings(app, {"enabled": True, "max_contacts_24h": 1}, target=target_for(second_context)).unwrap()
 
@@ -486,7 +486,7 @@ class ContactSchedulingTests(ContactScheduleFixture, unittest.IsolatedAsyncioTes
         app = await self.enabled()
         first_context = self.contact_context()
         second_context = self.other_window_context()
-        from companion_v2.proactive.configuration import target_for
+        from digital_life_core.proactive.configuration import target_for
         self.settings(app, {"enabled": True, "max_contacts_24h": 1}, target=target_for(first_context)).unwrap()
         self.settings(app, {"enabled": True, "max_contacts_24h": 1}, target=target_for(second_context)).unwrap()
 
@@ -514,7 +514,7 @@ class ContactSchedulingTests(ContactScheduleFixture, unittest.IsolatedAsyncioTes
 
     async def test_delivered_contact_allowance_resets_at_window_local_midnight(self):
         app = await self.enabled()
-        from companion_v2.proactive.configuration import target_for
+        from digital_life_core.proactive.configuration import target_for
         context = self.contact_context()
         self.settings(app, {"max_contacts_24h": 1}, target=target_for(context)).unwrap()
 
@@ -564,9 +564,9 @@ class ContactSchedulingTests(ContactScheduleFixture, unittest.IsolatedAsyncioTes
                          "contact_delivery_budget")
 
     async def test_preparation_failure_does_not_count_but_unknown_model_call_does(self):
-        from companion_v2.model_gateway.failures import ModelFailure
-        from companion_v2.model_gateway.models import Amount, ProviderResponse
-        from companion_v2.proactive.configuration import target_for
+        from digital_life_core.model_gateway.failures import ModelFailure
+        from digital_life_core.model_gateway.models import Amount, ProviderResponse
+        from digital_life_core.proactive.configuration import target_for
 
         app = await self.enabled()
         first_context = self.contact_context()
@@ -619,7 +619,7 @@ class ContactSchedulingTests(ContactScheduleFixture, unittest.IsolatedAsyncioTes
         self.assertEqual(self.called, [])
 
     async def test_disabled_scan_page_does_not_starve_later_window_or_mix_its_persona(self):
-        from companion_v2.proactive.configuration import target_for
+        from digital_life_core.proactive.configuration import target_for
         host = await self.start(self.host(policy=ConversationPolicy(0, 0, 180, 0)))
         app = host.application
         for index in range(17):

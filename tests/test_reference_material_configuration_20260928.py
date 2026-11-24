@@ -3,8 +3,8 @@
 两组此前都有 owner、有注册契约、有真实消费端（``ReferenceAssetService._admit``
 的总闸、``daily_outfit_options`` 的每日穿搭闸、``wardrobe_material`` 的提示词材料），
 只是没有任何页面读写路径：前端 ``config-editor.js`` 早已写好两个分区的声明，
-但 ``app.js`` 没有挂载点、``companion_v2.configuration.management`` 没有编辑器、
-``astrbot_host.configuration_api.SECTIONS`` 也不含这两个键——页面即使渲染出来，
+但 ``app.js`` 没有挂载点、``digital_life_core.configuration.management`` 没有编辑器、
+``digital_life_host.configuration_api.SECTIONS`` 也不含这两个键——页面即使渲染出来，
 保存也会以 ``configuration_request_invalid``（unknown configuration section）被拒。
 本文件锁四件事：
 
@@ -17,21 +17,21 @@
 
 import unittest
 
-from companion_v2.configuration.management import ReferenceManagement, WardrobeManagement
-from companion_v2.configuration.models import ConfigLayer, ConfigurationError
-from companion_v2.references.configuration import DEFAULTS as REFERENCE_DEFAULTS
-from companion_v2.references.configuration import GROUP as REFERENCE_GROUP
-from companion_v2.references.configuration import LIMITS as REFERENCE_LIMITS
-from companion_v2.references.configuration import OWNER as REFERENCE_OWNER
-from companion_v2.references.configuration import configuration_fields as reference_fields
-from companion_v2.references.configuration import validate as reference_validate
-from companion_v2.references.wardrobe import DEFAULTS as WARDROBE_DEFAULTS
-from companion_v2.references.wardrobe import GROUP as WARDROBE_GROUP
-from companion_v2.references.wardrobe import LIMITS as WARDROBE_LIMITS
-from companion_v2.references.wardrobe import (MAX_IMAGE_PROMPT, MAX_TENDENCY,
+from digital_life_core.configuration.management import ReferenceManagement, WardrobeManagement
+from digital_life_core.configuration.models import ConfigLayer, ConfigurationError
+from digital_life_core.references.configuration import DEFAULTS as REFERENCE_DEFAULTS
+from digital_life_core.references.configuration import GROUP as REFERENCE_GROUP
+from digital_life_core.references.configuration import LIMITS as REFERENCE_LIMITS
+from digital_life_core.references.configuration import OWNER as REFERENCE_OWNER
+from digital_life_core.references.configuration import configuration_fields as reference_fields
+from digital_life_core.references.configuration import validate as reference_validate
+from digital_life_core.references.wardrobe import DEFAULTS as WARDROBE_DEFAULTS
+from digital_life_core.references.wardrobe import GROUP as WARDROBE_GROUP
+from digital_life_core.references.wardrobe import LIMITS as WARDROBE_LIMITS
+from digital_life_core.references.wardrobe import (MAX_IMAGE_PROMPT, MAX_TENDENCY,
                                               OWNER as WARDROBE_OWNER)
-from companion_v2.references.wardrobe import configuration_fields as wardrobe_fields
-from companion_v2.references.wardrobe import validate as wardrobe_validate
+from digital_life_core.references.wardrobe import configuration_fields as wardrobe_fields
+from digital_life_core.references.wardrobe import validate as wardrobe_validate
 
 
 class MaterialEditorDeclarationTests(unittest.TestCase):

@@ -4,8 +4,8 @@ from __future__ import annotations
 
 import unittest
 
-from companion_v2.configuration.models import ConfigurationError
-from companion_v2.conversation.web_understanding import (
+from digital_life_core.configuration.models import ConfigurationError
+from digital_life_core.conversation.web_understanding import (
     DEFAULTS,
     GROUP,
     configuration_fields,

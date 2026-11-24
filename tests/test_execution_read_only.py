@@ -3,8 +3,8 @@
 import contextvars
 import sqlite3
 
-from companion_v2.execution.models import Lane, TaskError
-from companion_v2.storage.runtime import StorageOpenError
+from digital_life_core.execution.models import Lane, TaskError
+from digital_life_core.storage.runtime import StorageOpenError
 from tests.test_execution import ExecutionFixture
 
 

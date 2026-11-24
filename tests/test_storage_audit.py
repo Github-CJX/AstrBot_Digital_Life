@@ -12,7 +12,7 @@
      violations 为空、退出码不变（WAL 的硬线只保留绝对大小 > 32 MiB）。
 
 被测对象是 tests/../tools/audit_storage_baseline.py。工具只用标准库、不导入
-`companion_v2` 或 `astrbot_host`，所以这里也**不**需要 AstrBot 运行实例：
+`digital_life_core` 或 `digital_life_host`，所以这里也**不**需要 AstrBot 运行实例：
 临时目录里手搓一个最小 SQLite 就够了。
 """
 
@@ -351,7 +351,7 @@ class DiscoveryTests(unittest.TestCase):
     def test_plugin_data_root_picks_the_most_recently_written_profile(self) -> None:
         """给它插件数据目录时，选主库最近被写的那个 profile，并列出其余。"""
         with tempfile.TemporaryDirectory(prefix="companion-v2-audit-") as temporary:
-            plugin_data = pathlib.Path(temporary) / "plugin_data" / "astrbot_plugin_private_companion"
+            plugin_data = pathlib.Path(temporary) / "plugin_data" / "astrbot_plugin_digital_life"
             older = plugin_data / "profiles" / "older-profile" / "runtime"
             newer = plugin_data / "profiles" / "newer-profile" / "runtime"
             for runtime in (older, newer):

@@ -1,0 +1,26 @@
+{
+  "revision": "M1-20261124",
+  "status": "approved_by_user",
+  "feature_dispositions": {
+    "聊天与表达学习": "保留",
+    "长期记忆": "保留",
+    "生理与睡眠": "保留",
+    "情绪系统": "保留",
+    "自我认知与成长": "保留",
+    "日记与梦境": "保留",
+    "社交关系": "保留",
+    "阅读与创作": "保留",
+    "B 站直播互动": "移除",
+    "QQ 空间互动": "移除",
+    "内置小游戏": "可选",
+    "生图与合照": "可选",
+    "3D 陪伴小屋": "可选",
+    "多角色管理": "可选",
+    "手机控制": "可选",
+    "米家智能家居": "移除",
+    "华为健康": "移除",
+    "远程屏幕捕获": "可选"
+  },
+  "optional_default": "off in M2, not yet implemented",
+  "bilibili_video_browsing": "future WORLD feature; distinct from removed live streaming"
+}

@@ -3,13 +3,13 @@ from dataclasses import replace
 import unittest
 from unittest.mock import patch
 
-from companion_v2.conversation.delivery import DeliveryEnvelope
-from companion_v2.conversation.media.models import PromptImage
-from companion_v2.delivery.media import ImageDeliveryEnvelope, payload_hash
-from companion_v2.delivery.plan import PokePlan
-from companion_v2.execution.models import TaskError, digest
-from companion_v2.foundation.outcome import Outcome
-from companion_v2.foundation.refs import SourceRef, VersionRef
+from digital_life_core.conversation.delivery import DeliveryEnvelope
+from digital_life_core.conversation.media.models import PromptImage
+from digital_life_core.delivery.media import ImageDeliveryEnvelope, payload_hash
+from digital_life_core.delivery.plan import PokePlan
+from digital_life_core.execution.models import TaskError, digest
+from digital_life_core.foundation.outcome import Outcome
+from digital_life_core.foundation.refs import SourceRef, VersionRef
 from tests.native_adapter_support import NativeFixture
 from tests.test_semantic_integration import picture
 
@@ -145,7 +145,7 @@ class OneBotSenderTests(NativeFixture, unittest.IsolatedAsyncioTestCase):
         actor = replace(envelope.context.actor, principal=replace(envelope.context.actor.principal, native_account_id="201"))
         self.assertEqual((await self.native_sender.send(replace(envelope, context=replace(envelope.context, actor=actor)))).status, "not_sent")
         self.select_window_persona("changed")
-        with self.assertLogs("companion_v2.adapters.astrbot.onebot", level="WARNING") as captured:
+        with self.assertLogs("digital_life_core.adapters.astrbot.onebot", level="WARNING") as captured:
             receipt = await self.native_sender.send(envelope)
         self.assertEqual(receipt.status, "not_sent")
         self.assertIn("stage=final_dispatch_check", captured.output[0])

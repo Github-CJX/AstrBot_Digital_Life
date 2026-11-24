@@ -5,13 +5,13 @@ import unittest
 import httpx
 from openai import APIConnectionError
 
-from companion_v2.adapters.astrbot.model_wire import (REPLY_CONTRACT, REPLY_CONTRACT_EXAMPLE,
+from digital_life_core.adapters.astrbot.model_wire import (REPLY_CONTRACT, REPLY_CONTRACT_EXAMPLE,
     ModelWire, build_wire, decode_response, decode_text_response, tool_alias)
-from companion_v2.conversation.foreground import PromptMaterial
-from companion_v2.execution.models import TaskError, encode
-from companion_v2.model_gateway.failures import ModelFailure
-from companion_v2.model_gateway.models import MAX_TOOL_CATALOG, Amount, ToolCall, ToolExchange, ToolSpec
-from companion_v2.model_gateway.response_diagnostics import ResponseTextSummary
+from digital_life_core.conversation.foreground import PromptMaterial
+from digital_life_core.execution.models import TaskError, encode
+from digital_life_core.model_gateway.failures import ModelFailure
+from digital_life_core.model_gateway.models import MAX_TOOL_CATALOG, Amount, ToolCall, ToolExchange, ToolSpec
+from digital_life_core.model_gateway.response_diagnostics import ResponseTextSummary
 from tests.native_adapter_support import NativeFixture, completion, final_text
 
 REPORTED_USAGE = Amount(40, 90, input_tokens=30, cached_input_tokens=10, output_tokens=10)
@@ -520,7 +520,7 @@ class NativeModelTests(NativeFixture, unittest.IsolatedAsyncioTestCase):
         self.assertIsNone(response.usage)
         async def timeout(*_): raise TimeoutError("private endpoint information")
         self.native.provider.client.state.behavior = timeout
-        with self.assertLogs("companion_v2.adapters.astrbot.provider", level="WARNING") as captured:
+        with self.assertLogs("digital_life_core.adapters.astrbot.provider", level="WARNING") as captured:
             response = await self.native_model.generate(envelope)
         self.assertEqual(response.status, "unknown")
         self.assertEqual(response.failure, ModelFailure.TRANSPORT)
@@ -543,7 +543,7 @@ class NativeModelTests(NativeFixture, unittest.IsolatedAsyncioTestCase):
                     raise error from transport("private transport detail")
 
                 self.native.provider.client.state.behavior = fail
-                with self.assertLogs("companion_v2.adapters.astrbot.provider", level="WARNING") as captured:
+                with self.assertLogs("digital_life_core.adapters.astrbot.provider", level="WARNING") as captured:
                     result = await self.native_model.generate(envelope)
                 self.assertEqual(result.status, state)
                 self.assertEqual(result.usage, Amount(0, 0) if state == "not_started" else None)
@@ -594,7 +594,7 @@ class NativeModelTests(NativeFixture, unittest.IsolatedAsyncioTestCase):
             return completion(malformed)
 
         self.native.provider.client.state.behavior = respond
-        with self.assertLogs("companion_v2.adapters.astrbot.provider", level="WARNING") as captured:
+        with self.assertLogs("digital_life_core.adapters.astrbot.provider", level="WARNING") as captured:
             response = await self.native_model.generate(envelope)
         self.assertEqual(response.failure, ModelFailure.WIRE_DECODE)
         message = "\n".join(captured.output)

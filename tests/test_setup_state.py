@@ -5,7 +5,7 @@ from pathlib import Path
 from tempfile import TemporaryDirectory
 import unittest
 
-from astrbot_host.setup_state import SCHEMA_VERSION, SetupStateStore, SetupStepsIncomplete
+from digital_life_host.setup_state import SCHEMA_VERSION, SetupStateStore, SetupStepsIncomplete
 
 
 class SetupStateTests(unittest.TestCase):

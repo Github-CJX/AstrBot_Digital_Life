@@ -14,9 +14,9 @@ import tempfile
 from pathlib import Path
 import unittest
 
-from companion_v2.storage import schema
-from companion_v2.storage.persona_craft_schema import PERSONA_CRAFT_TABLES, PERSONA_CRAFT_TRIGGERS
-from companion_v2.storage.runtime import StorageOpenError, StorageRuntime
+from digital_life_core.storage import schema
+from digital_life_core.storage.persona_craft_schema import PERSONA_CRAFT_TABLES, PERSONA_CRAFT_TRIGGERS
+from digital_life_core.storage.runtime import StorageOpenError, StorageRuntime
 from tests.execution_support import remove_v45
 
 

@@ -12,7 +12,7 @@ V1 迁移可以重复试算、重复执行，所以它必然落在「新版界�
   而不是让它掉到通用配置路径上。
 
 保存走真实的 ``save_configuration``，因此断言的是落盘后的配置，而不是一份
-手写的近似快照。宿主方法无法直接 import（``astrbot_host.legacy_api`` 在导入期
+手写的近似快照。宿主方法无法直接 import（``digital_life_host.legacy_api`` 在导入期
 依赖 AstrBot 宿主 SDK），由 ``_host_type`` 从真实源码按方法名取出后编译执行。
 """
 
@@ -25,17 +25,17 @@ from pathlib import Path
 from types import SimpleNamespace
 import unittest
 
-from astrbot_host.native_extensions.image_native.output_configuration import (
+from digital_life_host.native_extensions.image_native.output_configuration import (
     public_configuration,
     save_configuration,
 )
-from companion_v2.configuration.models import ConfigLayer
-from companion_v2.execution.models import digest
-from companion_v2.legacy.image_configuration_migration import (
+from digital_life_core.configuration.models import ConfigLayer
+from digital_life_core.execution.models import digest
+from digital_life_core.legacy.image_configuration_migration import (
     convert_image_configuration,
     plan_image_output_changes,
 )
-from companion_v2.legacy.migration import ConfigIntent, MigrationPlan
+from digital_life_core.legacy.migration import ConfigIntent, MigrationPlan
 
 
 class _Config(dict):
@@ -82,7 +82,7 @@ def v1_photo_action_config():
     }}
 
 
-_HOST_SOURCE = Path(__file__).resolve().parents[1] / "astrbot_host" / "legacy_api.py"
+_HOST_SOURCE = Path(__file__).resolve().parents[1] / "digital_life_host" / "legacy_api.py"
 # ``_prepare_intents`` 连同它的两个依赖一起取出：只测预处理方法本身，无法发现
 # 分发分支被改名后生图意图掉到通用配置路径上的情况。
 _HOST_METHODS = ("_image_extension_api", "_prepare_image_output_intent", "_intent_key",

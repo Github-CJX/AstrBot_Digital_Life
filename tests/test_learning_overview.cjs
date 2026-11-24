@@ -5,7 +5,7 @@ const fs=require("node:fs");
 const path=require("node:path");
 const vm=require("node:vm");
 
-const HOST="astrbot_plugin_private_companion";
+const HOST="astrbot_plugin_digital_life";
 const source=fs.readFileSync(path.join(__dirname,"..","pages","陪伴小屋","learning-overview.js"),"utf8");
 
 const SOURCE={growthApi:`/${HOST}/targets/profile-a/roles/role-a/growth`,

@@ -2,8 +2,8 @@ from dataclasses import replace
 from datetime import timedelta
 import unittest
 
-from companion_v2.foundation.refs import RoleOwnerRef
-from companion_v2.role_work.journal import (JournalContext, JournalDerivatives, JournalDraft,
+from digital_life_core.foundation.refs import RoleOwnerRef
+from digital_life_core.role_work.journal import (JournalContext, JournalDerivatives, JournalDraft,
     JournalKey, JournalKind, JournalRef, JournalState)
 from tests.test_host_application import HostFixture
 from tests.test_management_access import NOW, ROLE, SCOPE

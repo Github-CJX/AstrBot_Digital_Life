@@ -7,34 +7,34 @@ import json
 import unittest
 from zoneinfo import ZoneInfo
 
-from companion_v2.agenda.annual_calendar import SCHEMA
-from companion_v2.agenda.models import Frequency, Schedule
-from companion_v2.agenda.planning import KIND, CalendarPlanning, planning_profile
-from companion_v2.agenda.planning_config import configured_annual_calendars, planning_values
-from companion_v2.agenda.planning_inputs import capture, validate, MATERIAL_CHARS, planning_calendar_context
-from companion_v2.agenda.planning_output import INSTRUCTION, INTERVENTION_INSTRUCTION, parse_output
-from companion_v2.configuration.models import ConfigurationError
-from companion_v2.configuration.registry import FieldRegistry
-from companion_v2.configuration.owners import SparseConfigurationOwner
-from companion_v2.conversation.models import InboundConversationEvent
-from companion_v2.conversation.state_context import ConversationStateContext
-from companion_v2.execution.models import TaskContext, TaskError, digest, encode
-from companion_v2.foundation.refs import AudienceRef, SourceRef, VersionRef, OperationRef
-from companion_v2.identity_policy.personas import ConversationRoute
-from companion_v2.identity_policy.models import AuthorizationTier
-from companion_v2.identity_policy.interventions import CALENDAR_INTERVENTION
-from companion_v2.model_gateway.routing import configuration_fields
-from companion_v2.model_gateway.budget import BudgetLedger
-from companion_v2.model_gateway.models import Amount, BudgetPolicy, CapturedModelOutput, ProviderResponse
-from companion_v2.proactive.management import ContactManagement
-from companion_v2.role_work.growth import RoleGrowthRecord, GrowthKind
-from companion_v2.role_work.growth.progress import growth_progress_profile
-from companion_v2.role_work.growth.progress_management import GrowthProgressManagement
-from companion_v2.role_work.models import RoleActivity, RoleActivityState
-from companion_v2.role_work.state.configuration import configuration_fields as state_configuration_fields, target_for
-from companion_v2.role_work.state.ownership import role_schedule_key
-from companion_v2.storage.versioned_records import VersionedRecords
-from companion_v2.sources.models import SourceRecord
+from digital_life_core.agenda.annual_calendar import SCHEMA
+from digital_life_core.agenda.models import Frequency, Schedule
+from digital_life_core.agenda.planning import KIND, CalendarPlanning, planning_profile
+from digital_life_core.agenda.planning_config import configured_annual_calendars, planning_values
+from digital_life_core.agenda.planning_inputs import capture, validate, MATERIAL_CHARS, planning_calendar_context
+from digital_life_core.agenda.planning_output import INSTRUCTION, INTERVENTION_INSTRUCTION, parse_output
+from digital_life_core.configuration.models import ConfigurationError
+from digital_life_core.configuration.registry import FieldRegistry
+from digital_life_core.configuration.owners import SparseConfigurationOwner
+from digital_life_core.conversation.models import InboundConversationEvent
+from digital_life_core.conversation.state_context import ConversationStateContext
+from digital_life_core.execution.models import TaskContext, TaskError, digest, encode
+from digital_life_core.foundation.refs import AudienceRef, SourceRef, VersionRef, OperationRef
+from digital_life_core.identity_policy.personas import ConversationRoute
+from digital_life_core.identity_policy.models import AuthorizationTier
+from digital_life_core.identity_policy.interventions import CALENDAR_INTERVENTION
+from digital_life_core.model_gateway.routing import configuration_fields
+from digital_life_core.model_gateway.budget import BudgetLedger
+from digital_life_core.model_gateway.models import Amount, BudgetPolicy, CapturedModelOutput, ProviderResponse
+from digital_life_core.proactive.management import ContactManagement
+from digital_life_core.role_work.growth import RoleGrowthRecord, GrowthKind
+from digital_life_core.role_work.growth.progress import growth_progress_profile
+from digital_life_core.role_work.growth.progress_management import GrowthProgressManagement
+from digital_life_core.role_work.models import RoleActivity, RoleActivityState
+from digital_life_core.role_work.state.configuration import configuration_fields as state_configuration_fields, target_for
+from digital_life_core.role_work.state.ownership import role_schedule_key
+from digital_life_core.storage.versioned_records import VersionedRecords
+from digital_life_core.sources.models import SourceRecord
 from tests.test_management_access import NOW
 from tests.test_role_state import StateFixture, calendar_data, state_data
 from tests.test_role_tool_loop import answered
@@ -355,7 +355,7 @@ class CalendarPlanningTests(StateFixture, unittest.IsolatedAsyncioTestCase):
                 "important_date_lookahead_days": 2,
                 "quiet_timezone": "Asia/Shanghai",
             }}).unwrap()
-        from companion_v2.relationships import anniversaries
+        from digital_life_core.relationships import anniversaries
         anniversaries.remember(app.runtime, context, {
             "label": "第一次一起看星星", "reason": "用户原话明确说这是第一次一起看星星。",
             "confidence": 0.91, "evidence_handle": "s1",

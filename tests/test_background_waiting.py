@@ -6,9 +6,9 @@ from datetime import timedelta
 import unittest
 from unittest.mock import patch
 
-from companion_v2.execution.models import Lane, TaskRegistration, TaskResult
-from companion_v2.execution.runner import ExactTaskRunner
-from companion_v2.execution.waiting import BackgroundTaskQueue
+from digital_life_core.execution.models import Lane, TaskRegistration, TaskResult
+from digital_life_core.execution.runner import ExactTaskRunner
+from digital_life_core.execution.waiting import BackgroundTaskQueue
 from tests.test_execution import ExecutionFixture
 
 

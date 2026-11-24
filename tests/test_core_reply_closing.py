@@ -4,9 +4,9 @@ import asyncio
 from datetime import timedelta
 import unittest
 
-from astrbot_host.core_reply import CORE_REPLY_CONTEXT_EXTRA
-from companion_v2.conversation.reply_settings import ReplyConfigurationOwner, configuration_fields, target_for
-from companion_v2.model_gateway.core_observations import observations_for_role
+from digital_life_host.core_reply import CORE_REPLY_CONTEXT_EXTRA
+from digital_life_core.conversation.reply_settings import ReplyConfigurationOwner, configuration_fields, target_for
+from digital_life_core.model_gateway.core_observations import observations_for_role
 from tests.multi_host_support import MultiFixture
 from tests.test_main_no_reply import ENTRY
 

@@ -1,11 +1,11 @@
 from dataclasses import replace
 
-from companion_v2.execution.models import digest
-from companion_v2.foundation.refs import SubjectKind, SubjectRef
-from companion_v2.identity_policy.personas import PersonaBinding, PersonaSelector, SelectorKind
-from companion_v2.memory.models import Proposal, AtomRef
-from companion_v2.memory.writer import MemoryWriter
-from companion_v2.memory.query import MemoryQuery
+from digital_life_core.execution.models import digest
+from digital_life_core.foundation.refs import SubjectKind, SubjectRef
+from digital_life_core.identity_policy.personas import PersonaBinding, PersonaSelector, SelectorKind
+from digital_life_core.memory.models import Proposal, AtomRef
+from digital_life_core.memory.writer import MemoryWriter
+from digital_life_core.memory.query import MemoryQuery
 from tests.test_conversation_messages import MessageFixture
 
 

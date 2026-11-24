@@ -13,7 +13,7 @@ import asyncio
 import sqlite3
 import unittest
 
-from companion_v2.host.tick_budget import TickScheduler, TickUnit
+from digital_life_core.host.tick_budget import TickScheduler, TickUnit
 from tests.test_host_application import HostFixture
 
 

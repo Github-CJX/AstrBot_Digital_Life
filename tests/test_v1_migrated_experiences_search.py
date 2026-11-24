@@ -13,16 +13,16 @@ from types import ModuleType, SimpleNamespace
 import unittest
 from unittest.mock import patch
 
-from astrbot_host.management_identity import dashboard_operator
-from companion_v2.execution.models import digest, encode
-from companion_v2.identity_policy.models import AuthorizationTier
-from companion_v2.identity_policy.personas import PersonaBinding, PersonaSelector, SelectorKind
-from companion_v2.legacy.data_migration import build_data_plan, next_journal_batch
-from companion_v2.memory.management import MemoryManagement
-from companion_v2.memory.models import AtomRef, Proposal, owner_key
-from companion_v2.memory.query import MemoryQuery
-from companion_v2.memory.service import MemoryService
-from companion_v2.role_work.journal.models import (
+from digital_life_host.management_identity import dashboard_operator
+from digital_life_core.execution.models import digest, encode
+from digital_life_core.identity_policy.models import AuthorizationTier
+from digital_life_core.identity_policy.personas import PersonaBinding, PersonaSelector, SelectorKind
+from digital_life_core.legacy.data_migration import build_data_plan, next_journal_batch
+from digital_life_core.memory.management import MemoryManagement
+from digital_life_core.memory.models import AtomRef, Proposal, owner_key
+from digital_life_core.memory.query import MemoryQuery
+from digital_life_core.memory.service import MemoryService
+from digital_life_core.role_work.journal.models import (
     DreamRecall,
     JournalContext,
     JournalDraft,
@@ -30,11 +30,11 @@ from companion_v2.role_work.journal.models import (
     JournalKind,
     JournalOrigin,
 )
-from companion_v2.role_work.journal.service import RoleJournalService
-from companion_v2.role_work.ledger import PersistentRoleLifeLedger
-from companion_v2.role_work.life.context import RoleLifeContextReader
-from companion_v2.role_work.models import RoleActivity, RoleActivityState as State, RoleReadingReceipt
-from companion_v2.role_work.work_models import RoleWorkSpec
+from digital_life_core.role_work.journal.service import RoleJournalService
+from digital_life_core.role_work.ledger import PersistentRoleLifeLedger
+from digital_life_core.role_work.life.context import RoleLifeContextReader
+from digital_life_core.role_work.models import RoleActivity, RoleActivityState as State, RoleReadingReceipt
+from digital_life_core.role_work.work_models import RoleWorkSpec
 from tests.memory_support import MemoryFixture
 from tests.test_management_access import NOW
 
@@ -191,7 +191,7 @@ class V1MigratedExperiencesSearchTests(MemoryFixture, unittest.IsolatedAsyncioTe
         astrbot_mod.api = astrbot_api_mod
         astrbot_api_mod.web = astrbot_web_mod
 
-        fake_web_api_mod = ModuleType("astrbot_host.web_api")
+        fake_web_api_mod = ModuleType("digital_life_host.web_api")
 
         def _outcome_response(result):
             if result.failure is not None:
@@ -229,10 +229,10 @@ class V1MigratedExperiencesSearchTests(MemoryFixture, unittest.IsolatedAsyncioTe
                 "astrbot": astrbot_mod,
                 "astrbot.api": astrbot_api_mod,
                 "astrbot.api.web": astrbot_web_mod,
-                "astrbot_host.web_api": fake_web_api_mod,
+                "digital_life_host.web_api": fake_web_api_mod,
             },
         ):
-            import astrbot_host.memory_api as memory_api_module
+            import digital_life_host.memory_api as memory_api_module
 
             with patch.object(memory_api_module, "request", fake_req):
                 api = memory_api_module.MemoryWebAPI(fake_controller)

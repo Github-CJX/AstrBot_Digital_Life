@@ -2,9 +2,9 @@ import json
 import unittest
 from dataclasses import replace
 
-from companion_v2.memory import codec
-from companion_v2.memory.models import AtomRef, Proposal
-from companion_v2.memory.management import MemoryManagement
+from digital_life_core.memory import codec
+from digital_life_core.memory.models import AtomRef, Proposal
+from digital_life_core.memory.management import MemoryManagement
 from tests.test_host_application import HostFixture
 from tests.test_role_tool_loop import requested, answered, call
 

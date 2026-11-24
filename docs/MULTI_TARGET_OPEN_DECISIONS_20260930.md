@@ -12,9 +12,9 @@
 ### 现状事实
 
 1. 快照是**整棵 V2 数据根**的镜像，格式 `companion-v2.installation-backup.v1`，元数据必须带
-   `installation_id` 与 `schema_version`；换安装或换结构版本一律拒收（`companion_v2/storage/backup.py:1,32,43,124-127`）。
+   `installation_id` 与 `schema_version`；换安装或换结构版本一律拒收（`digital_life_core/storage/backup.py:1,32,43,124-127`）。
 2. 还原是**两阶段**：先暂存，宿主重启时才替换数据库文件（`storage/backup.py:16`）。
-3. 授权是**安装级**：要 operator、不需要 target（`astrbot_host/backup_api.py:58`），且要求已有运行档
+3. 授权是**安装级**：要 operator、不需要 target（`digital_life_host/backup_api.py:58`），且要求已有运行档
    （`session` 与 `runtime` 都得在，`:68-70`）。多目标控制器**两个都有**（`multi_controller.py:38,131`），
    所以这一条不是障碍。
 4. 六条路由：列表 / 创建 / 校验 / 还原预览 / 暂存还原 / 待生效（`backup_api.py:28-34`）。
@@ -61,9 +61,9 @@
 ### 现状事实
 
 1. 迁移产出的是 `ConfigIntent`：作用域（如 `role.state`、`proactive.contact`）+ 分组 + 字段改动
-   （`companion_v2/legacy/migration.py:95-99,382`）。
+   （`digital_life_core/legacy/migration.py:95-99,382`）。
 2. 执行时要求**当前运行档里存在那些作用域**，否则报 `legacy_scope_unavailable`
-   （`astrbot_host/legacy_api.py:235`）。多目标下有多个目标与角色，所以"用哪一个"必须先说清。
+   （`digital_life_host/legacy_api.py:235`）。多目标下有多个目标与角色，所以"用哪一个"必须先说清。
 3. 幂等由 `plan_token`（V1 根指纹）保护：看到的那份与写入的那份必须一致（`legacy_api.py:164-172`）。
    记账按作用域逐条写进操作账本；**没有**"这份 V1 已经迁过"的安装级标记。
 4. 迁移只读 V1、单向写 V2；V1 路径来自插件配置 `legacy.v1_root`（留空则同级目录自动寻找）——与模式无关。
@@ -145,8 +145,8 @@
 界面只会显示 `legacy_apply_failed`：
 
 1. 目标推导传的是**宿主上下文**（`controller.context`）而不是**管线上下文** → 改 `session.profile.target`；
-2. `OperationRef` 从 `companion_v2.execution.models` 导入（该模块没有这个名字）→ 改 `foundation.refs`；
-3. `VersionRef` 从 `companion_v2.foundation.version` 导入（不存在）→ 同一个模块；
+2. `OperationRef` 从 `digital_life_core.execution.models` 导入（该模块没有这个名字）→ 改 `foundation.refs`；
+3. `VersionRef` 从 `digital_life_core.foundation.version` 导入（不存在）→ 同一个模块；
 4. operation 的属主写成分组名，而 `configuration/service.py` 比的是分组声明的 `owner_id`。
 
 回归护栏：`tests/test_multi_target_install_apis.py`（8 项，含单目标与多目标各一次真实迁移）。

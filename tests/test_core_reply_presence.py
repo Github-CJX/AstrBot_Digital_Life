@@ -12,16 +12,16 @@ from tests.test_role_presence import FakePresence
 from tests.test_role_state import StateFixture
 from tests.multi_host_support import MultiFixture
 from astrbot.core.message.message_event_result import MessageEventResult, ResultContentType
-from astrbot_host.core_reply import (
+from digital_life_host.core_reply import (
     CORE_REPLY_CONTEXT_EXTRA, activate_core_reply_delivery_guard,
     prepare_core_reply_event, restore_core_reply_event,
 )
-from astrbot_host.core_reply_presence import agent_presence_begin, agent_presence_done, result_presence
-from astrbot_host.core_reply_segmentation import prepare_core_reply_segmentation
-from companion_v2.conversation.native_turns import NativeConversationTurns
-from companion_v2.conversation.reset import ConversationWindow, reset_window
-from companion_v2.conversation.segmentation import SegmentationPolicy
-from companion_v2.foundation.outcome import Outcome
+from digital_life_host.core_reply_presence import agent_presence_begin, agent_presence_done, result_presence
+from digital_life_host.core_reply_segmentation import prepare_core_reply_segmentation
+from digital_life_core.conversation.native_turns import NativeConversationTurns
+from digital_life_core.conversation.reset import ConversationWindow, reset_window
+from digital_life_core.conversation.segmentation import SegmentationPolicy
+from digital_life_core.foundation.outcome import Outcome
 
 
 class NativeTypingTests(StateFixture, unittest.IsolatedAsyncioTestCase):
@@ -65,7 +65,7 @@ class NativeTypingTests(StateFixture, unittest.IsolatedAsyncioTestCase):
             entered.set()
             await release.wait()
 
-        with patch("astrbot_host.core_reply_segmentation.asyncio.sleep", side_effect=part_gap):
+        with patch("digital_life_host.core_reply_segmentation.asyncio.sleep", side_effect=part_gap):
             sending = asyncio.create_task(self.event.send(result))
             await asyncio.wait_for(entered.wait(), 2)
             self.assertEqual(len(self.event.sent), 1)
@@ -123,7 +123,7 @@ class NativeTypingTests(StateFixture, unittest.IsolatedAsyncioTestCase):
             gap.set()
             await asyncio.Event().wait()
 
-        with patch("astrbot_host.core_reply_segmentation.asyncio.sleep", side_effect=part_gap):
+        with patch("digital_life_host.core_reply_segmentation.asyncio.sleep", side_effect=part_gap):
             sending = asyncio.create_task(self.event.send(MessageEventResult().message("第一段\n\n第二段")))
             await asyncio.wait_for(gap.wait(), 2)
             sending.cancel()
@@ -209,7 +209,7 @@ class NativeTypingPreparationTests(MultiFixture, unittest.IsolatedAsyncioTestCas
                 await release.wait()
                 return ""
 
-            with patch("astrbot_host.fish_audio.provider_direction", side_effect=direction):
+            with patch("digital_life_host.fish_audio.provider_direction", side_effect=direction):
                 preparing = asyncio.create_task(self.controller.prepare_core_reply(
                     self.event(identifier="slow-typing-" + str(cancel))))
                 await asyncio.wait_for(entered.wait(), 2)

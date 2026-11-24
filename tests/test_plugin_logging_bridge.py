@@ -4,9 +4,9 @@ import logging
 import unittest
 from unittest.mock import patch
 
-from astrbot_host.log_buffer import install_log_buffer, snapshot
+from digital_life_host.log_buffer import install_log_buffer, snapshot
 
-from astrbot_host.logging_bridge import (
+from digital_life_host.logging_bridge import (
     PLUGIN_NAME, PluginLogBridge, install_logging_bridge, retire_logging_bridge,
 )
 
@@ -22,14 +22,14 @@ class Capture(logging.Handler):
 
 class PluginLoggingBridgeTests(unittest.TestCase):
     def setUp(self):
-        self.entry = "data.plugins.astrbot_plugin_private_companion.main"
+        self.entry = "data.plugins.astrbot_plugin_digital_life.main"
         # A previous real entry test may have installed a bridge in this process.
         # Establish the clean lifecycle state whose restoration is asserted here.
         retire_logging_bridge(self.entry)
         self.capture = Capture()
         self.sink = logging.Logger("astrbot.plugin." + PLUGIN_NAME, logging.INFO)
         self.sink.addHandler(self.capture)
-        self.get_sink = patch("astrbot_host.logging_bridge.LogManager.get_plugin_logger", return_value=self.sink)
+        self.get_sink = patch("digital_life_host.logging_bridge.LogManager.get_plugin_logger", return_value=self.sink)
         self.get_sink_mock = self.get_sink.start()
         self.addCleanup(self.get_sink.stop)
         self.addCleanup(retire_logging_bridge, self.entry)
@@ -37,16 +37,16 @@ class PluginLoggingBridgeTests(unittest.TestCase):
     def test_source_and_relative_host_logs_use_formal_plugin_identity_once(self):
         install_logging_bridge(self.entry)
         install_logging_bridge(self.entry)
-        logging.getLogger("companion_v2.conversation.generation").info("正文 %r", ("甲", "乙"))
-        logging.getLogger(self.entry.rsplit(".", 1)[0] + ".astrbot_host.controller").warning("宿主状态")
+        logging.getLogger("digital_life_core.conversation.generation").info("正文 %r", ("甲", "乙"))
+        logging.getLogger(self.entry.rsplit(".", 1)[0] + ".digital_life_host.controller").warning("宿主状态")
         self.assertEqual(len(self.capture.records), 2)
         self.assertEqual(self.capture.records[0].getMessage(), "正文 ('甲', '乙')")
         self.assertTrue(all(record.name == self.sink.name for record in self.capture.records))
         self.get_sink_mock.assert_called_with(PLUGIN_NAME)
 
     def test_live_level_changes_are_respected_and_other_logs_stay_on_original_route(self):
-        source = logging.getLogger("companion_v2")
-        prior = getattr(source, "_private_companion_v2_log_bridge", None)
+        source = logging.getLogger("digital_life_core")
+        prior = getattr(source, "_digital_life_log_bridge", None)
         level, propagate = prior[1:3] if prior is not None else (source.level, source.propagate)
         root_capture = Capture()
         root = logging.getLogger()
@@ -54,13 +54,13 @@ class PluginLoggingBridgeTests(unittest.TestCase):
         self.addCleanup(root.removeHandler, root_capture)
         install_logging_bridge(self.entry)
         self.sink.setLevel(logging.ERROR)
-        logging.getLogger("companion_v2.conversation.flow").warning("隐藏警告")
-        logging.getLogger("companion_v2.conversation.flow").error("显示错误")
+        logging.getLogger("digital_life_core.conversation.flow").warning("隐藏警告")
+        logging.getLogger("digital_life_core.conversation.flow").error("显示错误")
         logging.getLogger("another_plugin.example").warning("其他插件")
         self.assertEqual([record.getMessage() for record in self.capture.records], ["显示错误"])
         self.assertEqual([record.getMessage() for record in root_capture.records], ["其他插件"])
         self.sink.setLevel(logging.DEBUG)
-        logging.getLogger("companion_v2.conversation.flow").debug("显示调试")
+        logging.getLogger("digital_life_core.conversation.flow").debug("显示调试")
         self.assertEqual(self.capture.records[-1].getMessage(), "显示调试")
         retire_logging_bridge(self.entry)
         self.assertEqual((source.level, source.propagate), (level, propagate))
@@ -70,7 +70,7 @@ class PluginLoggingBridgeTests(unittest.TestCase):
         install_log_buffer()
         install_logging_bridge(self.entry)
         install_logging_bridge(self.entry)
-        logging.getLogger("companion_v2.tests.bridge_buffer").warning("bridge-buffer-domain")
+        logging.getLogger("digital_life_core.tests.bridge_buffer").warning("bridge-buffer-domain")
         self.sink.warning("bridge-buffer-direct")
         self.assertEqual([row["message"] for row in snapshot(query="bridge-buffer-", limit=20)["records"]],
                          ["bridge-buffer-domain", "bridge-buffer-direct"])
@@ -79,7 +79,7 @@ class PluginLoggingBridgeTests(unittest.TestCase):
     def test_builtin_buffer_respects_live_plugin_level_and_excludes_other_plugins(self):
         install_logging_bridge(self.entry)
         self.sink.setLevel(logging.ERROR)
-        source = logging.getLogger("astrbot_host.tests.bridge_buffer")
+        source = logging.getLogger("digital_life_host.tests.bridge_buffer")
         source.warning("bridge-level-hidden")
         source.error("bridge-level-shown")
         logging.getLogger("astrbot.plugin.other_plugin").error("bridge-level-other")

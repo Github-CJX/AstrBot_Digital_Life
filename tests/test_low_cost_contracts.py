@@ -2,15 +2,15 @@ from datetime import date, datetime, timedelta, timezone
 
 import pytest
 
-from companion_v2.agenda.annual_calendar import parse_annual_calendar
-from companion_v2.conversation.content.authoring import authoring_prompt, parse_output as parse_content
-from companion_v2.expression.learning import INSTRUCTION, parse_output as parse_learning
-from companion_v2.integration.nai_image import map_nai_request
-from companion_v2.knowledge.parsing import parse_knowledge_rows, parse_worldbook
-from companion_v2.model_gateway.replacement_rules import build_rules, match_route
-from companion_v2.proactive.external_materials import parse_news_response, parse_weather_response
-from companion_v2.role_work.journal.self_review import INSTRUCTION as REVIEW_INSTRUCTION
-from companion_v2.role_work.journal.self_review import parse_output as parse_review
+from digital_life_core.agenda.annual_calendar import parse_annual_calendar
+from digital_life_core.conversation.content.authoring import authoring_prompt, parse_output as parse_content
+from digital_life_core.expression.learning import INSTRUCTION, parse_output as parse_learning
+from digital_life_core.integration.nai_image import map_nai_request
+from digital_life_core.knowledge.parsing import parse_knowledge_rows, parse_worldbook
+from digital_life_core.model_gateway.replacement_rules import build_rules, match_route
+from digital_life_core.proactive.external_materials import parse_news_response, parse_weather_response
+from digital_life_core.role_work.journal.self_review import INSTRUCTION as REVIEW_INSTRUCTION
+from digital_life_core.role_work.journal.self_review import parse_output as parse_review
 
 
 def test_worldbook_and_knowledge_parsers_keep_valid_rows_and_report_bad_rows() -> None:

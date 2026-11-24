@@ -5,7 +5,7 @@ import unittest
 from unittest.mock import Mock
 
 from tests import astrbot_data_root  # noqa: F401
-from companion_v2.execution.models import TaskError
+from digital_life_core.execution.models import TaskError
 from tests.multi_host_support import MultiFixture
 
 
@@ -17,7 +17,7 @@ class BindingConnectionGateTests(MultiFixture, unittest.IsolatedAsyncioTestCase)
         self.controller.save_plugin_config = save
         self.native.platforms["qq-second"] = NS(
             meta=lambda: NS(name="weixin_oc", id="qq-second"), get_client=lambda: None)
-        with self.assertLogs("astrbot_host.multi_controller", level="WARNING") as logs:
+        with self.assertLogs("digital_life_host.multi_controller", level="WARNING") as logs:
             with self.assertRaises(TaskError) as caught:
                 await self.controller.apply_bindings(deepcopy(before))
         self.assertEqual(caught.exception.code, "host_account_unavailable")

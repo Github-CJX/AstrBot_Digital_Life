@@ -4,8 +4,8 @@ import unittest
 from types import SimpleNamespace as NS
 
 from tests import astrbot_data_root  # noqa: F401 - isolate the SDK before import
-from astrbot_host.binding import event_identity
-from companion_v2.adapters.astrbot.native import (
+from digital_life_host.binding import event_identity
+from digital_life_core.adapters.astrbot.native import (
     event_account_id, native_user_subject_id, supported_platform_name,
 )
 

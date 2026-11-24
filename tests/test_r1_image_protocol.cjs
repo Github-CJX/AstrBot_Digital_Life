@@ -93,7 +93,7 @@ function modelsHarness() {
   const window = {
     CompanionProduct: {
       hosted: () => true,
-      role: () => ({model_api: "/astrbot_plugin_private_companion/model"}),
+      role: () => ({model_api: "/astrbot_plugin_digital_life/model"}),
       identity: () => ({installation_id: "inst", operator_id: "operator"}),
       bridgeNow: () => window.AstrBotPluginPage,
       bridgeFor: () => ({then: resolve => resolve(window.AstrBotPluginPage)}),

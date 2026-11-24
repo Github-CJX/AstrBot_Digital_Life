@@ -16,40 +16,40 @@ from unittest.mock import patch
 
 from PIL import Image
 
-from companion_v2.conversation.media import native_generated_album
-from companion_v2.conversation.native_observations import NativeConversationObservations
-from companion_v2.conversation.native_tool_results import (
+from digital_life_core.conversation.media import native_generated_album
+from digital_life_core.conversation.native_observations import NativeConversationObservations
+from digital_life_core.conversation.native_tool_results import (
     PREFIX as TOOL_RESULT_PREFIX,
     PREFIX_END as TOOL_RESULT_PREFIX_END,
 )
-from companion_v2.conversation.native_turns import NativeConversationTurns, latest_role_contexts
-from companion_v2.conversation.scope_family import private_scope_keys
-from companion_v2.execution.models import TaskContext, digest, encode
-from companion_v2.expression.private_scope import private_people, role_private_contexts
-from companion_v2.expression.style_service import (
+from digital_life_core.conversation.native_turns import NativeConversationTurns, latest_role_contexts
+from digital_life_core.conversation.scope_family import private_scope_keys
+from digital_life_core.execution.models import TaskContext, digest, encode
+from digital_life_core.expression.private_scope import private_people, role_private_contexts
+from digital_life_core.expression.style_service import (
     KIND as EXPRESSION_LEARN_KIND,
     ExpressionStyleService,
 )
-from companion_v2.foundation.refs import AudienceRef, ScopeKind, ScopeRef, SubjectKind, SubjectRef
-from companion_v2.host import tick_budget
-from companion_v2.host.tick_budget import TickScheduler, TickUnit
-from companion_v2.identity_policy.models import AuthenticatedHostPrincipal, ResolvedIdentity, RoleBinding
-from companion_v2.model_gateway.core_observations import record_observation
-from companion_v2.model_gateway.maintenance_cache import (
+from digital_life_core.foundation.refs import AudienceRef, ScopeKind, ScopeRef, SubjectKind, SubjectRef
+from digital_life_core.host import tick_budget
+from digital_life_core.host.tick_budget import TickScheduler, TickUnit
+from digital_life_core.identity_policy.models import AuthenticatedHostPrincipal, ResolvedIdentity, RoleBinding
+from digital_life_core.model_gateway.core_observations import record_observation
+from digital_life_core.model_gateway.maintenance_cache import (
     clear_maintenance_cache,
     maintenance_cache_stats,
 )
-from companion_v2.model_gateway.management import ModelManagement
-from companion_v2.model_gateway.pricing import PricingSettingsStore
-from companion_v2.model_gateway.pricing_catalog import PriceCatalogStore
-from companion_v2.references.management import (
+from digital_life_core.model_gateway.management import ModelManagement
+from digital_life_core.model_gateway.pricing import PricingSettingsStore
+from digital_life_core.model_gateway.pricing_catalog import PriceCatalogStore
+from digital_life_core.references.management import (
     REFERENCE_THUMBNAIL_BYTES,
     ReferenceMaterialManagement,
     _THUMBNAIL_CACHE,
 )
-from companion_v2.role_work.state.service import MAX_ROLE_STATE_ANCESTOR_DEPTH
-from companion_v2.storage.codec import encode_timestamp
-from companion_v2.storage.runtime import StorageRuntime
+from digital_life_core.role_work.state.service import MAX_ROLE_STATE_ANCESTOR_DEPTH
+from digital_life_core.storage.codec import encode_timestamp
+from digital_life_core.storage.runtime import StorageRuntime
 from tests.test_host_application import HostFixture
 from tests.test_management_access import NOW, SCOPE
 from tests.test_role_state import StateFixture, calendar_data, state_data
@@ -197,7 +197,7 @@ class AlbumAndThumbnailCacheTests(HostFixture, unittest.IsolatedAsyncioTestCase)
         raw2 = buf2.getvalue()
 
         _THUMBNAIL_CACHE.clear()
-        with patch("companion_v2.references.management.Image.open", wraps=Image.open) as open_spy:
+        with patch("digital_life_core.references.management.Image.open", wraps=Image.open) as open_spy:
             first = ReferenceMaterialManagement._thumbnail(raw1, byte_limit=REFERENCE_THUMBNAIL_BYTES)
             second = ReferenceMaterialManagement._thumbnail(raw1, byte_limit=REFERENCE_THUMBNAIL_BYTES)
             self.assertEqual(first, second)

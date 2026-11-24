@@ -11,14 +11,14 @@ from unittest.mock import Mock
 
 from tests import astrbot_data_root as _host_import_root
 from astrbot.core.provider.entities import ProviderRequest
-from astrbot_host.core_reply import CORE_REPLY_CONTEXT_EXTRA
-from astrbot_host.native_extensions.game.host_events import GameHostEvents
-from companion_v2.execution.models import TaskContext, encode
-from companion_v2.foundation.refs import AudienceRef, ScopeKind, ScopeRef, SubjectKind, SubjectRef
-from companion_v2.games.native import provider as games
-from companion_v2.games.native.context import GAME_LABELS, conversation_records
-from companion_v2.identity_policy.models import AuthenticatedHostPrincipal, ResolvedIdentity, RoleBinding
-from companion_v2.product import PRODUCT_VERSION
+from digital_life_host.core_reply import CORE_REPLY_CONTEXT_EXTRA
+from digital_life_host.native_extensions.game.host_events import GameHostEvents
+from digital_life_core.execution.models import TaskContext, encode
+from digital_life_core.foundation.refs import AudienceRef, ScopeKind, ScopeRef, SubjectKind, SubjectRef
+from digital_life_core.games.native import provider as games
+from digital_life_core.games.native.context import GAME_LABELS, conversation_records
+from digital_life_core.identity_policy.models import AuthenticatedHostPrincipal, ResolvedIdentity, RoleBinding
+from digital_life_core.product import PRODUCT_VERSION
 from tests.test_game_native_web import request
 from tests.test_game_native_xiangqi import FakeEngine
 from tests.test_native_host_events import HostEvent, context_text

@@ -3,11 +3,11 @@
 from pathlib import Path
 from tempfile import TemporaryDirectory
 
-from companion_v2.execution.models import digest
-from companion_v2.foundation.refs import AudienceRef, RoleOwnerRef, SourceRef, SubjectKind, SubjectRef, VersionRef
-from companion_v2.role_work.journal import JournalContext, JournalDraft, JournalKey, JournalKind, RoleJournalService
-from companion_v2.sources.models import SourceRecord
-from companion_v2.storage.runtime import StorageRuntime
+from digital_life_core.execution.models import digest
+from digital_life_core.foundation.refs import AudienceRef, RoleOwnerRef, SourceRef, SubjectKind, SubjectRef, VersionRef
+from digital_life_core.role_work.journal import JournalContext, JournalDraft, JournalKey, JournalKind, RoleJournalService
+from digital_life_core.sources.models import SourceRecord
+from digital_life_core.storage.runtime import StorageRuntime
 from tests.test_management_access import INSTALLATION, NOW, ROLE, SCOPE
 
 

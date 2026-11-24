@@ -5,19 +5,19 @@ import hashlib
 import threading
 from unittest.mock import patch
 
-from companion_v2.execution.models import TaskError
-from companion_v2.capabilities import CapabilityAuthorizationState, CapabilityRepository
-from companion_v2.foundation.refs import AssetRef, AudienceRef, ReferenceValidationError, SourceRef, SubjectRef, SubjectKind, VersionRef
-from companion_v2.identity_policy.directory import IdentityDirectory
-from companion_v2.identity_policy.models import AuthorizationTier
-from companion_v2.screen import (
+from digital_life_core.execution.models import TaskError
+from digital_life_core.capabilities import CapabilityAuthorizationState, CapabilityRepository
+from digital_life_core.foundation.refs import AssetRef, AudienceRef, ReferenceValidationError, SourceRef, SubjectRef, SubjectKind, VersionRef
+from digital_life_core.identity_policy.directory import IdentityDirectory
+from digital_life_core.identity_policy.models import AuthorizationTier
+from digital_life_core.screen import (
     SCREEN_EXTENSION, SCREEN_PROCESS, SCREEN_READ, ClockQuality, ScreenCapture, ScreenCaptureRef,
     ScreenCoverage, ScreenFeedbackKind, ScreenInterpretation, ScreenMediaKind,
     ScreenProcessingPipeline, ScreenRepository,
 )
-from companion_v2.sources import AssetRecord, AssetRepository, SourceRecord, SourceRepository
-from companion_v2.storage.models import OperationState
-from companion_v2.storage.repositories import OperationRepository
+from digital_life_core.sources import AssetRecord, AssetRepository, SourceRecord, SourceRepository
+from digital_life_core.storage.models import OperationState
+from digital_life_core.storage.repositories import OperationRepository
 
 from tests.g6_support import G6Fixture, INSTALLATION, NOW
 

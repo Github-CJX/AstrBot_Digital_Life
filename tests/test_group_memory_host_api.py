@@ -7,14 +7,14 @@ import unittest
 
 from tests.group_memory_management_support import GroupMemoryManagementFixture
 from astrbot.api.web import PluginRequest, bind_request_context
-from astrbot_host.management_identity import dashboard_operator
+from digital_life_host.management_identity import dashboard_operator
 from starlette.requests import Request
-from companion_v2.execution.models import digest
-from companion_v2.identity_policy.models import AuthorizationTier
-from companion_v2.identity_policy.object_access import ObjectAccessPolicy
+from digital_life_core.execution.models import digest
+from digital_life_core.identity_policy.models import AuthorizationTier
+from digital_life_core.identity_policy.object_access import ObjectAccessPolicy
 
 
-PREFIX = "/astrbot_plugin_private_companion"
+PREFIX = "/astrbot_plugin_digital_life"
 
 
 class GroupMemoryHostAPITests(GroupMemoryManagementFixture, unittest.IsolatedAsyncioTestCase):

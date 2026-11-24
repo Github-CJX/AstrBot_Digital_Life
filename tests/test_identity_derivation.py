@@ -16,7 +16,7 @@ disk. So the tests that matter are not "does it produce a nice string" but:
 
 import unittest
 
-from astrbot_host.identity_derivation import (
+from digital_life_host.identity_derivation import (
     LEGACY_BOT_ID,
     LEGACY_ROLE_ID,
     derive_bot_id,
@@ -27,7 +27,7 @@ from astrbot_host.identity_derivation import (
     persona_label,
     role_display_name,
 )
-from astrbot_host.settings import HostControlError
+from digital_life_host.settings import HostControlError
 
 
 def identity(**overrides):

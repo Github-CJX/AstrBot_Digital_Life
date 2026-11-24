@@ -4,11 +4,11 @@ from dataclasses import replace
 import unittest
 from unittest.mock import patch
 
-from companion_v2.execution.models import TaskContext, TaskError
-from companion_v2.foundation.refs import AudienceRef
-from companion_v2.identity_policy.models import AuthorizationTier, GrantState
-from companion_v2.role_work.growth.access_management import RoleGrowthAccessManagement
-from companion_v2.role_work.growth.configuration import GROUP, OWNER, target_for
+from digital_life_core.execution.models import TaskContext, TaskError
+from digital_life_core.foundation.refs import AudienceRef
+from digital_life_core.identity_policy.models import AuthorizationTier, GrantState
+from digital_life_core.role_work.growth.access_management import RoleGrowthAccessManagement
+from digital_life_core.role_work.growth.configuration import GROUP, OWNER, target_for
 from tests.test_host_application import HostFixture
 from tests.test_management_access import NOW, SCOPE
 
@@ -72,7 +72,7 @@ class RoleGrowthAccessTests(HostFixture, unittest.IsolatedAsyncioTestCase):
                          "core_access_required")
 
     async def test_configuration_failure_rolls_back_both_setting_and_grant(self):
-        with patch("companion_v2.role_work.growth.configuration.PersistentIdentityDirectory.issue_grant",
+        with patch("digital_life_core.role_work.growth.configuration.PersistentIdentityDirectory.issue_grant",
                    side_effect=TaskError("simulated_grant_failure", "grant write failed")):
             result = self.configure({"read_enabled": True})
         self.assertEqual(result.failure.code, "simulated_grant_failure")

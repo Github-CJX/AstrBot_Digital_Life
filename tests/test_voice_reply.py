@@ -9,17 +9,17 @@ import json
 import re
 import unittest
 
-from companion_v2.conversation.segmentation import LLM_SEGMENT_MARKER, SegmentationPolicy
-from companion_v2.conversation.voice_reply import (
+from digital_life_core.conversation.segmentation import LLM_SEGMENT_MARKER, SegmentationPolicy
+from digital_life_core.conversation.voice_reply import (
     VoiceReplyDelivery, VoiceReplyPolicy, capability_instruction, detected_speech_language, eligible,
     planned_speech, requested_voice_language, separate_spoken, speech_candidates, speech_chunks,
     speech_decisions, strip_voice_markup, tts_wait_budget, voice_policy_for_turn,
 )
-from companion_v2.conversation.voice_markup import (
+from digital_life_core.conversation.voice_markup import (
     slice_speech, strip_performance_controls, visible_speech,
 )
-from companion_v2.foundation.refs import ScopeKind, ScopeRef, SubjectKind, SubjectRef
-from companion_v2.storage.runtime import StorageRuntime
+from digital_life_core.foundation.refs import ScopeKind, ScopeRef, SubjectKind, SubjectRef
+from digital_life_core.storage.runtime import StorageRuntime
 from tests.test_management_access import NOW
 
 

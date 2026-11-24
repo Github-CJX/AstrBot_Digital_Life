@@ -16,12 +16,12 @@ import unittest
 from copy import deepcopy
 from datetime import datetime, timezone
 
-from companion_v2.adapters.astrbot.native import HostPersona
-from companion_v2.adapters.astrbot.provider import UsageTariff
-from companion_v2.adapters.astrbot.staging_config import StagingConfiguration
-from companion_v2.execution.models import digest
-from companion_v2.foundation.refs import ScopeKind, ScopeRef, SubjectKind, SubjectRef
-from companion_v2.model_gateway.models import Amount, BudgetPolicy
+from digital_life_core.adapters.astrbot.native import HostPersona
+from digital_life_core.adapters.astrbot.provider import UsageTariff
+from digital_life_core.adapters.astrbot.staging_config import StagingConfiguration
+from digital_life_core.execution.models import digest
+from digital_life_core.foundation.refs import ScopeKind, ScopeRef, SubjectKind, SubjectRef
+from digital_life_core.model_gateway.models import Amount, BudgetPolicy
 
 
 INSTALLATION = "astrbot-private-companion-v2:preview-1"

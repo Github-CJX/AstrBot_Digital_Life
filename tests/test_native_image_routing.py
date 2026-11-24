@@ -6,16 +6,16 @@ from tempfile import TemporaryDirectory
 from types import SimpleNamespace as NS
 import unittest
 
-from astrbot_host.native_extensions import NativeExtensionRegistry
-from astrbot_host.native_extensions.builtins import BundledNativeLease
-from astrbot_host.native_extensions.image_native.adapter import PLUGIN_ID
-from astrbot_host.native_extensions.image_native.backends import NativeTransportBackend
-from astrbot_host.native_extensions.image_native.comfyui_service import ComfyUIService
-from astrbot_host.native_extensions.image_native.extension import ImageExtensionAPI
-from astrbot_host.native_extensions.image_native.output_configuration import settings as image_settings
-from astrbot_host.native_extensions.image_native.types import ImageInvocation, NativeImageError, ReferenceImage
-from companion_v2.capabilities.models import FurnitureDescriptor
-from companion_v2.product import PRODUCT_VERSION
+from digital_life_host.native_extensions import NativeExtensionRegistry
+from digital_life_host.native_extensions.builtins import BundledNativeLease
+from digital_life_host.native_extensions.image_native.adapter import PLUGIN_ID
+from digital_life_host.native_extensions.image_native.backends import NativeTransportBackend
+from digital_life_host.native_extensions.image_native.comfyui_service import ComfyUIService
+from digital_life_host.native_extensions.image_native.extension import ImageExtensionAPI
+from digital_life_host.native_extensions.image_native.output_configuration import settings as image_settings
+from digital_life_host.native_extensions.image_native.types import ImageInvocation, NativeImageError, ReferenceImage
+from digital_life_core.capabilities.models import FurnitureDescriptor
+from digital_life_core.product import PRODUCT_VERSION
 
 
 class NativeImageRoutingTests(unittest.TestCase):
@@ -24,7 +24,7 @@ class NativeImageRoutingTests(unittest.TestCase):
         root = Path(self.temporary.name)
         self.api = ImageExtensionAPI(data_root=root, config_path=root / "image-config.json",
                                      version=PRODUCT_VERSION)
-        lease = BundledNativeLease(PLUGIN_ID, self.api.companion_v2_native(), api=self.api,
+        lease = BundledNativeLease(PLUGIN_ID, self.api.digital_life_core_native(), api=self.api,
             furniture=FurnitureDescriptor("image", "image", "画面工作室", "image"))
         self.registry = NativeExtensionRegistry(NS(get_all_stars=lambda: ()), bundled_extensions=(lease,))
         self.registry._enforcing_image_settings = True
@@ -79,7 +79,7 @@ class NativeImageRoutingTests(unittest.TestCase):
         self.assertEqual(saved["settings"]["operation_routes"]["generate"], ["online:primary", "online:secondary"])
         self.assertEqual(saved["settings"]["operation_routes"]["edit"], ["online:secondary", "online:primary"])
 
-        backend = self.api.companion_v2_native().owner.backend
+        backend = self.api.digital_life_core_native().owner.backend
         route_ids = lambda operation: [item.config["id"] for item in backend._routes(operation)]
         self.assertEqual(route_ids("generate"), ["primary", "secondary"])
         self.assertEqual(route_ids("edit"), ["secondary", "primary"])
@@ -116,7 +116,7 @@ class NativeImageRoutingTests(unittest.TestCase):
         projected = saved["settings"]["endpoints"][0]
         self.assertEqual(projected["quality"], "hd")
         self.assertEqual(projected["max_reference_images"], 4)
-        route = next(self.api.companion_v2_native().owner.backend._routes("edit"))
+        route = next(self.api.digital_life_core_native().owner.backend._routes("edit"))
         self.assertEqual(route.config["quality"], "hd")
         self.assertEqual(route.config["max_reference_images"], 4)
 
@@ -169,7 +169,7 @@ class NativeImageRoutingTests(unittest.TestCase):
         self.assertEqual(saved["settings"]["endpoints"][0]["model"], "image-model")
 
     def test_online_image_download_uses_configured_proxy(self):
-        from astrbot_host.native_extensions.image_native.output_routing import OnlineImageBackend
+        from digital_life_host.native_extensions.image_native.output_routing import OnlineImageBackend
 
         backend = OnlineImageBackend(self.endpoint("primary", "image-v1"), {
             "download_proxy": "http://127.0.0.1:7890", "use_environment_proxy": False,
@@ -208,10 +208,10 @@ class NativeImageRoutingTests(unittest.TestCase):
         self.assertEqual(edit_parameters["cfg_scale"], 5.5)
 
     def test_dormant_provider_keeps_management_api_but_exposes_no_unconfigured_action(self):
-        self.assertEqual(self.api.companion_v2_native().manifest()["package"]["capabilities"], [
+        self.assertEqual(self.api.digital_life_core_native().manifest()["package"]["capabilities"], [
             "image.generate", "image.edit", "image.mask_edit",
         ])
-        self.assertEqual(self.api.companion_v2_native().owner.backend.operations, ())
+        self.assertEqual(self.api.digital_life_core_native().owner.backend.operations, ())
         self.assertIs(self.registry.image_extension_api(), self.api)
         self.assertTrue(all(self.registry.current_declaration(action) is None for action in self.declarations))
 
@@ -220,14 +220,14 @@ class NativeImageRoutingTests(unittest.TestCase):
         saved = self.api.save_output_configuration(current["revision"], {"enabled": False})
 
         self.assertFalse(saved["settings"]["enabled"])
-        self.assertFalse(self.api.companion_v2_native()._closed)
+        self.assertFalse(self.api.digital_life_core_native()._closed)
         self.assertIs(self.registry.image_extension_api(), self.api)
-        self.assertIn("image.generate", self.api.companion_v2_native().manifest()["package"]["capabilities"])
+        self.assertIn("image.generate", self.api.digital_life_core_native().manifest()["package"]["capabilities"])
         self.assertTrue(self.api.config["native_v2"]["enabled"])
 
         saved = self.save_online("openai")
         self.assertTrue(saved["settings"]["enabled"])
-        self.assertEqual(self.api.companion_v2_native().owner.backend.operations, ("generate", "edit"))
+        self.assertEqual(self.api.digital_life_core_native().owner.backend.operations, ("generate", "edit"))
         self.assertIs(self.registry.image_extension_api(), self.api)
 
     def test_disabled_output_from_previous_run_does_not_hide_configuration(self):
@@ -244,7 +244,7 @@ class NativeImageRoutingTests(unittest.TestCase):
                                     version=PRODUCT_VERSION)
             try:
                 self.assertFalse(api.output_configuration()["settings"]["enabled"])
-                self.assertFalse(api.companion_v2_native()._closed)
+                self.assertFalse(api.digital_life_core_native()._closed)
 
                 current = api.output_configuration()
                 saved = api.save_output_configuration(current["revision"], {
@@ -254,8 +254,8 @@ class NativeImageRoutingTests(unittest.TestCase):
                 })
 
                 self.assertTrue(saved["settings"]["enabled"])
-                self.assertFalse(api.companion_v2_native()._closed)
-                self.assertEqual(api.companion_v2_native().owner.backend.operations,
+                self.assertFalse(api.digital_life_core_native()._closed)
+                self.assertEqual(api.digital_life_core_native().owner.backend.operations,
                                  ("generate", "edit"))
                 persisted = json.loads(config_path.read_text(encoding="utf-8"))
                 self.assertTrue(persisted["native_v2"]["enabled"])
@@ -265,7 +265,7 @@ class NativeImageRoutingTests(unittest.TestCase):
 
     def test_online_backend_exposes_only_operations_supported_by_its_platform(self):
         self.save_online("minimax")
-        self.assertEqual(self.api.companion_v2_native().owner.backend.operations, ("generate",))
+        self.assertEqual(self.api.digital_life_core_native().owner.backend.operations, ("generate",))
         self.assertIsNotNone(self.registry.current_declaration("native:" + PLUGIN_ID + ":image.generate"))
         self.assertIsNone(self.registry.current_declaration("native:" + PLUGIN_ID + ":image.edit"))
         self.assertIsNone(self.registry.current_declaration("native:" + PLUGIN_ID + ":image.mask_edit"))
@@ -273,14 +273,14 @@ class NativeImageRoutingTests(unittest.TestCase):
                          "unsupported")
 
         self.save_online("openai")
-        self.assertEqual(self.api.companion_v2_native().owner.backend.operations, ("generate", "edit"))
+        self.assertEqual(self.api.digital_life_core_native().owner.backend.operations, ("generate", "edit"))
         self.assertIsNotNone(self.registry.current_declaration("native:" + PLUGIN_ID + ":image.edit"))
         self.assertIsNone(self.registry.current_declaration("native:" + PLUGIN_ID + ":image.mask_edit"))
         self.assertEqual(self.registry.declaration_readiness("native:" + PLUGIN_ID + ":image.mask_edit"),
                          "unsupported")
 
     def test_auto_platform_does_not_send_openai_requests_to_other_protocols(self):
-        from astrbot_host.native_extensions.image_native.output_routing import OnlineImageBackend, resolve_platform
+        from digital_life_host.native_extensions.image_native.output_routing import OnlineImageBackend, resolve_platform
 
         for url, expected, operations in (
             ("https://dashscope.aliyuncs.com/api/v1", "bailian", ("generate",)),
@@ -293,7 +293,7 @@ class NativeImageRoutingTests(unittest.TestCase):
                 self.assertEqual(OnlineImageBackend(endpoint).operations, operations)
 
     def test_dashscope_root_routes_to_native_multimodal_and_compatible_path_stays_openai(self):
-        from astrbot_host.native_extensions.image_native.output_routing import (
+        from digital_life_host.native_extensions.image_native.output_routing import (
             bailian_image_body, bailian_image_entries, effective_platform, operation_url)
 
         endpoint = {**self.endpoint("primary", "image-v1"), "platform": "openai",
@@ -323,7 +323,7 @@ class NativeImageRoutingTests(unittest.TestCase):
                           "parameters": {}},
             "comfyui": {},
         })
-        self.assertEqual(self.api.companion_v2_native().owner.backend.operations,
+        self.assertEqual(self.api.digital_life_core_native().owner.backend.operations,
                          ("generate", "edit", "mask_edit"))
         self.assertIsNotNone(self.registry.current_declaration("native:" + PLUGIN_ID + ":image.mask_edit"))
 

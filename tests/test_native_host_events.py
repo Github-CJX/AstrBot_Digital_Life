@@ -9,16 +9,16 @@ from tests import test_astrbot_staging_host as _host_import_root
 from astrbot.api.message_components import Image, Plain, Record
 from astrbot.core.message.message_event_result import MessageChain, MessageEventResult
 from astrbot.core.provider.entities import LLMResponse, ProviderRequest
-from astrbot_host.native_extensions.host_events import (
+from digital_life_host.native_extensions.host_events import (
     observe_native_host_response, observe_native_host_result, prepare_native_host_request,
 )
-from astrbot_host.native_extensions.game.model_methods import GameModelMethods
-from astrbot_host.native_extensions.game.rooms_methods import GameRoomsMethods
-from astrbot_host.native_extensions.live.l2d_mixin import Live2DMixin
-from astrbot_host.native_extensions.live.soullink_mixin import SoullinkMixin
-from astrbot_host.native_extensions.live.subtitle_mixin import SubtitleMixin
-from companion_v2.games.models import GameRoom
-from companion_v2.games.turtle_soup import TurtleSoupGame
+from digital_life_host.native_extensions.game.model_methods import GameModelMethods
+from digital_life_host.native_extensions.game.rooms_methods import GameRoomsMethods
+from digital_life_host.native_extensions.live.l2d_mixin import Live2DMixin
+from digital_life_host.native_extensions.live.soullink_mixin import SoullinkMixin
+from digital_life_host.native_extensions.live.subtitle_mixin import SubtitleMixin
+from digital_life_core.games.models import GameRoom
+from digital_life_core.games.turtle_soup import TurtleSoupGame
 
 
 class HostEvent:
@@ -157,7 +157,7 @@ class NativeHostEventTests(unittest.IsolatedAsyncioTestCase):
         game = NS(_host_event_owner=NS(request=Mock(side_effect=RuntimeError("fixture failure"))))
         host, _ = controller(game=game, live=LocalLive())
         req = ProviderRequest(system_prompt="AstrBot 基础人格")
-        with self.assertLogs("astrbot_host.native_extensions.host_events", level="WARNING"):
+        with self.assertLogs("digital_life_host.native_extensions.host_events", level="WARNING"):
             prepare_native_host_request(host, HostEvent(), req)
         self.assertIn("AstrBot 基础人格", req.system_prompt)
         self.assertIn("今天的声音好可爱", context_text(req))
@@ -187,7 +187,7 @@ class NativeHostEventTests(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(response.completion_text, "诶，这个好有意思！\n\n我刚读到的。")
         runtime._trigger_l2d_tags.assert_not_awaited()
         runtime._soullink_runtime.trigger.assert_not_awaited()
-        with self.assertLogs("astrbot_host.native_extensions.live.host_events", level="WARNING"):
+        with self.assertLogs("digital_life_host.native_extensions.live.host_events", level="WARNING"):
             await drain(runtime)
         runtime._trigger_l2d_tags.assert_awaited_once_with(["开心"])
         self.assertEqual(runtime._soullink_runtime.trigger.await_args.args[0]["emotion"], "happy")
@@ -277,7 +277,7 @@ class NativeHostEventTests(unittest.IsolatedAsyncioTestCase):
                      data={"users": {}}, _user=lambda user_id, **kwargs: None,
                      v2_host_api=lambda: NS(_reality_context=NS(target=lambda user_id, **kwargs: None)))
         host, _ = controller(reality=runtime)
-        camera = NS(_action="reality.camera.observe", name="companion_v2_reality_camera_observe")
+        camera = NS(_action="reality.camera.observe", name="digital_life_core_reality_camera_observe")
         for private, text, tools in ((False, "看看摄像头", [camera]), (True, "今天好累", [camera]),
                                      (True, "看看摄像头", [])):
             req = ProviderRequest(system_prompt="原提示", func_tool=NS(tools=tools))

@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import unittest
 
-from astrbot_host.core_reply_cleanup import clean_reply_text
+from digital_life_host.core_reply_cleanup import clean_reply_text
 
 
 class ReplyCleanupTests(unittest.TestCase):

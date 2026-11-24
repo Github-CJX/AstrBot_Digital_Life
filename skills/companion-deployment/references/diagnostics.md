@@ -5,7 +5,7 @@ Use these checks in order. Prefer read-only calls. Do not print secrets.
 ## Host status
 
 ```text
-GET /api/plug/astrbot_plugin_private_companion/host/status
+GET /api/plug/astrbot_plugin_digital_life/host/status
 ```
 
 Look for:
@@ -19,7 +19,7 @@ If the plugin route is missing, check AstrBot plugin logs and whether the plugin
 ## Target and role catalog
 
 ```text
-GET /api/plug/astrbot_plugin_private_companion/page/targets
+GET /api/plug/astrbot_plugin_digital_life/page/targets
 ```
 
 Confirm:
@@ -32,7 +32,7 @@ Confirm:
 ## Model task status
 
 ```text
-GET /api/plug/astrbot_plugin_private_companion/host/targets/<target>/roles/<role>/model
+GET /api/plug/astrbot_plugin_digital_life/host/targets/<target>/roles/<role>/model
 ```
 
 Confirm the task's selected Provider appears in `providers` and the task has no `model_provider_unavailable` failure.

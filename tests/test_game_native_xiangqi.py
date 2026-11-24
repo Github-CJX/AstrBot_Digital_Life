@@ -7,9 +7,9 @@ import tempfile
 from types import SimpleNamespace
 import unittest
 
-from companion_v2.capabilities.native import parse_manifest
-from companion_v2.games.native import provider as game_provider
-from companion_v2.product import PRODUCT_VERSION
+from digital_life_core.capabilities.native import parse_manifest
+from digital_life_core.games.native import provider as game_provider
+from digital_life_core.product import PRODUCT_VERSION
 from tests.native_internal_support import internal_registry
 from tests.test_game_native_pig_dice import request
 

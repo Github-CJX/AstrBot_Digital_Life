@@ -2,10 +2,10 @@
 
 Production slow-query logs identified four high-frequency read paths on large
 stores:
-1. ``companion_v2.conversation.native_history.rows``
-2. ``companion_v2.expression.private_scope.private_people`` / ``role_private_contexts``
-3. ``companion_v2.conversation.scope_family._windows`` (group & private families)
-4. ``companion_v2.conversation.native_turns.context_rows`` / ``latest`` / ``latest_input``
+1. ``digital_life_core.conversation.native_history.rows``
+2. ``digital_life_core.expression.private_scope.private_people`` / ``role_private_contexts``
+3. ``digital_life_core.conversation.scope_family._windows`` (group & private families)
+4. ``digital_life_core.conversation.native_turns.context_rows`` / ``latest`` / ``latest_input``
 
 Each test captures the exact SQL statement emitted by the production function
 against a real ``StorageRuntime`` and verifies SQLite serves it via index
@@ -23,20 +23,20 @@ from types import SimpleNamespace
 import unittest
 from unittest import mock
 
-from companion_v2.conversation import native_history
-from companion_v2.conversation.native_turns import (
+from digital_life_core.conversation import native_history
+from digital_life_core.conversation.native_turns import (
     NativeConversationTurns,
     context_rows,
     latest,
     latest_input,
 )
-from companion_v2.conversation.scope_family import group_scope_keys, private_scope_keys
-from companion_v2.execution.models import TaskContext, encode, stamp
-from companion_v2.expression.private_scope import private_people
-from companion_v2.foundation.outcome import Outcome
-from companion_v2.foundation.refs import AudienceRef, ScopeKind, ScopeRef, SubjectKind, SubjectRef
-from companion_v2.identity_policy.models import AuthenticatedHostPrincipal, ResolvedIdentity, RoleBinding
-from companion_v2.storage.runtime import StorageRuntime
+from digital_life_core.conversation.scope_family import group_scope_keys, private_scope_keys
+from digital_life_core.execution.models import TaskContext, encode, stamp
+from digital_life_core.expression.private_scope import private_people
+from digital_life_core.foundation.outcome import Outcome
+from digital_life_core.foundation.refs import AudienceRef, ScopeKind, ScopeRef, SubjectKind, SubjectRef
+from digital_life_core.identity_policy.models import AuthenticatedHostPrincipal, ResolvedIdentity, RoleBinding
+from digital_life_core.storage.runtime import StorageRuntime
 
 
 INSTALLATION_ID = "native-index-plan-inst"

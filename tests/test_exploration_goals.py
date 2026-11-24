@@ -5,14 +5,14 @@ from datetime import timedelta
 from types import SimpleNamespace as NS
 import unittest
 
-from companion_v2.foundation.refs import ScopeKind
-from companion_v2.proactive.exploration import (
+from digital_life_core.foundation.refs import ScopeKind
+from digital_life_core.proactive.exploration import (
     ExplorationEvents,
     build_queries,
     plan_goals,
     score_item,
 )
-from companion_v2.proactive.external_materials import NewsItem, ParseBatch
+from digital_life_core.proactive.external_materials import NewsItem, ParseBatch
 from tests.test_management_access import NOW
 
 

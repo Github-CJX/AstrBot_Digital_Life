@@ -13,7 +13,7 @@
 
 ## 1. 安装插件
 
-- 面板 →「插件」→ 安装 `astrbot_plugin_private_companion`（插件市场，或上传仓库 zip）；
+- 面板 →「插件」→ 安装 `astrbot_plugin_digital_life`（插件市场，或上传仓库 zip）；
 - 安装后重载插件，确认无加载报错；
 - 左侧「插件页面」应出现 **我会永远陪着你**（陪伴小屋）。
 
@@ -99,7 +99,7 @@
 
 ## 8. 数据与升级
 
-- 插件数据在 `data/plugin_data/astrbot_plugin_private_companion`，**不在插件代码目录**；
+- 插件数据在 `data/plugin_data/astrbot_plugin_digital_life`，**不在插件代码目录**；
 - 升级插件只替换代码，数据会保留；
 - 迁移机器时先做「资料与维护 → 备份」，再在新机器恢复；
 - 不要把旧版插件目录里的 `data/` 手动搬进新代码目录。

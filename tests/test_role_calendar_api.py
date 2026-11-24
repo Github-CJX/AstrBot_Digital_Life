@@ -9,9 +9,9 @@ from tests import test_astrbot_multi_state as multi_support
 from tests.multi_host_support import MultiFixture
 from tests.test_management_access import NOW
 from tests.test_role_state import calendar_data
-from companion_v2.agenda.models import Frequency, Schedule
-from companion_v2.execution.models import encode
-from companion_v2.identity_policy.models import AuthorizationTier
+from digital_life_core.agenda.models import Frequency, Schedule
+from digital_life_core.execution.models import encode
+from digital_life_core.identity_policy.models import AuthorizationTier
 
 
 class CalendarAPITests(unittest.IsolatedAsyncioTestCase):

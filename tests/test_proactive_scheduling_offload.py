@@ -5,7 +5,7 @@ import threading
 import unittest
 from types import SimpleNamespace
 
-from companion_v2.proactive.scheduling import ContactSchedule
+from digital_life_core.proactive.scheduling import ContactSchedule
 
 
 class ContactScheduleOffloadTests(unittest.IsolatedAsyncioTestCase):

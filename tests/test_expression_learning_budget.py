@@ -17,9 +17,9 @@ same budget question, so the trim policy is pinned here.
 
 import unittest
 
-from companion_v2.expression import learning
-from companion_v2.expression.configuration import MODES
-from companion_v2.expression.style_service import (MAX_TRIM_ROUNDS, MIN_EXISTING_RULES, RULE_READ_LIMIT,
+from digital_life_core.expression import learning
+from digital_life_core.expression.configuration import MODES
+from digital_life_core.expression.style_service import (MAX_TRIM_ROUNDS, MIN_EXISTING_RULES, RULE_READ_LIMIT,
     learning_instruction, reference_rule_priority, trim_reference_rules, trim_rounds)
 
 

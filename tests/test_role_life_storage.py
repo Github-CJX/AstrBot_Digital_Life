@@ -3,8 +3,8 @@ import sqlite3
 import unittest
 from unittest.mock import patch
 
-from companion_v2.storage.runtime import StorageOpenError, StorageRuntime
-from companion_v2.storage.schema import (
+from digital_life_core.storage.runtime import StorageOpenError, StorageRuntime
+from digital_life_core.storage.schema import (
     SCHEMA_VERSION, SCHEMA_VERSION_V14, SCHEMA_VERSION_V15, SCHEMA_VERSION_V16, V15_REQUIRED_TABLES, V16_MIGRATION_STATEMENTS,
     MIGRATION_V14_TO_V15_ID, MIGRATION_V14_TO_V15_FINGERPRINT,
     MIGRATION_V15_TO_V16_ID, MIGRATION_V15_TO_V16_FINGERPRINT,
@@ -50,7 +50,7 @@ class RoleLifeStorageTests(ModelFixture, unittest.IsolatedAsyncioTestCase):
         self.assertEqual(len(self.called), 1)
 
     async def test_failed_upgrade_rolls_back_all_new_tables_and_version(self):
-        with patch("companion_v2.storage.runtime.V16_MIGRATION_STATEMENTS", V16_MIGRATION_STATEMENTS + ("INVALID UPGRADE",)):
+        with patch("digital_life_core.storage.runtime.V16_MIGRATION_STATEMENTS", V16_MIGRATION_STATEMENTS + ("INVALID UPGRADE",)):
             with self.assertRaises(StorageOpenError):
                 StorageRuntime.open(data_root=self.root, installation_id=INSTALLATION)
         self.assertEqual(self.version(), SCHEMA_VERSION_V15)

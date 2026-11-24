@@ -7,12 +7,12 @@ from unittest.mock import patch
 
 from tests import test_private_account_links as fixtures
 from tests.test_private_account_links import context, NOW
-from companion_v2.relationships.account_link_memory import (
+from digital_life_core.relationships.account_link_memory import (
     CONFIRMATION, HISTORY_CONFIRMATION, read_scope,
 )
-from companion_v2.relationships.account_links import member_for
-from companion_v2.adapters.astrbot.memory_providers import ExternalMemoryProviderRegistry
-from companion_v2.execution.models import TaskError
+from digital_life_core.relationships.account_links import member_for
+from digital_life_core.adapters.astrbot.memory_providers import ExternalMemoryProviderRegistry
+from digital_life_core.execution.models import TaskError
 
 
 class MemoryConsentTests(unittest.TestCase):
@@ -100,7 +100,7 @@ class MemoryLeaseTests(unittest.TestCase):
 
     def test_expiry_and_unregister_revoke_lease(self):
         issued = self.issue()
-        with patch("companion_v2.adapters.astrbot.memory_providers.monotonic", return_value=float("inf")):
+        with patch("digital_life_core.adapters.astrbot.memory_providers.monotonic", return_value=float("inf")):
             with self.assertRaises(TaskError):
                 self.registry.authorize_memory_read(issued)
         self.registry.unregister(self.entry.registration_id)

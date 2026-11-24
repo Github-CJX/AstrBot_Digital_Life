@@ -6,7 +6,7 @@ const {chromium} = require("playwright");
 const ROOT = path.resolve(process.env.COMPANION_SOURCE_ROOT || path.join(__dirname, ".."));
 const PAGE = path.join(ROOT, "pages", "陪伴小屋");
 const HOST_ROOT = process.env.COMPANION_HOST_ROOT || path.resolve(__dirname, "../../../..");
-const HOST = "astrbot_plugin_private_companion", TOKEN = "synthetic-output-qa";
+const HOST = "astrbot_plugin_digital_life", TOKEN = "synthetic-output-qa";
 const PREFIX = "/api/plugin/page/content/" + HOST + "/" + encodeURIComponent("陪伴小屋") + "/";
 const ROLE = "host/targets/first/roles/role-a";
 const ok = data => ({status: "ok", data});
@@ -22,15 +22,15 @@ with tempfile.TemporaryDirectory(prefix="output-page-qa-") as data_root:
     os.environ["ASTRBOT_ROOT"] = data_root
     from astrbot.dashboard.services.plugin_page_service import PluginPageService
     from tools.host_page_render import render_css, render_html
-    from companion_v2.configuration.registry import FieldRegistry
-    from companion_v2.configuration.contract import contract_of
-    from companion_v2.conversation.media import output_settings, quota, review
-    from companion_v2.references import configuration, wardrobe
-    from companion_v2.conversation.content import authoring_service
+    from digital_life_core.configuration.registry import FieldRegistry
+    from digital_life_core.configuration.contract import contract_of
+    from digital_life_core.conversation.media import output_settings, quota, review
+    from digital_life_core.references import configuration, wardrobe
+    from digital_life_core.conversation.content import authoring_service
     root, sections = Path.cwd(), {}
     page = root / "pages" / "陪伴小屋"
     service = PluginPageService(SimpleNamespace(plugin_store_path=str(root.parent)))
-    query, args = {"asset_token":"synthetic-output-qa"}, ("astrbot_plugin_private_companion","陪伴小屋")
+    query, args = {"asset_token":"synthetic-output-qa"}, ("astrbot_plugin_digital_life","陪伴小屋")
     assets = {"index.html":render_html(service,(page/"index.html").read_text(encoding="utf-8"),*args,file_name="index.html",theme="light",extra_query_params=query)}
     for css in page.glob("*.css"):
         assets[css.name] = render_css(service,css.read_text(encoding="utf-8"),*args,file_name=css.name,extra_query_params=query)
@@ -64,7 +64,7 @@ with tempfile.TemporaryDirectory(prefix="output-page-qa-") as data_root:
   function api(method,endpoint,body,query){
     if(method==="GET"){
       if(endpoint==="page/targets")return ok({installation_id:"synthetic-installation",targets:[{target_id:"first",scope_kind:"private",participant_id:"200",platform_id:"qq-main",account_id:"100",bot_id:"bot-a",roles:[{role_id:"role-a",role_name:"澄汐",config_api:"/"+HOST+"/"+ROLE+"/config",model_api:"/"+HOST+"/"+ROLE+"/model",image_material_api:"/"+HOST+"/"+ROLE+"/image-materials"}]}]});
-      if(endpoint==="integration/manifest")return ok({nai,extensions:["image","content"].map(id=>({capability_id:id,extension_id:id,owner:"companion_v2",label:id,integration_state:"connected",assembled:true,enabled:true,runtime_ready:true,integration_label:"可用"})),providers:[],summary:{connected_count:2,extension_ready_count:2,provider_count:0}});
+      if(endpoint==="integration/manifest")return ok({nai,extensions:["image","content"].map(id=>({capability_id:id,extension_id:id,owner:"digital_life_core",label:id,integration_state:"connected",assembled:true,enabled:true,runtime_ready:true,integration_label:"可用"})),providers:[],summary:{connected_count:2,extension_ready_count:2,provider_count:0}});
       if(endpoint===ROLE+"/config")return ok({sections:Object.fromEntries(Object.entries(sections).filter(([kind])=>!query.sections||query.sections.split(",").includes(kind)).map(([kind,value])=>[kind,structuredClone(value)]))});
       if(endpoint===ROLE+"/model/image/output")return ok(snapshot());
       if(endpoint===ROLE+"/model/image/review/providers")return ok({providers:[{id:"vision-a",name:"视觉审核"}]});

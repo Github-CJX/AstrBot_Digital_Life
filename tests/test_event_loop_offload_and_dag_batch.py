@@ -12,9 +12,9 @@ from types import SimpleNamespace
 import unittest
 from unittest import mock
 
-from companion_v2.execution.models import TaskContext, TaskError, digest, encode
-from companion_v2.foundation.outcome import Outcome
-from companion_v2.foundation.refs import (
+from digital_life_core.execution.models import TaskContext, TaskError, digest, encode
+from digital_life_core.foundation.outcome import Outcome
+from digital_life_core.foundation.refs import (
     AudienceRef,
     ScopeKind,
     ScopeRef,
@@ -23,26 +23,26 @@ from companion_v2.foundation.refs import (
     SubjectRef,
     VersionRef,
 )
-from companion_v2.identity_policy.models import (
+from digital_life_core.identity_policy.models import (
     AuthenticatedHostPrincipal,
     ResolvedIdentity,
     RoleBinding,
 )
-from companion_v2.model_gateway.cache_diagnostics import checked_signature_record
-from companion_v2.model_gateway.core_observations import (
+from digital_life_core.model_gateway.cache_diagnostics import checked_signature_record
+from digital_life_core.model_gateway.core_observations import (
     observations_for_role,
     observations_with_scope_for_role,
     record_observation,
     request_rows,
 )
-from companion_v2.model_gateway.management import _cache_diagnostic_summary
-from companion_v2.model_gateway.models import CacheSignature
-from companion_v2.model_gateway.reply_efficiency import reply_efficiency_report
-from companion_v2.role_work.state.ownership import RoleStateRecords
-from companion_v2.sources import dependencies, governance
-from companion_v2.sources.models import SourceRecord
-from companion_v2.sources.repositories import SourceRepository
-from companion_v2.storage.runtime import StorageRuntime
+from digital_life_core.model_gateway.management import _cache_diagnostic_summary
+from digital_life_core.model_gateway.models import CacheSignature
+from digital_life_core.model_gateway.reply_efficiency import reply_efficiency_report
+from digital_life_core.role_work.state.ownership import RoleStateRecords
+from digital_life_core.sources import dependencies, governance
+from digital_life_core.sources.models import SourceRecord
+from digital_life_core.sources.repositories import SourceRepository
+from digital_life_core.storage.runtime import StorageRuntime
 
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
@@ -136,17 +136,17 @@ def _sample_cache_signature(**overrides):
 
 
 class ArchitectureAndModelOptimizationTests(unittest.TestCase):
-    def test_companion_v2_does_not_import_astrbot_host(self):
+    def test_digital_life_core_does_not_import_digital_life_host(self):
         offenders = []
-        for path in (REPO_ROOT / "companion_v2").rglob("*.py"):
+        for path in (REPO_ROOT / "digital_life_core").rglob("*.py"):
             tree = ast.parse(path.read_text(encoding="utf-8-sig"), filename=str(path))
             for node in ast.walk(tree):
                 if isinstance(node, ast.Import):
                     for alias in node.names:
-                        if alias.name == "astrbot_host" or alias.name.startswith("astrbot_host."):
+                        if alias.name == "digital_life_host" or alias.name.startswith("digital_life_host."):
                             offenders.append((path.relative_to(REPO_ROOT), alias.name))
                 elif isinstance(node, ast.ImportFrom) and node.module:
-                    if node.module == "astrbot_host" or node.module.startswith("astrbot_host."):
+                    if node.module == "digital_life_host" or node.module.startswith("digital_life_host."):
                         offenders.append((path.relative_to(REPO_ROOT), node.module))
         self.assertEqual(offenders, [])
 
@@ -184,7 +184,7 @@ class ArchitectureAndModelOptimizationTests(unittest.TestCase):
     def test_checked_signature_record_lazy_fallback_digest(self):
         h = "b" * 64
         v5 = _sample_cache_signature(model_hash=h, context_sequence_hash=h).to_record()
-        with mock.patch("companion_v2.model_gateway.cache_diagnostics.digest", side_effect=AssertionError("eager digest")):
+        with mock.patch("digital_life_core.model_gateway.cache_diagnostics.digest", side_effect=AssertionError("eager digest")):
             parsed = checked_signature_record(v5)
         self.assertIsNotNone(parsed)
         self.assertEqual(parsed.context_sequence_hash, h)
@@ -464,7 +464,7 @@ class ValidationBatchTransactionAndRegressionTests(unittest.TestCase):
             self.assertTrue(records.shared_source(ctx, state_src))
 
     def test_state_evidence_control_validated_skips_duplicate_root_check_when_unguarded(self):
-        from companion_v2.role_work.state.evidence import StateEvidence
+        from digital_life_core.role_work.state.evidence import StateEvidence
 
         runtime, repo, ctx = self._open_repo()
         records = RoleStateRecords(runtime)
@@ -509,9 +509,9 @@ class EventLoopOffloadTests(unittest.IsolatedAsyncioTestCase):
         return result, ticks
 
     async def test_web_apis_offload_to_worker_thread_without_blocking_loop(self):
-        from astrbot_host.life_api import LifeWebAPI
-        from astrbot_host.native_perception_api import NativePerceptionWebAPI
-        from astrbot_host.state_api import StateWebAPI
+        from digital_life_host.life_api import LifeWebAPI
+        from digital_life_host.native_perception_api import NativePerceptionWebAPI
+        from digital_life_host.state_api import StateWebAPI
 
         loop_thread = threading.get_ident()
         seen_threads = {}
@@ -523,7 +523,7 @@ class EventLoopOffloadTests(unittest.IsolatedAsyncioTestCase):
                 return value
             return inner
 
-        from companion_v2.role_work.state.configuration import DEFAULTS as STATE_DEFAULTS, GROUP as STATE_GROUP
+        from digital_life_core.role_work.state.configuration import DEFAULTS as STATE_DEFAULTS, GROUP as STATE_GROUP
         fake_controller = SimpleNamespace(
             _control_lock=_DummyLock(),
             _terminated=False,
@@ -546,20 +546,20 @@ class EventLoopOffloadTests(unittest.IsolatedAsyncioTestCase):
 
         # 1) StateWebAPI.status
         fake_state_mgr = SimpleNamespace(status=slow_sync("state_status", Outcome.success({"ok": True})))
-        with (mock.patch("astrbot_host.state_api.request", fake_req),
-              mock.patch("astrbot_host.state_api.dashboard_operator", return_value="op"),
-              mock.patch("astrbot_host.state_api.StateManagement", return_value=fake_state_mgr),
-              mock.patch("astrbot_host.web_api.outcome_response", side_effect=lambda o: o)):
+        with (mock.patch("digital_life_host.state_api.request", fake_req),
+              mock.patch("digital_life_host.state_api.dashboard_operator", return_value="op"),
+              mock.patch("digital_life_host.state_api.StateManagement", return_value=fake_state_mgr),
+              mock.patch("digital_life_host.web_api.outcome_response", side_effect=lambda o: o)):
             out, ticks = await self._measure_concurrent_ticks(StateWebAPI(fake_controller).status())
         self.assertTrue(out.is_success)
         self.assertGreaterEqual(ticks, 3)
         self.assertNotEqual(seen_threads["state_status"], loop_thread)
 
         # 2) StateWebAPI.weather
-        with (mock.patch("astrbot_host.state_api.request", fake_req),
-              mock.patch("astrbot_host.state_api.dashboard_operator", return_value="op"),
-              mock.patch("astrbot_host.state_api.StateManagement") as sm_cls,
-              mock.patch("astrbot_host.web_api.outcome_response", side_effect=lambda o: o)):
+        with (mock.patch("digital_life_host.state_api.request", fake_req),
+              mock.patch("digital_life_host.state_api.dashboard_operator", return_value="op"),
+              mock.patch("digital_life_host.state_api.StateManagement") as sm_cls,
+              mock.patch("digital_life_host.web_api.outcome_response", side_effect=lambda o: o)):
             sm_cls.return_value.life.authorize = lambda _op: None
             fake_controller.session.application.runtime = SimpleNamespace(read_snapshot=contextlib.nullcontext)
             out, ticks = await self._measure_concurrent_ticks(StateWebAPI(fake_controller).weather())
@@ -573,10 +573,10 @@ class EventLoopOffloadTests(unittest.IsolatedAsyncioTestCase):
             authorize=slow_sync("life_auth", None),
             command=mock.AsyncMock(return_value=Outcome.success({"done": True})),
         )
-        with (mock.patch("astrbot_host.life_api.request", fake_req),
-              mock.patch("astrbot_host.life_api.dashboard_operator", return_value="op"),
-              mock.patch("astrbot_host.life_api.RoleLifeManagement", return_value=fake_life_mgr),
-              mock.patch("astrbot_host.web_api.outcome_response", side_effect=lambda o: o)):
+        with (mock.patch("digital_life_host.life_api.request", fake_req),
+              mock.patch("digital_life_host.life_api.dashboard_operator", return_value="op"),
+              mock.patch("digital_life_host.life_api.RoleLifeManagement", return_value=fake_life_mgr),
+              mock.patch("digital_life_host.web_api.outcome_response", side_effect=lambda o: o)):
             out, ticks = await self._measure_concurrent_ticks(LifeWebAPI(fake_controller).status())
             self.assertTrue(out.is_success)
             self.assertGreaterEqual(ticks, 3)
@@ -587,7 +587,7 @@ class EventLoopOffloadTests(unittest.IsolatedAsyncioTestCase):
                 query={},
                 body=mock.AsyncMock(return_value=b'{"action":"diary","local_date":"2026-11-19"}'),
             )
-            with mock.patch("astrbot_host.life_api.request", fake_cmd_req):
+            with mock.patch("digital_life_host.life_api.request", fake_cmd_req):
                 out_cmd, ticks_cmd = await self._measure_concurrent_ticks(LifeWebAPI(fake_controller).command())
             self.assertTrue(out_cmd.is_success)
             self.assertGreaterEqual(ticks_cmd, 3)
@@ -607,24 +607,24 @@ class EventLoopOffloadTests(unittest.IsolatedAsyncioTestCase):
 
         fake_controller.session.application.contact_schedule.news_events.maintain_role = maintain_role_on_loop
         perc = NativePerceptionWebAPI(fake_controller)
-        with (mock.patch("astrbot_host.native_perception_api.request", fake_req),
-              mock.patch("astrbot_host.native_perception_api.dashboard_operator", return_value="op"),
+        with (mock.patch("digital_life_host.native_perception_api.request", fake_req),
+              mock.patch("digital_life_host.native_perception_api.dashboard_operator", return_value="op"),
               mock.patch.object(perc, "_status", slow_sync("perc_status", {
                   "model": {"settings": {"calendar_enabled": False}},
                   "environment": {"settings": {"planning_weather_enabled": False}},
               })),
-              mock.patch("astrbot_host.native_perception_api.ContactManagement",
+              mock.patch("digital_life_host.native_perception_api.ContactManagement",
                          return_value=SimpleNamespace(status=lambda _op: Outcome.success({"settings": {}}))),
               mock.patch.object(perc, "_weather_snapshot", new=mock.AsyncMock(return_value={"status": "disabled"})),
               mock.patch.object(perc, "_screen_snapshot", side_effect=slow_sync("perc_screen", {})),
               mock.patch.object(perc, "_reality_snapshot", return_value={}),
               mock.patch.object(perc, "_reality_camera_snapshot", return_value={}),
               mock.patch.object(perc, "_other_injections", return_value={}),
-              mock.patch("astrbot_host.native_perception_api.ProactiveContactManagement",
+              mock.patch("digital_life_host.native_perception_api.ProactiveContactManagement",
                          return_value=SimpleNamespace(status=slow_sync("perc_contact", Outcome.success({"settings": {}})))),
-              mock.patch("astrbot_host.native_perception_api.read_role_material_pool",
+              mock.patch("digital_life_host.native_perception_api.read_role_material_pool",
                          side_effect=slow_sync("perc_pool", {"items": [], "pool": {}, "summary": {}})),
-              mock.patch("astrbot_host.web_api.outcome_response", side_effect=lambda o: o)):
+              mock.patch("digital_life_host.web_api.outcome_response", side_effect=lambda o: o)):
             out_s, ticks_s = await self._measure_concurrent_ticks(perc.status())
             self.assertTrue(out_s.is_success)
             self.assertGreaterEqual(ticks_s, 3)
@@ -650,9 +650,9 @@ class EventLoopOffloadTests(unittest.IsolatedAsyncioTestCase):
             self.assertEqual(await maintain_tasks[0][1], "warmed")
 
     async def test_native_extensions_offload_to_worker_thread_without_blocking_loop(self):
-        from astrbot_host.native_extensions.game.native_context import room_background as game_room_background
-        from astrbot_host.native_extensions.reality.host_context import RealityHostContext
-        from astrbot_host.native_extensions.together.native_context import (
+        from digital_life_host.native_extensions.game.native_context import room_background as game_room_background
+        from digital_life_host.native_extensions.reality.host_context import RealityHostContext
+        from digital_life_host.native_extensions.together.native_context import (
             room_background as together_room_background,
             room_work_context as together_room_work_context,
         )
@@ -670,7 +670,7 @@ class EventLoopOffloadTests(unittest.IsolatedAsyncioTestCase):
 
         resolved = SimpleNamespace(application=object(), context=ctx, persona_prompt="p")
         game_rt = SimpleNamespace(private_qq_game_context_enabled=True, controller=SimpleNamespace(now=lambda: NOW))
-        with mock.patch("astrbot_host.native_extensions.game.native_context.build_core_reply_prompt",
+        with mock.patch("digital_life_host.native_extensions.game.native_context.build_core_reply_prompt",
                         side_effect=slow_prompt("game", "game-bg")):
             out, ticks = await self._measure_concurrent_ticks(
                 game_room_background(game_rt, "room-1", "user-1", "hi", resolved=resolved)
@@ -693,9 +693,9 @@ class EventLoopOffloadTests(unittest.IsolatedAsyncioTestCase):
             controller=SimpleNamespace(now=lambda: NOW),
         )
         together_resolved = SimpleNamespace(application=together_app, context=ctx)
-        with (mock.patch("astrbot_host.native_extensions.together.native_context.resolve_room_context",
+        with (mock.patch("digital_life_host.native_extensions.together.native_context.resolve_room_context",
                          new=mock.AsyncMock(return_value=together_resolved)),
-              mock.patch("astrbot_host.native_extensions.together.native_context.build_core_reply_prompt",
+              mock.patch("digital_life_host.native_extensions.together.native_context.build_core_reply_prompt",
                          side_effect=slow_prompt("together_bg", "together-bg"))):
             bg, ticks_bg = await self._measure_concurrent_ticks(together_room_background(together_rt, "r", "q"))
             self.assertEqual(bg, "together-bg")
@@ -714,8 +714,8 @@ class EventLoopOffloadTests(unittest.IsolatedAsyncioTestCase):
             return [{"role": "user", "text": "hello"}]
 
         from dataclasses import asdict
-        from companion_v2.conversation.reply_settings import VOICE_FIELDS
-        from companion_v2.conversation.voice_reply import VoiceReplyPolicy
+        from digital_life_core.conversation.reply_settings import VOICE_FIELDS
+        from digital_life_core.conversation.voice_reply import VoiceReplyPolicy
 
         voice_defaults = {
             f"voice_{k}": v for k, v in asdict(VoiceReplyPolicy()).items() if k in VOICE_FIELDS
@@ -744,7 +744,7 @@ class EventLoopOffloadTests(unittest.IsolatedAsyncioTestCase):
               mock.patch.object(host_ctx, "verified_persona",
                                 new=mock.AsyncMock(return_value={"prompt": "persona"})),
               mock.patch.object(host_ctx, "origin", return_value="test:FriendMessage:user-1"),
-              mock.patch("astrbot_host.core_reply_context.build_core_reply_prompt",
+              mock.patch("digital_life_host.core_reply_context.build_core_reply_prompt",
                          side_effect=slow_prompt("reality_bg", "scene"))):
             rt_res, ticks_rt = await self._measure_concurrent_ticks(host_ctx.realtime("user-1"))
             self.assertTrue(rt_res["available"])
@@ -752,7 +752,7 @@ class EventLoopOffloadTests(unittest.IsolatedAsyncioTestCase):
             self.assertNotEqual(seen_threads["reality_bg"], loop_thread)
             self.assertNotEqual(seen_threads["reality_hist"], loop_thread)
 
-            with mock.patch("astrbot_host.voice.NativeVoiceReply") as voice_cls:
+            with mock.patch("digital_life_host.voice.NativeVoiceReply") as voice_cls:
                 voice_cls.return_value.render = mock.AsyncMock(return_value=None)
                 syn_res, ticks_syn = await self._measure_concurrent_ticks(host_ctx.synthesize("hi", user_id="user-1"))
             self.assertFalse(syn_res["success"])

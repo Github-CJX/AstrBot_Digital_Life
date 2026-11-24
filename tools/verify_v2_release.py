@@ -67,11 +67,11 @@ def _verify_v2_contracts(core: Path) -> dict[str, object]:
 
     sys.path.insert(0, str(core))
     try:
-        from companion_v2.adapters.astrbot.staging_config import StagingConfiguration
-        from companion_v2.legacy.catalog import CatalogAction, LEGACY_COMPATIBILITY_CATALOG
-        from companion_v2.legacy.configuration_migration import convert_account_configuration
-        from companion_v2.legacy.data_migration import build_data_plan, map_legacy_worldbook
-        from companion_v2.legacy.migration import HANDLERS
+        from digital_life_core.adapters.astrbot.staging_config import StagingConfiguration
+        from digital_life_core.legacy.catalog import CatalogAction, LEGACY_COMPATIBILITY_CATALOG
+        from digital_life_core.legacy.configuration_migration import convert_account_configuration
+        from digital_life_core.legacy.data_migration import build_data_plan, map_legacy_worldbook
+        from digital_life_core.legacy.migration import HANDLERS
 
         fields = {field.name: field for field in dataclasses.fields(StagingConfiguration)}
         if fields["delivery_mode"].default != "onebot_private":
@@ -82,7 +82,7 @@ def _verify_v2_contracts(core: Path) -> dict[str, object]:
         if fixture.delivery_mode != "onebot_private":
             raise ValueError("legacy preview fixture did not normalize to onebot_private")
 
-        weather_path = core / "companion_v2" / "legacy" / "weather_migration.py"
+        weather_path = core / "digital_life_core" / "legacy" / "weather_migration.py"
         if not weather_path.is_file():
             raise ValueError("weather migration source missing from release")
         expected_handlers = frozenset({"v2.private-config-converter",

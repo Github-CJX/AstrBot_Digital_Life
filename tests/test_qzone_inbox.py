@@ -10,9 +10,9 @@ from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from tempfile import TemporaryDirectory
 
-from companion_v2.qzone.inbox import COOLDOWN, DUPLICATE, READY, SELF, CommentInbox, view_id
-from companion_v2.storage.repositories import InboxRepository
-from companion_v2.storage.runtime import StorageRuntime
+from digital_life_core.qzone.inbox import COOLDOWN, DUPLICATE, READY, SELF, CommentInbox, view_id
+from digital_life_core.storage.repositories import InboxRepository
+from digital_life_core.storage.runtime import StorageRuntime
 
 
 NOW = datetime(2026, 9, 30, 12, 0, tzinfo=timezone.utc)

@@ -8,9 +8,9 @@ from contextlib import closing
 from pathlib import Path
 import unittest
 
-from companion_v2.configuration.models import ConfigLayer
-from companion_v2.configuration.registry import FieldDefinition, FieldRegistry, ValueKind
-from companion_v2.legacy.configuration_migration import (
+from digital_life_core.configuration.models import ConfigLayer
+from digital_life_core.configuration.registry import FieldDefinition, FieldRegistry, ValueKind
+from digital_life_core.legacy.configuration_migration import (
     configuration_audit_sources,
     configuration_rules,
     configuration_exclusions,
@@ -179,7 +179,7 @@ class RuleTableTests(unittest.TestCase):
                          "semantic.slang_web_search_enabled")
 
     def test_holiday_switch_and_region_are_applied_to_live_perception_fields(self):
-        from companion_v2.conversation.perception_settings import configuration_fields
+        from digital_life_core.conversation.perception_settings import configuration_fields
 
         fields = FieldRegistry(version="migration-perception", fields=configuration_fields())
         rules = tuple(item for item in configuration_rules()
@@ -195,7 +195,7 @@ class RuleTableTests(unittest.TestCase):
         })
 
     def test_environment_master_switch_preserves_v1_disabled_behavior(self):
-        from companion_v2.conversation.perception_settings import configuration_fields
+        from digital_life_core.conversation.perception_settings import configuration_fields
 
         fields = FieldRegistry(version="migration-perception-master", fields=configuration_fields())
         result = convert_configuration({"basic_config": {
@@ -225,7 +225,7 @@ class RuleTableTests(unittest.TestCase):
         )
 
     def test_environment_master_switch_keeps_v2_child_preferences_when_enabled(self):
-        from companion_v2.conversation.perception_settings import configuration_fields
+        from digital_life_core.conversation.perception_settings import configuration_fields
 
         fields = FieldRegistry(version="migration-perception-master-enabled", fields=configuration_fields())
         result = convert_configuration({"basic_config": {
@@ -240,7 +240,7 @@ class RuleTableTests(unittest.TestCase):
         self.assertEqual(result.changes["conversation.perception.configured_modalities_enabled"], False)
 
     def test_model_perception_switch_covers_the_split_modalities_field(self):
-        from companion_v2.conversation.perception_settings import configuration_fields
+        from digital_life_core.conversation.perception_settings import configuration_fields
 
         fields = FieldRegistry(version="migration-model-perception", fields=configuration_fields())
         result = convert_configuration({"basic_config": {
@@ -287,9 +287,9 @@ class RuleTableTests(unittest.TestCase):
         self.assertIn("partial_mapping", {item.kind for item in state_result.differences})
 
     def test_recent_targets_exist_in_the_live_domain_field_contracts(self):
-        from companion_v2.conversation.reply_settings import configuration_fields as reply_fields
-        from companion_v2.conversation.segmentation import SegmentationPolicy
-        from companion_v2.role_work.state.configuration import configuration_fields as state_fields
+        from digital_life_core.conversation.reply_settings import configuration_fields as reply_fields
+        from digital_life_core.conversation.segmentation import SegmentationPolicy
+        from digital_life_core.role_work.state.configuration import configuration_fields as state_fields
 
         runtime_registry = FieldRegistry(version="configuration-migration.live-fields",
             fields=(*reply_fields(SegmentationPolicy(enabled=False), True, 1.5), *state_fields()))
@@ -343,7 +343,7 @@ class RuleTableTests(unittest.TestCase):
         self.assertNotIn("proactive.contact.weather_checkin_enabled", migration.changes)
 
     def test_semantic_rules_point_to_store_settings_with_explicit_contracts(self):
-        from companion_v2.storage.semantic import DEFAULTS, INTEGER_LIMITS, PROBABILITY_FIELDS, SETTING_OPTIONS
+        from digital_life_core.storage.semantic import DEFAULTS, INTEGER_LIMITS, PROBABILITY_FIELDS, SETTING_OPTIONS
 
         rules = semantic_configuration_rules()
         self.assertEqual(len(rules), 18)
@@ -424,13 +424,13 @@ class BehaviorConfigurationMigrationTests(unittest.TestCase):
                                 and item.kind == "manual_mapping" for item in result.differences))
 
     def convert(self, config):
-        from companion_v2.expression.configuration import configuration_fields as expression_fields
-        from companion_v2.proactive.configuration import configuration_fields as contact_fields
-        from companion_v2.role_work.state.configuration import configuration_fields as state_fields
-        from companion_v2.role_work.life.configuration import configuration_fields as life_fields
-        from companion_v2.conversation.media.quota import configuration_fields as quota_fields
-        from companion_v2.conversation.reply_settings import configuration_fields as reply_fields
-        from companion_v2.conversation.segmentation import SegmentationPolicy
+        from digital_life_core.expression.configuration import configuration_fields as expression_fields
+        from digital_life_core.proactive.configuration import configuration_fields as contact_fields
+        from digital_life_core.role_work.state.configuration import configuration_fields as state_fields
+        from digital_life_core.role_work.life.configuration import configuration_fields as life_fields
+        from digital_life_core.conversation.media.quota import configuration_fields as quota_fields
+        from digital_life_core.conversation.reply_settings import configuration_fields as reply_fields
+        from digital_life_core.conversation.segmentation import SegmentationPolicy
 
         fields = FieldRegistry(version="migration.behavior", fields=(
             *expression_fields(), *contact_fields(), *state_fields(), *life_fields(), *quota_fields(),
@@ -455,8 +455,8 @@ class BehaviorConfigurationMigrationTests(unittest.TestCase):
         self.assertIs(disabled.changes["proactive.contact.quiet_enabled"], False)
 
     def test_legacy_text_cleanup_migrates_into_the_presentation_fields(self):
-        from companion_v2.conversation.reply_settings import configuration_fields
-        from companion_v2.conversation.segmentation import SegmentationPolicy
+        from digital_life_core.conversation.reply_settings import configuration_fields
+        from digital_life_core.conversation.segmentation import SegmentationPolicy
 
         result = self.convert({"legacy_compat_config": {
             "enable_segmented_proactive_reply": True,
@@ -543,7 +543,7 @@ class BehaviorConfigurationMigrationTests(unittest.TestCase):
         self.assertNotIn("conversation.presentation.component_order", invalid.changes)
 
     def test_duplicate_split_words_remain_valid_for_the_actual_segmenter(self):
-        from companion_v2.conversation.segmentation import SegmentationPolicy
+        from digital_life_core.conversation.segmentation import SegmentationPolicy
 
         result = convert_plugin_configuration({"legacy_compat_config": {
             "segmented_proactive_split_words": ["~", "，", "~", "，", "。"]}})
@@ -833,7 +833,7 @@ class SemanticStoreMigrationTests(unittest.TestCase):
         import sqlite3
         from tempfile import TemporaryDirectory
 
-        from companion_v2.storage.semantic import SemanticStore
+        from digital_life_core.storage.semantic import SemanticStore
 
         with TemporaryDirectory() as temporary:
             path = Path(temporary) / "semantic-catalog.sqlite3"
@@ -857,7 +857,7 @@ class SemanticStoreMigrationTests(unittest.TestCase):
     def test_newly_configured_settings_are_marked_explicit(self):
         from tempfile import TemporaryDirectory
 
-        from companion_v2.storage.semantic import SemanticStore
+        from digital_life_core.storage.semantic import SemanticStore
 
         with TemporaryDirectory() as temporary:
             store = SemanticStore(Path(temporary))
@@ -1071,7 +1071,7 @@ class WindowedSegmentationMigrationTests(unittest.TestCase):
         )
 
         self.assertEqual(result.changes["knowledge.source_ids"], "lore-a\nlore-b")
-        from companion_v2.knowledge.configuration import _configured_list
+        from digital_life_core.knowledge.configuration import _configured_list
         self.assertEqual(_configured_list(result.changes["knowledge.source_ids"], limit=8),
                          ("lore-a", "lore-b"))
 
@@ -1397,9 +1397,9 @@ class SkillGrowthScheduleMigrationTests(unittest.TestCase):
 
 class ModelPolicyMigrationTests(unittest.TestCase):
     def test_routes_refusal_timeouts_streaming_and_cycle_preferences_reach_registered_fields(self):
-        from companion_v2.model_gateway.routing import configuration_fields
-        from companion_v2.model_gateway.models import ModelTaskProfile
-        from companion_v2.execution.models import Lane
+        from digital_life_core.model_gateway.routing import configuration_fields
+        from digital_life_core.model_gateway.models import ModelTaskProfile
+        from digital_life_core.execution.models import Lane
         profile=ModelTaskProfile('calendar.plan',Lane.FOREGROUND,'normal','Reply','',100)
         fields=FieldRegistry(version='migration-model',fields=configuration_fields((profile,)))
         source={'model_assignment_config':{'enable_llm_streaming':True,

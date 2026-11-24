@@ -10,10 +10,10 @@ from tests import astrbot_data_root  # Isolate the SDK before importing the host
 from astrbot.api.web import PluginRequest, bind_request_context
 from starlette.requests import Request
 
-from astrbot_host.management_identity import dashboard_operator
-from astrbot_host.native_extensions.screen_source import ScreenSourceSettings
-from astrbot_host.screen_access_api import ScreenAccessWebAPI, PREFIX
-from companion_v2.identity_policy.models import AuthorizationTier
+from digital_life_host.management_identity import dashboard_operator
+from digital_life_host.native_extensions.screen_source import ScreenSourceSettings
+from digital_life_host.screen_access_api import ScreenAccessWebAPI, PREFIX
+from digital_life_core.identity_policy.models import AuthorizationTier
 from tests.test_management_access import ManagementFixture, NOW
 
 

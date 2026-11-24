@@ -15,7 +15,7 @@ import tempfile
 import unittest
 from pathlib import Path
 
-from astrbot_host.binding_store import (
+from digital_life_host.binding_store import (
     BINDING_SCHEMA,
     PendingBinding,
     binding_path,

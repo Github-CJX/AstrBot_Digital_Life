@@ -9,7 +9,7 @@
     python tools/sync_runtime.py --check
     python tools/sync_runtime.py --plan
     python tools/sync_runtime.py --apply --plan-path <plan.json>
-    python tools/sync_runtime.py --plan --include companion_v2/conversation/media/quota.py
+    python tools/sync_runtime.py --plan --include digital_life_core/conversation/media/quota.py
 
 运行目录里的 ``data/``、``__pycache__/``、``.git/`` 和发布时生成的
 ``RELEASE_FILES.json`` 不会被同步覆盖。差异备份写在仓库外的
@@ -29,7 +29,7 @@ import sys
 from datetime import datetime, timezone
 
 SOURCE = Path(__file__).resolve().parents[1]
-DEFAULT_LIVE = Path(r"C:\Users\99505\.astrbot\data\plugins\astrbot_plugin_private_companion")
+DEFAULT_LIVE = Path(r"C:\Users\99505\.astrbot\data\plugins\astrbot_plugin_digital_life")
 DEFAULT_BACKUP_ROOT = Path(r"Z:\CompanionUpgrade\backups")
 IGNORED_PARTS = {"data", "__pycache__", ".git", ".pytest_cache"}
 TEXT_SUFFIXES = {".py", ".js", ".css", ".html", ".json", ".md", ".yaml", ".yml", ".txt", ".ini", ".toml"}

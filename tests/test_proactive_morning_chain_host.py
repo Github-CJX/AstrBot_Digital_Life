@@ -4,9 +4,9 @@ import json
 import unittest
 from unittest.mock import patch
 
-from companion_v2.proactive.configuration import PURPOSES
-from companion_v2.proactive.morning_rhythm import RoutineSample
-from companion_v2.proactive.wake_events import WakeContactEvents
+from digital_life_core.proactive.configuration import PURPOSES
+from digital_life_core.proactive.morning_rhythm import RoutineSample
+from digital_life_core.proactive.wake_events import WakeContactEvents
 from tests.contact_schedule_support import ContactScheduleFixture
 
 

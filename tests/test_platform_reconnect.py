@@ -5,8 +5,8 @@ import os
 import unittest
 from unittest.mock import patch
 
-from astrbot_host.multi_session import MultiHostSession
-from companion_v2.qzone.capability import CAPABILITIES as QZONE_CAPABILITIES
+from digital_life_host.multi_session import MultiHostSession
+from digital_life_core.qzone.capability import CAPABILITIES as QZONE_CAPABILITIES
 from tests.group_host_support import GroupFixture
 from tests.native_adapter_support import FakePlatform
 from tests.test_main_no_reply import ENTRY

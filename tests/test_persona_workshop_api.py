@@ -20,21 +20,21 @@ from types import SimpleNamespace as NS
 import unittest
 from unittest.mock import AsyncMock, Mock, patch
 
-from astrbot_host.persona_workshop_api import (COMMANDS, PREFIX, PERSONA_TRYOUT_SCENARIOS,
+from digital_life_host.persona_workshop_api import (COMMANDS, PREFIX, PERSONA_TRYOUT_SCENARIOS,
     PersonaWorkshopWebAPI, _session_provider_id,
     build_persona_standardization_prompt, parse_persona_standardization_draft)
-from companion_v2.adapters.astrbot.native import persona_instruction
-from companion_v2.knowledge.catalog import EntryDocument, KnowledgeCatalog, SourceBinding
-from companion_v2.knowledge.configuration import (GROUP as KNOWLEDGE_GROUP,
+from digital_life_core.adapters.astrbot.native import persona_instruction
+from digital_life_core.knowledge.catalog import EntryDocument, KnowledgeCatalog, SourceBinding
+from digital_life_core.knowledge.configuration import (GROUP as KNOWLEDGE_GROUP,
     KnowledgeConfigurationOwner, configuration_fields as knowledge_fields,
     target_for as knowledge_target_for)
-from companion_v2.knowledge.retrieval import KnowledgeCandidate
-from companion_v2.execution.models import digest
-from companion_v2.foundation.refs import ScopeKind
-from companion_v2.role_profile.configuration import (GROUP as ROLE_PROFILE_GROUP,
+from digital_life_core.knowledge.retrieval import KnowledgeCandidate
+from digital_life_core.execution.models import digest
+from digital_life_core.foundation.refs import ScopeKind
+from digital_life_core.role_profile.configuration import (GROUP as ROLE_PROFILE_GROUP,
     RoleProfileConfigurationOwner, configuration_fields as role_profile_fields,
     target_for as role_profile_target_for)
-from companion_v2.relationships.profile import (FIELD_LIMITS as RELATIONSHIP_PROFILE_FIELD_LIMITS,
+from digital_life_core.relationships.profile import (FIELD_LIMITS as RELATIONSHIP_PROFILE_FIELD_LIMITS,
     GROUP as RELATIONSHIP_PROFILE_GROUP, RelationshipProfileConfigurationOwner,
     configuration_fields as relationship_profile_fields,
     target_for as relationship_profile_target_for)
@@ -143,7 +143,7 @@ class PersonaWorkshopFixture(unittest.IsolatedAsyncioTestCase):
         self.routes = {path: handler for path, handler, _, _ in self.native.registered_web_apis}
 
     async def get(self, path=None, *, username="admin", query=None):
-        with patch("astrbot_host.persona_workshop_api.request",
+        with patch("digital_life_host.persona_workshop_api.request",
                    NS(username=username, query=Query(query or {}))):
             return await self.routes[path or PREFIX]()
 
@@ -153,7 +153,7 @@ class PersonaWorkshopFixture(unittest.IsolatedAsyncioTestCase):
         async def reader():
             return payload
 
-        with patch("astrbot_host.persona_workshop_api.request",
+        with patch("digital_life_host.persona_workshop_api.request",
                    NS(username=username, query=Query(), body=reader)):
             return await self.routes[PREFIX + "/command"]()
 
@@ -163,7 +163,7 @@ class PersonaWorkshopFixture(unittest.IsolatedAsyncioTestCase):
         async def reader():
             return payload
 
-        with patch("astrbot_host.persona_workshop_api.request",
+        with patch("digital_life_host.persona_workshop_api.request",
                    NS(username=username, query=Query(query or {}), body=reader)):
             return await self.routes[PREFIX + "/profile-draft"]()
 
@@ -173,7 +173,7 @@ class PersonaWorkshopFixture(unittest.IsolatedAsyncioTestCase):
         async def reader():
             return payload
 
-        with patch("astrbot_host.persona_workshop_api.request",
+        with patch("digital_life_host.persona_workshop_api.request",
                    NS(username=username, query=Query(), body=reader)):
             return await self.routes[PREFIX + "/standardize"]()
 
@@ -183,7 +183,7 @@ class PersonaWorkshopFixture(unittest.IsolatedAsyncioTestCase):
         async def reader():
             return payload
 
-        with patch("astrbot_host.persona_workshop_api.request",
+        with patch("digital_life_host.persona_workshop_api.request",
                    NS(username=username, query=Query(), body=reader)):
             return await self.routes[PREFIX + "/tryouts"]()
 
@@ -193,7 +193,7 @@ class PersonaWorkshopFixture(unittest.IsolatedAsyncioTestCase):
         async def reader():
             return payload
 
-        with patch("astrbot_host.persona_workshop_api.request",
+        with patch("digital_life_host.persona_workshop_api.request",
                    NS(username=username, query=Query(), body=reader)):
             return await self.routes[PREFIX + "/style-rules"]()
 
@@ -203,7 +203,7 @@ class PersonaWorkshopFixture(unittest.IsolatedAsyncioTestCase):
         async def reader():
             return payload
 
-        with patch("astrbot_host.persona_workshop_api.request",
+        with patch("digital_life_host.persona_workshop_api.request",
                    NS(username=username, query=Query(), body=reader)):
             return await self.routes[path]()
 
@@ -428,7 +428,7 @@ class RoleProfileDraftTests(PersonaWorkshopFixture):
         response_text = json.dumps({"fields": {"name": "米拉"}, "inferred_fields": [], "notes": []},
                                    ensure_ascii=False)
         provider = session.model.native
-        with patch("astrbot_host.knowledge_sources.AstrBotKnowledgeSources", return_value=official), \
+        with patch("digital_life_host.knowledge_sources.AstrBotKnowledgeSources", return_value=official), \
                 patch.object(provider, "text_chat", AsyncMock(return_value=NS(completion_text=response_text))) as call:
             response = await self.post_profile_draft()
 
@@ -579,7 +579,7 @@ class StandardizationTests(PersonaWorkshopFixture):
         saved = await self.post({"action": "save", "persona_id": "second", "text": result_text,
                                  "note": "问卷标准化", "expected_current": ""})
         self.assertEqual(saved["status"], "ok", saved)
-        with patch("astrbot_host.persona_workshop_api.request",
+        with patch("digital_life_host.persona_workshop_api.request",
                    NS(username="admin", query=Query({"persona_id": "second", "limit": "30"}))):
             selected_state = await self.routes[PREFIX]()
         self.assertEqual(selected_state["data"]["count"], 1)
@@ -673,9 +673,9 @@ class AuthorizationTests(PersonaWorkshopFixture):
 
     async def test_a_non_core_operator_cannot_read_or_write_the_persona(self):
         await self.initialize()
-        from astrbot_host.management_identity import dashboard_operator
-        from companion_v2.identity_policy.models import AuthorizationTier
-        from companion_v2.identity_policy.object_access import ObjectAccessPolicy
+        from digital_life_host.management_identity import dashboard_operator
+        from digital_life_core.identity_policy.models import AuthorizationTier
+        from digital_life_core.identity_policy.object_access import ObjectAccessPolicy
         operator = dashboard_operator(self.controller.runtime, "admin", at=support.NOW)
         policy = ObjectAccessPolicy(self.controller.runtime)
         policy.set_tier(operator.subject, AuthorizationTier.IMPORTANT,
@@ -711,8 +711,8 @@ class NoPersonaWriteTests(PersonaWorkshopFixture):
         forbidden = ("set_persona", "update_persona", "create_persona", "delete_persona",
                      "add_persona", "save_persona", "upsert_persona", "remove_persona",
                      "persona_manager.update", "persona_manager.set")
-        targets = [ROOT / "astrbot_host" / "persona_workshop_api.py",
-                   *sorted((ROOT / "companion_v2" / "persona_craft").glob("*.py")),
+        targets = [ROOT / "digital_life_host" / "persona_workshop_api.py",
+                   *sorted((ROOT / "digital_life_core" / "persona_craft").glob("*.py")),
                    ROOT / "pages" / "人物设定工坊" / "app.js",
                    ROOT / "pages" / "人物设定工坊" / "workspace.html"]
         for path in targets:
@@ -722,7 +722,7 @@ class NoPersonaWriteTests(PersonaWorkshopFixture):
 
     def test_the_native_adapter_only_reads_personas(self):
         """宿主适配器里唯一与人格有关的方法，是读取与冻结校验。"""
-        source = (ROOT / "companion_v2" / "adapters" / "astrbot" / "native.py").read_text(encoding="utf-8")
+        source = (ROOT / "digital_life_core" / "adapters" / "astrbot" / "native.py").read_text(encoding="utf-8")
         for name in ("set_persona", "update_persona", "create_persona", "delete_persona"):
             self.assertNotIn(name, source)
         self.assertIn("resolve_selected_persona", source)

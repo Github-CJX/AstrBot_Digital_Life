@@ -2,7 +2,7 @@
 
 import unittest
 
-from companion_v2.execution.models import encode
+from digital_life_core.execution.models import encode
 from tests import test_role_growth_api as support
 from tests.test_management_access import NOW
 

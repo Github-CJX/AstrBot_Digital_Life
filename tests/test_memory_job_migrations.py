@@ -5,8 +5,8 @@ import sqlite3
 import unittest
 from unittest.mock import patch
 
-from companion_v2.storage.runtime import StorageOpenError, StorageRuntime
-from companion_v2.storage.schema import SCHEMA_VERSION
+from digital_life_core.storage.runtime import StorageOpenError, StorageRuntime
+from digital_life_core.storage.schema import SCHEMA_VERSION
 from tests.execution_support import remove_v28
 from tests.test_memory_selection import SelectionFixture
 

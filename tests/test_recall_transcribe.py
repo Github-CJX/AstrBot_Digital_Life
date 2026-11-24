@@ -10,10 +10,10 @@ from __future__ import annotations
 
 import unittest
 
-from companion_v2.configuration.models import ConfigLayer, ConfigTarget
-from companion_v2.conversation.recall_management import RecallManagement
-from companion_v2.conversation.recall_settings import GROUP
-from companion_v2.conversation.recalls import MessageRecall
+from digital_life_core.configuration.models import ConfigLayer, ConfigTarget
+from digital_life_core.conversation.recall_management import RecallManagement
+from digital_life_core.conversation.recall_settings import GROUP
+from digital_life_core.conversation.recalls import MessageRecall
 from tests.test_host_application import HostFixture
 from tests.test_management_access import INSTALLATION, ROLE, SCOPE
 

@@ -8,8 +8,8 @@ const pageRoot = path.resolve(__dirname, "../pages/陪伴小屋");
 const source = fs.readFileSync(path.join(pageRoot, "decision-page.js"), "utf8");
 const configSource = fs.readFileSync(path.join(pageRoot, "config-editor.js"), "utf8");
 
-const CONFIG_API = "/astrbot_plugin_private_companion/config";
-const REPLY_API = "/astrbot_plugin_private_companion/abc/reply";
+const CONFIG_API = "/astrbot_plugin_digital_life/config";
+const REPLY_API = "/astrbot_plugin_digital_life/abc/reply";
 
 /* 角色层挂载点解析出的取值（角色没设过时就是 registry 默认）。页面必须把它们
    读出来显示；在修好之前，这里放什么都不会出现在四张卡片上。 */
@@ -20,12 +20,12 @@ const PARTICIPATION_DEFAULTS = {enable_group_topic_threads: true, group_topic_th
   enable_group_repeat_follow: true, group_repeat_trigger_threshold: 4,
   group_repeat_follow_probability: 0.18};
 /* 角色层上报的是整组 28 个字段，其中插话三键是**角色层**的解析值
-   （companion_v2/conversation/participation.py 的 CONFIG_DEFAULTS：默认关闭、
+   （digital_life_core/conversation/participation.py 的 CONFIG_DEFAULTS：默认关闭、
    间隔 180、每日上限 2）。角色层刷新/保存会重报这一整份。 */
 const PARTICIPATION_ROLE_LAYER = {...PARTICIPATION_DEFAULTS, enable_group_interjection: false,
   group_interject_min_interval_minutes: 60, group_interject_max_daily: 0,
   enable_group_interjection_feedback: true, group_interject_feedback_window_seconds: 600};
-/* 本群窗口覆盖：astrbot_host/group_reply_api.py 的 INTERJECTION_FIELDS，只有这 5 个键。 */
+/* 本群窗口覆盖：digital_life_host/group_reply_api.py 的 INTERJECTION_FIELDS，只有这 5 个键。 */
 const PARTICIPATION_LOCAL = {enable_group_interjection: true,
   group_interject_min_interval_minutes: 180, group_interject_max_daily: 2,
   enable_group_interjection_feedback: true, group_interject_feedback_window_seconds: 600};
@@ -451,5 +451,5 @@ test("private access editors separate known users from unbound accounts", () => 
   assert.deepEqual(Array.from(installation.sections, section => section.title), ["陌生号处理"]);
   assert.match(installation.note, /插件安装全局生效/);
   assert.equal(window.CompanionConfigEditors.endpointFor(null, "", ["private_access_installation"]),
-    "/astrbot_plugin_private_companion/config");
+    "/astrbot_plugin_digital_life/config");
 });

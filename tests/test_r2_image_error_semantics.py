@@ -26,19 +26,19 @@ from pathlib import Path
 from tempfile import TemporaryDirectory
 from unittest import mock
 
-from astrbot_host.native_extensions.image_native import output_routing
-from astrbot_host.native_extensions.image_native.adapter import NativeImageProvider
-from astrbot_host.native_extensions.image_native.extension import ImageExtensionAPI
-from astrbot_host.native_extensions.image_native.owner import NativeImageOwner
-from astrbot_host.native_extensions.image_native.store import ImageStore
-from astrbot_host.native_extensions.image_native.types import (
+from digital_life_host.native_extensions.image_native import output_routing
+from digital_life_host.native_extensions.image_native.adapter import NativeImageProvider
+from digital_life_host.native_extensions.image_native.extension import ImageExtensionAPI
+from digital_life_host.native_extensions.image_native.owner import NativeImageOwner
+from digital_life_host.native_extensions.image_native.store import ImageStore
+from digital_life_host.native_extensions.image_native.types import (
     ImageInvocation,
     NativeImageError,
     ReferenceImage,
 )
-from companion_v2.capabilities import native as native_contract
-from companion_v2.execution.models import SideEffect
-from companion_v2.product import PRODUCT_VERSION
+from digital_life_core.capabilities import native as native_contract
+from digital_life_core.execution.models import SideEffect
+from digital_life_core.product import PRODUCT_VERSION
 
 PNG_BYTES = b"\x89PNG\r\n\x1a\n-round-2-image-body"
 API_KEY = "sk-round2-primary-secret"

@@ -4,9 +4,9 @@ import asyncio
 import json
 import unittest
 
-from companion_v2.qzone import protocol as P
-from companion_v2.qzone.references import QzonePost
-from companion_v2.qzone.transport import TransportOutcome
+from digital_life_core.qzone import protocol as P
+from digital_life_core.qzone.references import QzonePost
+from digital_life_core.qzone.transport import TransportOutcome
 from tests.test_qzone_extension import COOKIE, MSGLIST, FakeTransport, QzoneServiceFixture
 
 

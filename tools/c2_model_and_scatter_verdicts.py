@@ -51,17 +51,17 @@ ROWS: dict[str, tuple[str, str]] = {
         RETIRED, _PROFILE_GONE + "V2 的历史压缩由记忆与群历史链各自承担，不再单列一个指派。"),
     "model_assignment_config.DAILY_REVIEW_PROVIDER_ID": (
         RETIRED, _PROFILE_GONE + "角色自省改由 memory.reflect 档承担"
-                 "（companion_v2/memory/reflection.py:31），不另设“每日复盘”档。"),
+                 "（digital_life_core/memory/reflection.py:31），不另设“每日复盘”档。"),
     # --- C2-5 scatter -----------------------------------------------------------
     "basic_config.persona_inner_voice_prompt": (
         RETIRED, "（销号）V2 没有“内部动机/内心活动风格”这条独立入口。发送前自检通道确实存在"
-                 "（proactive.judge，companion_v2/proactive/persona_judge.py:73-84），"
+                 "（proactive.judge，digital_life_core/proactive/persona_judge.py:73-84），"
                  "但它的角色指令取自 job[\"role_instruction\"]，即与其他通道共用的同一份人格，"
                  "并非可单独设置文风的第五个 style_prompt 槽位。若要补这条通道，"
                  "应作为新增功能设计，不在配置缺口范围。"),
     "weather_config.weather_refresh_minutes": (
         RENAMED, "role.state.planning_weather_max_age_minutes"
-                 "（companion_v2/agenda/planning_config.py:14-30，默认 120，下限 5）："
+                 "（digital_life_core/agenda/planning_config.py:14-30，默认 120，下限 5）："
                  "账本记为 owed 属未回写，B 批已落地。"),
     "skill_growth_config.skill_growth_rate": (
         RETIRED, "（销号）与同组的 enable_skill_growth_simulation、"
@@ -69,12 +69,12 @@ ROWS: dict[str, tuple[str, str]] = {
                  "这套机制，全仓无该字段实现；技能成长由 role.growth 的既有机制承担。"),
     "memory_habit_config.meal_care_followup_minutes": (
         RENAMED, "proactive.contact.meal_care_followup_minutes（按窗口，1–240，默认 45）："
-                 "此前是 companion_v2/proactive/meal_events.py:13 硬编码的 45 分钟槽宽；"
+                 "此前是 digital_life_core/proactive/meal_events.py:13 硬编码的 45 分钟槽宽；"
                  "现已由配置驱动（同文件 _window），默认值与原行为一致。"),
     "life_schedule_config.daily_plan_time": (
         RETIRED, "（销号）V2 的每日规划由**本地日期**把关，不按时刻："
                  "CalendarPlanning.opportunity 的每日档以 daily:<时区>:<ISO 日期> 为尝试键"
-                 "（companion_v2/agenda/planning.py:178-183），当天未尝试过就生成，"
+                 "（digital_life_core/agenda/planning.py:178-183），当天未尝试过就生成，"
                  "刻意不做任何时刻门（_run 只校验 mode）。同组的 enable_daily_plan、"
                  "daily_plan_item_count、daily_plan_prompt 已分别落到 role.state.planning_enabled、"
                  "planning_max_items、planning_prompt，规划机制本身在 V2 是存在的。"
@@ -93,9 +93,9 @@ ROWS: dict[str, tuple[str, str]] = {
 
 # Carriers that must still exist.
 FIELD_CARRIERS = (
-    ("companion_v2.proactive.persona_judge", "KIND", "attr"),
-    ("companion_v2.model_gateway.routing", "CONSUMER", "attr"),
-    ("companion_v2.agenda.planning_config", "DEFAULTS", "attr"),
+    ("digital_life_core.proactive.persona_judge", "KIND", "attr"),
+    ("digital_life_core.model_gateway.routing", "CONSUMER", "attr"),
+    ("digital_life_core.agenda.planning_config", "DEFAULTS", "attr"),
 )
 
 # Every configuration field a RENAMED landing names as its carrier. Checked against
@@ -122,11 +122,11 @@ def verify_carriers() -> list[str]:
         if not hasattr(module, attribute):
             problems.append(f"{module_name}.{attribute} is gone")
     # The planning field the weather row names must really be a default.
-    from companion_v2.agenda.planning_config import DEFAULTS
+    from digital_life_core.agenda.planning_config import DEFAULTS
     if "planning_weather_max_age_minutes" not in DEFAULTS:
         problems.append("planning_weather_max_age_minutes is not a planning default")
     # Every named contact field must be registered.
-    from companion_v2.proactive.configuration import configuration_fields as contact_fields
+    from digital_life_core.proactive.configuration import configuration_fields as contact_fields
     registered = {field.field_id for field in contact_fields()}
     for name in NAMED_CONFIG_FIELDS:
         if name not in registered:
@@ -137,7 +137,7 @@ def verify_carriers() -> list[str]:
         if not any(name in landing for landing in claims.values()):
             problems.append(f"{name} is listed as a carrier but no landing names it")
     # Routing must still be keyword+window aware, since two landings claim it.
-    from companion_v2.model_gateway import replacement_rules
+    from digital_life_core.model_gateway import replacement_rules
     import dataclasses
     for name in ("match_route", "build_rules", "RouteRule", "RouteMatch"):
         if not hasattr(replacement_rules, name):

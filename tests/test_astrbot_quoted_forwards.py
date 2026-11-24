@@ -5,9 +5,9 @@ from functools import partial
 import unittest
 from unittest.mock import AsyncMock
 
-from astrbot_host.media import load_native_image
-from companion_v2.adapters.astrbot.quotes import read_private_quote
-from companion_v2.conversation.quotes.forward_models import CapturedForwardQuote
+from digital_life_host.media import load_native_image
+from digital_life_core.adapters.astrbot.quotes import read_private_quote
+from digital_life_core.conversation.quotes.forward_models import CapturedForwardQuote
 from tests.animation_support import animation_bytes
 from tests.forward_support import ForwardFixture, node_raw, quoted_forward_raw
 from tests.native_adapter_support import FakeReverseApi

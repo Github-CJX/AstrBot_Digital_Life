@@ -2,14 +2,14 @@
 
 from dataclasses import replace
 
-from companion_v2.capabilities import CapabilityDesiredState
-from companion_v2.capabilities.native_catalog import register_native_replacement
+from digital_life_core.capabilities import CapabilityDesiredState
+from digital_life_core.capabilities.native_catalog import register_native_replacement
 from tests.g6_support import G6Fixture, NOW, descriptor
 
 
 class NativeCatalogUpgradeTests(G6Fixture):
     def replacement(self):
-        return replace(descriptor(), package_id="astrbot_plugin_private_companion.screen",
+        return replace(descriptor(), package_id="astrbot_plugin_digital_life.screen",
                        package_version="2.1.0", artifact_hash="new-native-artifact")
 
     def upgrade(self, new=None):

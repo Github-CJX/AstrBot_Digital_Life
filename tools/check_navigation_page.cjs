@@ -7,12 +7,12 @@ const http = require("node:http");
 const {chromium} = require("playwright");
 
 async function run({pageRoot, output, bridgePath}) {
-  const HOST = "astrbot_plugin_private_companion", calls = [], errors = [], checks = [];
+  const HOST = "astrbot_plugin_digital_life", calls = [], errors = [], checks = [];
   await fs.mkdir(output, {recursive: true});
   const sdk = await fs.readFile(bridgePath, "utf8");
   const api = name => `/${HOST}/host/targets/qa/roles/qa/${name}`;
   const extensions = ["content", "image", "together", "game", "screen", "reality", "live"].map(id => ({
-    capability_id: id, extension_id: id, owner: "companion_v2", assembled: true,
+    capability_id: id, extension_id: id, owner: "digital_life_core", assembled: true,
     label: id, enabled: true, runtime_ready: true, integration_state: "connected", pages: [],
     version: "qa-native", installed_package_version: "qa-native", desired_state: "active",
   }));

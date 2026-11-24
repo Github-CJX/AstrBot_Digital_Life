@@ -7,15 +7,15 @@ import json
 import unittest
 from unittest.mock import patch
 
-from companion_v2.agenda.background import AgendaDispatchPolicy
-from companion_v2.agenda.models import AgendaError, AgendaTarget, Frequency, Schedule
-from companion_v2.delivery.service import DeliveryRequest
-from companion_v2.execution.models import ClaimResult, SupervisorLimits
-from companion_v2.execution.runner import TaskRun
-from companion_v2.foundation.outcome import Outcome
-from companion_v2.foundation.refs import SubjectKind, SubjectRef
-from companion_v2.identity_policy.models import AuthorizationTier
-from companion_v2.identity_policy.personas import ConversationRoute
+from digital_life_core.agenda.background import AgendaDispatchPolicy
+from digital_life_core.agenda.models import AgendaError, AgendaTarget, Frequency, Schedule
+from digital_life_core.delivery.service import DeliveryRequest
+from digital_life_core.execution.models import ClaimResult, SupervisorLimits
+from digital_life_core.execution.runner import TaskRun
+from digital_life_core.foundation.outcome import Outcome
+from digital_life_core.foundation.refs import SubjectKind, SubjectRef
+from digital_life_core.identity_policy.models import AuthorizationTier
+from digital_life_core.identity_policy.personas import ConversationRoute
 from tests.test_host_application import HostFixture
 from tests.test_management_access import INSTALLATION, NOW, ROLE, SCOPE
 

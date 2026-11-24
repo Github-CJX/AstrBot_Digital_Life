@@ -11,12 +11,12 @@ from tempfile import TemporaryDirectory
 import unittest
 from unittest.mock import AsyncMock, patch
 
-from astrbot_host.video.container import boxes, child, inspect_container
-from astrbot_host.video.decoder import _ffmpeg_binary, inspect_video, relative_times
-from astrbot_host.video.loader import decode_video, load_host_resolved_video, load_native_video
-from companion_v2.adapters.astrbot.native import NativeVideoLocator
-from companion_v2.conversation.media.video.models import CapturedVideo, MAX_VIDEO_BYTES, fits_video_budget
-from companion_v2.execution.models import TaskError
+from digital_life_host.video.container import boxes, child, inspect_container
+from digital_life_host.video.decoder import _ffmpeg_binary, inspect_video, relative_times
+from digital_life_host.video.loader import decode_video, load_host_resolved_video, load_native_video
+from digital_life_core.adapters.astrbot.native import NativeVideoLocator
+from digital_life_core.conversation.media.video.models import CapturedVideo, MAX_VIDEO_BYTES, fits_video_budget
+from digital_life_core.execution.models import TaskError
 from tests.video_support import video_bytes
 
 
@@ -52,7 +52,7 @@ class VideoDecoderTests(unittest.IsolatedAsyncioTestCase):
             inside.write_bytes(b"video")
             outside.write_bytes(b"other")
             with patch("astrbot.core.utils.astrbot_path.get_astrbot_temp_path", return_value=trusted), \
-                    patch("astrbot_host.video.loader.decode_video", AsyncMock(return_value="decoded")) as decode:
+                    patch("digital_life_host.video.loader.decode_video", AsyncMock(return_value="decoded")) as decode:
                 self.assertEqual(await load_host_resolved_video(str(inside), 2), "decoded")
                 decode.assert_awaited_once_with(b"video", 2)
                 with self.assertRaises(TaskError) as caught:
@@ -134,7 +134,7 @@ class VideoDecoderTests(unittest.IsolatedAsyncioTestCase):
         self.assertFalse(fits_video_budget((video.descriptor,) * 3))
 
     async def test_paths_covers_and_private_urls_never_trigger_local_or_remote_decoding(self):
-        with patch("astrbot_host.video.loader.decode_video", AsyncMock()) as decode:
+        with patch("digital_life_host.video.loader.decode_video", AsyncMock()) as decode:
             for value in ("C:/private.mp4", "file:///C:/private.mp4", "http://127.0.0.1/video", "http://[::1]/video"):
                 with self.subTest(value=value), self.assertRaises(TaskError) as caught:
                     await load_native_video(NativeVideoLocator(0, value))
@@ -142,11 +142,11 @@ class VideoDecoderTests(unittest.IsolatedAsyncioTestCase):
             decode.assert_not_awaited()
 
     async def test_public_download_uses_video_budget_and_oversize_does_not_spawn_worker(self):
-        with patch("astrbot_host.video.loader.fetch_attachment", AsyncMock(return_value=video_bytes())) as fetch:
+        with patch("digital_life_host.video.loader.fetch_attachment", AsyncMock(return_value=video_bytes())) as fetch:
             result = await load_native_video(NativeVideoLocator(0, "https://attachment.example/video"))
             self.assertEqual(result.content, video_bytes())
             fetch.assert_awaited_once_with("https://attachment.example/video", maximum_bytes=MAX_VIDEO_BYTES)
-        with patch("astrbot_host.video.loader.decode_video", AsyncMock()) as decode, self.assertRaises(TaskError):
+        with patch("digital_life_host.video.loader.decode_video", AsyncMock()) as decode, self.assertRaises(TaskError):
             await load_native_video(NativeVideoLocator(0, "base64://" + "A" * ((MAX_VIDEO_BYTES + 2) // 3 * 4 + 1)))
         decode.assert_not_awaited()
 
@@ -170,7 +170,7 @@ class VideoDecoderTests(unittest.IsolatedAsyncioTestCase):
                 directories.append(directory)
                 (directory / "original.mp4").write_bytes(video_bytes())
                 return process
-            with patch("astrbot_host.video.loader.asyncio.create_subprocess_exec", spawn), patch("astrbot_host.video.loader.DECODE_TIMEOUT", 0.03):
+            with patch("digital_life_host.video.loader.asyncio.create_subprocess_exec", spawn), patch("digital_life_host.video.loader.DECODE_TIMEOUT", 0.03):
                 task = asyncio.create_task(decode_video(video_bytes(), 0))
                 await entered.wait()
                 if cancel:

@@ -7,7 +7,7 @@ import sqlite3
 from tempfile import TemporaryDirectory
 import unittest
 
-from companion_v2.memory.group.hits import (
+from digital_life_core.memory.group.hits import (
     DEFAULT_GROUP_SAFETY_POLICY,
     GroupSafetyPolicy,
     RULE_IMPERSONATED_BOT_NAME,
@@ -17,8 +17,8 @@ from companion_v2.memory.group.hits import (
     evaluate_message,
     persist_hits,
 )
-from companion_v2.storage.runtime import StorageRuntime
-from companion_v2.storage.schema import (
+from digital_life_core.storage.runtime import StorageRuntime
+from digital_life_core.storage.schema import (
     MIGRATION_V40_TO_V41_ID,
     SCHEMA_VERSION,
     SCHEMA_VERSION_V40,

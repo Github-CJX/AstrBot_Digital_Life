@@ -30,9 +30,9 @@ with tempfile.TemporaryDirectory(prefix="v2-native-recall-entry-") as temporary:
     from astrbot.core.platform.sources.aiocqhttp.aiocqhttp_message_event import AiocqhttpMessageEvent
     from astrbot.core.platform.sources.aiocqhttp.aiocqhttp_platform_adapter import AiocqhttpAdapter
     from astrbot.core.utils.astrbot_path import get_astrbot_data_path
-    from companion_v2.adapters.astrbot.staging import NativeAdapterTypes
-    from companion_v2.foundation.clock import DeterministicClock
-    from companion_v2.memory.codec import source as decode_source
+    from digital_life_core.adapters.astrbot.staging import NativeAdapterTypes
+    from digital_life_core.foundation.clock import DeterministicClock
+    from digital_life_core.memory.codec import source as decode_source
     from tests.group_host_support import GroupContext, group_config
     from tests.native_adapter_support import FakeProvider, FakeReverseApi
     from tests.test_management_access import NOW
@@ -160,7 +160,7 @@ with tempfile.TemporaryDirectory(prefix="v2-native-recall-entry-") as temporary:
             await astrbot_preferences.db_helper.engine.dispose()
         assert plugin.staging._terminated and plugin.staging.runtime is None
         assert not native.registered_web_apis
-        assert not any(name == "companion_v2" or name.startswith("companion_v2.") for name in sys.modules)
+        assert not any(name == "digital_life_core" or name.startswith("digital_life_core.") for name in sys.modules)
         print("PASS: real SDK recall and poke entry, private/group conversion, admin and unique-session routing, "
               "duplicate and early notices, other-plugin visibility, shutdown and route cleanup; "
               "temporary data only, no QQ or provider traffic.")

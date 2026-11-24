@@ -15,7 +15,7 @@ const vm = require("node:vm");
 
 const SOURCE = fs.readFileSync(
   path.join(__dirname, "..", "pages", "陪伴小屋", "product-page.js"), "utf8");
-const HOST = "astrbot_plugin_private_companion";
+const HOST = "astrbot_plugin_digital_life";
 
 function harness() {
   const warnings = [];

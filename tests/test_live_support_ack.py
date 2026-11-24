@@ -3,8 +3,8 @@
 from types import SimpleNamespace
 import unittest
 
-from astrbot_host.native_extensions.live.activity_methods import LiveActivityMethods
-from astrbot_host.native_extensions.live.bilibili_live import LiveDanmakuEvent
+from digital_life_host.native_extensions.live.activity_methods import LiveActivityMethods
+from digital_life_host.native_extensions.live.bilibili_live import LiveDanmakuEvent
 
 
 class LiveSupportAckTests(unittest.TestCase):

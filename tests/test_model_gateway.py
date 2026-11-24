@@ -7,27 +7,27 @@ from datetime import timedelta
 import json
 import unittest
 
-from companion_v2.configuration.models import ConfigLayer, ConfigTarget
-from companion_v2.configuration.registry import FieldRegistry
-from companion_v2.configuration.service import ConfigurationService
-from companion_v2.conversation.foreground import ModelDraft, PromptMaterial, PromptRequest, SealedForegroundContext
-from companion_v2.conversation.models import InboundConversationEvent
-from companion_v2.diagnostics.models import CheckStatus, DiagnosticContext, DiagnosticQuery
-from companion_v2.diagnostics.service import DiagnosticService
-from companion_v2.execution.models import Lane, ProviderBinding, TaskError, TaskRegistration, TaskResult, digest, encode, stamp
-from companion_v2.execution.runner import LocalTaskRunner, TaskRun
-from companion_v2.foundation.refs import SourceRef, SubjectKind, SubjectRef, VersionRef
-from companion_v2.identity_policy.personas import PersonaBinding, PersonaSelector, SelectorKind
-from companion_v2.model_gateway.budget import BudgetLedger
-from companion_v2.model_gateway.failures import ModelFailure
-from companion_v2.model_gateway.models import (Amount, BudgetPolicy, CacheSignature, CapturedModelOutput,
+from digital_life_core.configuration.models import ConfigLayer, ConfigTarget
+from digital_life_core.configuration.registry import FieldRegistry
+from digital_life_core.configuration.service import ConfigurationService
+from digital_life_core.conversation.foreground import ModelDraft, PromptMaterial, PromptRequest, SealedForegroundContext
+from digital_life_core.conversation.models import InboundConversationEvent
+from digital_life_core.diagnostics.models import CheckStatus, DiagnosticContext, DiagnosticQuery
+from digital_life_core.diagnostics.service import DiagnosticService
+from digital_life_core.execution.models import Lane, ProviderBinding, TaskError, TaskRegistration, TaskResult, digest, encode, stamp
+from digital_life_core.execution.runner import LocalTaskRunner, TaskRun
+from digital_life_core.foundation.refs import SourceRef, SubjectKind, SubjectRef, VersionRef
+from digital_life_core.identity_policy.personas import PersonaBinding, PersonaSelector, SelectorKind
+from digital_life_core.model_gateway.budget import BudgetLedger
+from digital_life_core.model_gateway.failures import ModelFailure
+from digital_life_core.model_gateway.models import (Amount, BudgetPolicy, CacheSignature, CapturedModelOutput,
     LocalProvider, MAX_MODEL_OUTPUT_TOKENS, ModelTaskProfile, ProviderResponse, is_released)
-from companion_v2.model_gateway.perception import capability_instruction
-from companion_v2.model_gateway.response_diagnostics import ResponseDiagnostics
-from companion_v2.model_gateway.routing import ModelRouter, configuration_fields
-from companion_v2.model_gateway.service import LocalModelGateway
-from companion_v2.sources.models import SourceRecord
-from companion_v2.sources.repositories import SourceRepository
+from digital_life_core.model_gateway.perception import capability_instruction
+from digital_life_core.model_gateway.response_diagnostics import ResponseDiagnostics
+from digital_life_core.model_gateway.routing import ModelRouter, configuration_fields
+from digital_life_core.model_gateway.service import LocalModelGateway
+from digital_life_core.sources.models import SourceRecord
+from digital_life_core.sources.repositories import SourceRepository
 from tests.test_execution import ExecutionFixture
 from tests.test_management_access import INSTALLATION, NOW, ROLE, SCOPE
 
@@ -490,7 +490,7 @@ class ModelGatewayTests(ModelFixture, unittest.IsolatedAsyncioTestCase):
         self.gateway_with(self.provider("primary", reserve), self.provider("fallback"))
         run = self.model_run()
 
-        with self.assertLogs("companion_v2.model_gateway.service", level="WARNING") as captured:
+        with self.assertLogs("digital_life_core.model_gateway.service", level="WARNING") as captured:
             with self.assertRaises(TaskError) as error:
                 await self.gateway.generate(run, self.request())
 
@@ -516,7 +516,7 @@ class ModelGatewayTests(ModelFixture, unittest.IsolatedAsyncioTestCase):
         self.gateway_with(self.provider("primary", reserve), self.provider("fallback"))
         run = self.model_run()
 
-        with self.assertLogs("companion_v2.model_gateway.service", level="WARNING") as captured:
+        with self.assertLogs("digital_life_core.model_gateway.service", level="WARNING") as captured:
             with self.assertRaises(TaskError) as error:
                 await self.gateway.generate(run, self.request())
 

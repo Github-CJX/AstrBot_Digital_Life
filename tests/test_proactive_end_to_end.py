@@ -3,7 +3,7 @@
 真跑的部分（全程不打桩）：
 
 * ``NewsContactEvents.select`` → ``ContactSchedule._plan`` 的契机分支
-  （``companion_v2/proactive/scheduling.py:256``）→ ``NewsContactEvents.prepare`` 的真实取源、
+  （``digital_life_core/proactive/scheduling.py:256``）→ ``NewsContactEvents.prepare`` 的真实取源、
   真实拒收条件与真实 ``SourceRecord`` 发布（``news_events.py:308``）→
   ``ProactiveContacts.contact`` 的压制、预算、草稿封存与分片（``service.py:380``、``:537``）
   → ``OutboundDelivery.queue/deliver`` 的排程、三态、回执、幂等与重启恢复
@@ -16,7 +16,7 @@
 1. **新闻来源**：``RecordedNewsPort`` 回放 ``fixtures/proactive/news_feed_sample.json``
    指向的**真实录制样本**（一次真实 ``GET https://daily.juya.uk/rss.xml`` 的原始响应体，
    见 ``fixtures/proactive/README.md``），并交给**真解析器**
-   ``astrbot_host.news_parsing.parse_rss_news``。``SyntheticNewsPort`` 用的则是
+   ``digital_life_host.news_parsing.parse_rss_news``。``SyntheticNewsPort`` 用的则是
    **手写近似样本，非录制**，只用于录制样本覆盖不到的断言（固定文案的渲染态与拒收条件）；
    它与录制样本走同一个来源端口契约，但字节不来自任何真实站点。每个用例的 docstring
    标明自己用的是哪一种。
@@ -43,24 +43,24 @@ import json
 from pathlib import Path
 import unittest
 
-from astrbot_host.news import DEFAULT_AI_NEWS_FEED_LABEL
-from astrbot_host.news_parsing import parse_rss_news
-from companion_v2.configuration.models import ConfigLayer, ConfigTarget
-from companion_v2.conversation.media.models import ImageDescriptor, PromptImage
-from companion_v2.conversation.reply_settings import GROUP as PRESENTATION_GROUP
-from companion_v2.conversation.text_processing import TEXT_DEFAULTS
-from companion_v2.delivery.components import build_component_plan
-from companion_v2.delivery.media import ImageDeliveryEnvelope, image_manifest, payload_hash
-from companion_v2.delivery.models import DeliveryReceipt, LocalSender
-from companion_v2.delivery.plan import DeliveryContent
-from companion_v2.delivery.service import DeliveryRequest
-from companion_v2.execution.models import ProviderBinding, digest, stamp
-from companion_v2.foundation.refs import SourceRef, VersionRef
-from companion_v2.proactive.external_materials import ParseBatch
-from companion_v2.proactive.configuration import GROUP
-from companion_v2.proactive.news_events import SOURCE_OWNER as NEWS_SOURCE_OWNER
-from companion_v2.proactive.news_events import news_provenance
-from companion_v2.proactive.news_sources import NewsFetchError
+from digital_life_host.news import DEFAULT_AI_NEWS_FEED_LABEL
+from digital_life_host.news_parsing import parse_rss_news
+from digital_life_core.configuration.models import ConfigLayer, ConfigTarget
+from digital_life_core.conversation.media.models import ImageDescriptor, PromptImage
+from digital_life_core.conversation.reply_settings import GROUP as PRESENTATION_GROUP
+from digital_life_core.conversation.text_processing import TEXT_DEFAULTS
+from digital_life_core.delivery.components import build_component_plan
+from digital_life_core.delivery.media import ImageDeliveryEnvelope, image_manifest, payload_hash
+from digital_life_core.delivery.models import DeliveryReceipt, LocalSender
+from digital_life_core.delivery.plan import DeliveryContent
+from digital_life_core.delivery.service import DeliveryRequest
+from digital_life_core.execution.models import ProviderBinding, digest, stamp
+from digital_life_core.foundation.refs import SourceRef, VersionRef
+from digital_life_core.proactive.external_materials import ParseBatch
+from digital_life_core.proactive.configuration import GROUP
+from digital_life_core.proactive.news_events import SOURCE_OWNER as NEWS_SOURCE_OWNER
+from digital_life_core.proactive.news_events import news_provenance
+from digital_life_core.proactive.news_sources import NewsFetchError
 from tests.contact_schedule_support import ContactScheduleFixture
 from tests.test_management_access import INSTALLATION, ROLE, SCOPE
 from tests.test_role_tool_loop import answered
@@ -172,7 +172,7 @@ class RecordingSender:
 
     记录项就是"如果平台可用，实际会发出去的那份 envelope"：目标对象、正文、分片与顺序、
     图片/TTS 渲染态、回执引用。渲染态使用生产同款 ``build_component_plan``
-    （``companion_v2/adapters/astrbot/onebot.py:144``），断言的是真渲染结果，
+    （``digital_life_core/adapters/astrbot/onebot.py:144``），断言的是真渲染结果，
     不是测试自己拼的期望值。
     """
 
@@ -814,7 +814,7 @@ class ProactiveDeliveryEndToEndTests(ProactiveEndToEndFixture, unittest.Isolated
         self.semantic.store.configure({"reactions_proactive_enabled": True,
                                        "reactions_trigger_probability": 1.0,
                                        "reactions_cooldown_seconds": 0}, 0)
-        from companion_v2.conversation.media.output_settings import GROUP as IMAGE_OUTPUT_GROUP
+        from digital_life_core.conversation.media.output_settings import GROUP as IMAGE_OUTPUT_GROUP
         target = ConfigTarget(INSTALLATION, ConfigLayer.ROLE, ROLE, bot_id=SCOPE.bot_id)
         snapshot = app.configuration.read(self.core, target=target, group_id=IMAGE_OUTPUT_GROUP,
                                           observed_at=self.clock.now()).unwrap()
@@ -870,7 +870,7 @@ class ProactiveDeliveryEndToEndTests(ProactiveEndToEndFixture, unittest.Isolated
 
 
 def _picture():
-    from companion_v2.conversation.media.models import CapturedImage
+    from digital_life_core.conversation.media.models import CapturedImage
     return CapturedImage(PICTURE, PICTURE_BYTES)
 
 

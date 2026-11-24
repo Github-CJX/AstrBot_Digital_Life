@@ -39,16 +39,16 @@ from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from unittest.mock import patch
 
-from companion_v2.storage import backup as backup_module
-from companion_v2.storage import management as management_module
-from companion_v2.storage.backup import (
+from digital_life_core.storage import backup as backup_module
+from digital_life_core.storage import management as management_module
+from digital_life_core.storage.backup import (
     BACKUP_FORMAT, JOURNAL_FORMAT, LEGACY_BACKUP_FORMAT, MAIN_DATABASE, PENDING_FILENAME,
     RESTORE_FORMAT, InstallationBackup, apply_pending,
 )
-from companion_v2.storage.management import (
+from digital_life_core.storage.management import (
     cleanup_all_backups, cleanup_backups, cleanup_plan, copy_backup_snapshots,
 )
-from companion_v2.storage.runtime import StorageRuntime
+from digital_life_core.storage.runtime import StorageRuntime
 
 
 NOW = datetime(2026, 10, 27, 6, 0, tzinfo=timezone.utc)
@@ -292,8 +292,8 @@ class RuntimeLockWindowTests(unittest.TestCase):
 def _astrbot_stubs():
     """Minimal synthetic seams so ``backup_api`` can be imported without the SDK.
 
-    ``astrbot_host/backup_api.py`` imports ``astrbot.api.web.request`` and resolves
-    ``outcome_response`` from ``astrbot_host.web_api`` at call time. Replacing those
+    ``digital_life_host/backup_api.py`` imports ``astrbot.api.web.request`` and resolves
+    ``outcome_response`` from ``digital_life_host.web_api`` at call time. Replacing those
     two with small fakes is the whole host surface this route needs, and it keeps
     the test offline and free of the production SDK.
     """
@@ -304,7 +304,7 @@ def _astrbot_stubs():
     astrbot_web.request = request
     astrbot.api = astrbot_api
     astrbot_api.web = astrbot_web
-    host_web_api = types.ModuleType("astrbot_host.web_api")
+    host_web_api = types.ModuleType("digital_life_host.web_api")
 
     def outcome_response(result, *, message=""):
         if result.failure is not None:
@@ -314,7 +314,7 @@ def _astrbot_stubs():
 
     host_web_api.outcome_response = outcome_response
     return request, {"astrbot": astrbot, "astrbot.api": astrbot_api,
-                     "astrbot.api.web": astrbot_web, "astrbot_host.web_api": host_web_api}
+                     "astrbot.api.web": astrbot_web, "digital_life_host.web_api": host_web_api}
 
 
 class DashboardRouteTests(unittest.IsolatedAsyncioTestCase):
@@ -322,7 +322,7 @@ class DashboardRouteTests(unittest.IsolatedAsyncioTestCase):
     def setUpClass(cls) -> None:
         cls.request, stubs = _astrbot_stubs()
         cls.enterClassContext(patch.dict(sys.modules, stubs))
-        import astrbot_host.backup_api as backup_api
+        import digital_life_host.backup_api as backup_api
         cls.enterClassContext(patch.object(backup_api, "request", cls.request))
         cls.backup_api = backup_api
 
@@ -339,7 +339,7 @@ class DashboardRouteTests(unittest.IsolatedAsyncioTestCase):
         every other AstrBot task (messages, web requests, timers) for the duration.
         The route has to hand the synchronous call to a worker thread.
         """
-        from companion_v2.execution.models import Outcome
+        from digital_life_core.execution.models import Outcome
 
         installation = _installations(self)(external=True)
         self.request.body = self._body_for({"note": "event loop probe"})
@@ -373,7 +373,7 @@ class DashboardRouteTests(unittest.IsolatedAsyncioTestCase):
                 await task
         self.assertEqual(response["status"], "ok", response)
         self.assertGreater(ticks, 8, f"the event loop only ran {ticks} times during a 0.6s backup")
-        from astrbot_host.backup_api import backup_operation_lock
+        from digital_life_host.backup_api import backup_operation_lock
         self.assertFalse(backup_operation_lock(api.controller).locked())
 
     async def test_delete_route_requires_confirmation_and_dashboard_identity(self) -> None:
@@ -523,13 +523,13 @@ class LegacySnapshotTests(unittest.TestCase):
 
     def test_v1_pairs_take_part_in_a_backup_directory_move(self) -> None:
         """P2-7: relocation only enumerated the v2 format, so v1 pairs stayed behind."""
-        from astrbot_host.storage_location import (
+        from digital_life_host.storage_location import (
             _backup_installations, finish_backup_relocation, relocate_backup_storage,
         )
 
         installation = _installations(self)()
         installation.legacy_pair()
-        plugin_root = installation.base / "plugin-data" / "astrbot_plugin_private_companion"
+        plugin_root = installation.base / "plugin-data" / "astrbot_plugin_digital_life"
         source = plugin_root / "profiles" / "main" / "runtime" / "backups"
         source.mkdir(parents=True)
         for suffix in (".json", ".sqlite3"):

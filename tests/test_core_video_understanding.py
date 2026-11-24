@@ -4,7 +4,7 @@ from types import SimpleNamespace as NS
 import unittest
 from unittest.mock import AsyncMock, patch
 
-from astrbot_host.video.core_understanding import select_native_video_routes, summarize_original_video
+from digital_life_host.video.core_understanding import select_native_video_routes, summarize_original_video
 
 
 class CoreVideoUnderstandingTests(unittest.IsolatedAsyncioTestCase):
@@ -18,7 +18,7 @@ class CoreVideoUnderstandingTests(unittest.IsolatedAsyncioTestCase):
                   get_config=lambda **_kwargs: {"provider_settings": {}, "agent_runner": {}},
                   get_all_providers=lambda: [object(), provider])
         event = NS(unified_msg_origin="qq:private:1", get_extra=lambda _key: None)
-        with patch("astrbot_host.video.core_understanding.ProviderGoogleGenAI", Gemini):
+        with patch("digital_life_host.video.core_understanding.ProviderGoogleGenAI", Gemini):
             self.assertEqual(select_native_video_routes(NS(router=None), host, None, event, None),
                              ((provider, "gemini-video"),))
 
@@ -27,9 +27,9 @@ class CoreVideoUnderstandingTests(unittest.IsolatedAsyncioTestCase):
         result = NS(candidates=[NS(finish_reason="STOP", content=NS(parts=[NS(text="完整视频转述", thought=False)]))])
         generate = AsyncMock(return_value=result)
         provider = NS(client=NS(models=NS(generate_content=generate)))
-        with patch("astrbot_host.video.core_understanding._prepare_generation_config",
+        with patch("digital_life_host.video.core_understanding._prepare_generation_config",
                    AsyncMock(return_value=NS())), \
-             patch("astrbot_host.video.core_understanding.inspect_container"):
+             patch("digital_life_host.video.core_understanding.inspect_container"):
             text = await summarize_original_video(original, provider, "gemini-video", {})
         self.assertEqual(text, "完整视频转述")
         kwargs = generate.await_args.kwargs

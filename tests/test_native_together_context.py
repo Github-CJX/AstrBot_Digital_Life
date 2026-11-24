@@ -9,22 +9,22 @@ import unittest
 from unittest.mock import patch
 
 from tests.multi_host_support import MultiFixture
-from astrbot_host.mobile_together import MobileTogetherBridge
-from astrbot_host.native_extensions.together.activity_methods import TogetherActivityMethods
-from astrbot_host.native_extensions.together.model_methods import TogetherModelMethods
-from astrbot_host.native_extensions.together.native_context import existing_host_conversation, resolve_room_context
-from astrbot_host.native_extensions.together.native_transcripts import received_input
-from astrbot_host.native_extensions.together.rooms_methods import TogetherRoomsMethods
-from astrbot_host.native_extensions.together.settings_methods import TogetherSettingsMethods
-from astrbot_host.native_extensions.together.speech_methods import TogetherSpeechMethods
-from companion_v2.conversation.foreground import ContextContribution, ContributionState
-from companion_v2.conversation.native_history import body, reference
-from companion_v2.conversation.native_observations import TOGETHER_ASSISTANT_OWNER, TOGETHER_INPUT_OWNER
-from companion_v2.execution.models import encode, require, stamp
-from companion_v2.foundation.refs import ScopeKind
-from companion_v2.memory.episodes import recent_dialogue_lines
-from companion_v2.together.models import NativeRoomBinding, RoomMember, RoomSession
-from companion_v2.together.provider import scope_key
+from digital_life_host.mobile_together import MobileTogetherBridge
+from digital_life_host.native_extensions.together.activity_methods import TogetherActivityMethods
+from digital_life_host.native_extensions.together.model_methods import TogetherModelMethods
+from digital_life_host.native_extensions.together.native_context import existing_host_conversation, resolve_room_context
+from digital_life_host.native_extensions.together.native_transcripts import received_input
+from digital_life_host.native_extensions.together.rooms_methods import TogetherRoomsMethods
+from digital_life_host.native_extensions.together.settings_methods import TogetherSettingsMethods
+from digital_life_host.native_extensions.together.speech_methods import TogetherSpeechMethods
+from digital_life_core.conversation.foreground import ContextContribution, ContributionState
+from digital_life_core.conversation.native_history import body, reference
+from digital_life_core.conversation.native_observations import TOGETHER_ASSISTANT_OWNER, TOGETHER_INPUT_OWNER
+from digital_life_core.execution.models import encode, require, stamp
+from digital_life_core.foundation.refs import ScopeKind
+from digital_life_core.memory.episodes import recent_dialogue_lines
+from digital_life_core.together.models import NativeRoomBinding, RoomMember, RoomSession
+from digital_life_core.together.provider import scope_key
 
 
 class RoomRuntime(TogetherModelMethods, TogetherActivityMethods, TogetherRoomsMethods,
@@ -122,7 +122,7 @@ class NativeTogetherContextTests(MultiFixture, unittest.IsolatedAsyncioTestCase)
 
         role = NS(capture=lambda *args: {}, instruction=lambda *args: "角色档案仍然生效")
         relationship = NS(capture=lambda *args: {}, instruction=lambda *args: "相处称呼仍然生效")
-        with patch("astrbot_host.core_reply_context._memory_materials", side_effect=memory), \
+        with patch("digital_life_host.core_reply_context._memory_materials", side_effect=memory), \
                 patch.object(self.app.messages, "role_profile_context", role), \
                 patch.object(self.app.messages, "relationship_profile_context", relationship):
             enabled = await self.runtime._build_system_prompt(self.room, query="那本天文书")
@@ -168,7 +168,7 @@ class NativeTogetherContextTests(MultiFixture, unittest.IsolatedAsyncioTestCase)
 
         class Repository:
             def latest_analysis(owner, **kwargs):
-                from companion_v2.foundation.outcome import Outcome
+                from digital_life_core.foundation.outcome import Outcome
                 calls.append(kwargs)
                 return Outcome.success((NS(analysis=NS(interpretation='{"summary":"正在修改草稿","scene":"写作"}'),
                     material=NS(capture=NS(captured_at=captured_at))),))

@@ -23,16 +23,16 @@ from tempfile import TemporaryDirectory
 from types import SimpleNamespace
 import unittest
 
-from companion_v2.execution.models import TaskError, digest, stamp
-from companion_v2.execution.runner import RunResult
-from companion_v2.expression.style_management import ExpressionStyleManagement
-from companion_v2.expression.style_service import (KIND, LEARN_LEASE_SECONDS, LEASE_PREFIX, OWNER,
+from digital_life_core.execution.models import TaskError, digest, stamp
+from digital_life_core.execution.runner import RunResult
+from digital_life_core.expression.style_management import ExpressionStyleManagement
+from digital_life_core.expression.style_service import (KIND, LEARN_LEASE_SECONDS, LEASE_PREFIX, OWNER,
     ExpressionStyleService)
-from companion_v2.foundation.outcome import Outcome
-from companion_v2.foundation.refs import OperationRef, ScopeKind, ScopeRef, VersionRef
-from companion_v2.storage.models import OperationState
-from companion_v2.storage.repositories import OperationRepository
-from companion_v2.storage.runtime import StorageRuntime
+from digital_life_core.foundation.outcome import Outcome
+from digital_life_core.foundation.refs import OperationRef, ScopeKind, ScopeRef, VersionRef
+from digital_life_core.storage.models import OperationState
+from digital_life_core.storage.repositories import OperationRepository
+from digital_life_core.storage.runtime import StorageRuntime
 from tests import test_expression_v1_pipeline as pipeline
 from tests.test_expression_v1_pipeline import ExpressionFixture
 from tests.test_host_application import HostFixture
@@ -41,7 +41,7 @@ NOW = datetime(2026, 10, 30, 9, 0, tzinfo=timezone.utc)
 SCOPE = ScopeRef("installation-a", "onebot", ScopeKind.PRIVATE, "native-a", "bot-a", "login-a",
                  "conversation-a", "session-a")
 MATERIAL = "0123456789abcdef0123"
-LOGGER = "companion_v2.expression.style_service"
+LOGGER = "digital_life_core.expression.style_service"
 
 
 async def _noop(*_args):

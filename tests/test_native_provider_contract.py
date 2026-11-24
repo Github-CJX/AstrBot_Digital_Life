@@ -3,10 +3,10 @@ from datetime import datetime, timezone
 import hashlib
 import unittest
 
-from companion_v2.capabilities.native import (
+from digital_life_core.capabilities.native import (
     NativeArtifact, NativeResult, SCHEMA, parse_manifest, parse_result,
 )
-from companion_v2.execution.models import ProviderBinding, SideEffect, TaskError, encode
+from digital_life_core.execution.models import ProviderBinding, SideEffect, TaskError, encode
 
 
 def manifest():

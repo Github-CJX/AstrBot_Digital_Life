@@ -5,10 +5,10 @@ from types import SimpleNamespace
 import unittest
 from unittest.mock import patch
 
-from astrbot_host.model_route_material import (build_summary, image_edit_reference_limit,
+from digital_life_host.model_route_material import (build_summary, image_edit_reference_limit,
                                                image_route_snapshot, route_snapshot, scope_umo)
-from companion_v2.foundation.outcome import Outcome
-from companion_v2.foundation.refs import ScopeKind, ScopeRef, SubjectKind, SubjectRef
+from digital_life_core.foundation.outcome import Outcome
+from digital_life_core.foundation.refs import ScopeKind, ScopeRef, SubjectKind, SubjectRef
 
 
 class Meta(dict):
@@ -64,7 +64,7 @@ class ModelRouteMaterialTests(unittest.TestCase):
     def test_the_same_snapshot_as_the_dashboard_card_drives_every_category(self):
         # 扩展页那张卡读的就是这份快照；回复链路直接复用，避免"页面看得到、聊天看不到"。
         host = Host(tts=Provider({"id": "fishaudio", "model": "s2.1-pro-free"}))
-        with patch("astrbot_host.model_route_material.route_snapshot", return_value=SNAPSHOT):
+        with patch("digital_life_host.model_route_material.route_snapshot", return_value=SNAPSHOT):
             summary = build_summary(None, host, None, context(), NOW)
         self.assertEqual(summary["对话"], {"provider": "p-chat", "model": "gemini-3.8-flash"})
         self.assertEqual(summary["视觉理解"], {"provider": "p-vision", "model": "deepseek-v4-flash"})
@@ -73,14 +73,14 @@ class ModelRouteMaterialTests(unittest.TestCase):
 
     def test_without_a_snapshot_it_falls_back_to_host_providers(self):
         host = Host(chat=Provider({"id": "星渊哈基米", "model": "gemini-3.8-flash"}))
-        with patch("astrbot_host.model_route_material.route_snapshot", return_value=None):
+        with patch("digital_life_host.model_route_material.route_snapshot", return_value=None):
             summary = build_summary(None, host, None, context(), NOW)
         self.assertEqual(summary["对话"], {"provider": "星渊哈基米", "model": "gemini-3.8-flash"})
         self.assertEqual(summary["生图"]["state"], "unavailable")
         self.assertEqual(summary["视觉理解"]["state"], "unavailable")
 
     def test_missing_everything_is_still_an_explicit_state(self):
-        with patch("astrbot_host.model_route_material.route_snapshot", return_value=None):
+        with patch("digital_life_host.model_route_material.route_snapshot", return_value=None):
             summary = build_summary(None, None, None, context(), NOW)
         for title in ("对话", "语音合成", "视觉理解", "生图"):
             self.assertEqual(summary[title]["state"], "unavailable", title)

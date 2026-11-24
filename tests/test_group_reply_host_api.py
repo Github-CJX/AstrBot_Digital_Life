@@ -11,17 +11,17 @@ from urllib.parse import urlencode
 from astrbot.api.web import PluginRequest, bind_request_context
 from starlette.requests import Request
 
-from astrbot_host.management_identity import dashboard_operator
-from companion_v2.execution.models import TaskContext, digest, encode
-from companion_v2.identity_policy.models import AuthorizationTier
-from companion_v2.identity_policy.object_access import ObjectAccessPolicy
-from companion_v2.configuration.models import ConfigLayer, ConfigTarget
-from companion_v2.configuration.owners import SparseConfigurationOwner
-from companion_v2.conversation.participation import (ACTION, CONFIG_GROUP as PARTICIPATION_GROUP,
+from digital_life_host.management_identity import dashboard_operator
+from digital_life_core.execution.models import TaskContext, digest, encode
+from digital_life_core.identity_policy.models import AuthorizationTier
+from digital_life_core.identity_policy.object_access import ObjectAccessPolicy
+from digital_life_core.configuration.models import ConfigLayer, ConfigTarget
+from digital_life_core.configuration.owners import SparseConfigurationOwner
+from digital_life_core.conversation.participation import (ACTION, CONFIG_GROUP as PARTICIPATION_GROUP,
     group_participation_settings)
-from companion_v2.expression.configuration import GROUP_SCOPE_GROUP
-from companion_v2.foundation.refs import RoleOwnerRef, ScopeKind, ScopeRef
-from companion_v2.foundation.clock import DeterministicClock
+from digital_life_core.expression.configuration import GROUP_SCOPE_GROUP
+from digital_life_core.foundation.refs import RoleOwnerRef, ScopeKind, ScopeRef
+from digital_life_core.foundation.clock import DeterministicClock
 from tests.group_host_support import GroupFixture, group_config
 from tests.native_adapter_support import completion
 from tests.test_group_participation import command
@@ -29,7 +29,7 @@ from tests.staging_bootstrap_support import wait_for_batch
 from tests.test_management_access import NOW
 
 
-PREFIX = "/astrbot_plugin_private_companion"
+PREFIX = "/astrbot_plugin_digital_life"
 
 
 class CapacityClockWaitTests(unittest.IsolatedAsyncioTestCase):

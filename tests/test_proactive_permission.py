@@ -11,10 +11,10 @@
 
 import unittest
 
-from companion_v2.adapters.astrbot.staging_config import REQUIRED_CAPABILITIES
-from companion_v2.execution.models import TaskError
-from companion_v2.identity_policy.models import AuthorizationTier
-from companion_v2.proactive.configuration import GROUP
+from digital_life_core.adapters.astrbot.staging_config import REQUIRED_CAPABILITIES
+from digital_life_core.execution.models import TaskError
+from digital_life_core.identity_policy.models import AuthorizationTier
+from digital_life_core.proactive.configuration import GROUP
 from tests.contact_schedule_support import ContactScheduleFixture
 
 

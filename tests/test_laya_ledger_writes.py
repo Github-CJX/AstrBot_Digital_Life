@@ -13,9 +13,9 @@ import sqlite3
 
 import pytest
 
-from companion_v2.decision.service import LayaDecisionService
-from companion_v2.decision.store import LayaSettingsStore
-from companion_v2.storage.runtime import StorageRuntime
+from digital_life_core.decision.service import LayaDecisionService
+from digital_life_core.decision.store import LayaSettingsStore
+from digital_life_core.storage.runtime import StorageRuntime
 
 
 class Refusing:

@@ -4,8 +4,8 @@ import asyncio
 from dataclasses import replace
 import unittest
 
-from companion_v2.execution.models import Lane, TaskDeferred, TaskError, TaskRegistration, TaskResult
-from companion_v2.execution.runner import LocalTaskRunner
+from digital_life_core.execution.models import Lane, TaskDeferred, TaskError, TaskRegistration, TaskResult
+from digital_life_core.execution.runner import LocalTaskRunner
 from tests.test_execution import ExecutionFixture
 from tests.test_management_access import NOW
 
@@ -176,7 +176,7 @@ class ExecutionRunnerTests(ExecutionFixture, unittest.IsolatedAsyncioTestCase):
 
         runner = self.runner(handler)
         self.submit()
-        with self.assertLogs("companion_v2.execution.runner", level="ERROR") as captured:
+        with self.assertLogs("digital_life_core.execution.runner", level="ERROR") as captured:
             run_result = (await runner.run_once(Lane.FOREGROUND)).unwrap()
             result = run_result.task
         self.assertEqual((result.state, result.reason), ("failed", "worker_error"))
@@ -190,7 +190,7 @@ class ExecutionRunnerTests(ExecutionFixture, unittest.IsolatedAsyncioTestCase):
 
         runner = self.runner(handler, kind="fixture.background")
         self.submit(kind="fixture.background")
-        with self.assertLogs("companion_v2.execution.runner", level="INFO") as captured:
+        with self.assertLogs("digital_life_core.execution.runner", level="INFO") as captured:
             result = (await runner.run_once(Lane.BACKGROUND)).unwrap()
         self.assertEqual(result.retry_at, NOW)
         self.assertEqual(result.failure_code, "model_budget_exhausted")

@@ -39,11 +39,11 @@ from astrbot.core.message.message_event_result import MessageChain
 from astrbot.core.pipeline.process_stage.follow_up import _ACTIVE_AGENT_RUNNERS
 from astrbot.core.provider.entities import LLMResponse, ProviderRequest
 
-from astrbot_host.core_reply import CORE_REPLY_CONTEXT_EXTRA
-from astrbot_host.core_reply_tool_dispatch import (
+from digital_life_host.core_reply import CORE_REPLY_CONTEXT_EXTRA
+from digital_life_host.core_reply_tool_dispatch import (
     CORE_TOOL_DISPATCH_EXTRA, observe_core_tool_dispatch_begin, restore_core_tool_dispatch,
 )
-from astrbot_host.core_reply_turn_gate import (
+from digital_life_host.core_reply_turn_gate import (
     RESPONSE_STREAM, _blank, _downstream_buffers, _restore_blank,
     _turn_round, close_core_reply_turn, discard_skipped_core_reply,
     install_core_reply_turn, turn_gate,
@@ -52,7 +52,7 @@ from astrbot_host.core_reply_turn_gate import (
 BODY = "我先看看这事的来龙去脉。"
 OTHER = "其实我刚查了，是服务器在维护。"
 LATER = "那就等它维护完。"
-TOOL = "companion_v2_group_participation_choose"
+TOOL = "digital_life_core_group_participation_choose"
 SHAPES = ("openai", "anthropic", "gemini")
 
 
@@ -378,7 +378,7 @@ class TurnGateTests(unittest.IsolatedAsyncioTestCase):
 
         runner = CrashingRunner()
         event.set_extra(CORE_TOOL_DISPATCH_EXTRA, {"runner": runner, "run_context": runner.run_context})
-        with patch("astrbot_host.core_reply_turn_gate.discover_runner", return_value=runner):
+        with patch("digital_life_host.core_reply_turn_gate.discover_runner", return_value=runner):
             gate = install_core_reply_turn(event, runner.run_context)
         self.assertIsNotNone(gate)
         gate["draft"] = {"fragments": [], "text": BODY, "chain": None}
@@ -446,7 +446,7 @@ class TurnGateTests(unittest.IsolatedAsyncioTestCase):
             yield first
             yield second
 
-        with self.assertLogs("astrbot_host.core_reply_turn_gate", level="WARNING") as logs:
+        with self.assertLogs("digital_life_host.core_reply_turn_gate", level="WARNING") as logs:
             shown = [response async for response in _turn_round(gate, source())]
         self.assertEqual([response.completion_text for response in shown], [OTHER])
         self.assertIn("extra_final", "\n".join(logs.output))
@@ -593,7 +593,7 @@ class TurnGateTests(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(result["visible"], [BODY, BODY], "unchanged from today without the gate")
 
     async def test_without_an_active_runner_nothing_is_withheld(self):
-        with patch("astrbot_host.core_reply_tool_dispatch.active_core_runner", return_value=None):
+        with patch("digital_life_host.core_reply_tool_dispatch.active_core_runner", return_value=None):
             result = await self.run_turn([tool_round(), text_round(BODY)])
         self.assertIsNone(result["gate"])
         self.assertEqual(result["visible"], [BODY, BODY])
@@ -604,13 +604,13 @@ class TurnGateTests(unittest.IsolatedAsyncioTestCase):
         event = GateEvent()
         event.set_extra(CORE_REPLY_CONTEXT_EXTRA, {"prepared": {}})
         event.set_extra(CORE_TOOL_DISPATCH_EXTRA, {"runner": runner, "run_context": runner.run_context})
-        with patch("astrbot_host.core_reply_turn_gate.discover_runner", return_value=runner):
+        with patch("digital_life_host.core_reply_turn_gate.discover_runner", return_value=runner):
             self.assertIsNone(install_core_reply_turn(event, runner.run_context))
         self.assertNotIn(RESPONSE_STREAM, runner.__dict__)
         self.assertIsNone(turn_gate(event))
 
     async def test_a_failing_decision_never_swallows_the_round(self):
-        with patch("astrbot_host.core_reply_turn_gate._round_plan", side_effect=RuntimeError("boom")):
+        with patch("digital_life_host.core_reply_turn_gate._round_plan", side_effect=RuntimeError("boom")):
             result = await self.run_turn([tool_round(), text_round(BODY)])
         self.assertEqual(result["text"], BODY + BODY, "fail open: duplicate, never silent")
         self.assertTrue(result["gate"]["failed"])
@@ -691,9 +691,9 @@ class DownstreamBufferReasonTests(unittest.TestCase):
 
     def _reason(self, error):
         event = GateEvent()
-        with patch("astrbot_host.core_reply_segmentation.uses_managed_group_stream",
+        with patch("digital_life_host.core_reply_segmentation.uses_managed_group_stream",
                    side_effect=error):
-            with self.assertLogs("astrbot_host.core_reply_turn_gate", level="WARNING") as logs:
+            with self.assertLogs("digital_life_host.core_reply_turn_gate", level="WARNING") as logs:
                 buffered = _downstream_buffers(event)
         self.assertFalse(buffered, "unknown must not withhold fragments")
         return "\n".join(logs.output)

@@ -9,34 +9,34 @@ import tempfile
 import unittest
 from uuid import uuid4
 
-from companion_v2.capabilities.models import CapabilityAuthorizationState
-from companion_v2.capabilities.qzone_access import QzoneAccess, catalogue
-from companion_v2.capabilities.repositories import CapabilityRepository
-from companion_v2.configuration.models import ConfigLayer, ConfigTarget
-from companion_v2.foundation.outcome import Outcome
-from companion_v2.configuration.registry import FieldRegistry
-from companion_v2.configuration.service import ConfigurationService
-from companion_v2.execution.models import TaskContext, TaskError
-from companion_v2.foundation.clock import DeterministicClock
-from companion_v2.foundation.refs import (AudienceRef, OperationRef, ScopeKind, ScopeRef, SubjectKind,
+from digital_life_core.capabilities.models import CapabilityAuthorizationState
+from digital_life_core.capabilities.qzone_access import QzoneAccess, catalogue
+from digital_life_core.capabilities.repositories import CapabilityRepository
+from digital_life_core.configuration.models import ConfigLayer, ConfigTarget
+from digital_life_core.foundation.outcome import Outcome
+from digital_life_core.configuration.registry import FieldRegistry
+from digital_life_core.configuration.service import ConfigurationService
+from digital_life_core.execution.models import TaskContext, TaskError
+from digital_life_core.foundation.clock import DeterministicClock
+from digital_life_core.foundation.refs import (AudienceRef, OperationRef, ScopeKind, ScopeRef, SubjectKind,
                                           SubjectRef, VersionRef)
-from companion_v2.identity_policy.directory import IdentityDirectory
-from companion_v2.identity_policy.models import AuthenticatedHostPrincipal, AuthorizationTier, RoleBinding
-from companion_v2.identity_policy.repository import PersistentIdentityDirectory
-from companion_v2.identity_policy.object_access import ObjectAccessPolicy
-from companion_v2.identity_policy.personas import (ConversationRoute, PersonaBinding, PersonaDirectory,
+from digital_life_core.identity_policy.directory import IdentityDirectory
+from digital_life_core.identity_policy.models import AuthenticatedHostPrincipal, AuthorizationTier, RoleBinding
+from digital_life_core.identity_policy.repository import PersistentIdentityDirectory
+from digital_life_core.identity_policy.object_access import ObjectAccessPolicy
+from digital_life_core.identity_policy.personas import (ConversationRoute, PersonaBinding, PersonaDirectory,
                                                    PersonaSelector, SelectorKind)
-from companion_v2.qzone import feed as F, policy as Y, protocol as P
-from companion_v2.qzone.capability import CAPABILITIES, EXTENSION, package_descriptor, tool_descriptors
-from companion_v2.qzone.topics import SCENES, TOPIC_SPECS, QzoneTopic, parse_decision
-from companion_v2.qzone.topic_prompt import parse_output
-from companion_v2.qzone.configuration import (GROUP, QzoneConfigurationOwner, QzoneSettings,
+from digital_life_core.qzone import feed as F, policy as Y, protocol as P
+from digital_life_core.qzone.capability import CAPABILITIES, EXTENSION, package_descriptor, tool_descriptors
+from digital_life_core.qzone.topics import SCENES, TOPIC_SPECS, QzoneTopic, parse_decision
+from digital_life_core.qzone.topic_prompt import parse_output
+from digital_life_core.qzone.configuration import (GROUP, QzoneConfigurationOwner, QzoneSettings,
                                               configuration_fields, target_for)
-from companion_v2.qzone.references import COMMENT, LIKE, QzonePost, QzoneReferenceStore
-from companion_v2.qzone.service import QzoneService, local_day, owner_key
-from companion_v2.qzone.transport import TransportOutcome
-from companion_v2.storage.models import OperationState
-from companion_v2.storage.runtime import StorageRuntime
+from digital_life_core.qzone.references import COMMENT, LIKE, QzonePost, QzoneReferenceStore
+from digital_life_core.qzone.service import QzoneService, local_day, owner_key
+from digital_life_core.qzone.transport import TransportOutcome
+from digital_life_core.storage.models import OperationState
+from digital_life_core.storage.runtime import StorageRuntime
 
 
 NOW = datetime(2026, 10, 2, 4, 0, tzinfo=timezone.utc)
@@ -757,7 +757,7 @@ class TopicTests(unittest.TestCase):
         self.assertEqual(schema["additionalProperties"], False)
 
     def test_the_conversation_guidance_is_not_the_classification_contract(self):
-        from companion_v2.qzone.topic_prompt import CONVERSATION_GUIDANCE, INSTRUCTION
+        from digital_life_core.qzone.topic_prompt import CONVERSATION_GUIDANCE, INSTRUCTION
         self.assertIn("只输出一个 JSON 对象", INSTRUCTION)
         # The turn guidance must not tell a normal reply to answer with JSON only.
         self.assertNotIn("只输出一个 JSON 对象", CONVERSATION_GUIDANCE)
@@ -878,8 +878,8 @@ class AgendaSuggestionTests(QzoneServiceFixture):
         self.assertEqual(status["agenda_suggestions"][0]["agenda_id"], "agenda-9")
 
     def test_the_question_is_offered_to_the_model_until_it_is_closed(self):
-        from companion_v2.qzone.agenda_link import SuggestionStore
-        from companion_v2.qzone.service import owner_key as qzone_owner_key
+        from digital_life_core.qzone.agenda_link import SuggestionStore
+        from digital_life_core.qzone.service import owner_key as qzone_owner_key
         store = SuggestionStore(self.runtime)
         self.assertEqual(store.material(qzone_owner_key(self.context)), "")
         self.help_post()
@@ -929,7 +929,7 @@ class AgendaSuggestionTests(QzoneServiceFixture):
         self.assertEqual(caught.exception.code, "qzone_suggestion_state_invalid")
 
     def test_another_role_cannot_close_this_question(self):
-        from companion_v2.qzone.agenda_link import SuggestionStore
+        from digital_life_core.qzone.agenda_link import SuggestionStore
         self.help_post()
         foreign = SuggestionStore(self.runtime)
         self.assertIsNone(foreign.read("qzone-role:someone-else",

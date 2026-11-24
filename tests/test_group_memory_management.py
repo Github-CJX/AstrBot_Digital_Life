@@ -8,12 +8,12 @@ from unittest.mock import patch
 from tests.group_memory_management_support import GroupMemoryManagementFixture, group_config
 from tests.native_adapter_support import completion, final_text
 from tests.staging_bootstrap_support import wait_for_batch
-from astrbot_host.group_authority import GroupAuthority
-from companion_v2.execution.models import TaskError
-from companion_v2.identity_policy.models import AuthorizationTier
-from companion_v2.identity_policy.object_access import ObjectAccessPolicy
-from companion_v2.memory.group.management import GroupMemoryManagement
-from companion_v2.memory.group.hits import evaluate_message, persist_hits
+from digital_life_host.group_authority import GroupAuthority
+from digital_life_core.execution.models import TaskError
+from digital_life_core.identity_policy.models import AuthorizationTier
+from digital_life_core.identity_policy.object_access import ObjectAccessPolicy
+from digital_life_core.memory.group.management import GroupMemoryManagement
+from digital_life_core.memory.group.hits import evaluate_message, persist_hits
 
 
 class GroupMemoryManagementTests(GroupMemoryManagementFixture, unittest.IsolatedAsyncioTestCase):

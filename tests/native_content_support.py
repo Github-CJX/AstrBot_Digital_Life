@@ -3,13 +3,13 @@
 import traceback
 from types import SimpleNamespace
 
-from astrbot_host.native_extensions import NativeExtensionRegistry
-from astrbot_host.native_extensions.builtins import MANAGED_EXTENSIONS
-from companion_v2.capabilities.models import CapabilityAuthorizationState
-from companion_v2.capabilities.repositories import CapabilityRepository
-from companion_v2.content.assembly import build_provider
-from companion_v2.conversation.flow import ConversationPolicy
-from companion_v2.product import PRODUCT_VERSION
+from digital_life_host.native_extensions import NativeExtensionRegistry
+from digital_life_host.native_extensions.builtins import MANAGED_EXTENSIONS
+from digital_life_core.capabilities.models import CapabilityAuthorizationState
+from digital_life_core.capabilities.repositories import CapabilityRepository
+from digital_life_core.content.assembly import build_provider
+from digital_life_core.conversation.flow import ConversationPolicy
+from digital_life_core.product import PRODUCT_VERSION
 from tests.native_internal_support import internal_lease
 from tests.test_management_access import NOW, SCOPE
 

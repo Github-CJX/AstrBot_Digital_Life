@@ -2,10 +2,10 @@
 
 import unittest
 
-from companion_v2.conversation.flow import ConversationPolicy
-from companion_v2.execution.models import TaskContext
-from companion_v2.foundation.refs import AudienceRef
-from companion_v2.role_work.growth.management import RoleGrowthManagement
+from digital_life_core.conversation.flow import ConversationPolicy
+from digital_life_core.execution.models import TaskContext
+from digital_life_core.foundation.refs import AudienceRef
+from digital_life_core.role_work.growth.management import RoleGrowthManagement
 from tests.test_host_application import HostFixture
 from tests.test_management_access import NOW, SCOPE
 

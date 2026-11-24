@@ -2,13 +2,13 @@ from dataclasses import replace
 from datetime import timedelta
 import unittest
 
-from companion_v2.capabilities.models import CapabilityAuthorizationState, CapabilityPackageDescriptor
-from companion_v2.capabilities.read_providers import ReadLimits, ReadProviderRegistry
-from companion_v2.execution.models import TaskError, require, stamp
-from companion_v2.identity_policy.models import AuthorizationTier
-from companion_v2.identity_policy.personas import RuntimeIdentity
-from companion_v2.memory.provider import CAPABILITY, make_provider
-from companion_v2.memory.service import MemoryService
+from digital_life_core.capabilities.models import CapabilityAuthorizationState, CapabilityPackageDescriptor
+from digital_life_core.capabilities.read_providers import ReadLimits, ReadProviderRegistry
+from digital_life_core.execution.models import TaskError, require, stamp
+from digital_life_core.identity_policy.models import AuthorizationTier
+from digital_life_core.identity_policy.personas import RuntimeIdentity
+from digital_life_core.memory.provider import CAPABILITY, make_provider
+from digital_life_core.memory.service import MemoryService
 from tests.memory_support import MemoryFixture
 from tests.test_management_access import NOW
 
@@ -20,7 +20,7 @@ class ReadProviderRegistryTests(MemoryFixture, unittest.TestCase):
         self.runtime_identity = RuntimeIdentity("companion", "registry-runtime", "astrbot", "host")
         self.registry = ReadProviderRegistry(self.tasks, require_running=lambda: require(self.tasks.check_generation()))
         self.registration = self.registry.register(
-            "companion_v2.memory", CAPABILITY,
+            "digital_life_core.memory", CAPABILITY,
             self.read_provider,
         )
 
@@ -29,7 +29,7 @@ class ReadProviderRegistryTests(MemoryFixture, unittest.TestCase):
 
     def bind(self, **changes):
         return self.registry.bind(self.context, **(dict(capability_id="memory.query", capability_version="1.0",
-            provider_id="companion_v2.memory") | changes))
+            provider_id="digital_life_core.memory") | changes))
 
     def request(self, binding):
         scope = binding.scope
@@ -63,7 +63,7 @@ class ReadProviderRegistryTests(MemoryFixture, unittest.TestCase):
 
         binding = self.registry.bind(
             self.context, capability_id="memory.query", capability_version="1.0",
-            provider_id="companion_v2.memory", limits=ReadLimits(16384, 20000),
+            provider_id="digital_life_core.memory", limits=ReadLimits(16384, 20000),
         ).unwrap()
         result = self.registry.invoke(self.context, binding.binding_ref, self.request(binding)).unwrap()
         self.assertEqual(result["status"], "succeeded", result)
@@ -73,7 +73,7 @@ class ReadProviderRegistryTests(MemoryFixture, unittest.TestCase):
     def test_release_and_stale_scope_cannot_reuse_a_read_binding(self):
         binding = self.registry.bind(
             self.context, capability_id="memory.query", capability_version="1.0",
-            provider_id="companion_v2.memory",
+            provider_id="digital_life_core.memory",
         ).unwrap()
         self.assertTrue(self.registry.release(self.context, binding.binding_ref).unwrap())
         failed = self.registry.invoke(self.context, binding.binding_ref, self.request(binding))
@@ -81,7 +81,7 @@ class ReadProviderRegistryTests(MemoryFixture, unittest.TestCase):
 
         binding = self.registry.bind(
             self.context, capability_id="memory.query", capability_version="1.0",
-            provider_id="companion_v2.memory",
+            provider_id="digital_life_core.memory",
         ).unwrap()
         request = self.request(binding)
         request["scope"] = dict(request["scope"], installation_id="other-installation")
@@ -91,7 +91,7 @@ class ReadProviderRegistryTests(MemoryFixture, unittest.TestCase):
     def test_close_invalidates_discovery_and_all_existing_leases(self):
         binding = self.registry.bind(
             self.context, capability_id="memory.query", capability_version="1.0",
-            provider_id="companion_v2.memory",
+            provider_id="digital_life_core.memory",
         ).unwrap()
         self.registry.close()
         self.assertEqual(self.registry.discover(self.context, capability_id="memory.query").failure.code,
@@ -102,7 +102,7 @@ class ReadProviderRegistryTests(MemoryFixture, unittest.TestCase):
     def test_unregister_old_registration_cannot_remove_replacement_or_redirect_old_calls(self):
         old = self.bind().unwrap()
         self.assertTrue(self.registry.unregister(self.registration))
-        replacement = self.registry.register("companion_v2.memory", CAPABILITY, self.read_provider)
+        replacement = self.registry.register("digital_life_core.memory", CAPABILITY, self.read_provider)
         self.assertNotEqual(old.provider.generation, replacement.binding.generation)
         self.assertFalse(self.registry.unregister(self.registration))
         current = self.bind().unwrap()
@@ -114,7 +114,7 @@ class ReadProviderRegistryTests(MemoryFixture, unittest.TestCase):
 
     def test_duplicate_registration_and_missing_features_do_not_silently_choose_a_provider(self):
         with self.assertRaisesRegex(TaskError, "unregister"):
-            self.registry.register("companion_v2.memory", CAPABILITY, self.read_provider)
+            self.registry.register("digital_life_core.memory", CAPABILITY, self.read_provider)
         self.assertEqual(self.bind(required_features=("memory.pending@1",)).failure.code, "provider_feature_unavailable")
         self.assertEqual(self.bind(capability_version="2.0").failure.code, "provider_unavailable")
         self.assertEqual(self.bind(provider_id="missing").failure.code, "provider_unavailable")
@@ -163,7 +163,7 @@ class ReadProviderRegistryTests(MemoryFixture, unittest.TestCase):
                 return result
             return replace(provider, invoke=invoke)
         self.registry.unregister(self.registration)
-        self.registry.register("companion_v2.memory", CAPABILITY, factory)
+        self.registry.register("digital_life_core.memory", CAPABILITY, factory)
         bound = self.bind().unwrap()
         result = self.registry.invoke(self.context, bound.binding_ref, self.request(bound))
         self.assertIsNone(result.value)
@@ -175,11 +175,11 @@ class ReadProviderRegistryTests(MemoryFixture, unittest.TestCase):
             def invoke(context, request):
                 result = provider.invoke(context, request)
                 self.registry.unregister(registration)
-                self.registry.register("companion_v2.memory", CAPABILITY, self.read_provider)
+                self.registry.register("digital_life_core.memory", CAPABILITY, self.read_provider)
                 return result
             return replace(provider, invoke=invoke)
         self.registry.unregister(self.registration)
-        registration = self.registry.register("companion_v2.memory", CAPABILITY, factory)
+        registration = self.registry.register("digital_life_core.memory", CAPABILITY, factory)
         bound = self.bind().unwrap()
         self.assertEqual(self.registry.invoke(self.context, bound.binding_ref, self.request(bound)).failure.code,
                          "provider_binding_unavailable")
@@ -193,7 +193,7 @@ class ReadProviderRegistryTests(MemoryFixture, unittest.TestCase):
                 return provider.invoke(context, request)
             return replace(provider, invoke=invoke)
         self.registry.unregister(self.registration)
-        self.registry.register("companion_v2.memory", CAPABILITY, factory)
+        self.registry.register("digital_life_core.memory", CAPABILITY, factory)
         bound = self.bind(limits=ReadLimits(16384, 20000)).unwrap()
         request = self.request(bound)
         bad = dict(request, budget=dict(request["budget"], max_output_bytes=20001))
@@ -219,14 +219,14 @@ class ReadProviderRegistryTests(MemoryFixture, unittest.TestCase):
                 def factory(binding):
                     provider = self.read_provider(binding)
                     return replace(provider, invoke=lambda context, request: mutate(provider.invoke(context, request)))
-                self.registration = self.registry.register("companion_v2.memory", CAPABILITY, factory)
+                self.registration = self.registry.register("digital_life_core.memory", CAPABILITY, factory)
                 bound = self.bind().unwrap()
                 self.assertEqual(self.registry.invoke(self.context, bound.binding_ref, self.request(bound)).failure.code,
                                  "provider_result_invalid")
         self.registry.unregister(self.registration)
         def fail(context, request):
             raise RuntimeError("private database path and secrets")
-        self.registry.register("companion_v2.memory", CAPABILITY,
+        self.registry.register("digital_life_core.memory", CAPABILITY,
             lambda binding: replace(self.read_provider(binding), invoke=fail))
         bound = self.bind().unwrap()
         result = self.registry.invoke(self.context, bound.binding_ref, self.request(bound))
@@ -257,12 +257,12 @@ class ReadProviderRegistryTests(MemoryFixture, unittest.TestCase):
                 return result
             return replace(provider, invoke=invoke)
         self.registry.unregister(self.registration)
-        self.registration = self.registry.register("companion_v2.memory", CAPABILITY, factory)
+        self.registration = self.registry.register("digital_life_core.memory", CAPABILITY, factory)
         bound = self.bind().unwrap()
         self.assertEqual(self.registry.invoke(self.context, bound.binding_ref, self.request(bound)).failure.code,
                          "provider_deadline_expired")
         self.registry.unregister(self.registration)
-        self.registry.register("companion_v2.memory", CAPABILITY, self.read_provider)
+        self.registry.register("digital_life_core.memory", CAPABILITY, self.read_provider)
         fresh = self.bind().unwrap()
         request = self.request(fresh)
         request["deadline_at"] = stamp(self.clock.now() + timedelta(seconds=30))
@@ -274,7 +274,7 @@ class ReadProviderRegistryTests(MemoryFixture, unittest.TestCase):
         package = CapabilityPackageDescriptor("fixture.memory", "fixture-memory", "publisher", "1", "hash",
                                                ("memory.query",), ("memory",))
         self.registry.unregister(self.registration)
-        self.registry.register("companion_v2.memory", CAPABILITY,
+        self.registry.register("digital_life_core.memory", CAPABILITY,
             lambda binding: replace(self.read_provider(binding), package=package))
         repo = self.registry.packages
         self.assertEqual(self.registry.discover(self.context, capability_id="memory.query").unwrap(), ())

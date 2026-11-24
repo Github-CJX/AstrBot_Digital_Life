@@ -8,10 +8,10 @@ from unittest.mock import AsyncMock, patch
 
 from PIL import Image
 
-from astrbot_host.media import PublicImageResolver, fetch_image, inspect_image, load_native_image, public_url
-from companion_v2.adapters.astrbot.native import NativeImageLocator
-from companion_v2.conversation.media.models import MAX_IMAGE_BYTES
-from companion_v2.execution.models import TaskError
+from digital_life_host.media import PublicImageResolver, fetch_image, inspect_image, load_native_image, public_url
+from digital_life_core.adapters.astrbot.native import NativeImageLocator
+from digital_life_core.conversation.media.models import MAX_IMAGE_BYTES
+from digital_life_core.execution.models import TaskError
 from tests.test_conversation_images import image_bytes
 
 
@@ -38,7 +38,7 @@ class StaticImageLoaderTests(unittest.IsolatedAsyncioTestCase):
         for locator in ("file:///C:/secret", "C:/secret", "../../secret", "https://127.0.0.1/image",
                         "http://169.254.169.254/image", "http://[::1]/image", "ftp://public.example/image",
                         "https://user:pass@public.example/image", "https://public.example:8000/image"):
-            with self.subTest(locator=locator), patch("astrbot_host.media.aiohttp.ClientSession") as session:
+            with self.subTest(locator=locator), patch("digital_life_host.media.aiohttp.ClientSession") as session:
                 with self.assertRaises(TaskError):
                     await load_native_image(NativeImageLocator(0, locator))
                 session.assert_not_called()
@@ -49,7 +49,7 @@ class StaticImageLoaderTests(unittest.IsolatedAsyncioTestCase):
         with TemporaryDirectory() as directory:
             cached = Path(directory) / "quoted-image.png"
             cached.write_bytes(source)
-            with patch("astrbot_host.media.aiohttp.ClientSession") as session:
+            with patch("digital_life_host.media.aiohttp.ClientSession") as session:
                 captured = await load_native_image(NativeImageLocator(4, str(cached), host_resolved=True))
                 session.assert_not_called()
             self.assertEqual(captured.content, source)
@@ -64,8 +64,8 @@ class StaticImageLoaderTests(unittest.IsolatedAsyncioTestCase):
         from types import SimpleNamespace as NS
         from astrbot.core.message.components import Image
         from astrbot.core.utils.astrbot_path import get_astrbot_temp_path
-        from astrbot_host.core_reply_media import frozen_image_locators
-        from companion_v2.adapters.astrbot.quotes import image_locator
+        from digital_life_host.core_reply_media import frozen_image_locators
+        from digital_life_core.adapters.astrbot.quotes import image_locator
 
         source = image_bytes("green")
         root = Path(get_astrbot_temp_path())
@@ -75,7 +75,7 @@ class StaticImageLoaderTests(unittest.IsolatedAsyncioTestCase):
             cached.write_bytes(source)
             locator = image_locator(2, str(cached), str(cached))
             self.assertTrue(locator.host_resolved)
-            with patch("astrbot_host.media.aiohttp.ClientSession") as session:
+            with patch("digital_life_host.media.aiohttp.ClientSession") as session:
                 captured = await load_native_image(locator)
                 session.assert_not_called()
             self.assertEqual(captured.content, source)
@@ -86,7 +86,7 @@ class StaticImageLoaderTests(unittest.IsolatedAsyncioTestCase):
                 Image(file=str(cached), url=str(cached))])))
             self.assertEqual(len(frozen), 1)
             self.assertTrue(frozen[0].host_resolved)
-            with patch("astrbot_host.media.aiohttp.ClientSession") as session:
+            with patch("digital_life_host.media.aiohttp.ClientSession") as session:
                 self.assertEqual((await load_native_image(frozen[0])).content, source)
                 session.assert_not_called()
 
@@ -132,7 +132,7 @@ class StaticImageLoaderTests(unittest.IsolatedAsyncioTestCase):
 
     async def test_obfuscated_numeric_hosts_cannot_bypass_the_checked_resolver(self):
         for host in ("2130706433", "127.1", "0177.0.0.1", "127.0.0.1.", "１２７.０.０.１"):
-            with self.subTest(host=host), patch("astrbot_host.media.aiohttp.ClientSession") as session:
+            with self.subTest(host=host), patch("digital_life_host.media.aiohttp.ClientSession") as session:
                 with self.assertRaises(TaskError) as caught:
                     await load_native_image(NativeImageLocator(0, "http://" + host + "/image"))
                 self.assertEqual(caught.exception.code, "host_image_location_invalid")
@@ -157,7 +157,7 @@ class StaticImageLoaderTests(unittest.IsolatedAsyncioTestCase):
                 return self.response
         response = Response()
         session = Session(response)
-        with patch("astrbot_host.media.aiohttp.TCPConnector"), patch("astrbot_host.media.aiohttp.ClientSession", return_value=session):
+        with patch("digital_life_host.media.aiohttp.TCPConnector"), patch("digital_life_host.media.aiohttp.ClientSession", return_value=session):
             with self.assertRaises(TaskError) as caught:
                 await fetch_image("https://public.example/image")
             self.assertEqual(caught.exception.code, "host_image_limit")
@@ -168,6 +168,6 @@ class StaticImageLoaderTests(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(len(session.calls), 2)
 
     async def test_cancelled_loader_propagates_without_partial_success(self):
-        with patch("astrbot_host.media.fetch_image", AsyncMock(side_effect=asyncio.CancelledError)):
+        with patch("digital_life_host.media.fetch_image", AsyncMock(side_effect=asyncio.CancelledError)):
             with self.assertRaises(asyncio.CancelledError):
                 await load_native_image(NativeImageLocator(0, "https://public.example/image"))

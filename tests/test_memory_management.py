@@ -1,13 +1,13 @@
 from dataclasses import replace
 import unittest
 
-from companion_v2.configuration.registry import FieldRegistry
-from companion_v2.configuration.service import ConfigurationService
-from companion_v2.identity_policy.models import AuthorizationTier
-from companion_v2.memory.configuration import configuration_fields, target_for
-from companion_v2.memory.management import MemoryManagement
-from companion_v2.memory.models import AtomRef
-from companion_v2.memory.service import MemoryService
+from digital_life_core.configuration.registry import FieldRegistry
+from digital_life_core.configuration.service import ConfigurationService
+from digital_life_core.identity_policy.models import AuthorizationTier
+from digital_life_core.memory.configuration import configuration_fields, target_for
+from digital_life_core.memory.management import MemoryManagement
+from digital_life_core.memory.models import AtomRef
+from digital_life_core.memory.service import MemoryService
 from tests.memory_support import MemoryFixture
 
 

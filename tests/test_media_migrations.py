@@ -5,8 +5,8 @@ from tempfile import TemporaryDirectory
 import unittest
 from unittest.mock import patch
 
-from companion_v2.storage.runtime import StorageRuntime, StorageOpenError
-from companion_v2.storage.schema import (
+from digital_life_core.storage.runtime import StorageRuntime, StorageOpenError
+from digital_life_core.storage.schema import (
     SCHEMA_VERSION, SCHEMA_VERSION_V24, MIGRATION_V23_TO_V24_FINGERPRINT,
     MIGRATION_V42_TO_V43_ID,
 )

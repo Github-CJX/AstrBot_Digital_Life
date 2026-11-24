@@ -3,13 +3,13 @@ import base64
 import json
 import unittest
 
-from companion_v2.adapters.astrbot.model_wire import tool_alias
-from companion_v2.conversation.flow import ConversationPolicy
-from companion_v2.conversation.generation import MODEL_FAILURE_NOTICE
-from companion_v2.conversation.reply_management import ReplyManagement
-from companion_v2.conversation.segmentation import SegmentationPolicy, LLM_SEGMENT_MARKER as MARKER
-from companion_v2.conversation.voice_reply import VoiceReplyDelivery, VoiceReplyPolicy
-from companion_v2.model_gateway.models import Amount, BudgetPolicy
+from digital_life_core.adapters.astrbot.model_wire import tool_alias
+from digital_life_core.conversation.flow import ConversationPolicy
+from digital_life_core.conversation.generation import MODEL_FAILURE_NOTICE
+from digital_life_core.conversation.reply_management import ReplyManagement
+from digital_life_core.conversation.segmentation import SegmentationPolicy, LLM_SEGMENT_MARKER as MARKER
+from digital_life_core.conversation.voice_reply import VoiceReplyDelivery, VoiceReplyPolicy
+from digital_life_core.model_gateway.models import Amount, BudgetPolicy
 from tests.native_adapter_support import FakeEvent, final_text
 from tests.segmentation_stream_support import StreamingFixture, chunk, text_chunks, USAGE
 
@@ -180,7 +180,7 @@ class SegmentedStreamDeliveryTests(StreamingFixture, unittest.IsolatedAsyncioTes
 
     async def test_streamed_natural_segments_keep_original_image_order_on_last_part(self):
         from astrbot.core.message.components import Image, Plain
-        from astrbot_host.media import load_native_image
+        from digital_life_host.media import load_native_image
         from tests.image_delivery_support import offered_images
         from tests.test_conversation_images import image_bytes
         self.bridge.image_type, self.bridge.image_loader = Image, load_native_image
@@ -225,7 +225,7 @@ class SegmentedStreamDeliveryTests(StreamingFixture, unittest.IsolatedAsyncioTes
 
     async def test_streamed_tool_reply_combines_segments_images_and_tts_in_one_ordered_plan(self):
         from astrbot.core.message.components import Image, Plain
-        from astrbot_host.media import load_native_image
+        from digital_life_host.media import load_native_image
         from tests.image_delivery_support import offered_images
         from tests.test_conversation_images import image_bytes
 
@@ -278,7 +278,7 @@ class SegmentedStreamDeliveryTests(StreamingFixture, unittest.IsolatedAsyncioTes
 
     async def test_leading_images_keep_sealed_order_across_stream_config_change_tts_failure_and_restart(self):
         from astrbot.core.message.components import Image, Plain
-        from astrbot_host.media import load_native_image
+        from digital_life_host.media import load_native_image
         from tests.image_delivery_support import offered_images
         from tests.test_conversation_images import image_bytes
 

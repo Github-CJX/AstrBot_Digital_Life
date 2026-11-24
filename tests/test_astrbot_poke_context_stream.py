@@ -4,7 +4,7 @@ import asyncio
 from types import SimpleNamespace as NS
 import unittest
 
-from companion_v2.conversation.pokes import PokePolicy
+from digital_life_core.conversation.pokes import PokePolicy
 from tests.group_host_support import GroupFixture, group_config
 from tests.native_adapter_support import completion, final_text
 from tests.test_astrbot_poke_host import poke_notice

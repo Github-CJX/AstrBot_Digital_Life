@@ -5,7 +5,7 @@ description: Deploy, upgrade, and configure the AstrBot "我会永远陪着你 /
 
 # Companion V2 deployment and configuration
 
-Use this skill when you are an agent helping a user install, upgrade, or configure `astrbot_plugin_private_companion`.
+Use this skill when you are an agent helping a user install, upgrade, or configure `astrbot_plugin_digital_life`.
 
 ## 0. Ask before changing anything
 
@@ -91,17 +91,17 @@ Runtime database path
 Typical Docker/Linux layout:
 
 ```text
-/AstrBot/data/plugins/astrbot_plugin_private_companion
-/AstrBot/data/plugin_data/astrbot_plugin_private_companion
-/AstrBot/data/config/astrbot_plugin_private_companion_config.json
+/AstrBot/data/plugins/astrbot_plugin_digital_life
+/AstrBot/data/plugin_data/astrbot_plugin_digital_life
+/AstrBot/data/config/astrbot_plugin_digital_life_config.json
 ```
 
 Typical host layout:
 
 ```text
-<data>/plugins/astrbot_plugin_private_companion
-<data>/plugin_data/astrbot_plugin_private_companion
-<data>/config/astrbot_plugin_private_companion_config.json
+<data>/plugins/astrbot_plugin_digital_life
+<data>/plugin_data/astrbot_plugin_digital_life
+<data>/config/astrbot_plugin_digital_life_config.json
 ```
 
 The runtime database normally lives under:
@@ -121,7 +121,7 @@ The supported AstrBot range begins at `4.27.2`; verify the installed release met
 5. Start/reload the backend and verify:
 
 ```text
-GET /api/plug/astrbot_plugin_private_companion/host/status
+GET /api/plug/astrbot_plugin_digital_life/host/status
 ```
 
 Expect:
@@ -130,7 +130,7 @@ Expect:
 {"state": "running", "accepting": true}
 ```
 
-If the status is absent, read AstrBot backend logs for import errors before retrying. A plugin reload does not reload already-imported `companion_v2` modules; a backend restart is required for those code changes.
+If the status is absent, read AstrBot backend logs for import errors before retrying. A plugin reload does not reload already-imported `digital_life_core` modules; a backend restart is required for those code changes.
 
 ## 3. Fix `StoragePathError` first
 
@@ -147,7 +147,7 @@ Set `storage.path` to the **parent** of the dedicated data directory, for exampl
 Do not point it at:
 
 ```text
-/AstrBot/data/plugins/astrbot_plugin_private_companion
+/AstrBot/data/plugins/astrbot_plugin_digital_life
 ```
 
 Do not append the plugin name twice. Ensure the directory is writable by the AstrBot user, then restart the backend.

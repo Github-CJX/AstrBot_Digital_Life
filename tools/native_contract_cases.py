@@ -22,24 +22,24 @@ from astrbot.core.provider.sources.openai_source import ProviderOpenAIOfficial
 import httpx
 from openai import AsyncOpenAI
 
-from companion_v2.adapters.astrbot.model_wire import tool_alias
-from companion_v2.adapters.astrbot.native import HostAccount, HostPersona, NativePrivateBridge, persona_instruction
-from companion_v2.adapters.astrbot.onebot import OneBotPrivateSender
-from companion_v2.adapters.astrbot.provider import AstrBotTextProvider, UsageTariff
-from companion_v2.adapters.astrbot.staging import AstrBotStagingSession, NativeAdapterTypes, StagingProfile
-from companion_v2.adapters.astrbot.staging_bootstrap import AstrBotStagingBootstrap
-from companion_v2.adapters.astrbot.staging_config import (
+from digital_life_core.adapters.astrbot.model_wire import tool_alias
+from digital_life_core.adapters.astrbot.native import HostAccount, HostPersona, NativePrivateBridge, persona_instruction
+from digital_life_core.adapters.astrbot.onebot import OneBotPrivateSender
+from digital_life_core.adapters.astrbot.provider import AstrBotTextProvider, UsageTariff
+from digital_life_core.adapters.astrbot.staging import AstrBotStagingSession, NativeAdapterTypes, StagingProfile
+from digital_life_core.adapters.astrbot.staging_bootstrap import AstrBotStagingBootstrap
+from digital_life_core.adapters.astrbot.staging_config import (
     DELIVERY_CAPABILITY,
     DELIVERY_GRANT_ID,
     StagingConfiguration,
 )
-from companion_v2.conversation.flow import ConversationPolicy
-from companion_v2.execution.models import TaskContext, digest
-from companion_v2.identity_policy.personas import RuntimeIdentity
-from companion_v2.identity_policy.models import AuthorizationTier
-from companion_v2.model_gateway.models import Amount, BudgetPolicy
-from companion_v2.model_gateway.failures import ModelFailure
-from companion_v2.storage.runtime import StorageRuntime
+from digital_life_core.conversation.flow import ConversationPolicy
+from digital_life_core.execution.models import TaskContext, digest
+from digital_life_core.identity_policy.personas import RuntimeIdentity
+from digital_life_core.identity_policy.models import AuthorizationTier
+from digital_life_core.model_gateway.models import Amount, BudgetPolicy
+from digital_life_core.model_gateway.failures import ModelFailure
+from digital_life_core.storage.runtime import StorageRuntime
 from tests.native_adapter_support import NativeFixture, final_text
 from tests.staging_bootstrap_support import database_contents, synthetic_configuration
 from tests.test_management_access import INSTALLATION, NOW, ROLE
@@ -177,7 +177,7 @@ class NativeContractTests(NativeFixture, unittest.IsolatedAsyncioTestCase):
         self.assertIsNone(response.usage)
 
     async def test_native_parser_argument_repair_cannot_trigger_zero_argument_tool(self):
-        from companion_v2.model_gateway.models import ToolSpec
+        from digital_life_core.model_gateway.models import ToolSpec
         envelope = await self.envelope(tools=(ToolSpec("memo.list", "list", '{"type":"object"}'),))
         def invalid(payload, result):
             result["choices"][0].update(finish_reason="tool_calls", message={"role": "assistant", "content": None,

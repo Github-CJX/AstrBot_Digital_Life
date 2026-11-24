@@ -8,11 +8,11 @@ from astrbot.core.agent.message import Message, TextPart
 from astrbot.core.agent.runners.tool_loop_agent_runner import ToolLoopAgentRunner
 from astrbot.core.provider.entities import LLMResponse, ProviderRequest
 
-from astrbot_host.core_reply import CORE_REPLY_CONTEXT_EXTRA, inject_core_reply_prompt
-from astrbot_host.core_reply_media_prompt import core_media_request_diagnostics, finalize_core_reply_media_prompt
-from companion_v2.conversation.voice_reply import VoiceReplyPolicy
-from companion_v2.expression.reply_intent import INSTRUCTION as REACTION_INSTRUCTION
-from astrbot_host.fish_audio import DRAMA_DIRECTION
+from digital_life_host.core_reply import CORE_REPLY_CONTEXT_EXTRA, inject_core_reply_prompt
+from digital_life_host.core_reply_media_prompt import core_media_request_diagnostics, finalize_core_reply_media_prompt
+from digital_life_core.conversation.voice_reply import VoiceReplyPolicy
+from digital_life_core.expression.reply_intent import INSTRUCTION as REACTION_INSTRUCTION
+from digital_life_host.fish_audio import DRAMA_DIRECTION
 from tests.test_core_reply_voice import FakeEvent
 
 

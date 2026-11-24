@@ -5,9 +5,9 @@ from types import SimpleNamespace as NS
 import unittest
 from unittest.mock import AsyncMock
 
-from astrbot_host.identity_derivation import derive_role_id
-from astrbot_host.legacy_persona_mapping import legacy_account_inventory
-from companion_v2.legacy.configuration_migration import convert_account_configuration
+from digital_life_host.identity_derivation import derive_role_id
+from digital_life_host.legacy_persona_mapping import legacy_account_inventory
+from digital_life_core.legacy.configuration_migration import convert_account_configuration
 
 
 class LegacyPersonaMappingTests(unittest.IsolatedAsyncioTestCase):

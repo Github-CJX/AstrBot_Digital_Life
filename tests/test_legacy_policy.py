@@ -1,6 +1,6 @@
 import unittest
 
-from companion_v2.memory.legacy_policy import evaluate_legacy_memory_access
+from digital_life_core.memory.legacy_policy import evaluate_legacy_memory_access
 
 
 PRIVATE_OWNER = ("private", "user-1")

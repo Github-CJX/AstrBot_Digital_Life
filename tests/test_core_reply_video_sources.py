@@ -2,7 +2,7 @@
 
 两段被测代码：
 
-- ``astrbot_host/core_reply_video_sources.py``：进程内五元组缓存（写入/取出/过期/淘汰）。
+- ``digital_life_host/core_reply_video_sources.py``：进程内五元组缓存（写入/取出/过期/淘汰）。
 - ``main.py`` 的 ``_attach_core_reply_videos``：按**既有**视频理解开关决定补挂，
   并在任何判断之前就把位置消费掉。
 """
@@ -15,14 +15,14 @@ from unittest.mock import AsyncMock, patch
 
 from astrbot.core.agent.message import AudioURLPart, TextPart
 
-from astrbot_host import core_reply_video_sources as sources
-from astrbot_host.core_reply import CORE_REPLY_CONTEXT_EXTRA
-from astrbot_host.video.fusion import MAX_CORE_VIDEO_DOWNLOAD_BYTES
-from companion_v2.adapters.astrbot.native import NativeConversationInput, NativeVideoLocator
-from companion_v2.execution.models import TaskContext
-from companion_v2.foundation.refs import AudienceRef, ScopeKind, ScopeRef, SubjectKind, SubjectRef
-from companion_v2.identity_policy.models import AuthenticatedHostPrincipal, ResolvedIdentity, RoleBinding
-from companion_v2.identity_policy.personas import ConversationRoute
+from digital_life_host import core_reply_video_sources as sources
+from digital_life_host.core_reply import CORE_REPLY_CONTEXT_EXTRA
+from digital_life_host.video.fusion import MAX_CORE_VIDEO_DOWNLOAD_BYTES
+from digital_life_core.adapters.astrbot.native import NativeConversationInput, NativeVideoLocator
+from digital_life_core.execution.models import TaskContext
+from digital_life_core.foundation.refs import AudienceRef, ScopeKind, ScopeRef, SubjectKind, SubjectRef
+from digital_life_core.identity_policy.models import AuthenticatedHostPrincipal, ResolvedIdentity, RoleBinding
+from digital_life_core.identity_policy.personas import ConversationRoute
 from tests.test_main_no_reply import ENTRY
 from tests.test_management_access import NOW
 
@@ -30,17 +30,17 @@ from tests.test_management_access import NOW
 INSTALLATION = "install-c6"
 AT = datetime(2026, 11, 5, 12, 0, tzinfo=timezone.utc)
 
-#: main.py 用相对导入（``from .astrbot_host.core_reply_video_sources import ...``），
+#: main.py 用相对导入（``from .digital_life_host.core_reply_video_sources import ...``），
 #: 所以补挂点用的是插件包下的那份模块。入口测试把 main.py 加载成合成包的子模块，
 #: 这里必须取同一份实例，否则缓存会分成两个互不相干的表。
 PLUGIN_PACKAGE = ENTRY.__name__.rsplit(".", 1)[0]
-PLUGIN_SOURCES = importlib.import_module(PLUGIN_PACKAGE + ".astrbot_host.core_reply_video_sources")
-PLUGIN_FETCH = PLUGIN_PACKAGE + ".astrbot_host.video.loader.fetch_native_video_bytes"
-PLUGIN_HOST_READ = PLUGIN_PACKAGE + ".astrbot_host.video.loader.read_host_resolved_video_bytes"
-PLUGIN_DECODE = PLUGIN_PACKAGE + ".astrbot_host.video.loader.decode_video"
-PLUGIN_NATIVE_ROUTE = PLUGIN_PACKAGE + ".astrbot_host.video.core_understanding.select_native_video_routes"
-PLUGIN_SUMMARIZE = PLUGIN_PACKAGE + ".astrbot_host.video.core_understanding.summarize_original_video"
-PLUGIN_INSPECT = PLUGIN_PACKAGE + ".astrbot_host.video.container.inspect_container"
+PLUGIN_SOURCES = importlib.import_module(PLUGIN_PACKAGE + ".digital_life_host.core_reply_video_sources")
+PLUGIN_FETCH = PLUGIN_PACKAGE + ".digital_life_host.video.loader.fetch_native_video_bytes"
+PLUGIN_HOST_READ = PLUGIN_PACKAGE + ".digital_life_host.video.loader.read_host_resolved_video_bytes"
+PLUGIN_DECODE = PLUGIN_PACKAGE + ".digital_life_host.video.loader.decode_video"
+PLUGIN_NATIVE_ROUTE = PLUGIN_PACKAGE + ".digital_life_host.video.core_understanding.select_native_video_routes"
+PLUGIN_SUMMARIZE = PLUGIN_PACKAGE + ".digital_life_host.video.core_understanding.summarize_original_video"
+PLUGIN_INSPECT = PLUGIN_PACKAGE + ".digital_life_host.video.container.inspect_container"
 ORIGINAL_VIDEO = b"complete-original-mp4"
 
 
@@ -334,7 +334,7 @@ class CoreReplyVideoAttachTests(unittest.IsolatedAsyncioTestCase):
         fetch.assert_awaited_once()
         self.assertEqual(summarize.await_args.args[:3], (original, provider, "gemini-test"))
         decode.assert_not_awaited()
-        from astrbot_host.core_reply_perception import video_request_state
+        from digital_life_host.core_reply_perception import video_request_state
         self.assertEqual(video_request_state(request), "native_summary")
         self.assertTrue(all(part._no_save for part in request.extra_user_content_parts))
         self.assertEqual(PLUGIN_SOURCES.take(key), ())
@@ -355,7 +355,7 @@ class CoreReplyVideoAttachTests(unittest.IsolatedAsyncioTestCase):
         self.assertTrue(all(40 < call.args[3]["video_understanding_wait_seconds"] <= 45
                             for call in summarize.await_args_list))
         decode.assert_not_awaited()
-        from astrbot_host.core_reply_perception import video_request_state
+        from digital_life_host.core_reply_perception import video_request_state
         self.assertEqual(video_request_state(request), "native_summary")
 
     async def test_a_private_turn_never_carries_a_group_video(self):
@@ -405,7 +405,7 @@ class CoreReplyVideoAttachTests(unittest.IsolatedAsyncioTestCase):
             maximum_bytes=MAX_CORE_VIDEO_DOWNLOAD_BYTES,
         )
         decode.assert_awaited_once_with(original, 0)
-        from astrbot_host.core_reply_perception import video_request_state
+        from digital_life_host.core_reply_perception import video_request_state
         self.assertEqual(video_request_state(request), "sampled_frames")
         images = [part for part in request.extra_user_content_parts if part.type == "image_url"]
         self.assertEqual([part.image_url.id for part in images],
@@ -421,7 +421,7 @@ class CoreReplyVideoAttachTests(unittest.IsolatedAsyncioTestCase):
               patch(PLUGIN_DECODE, AsyncMock(return_value=self.sampled_video()))):
             await self.plugin.restate_companion_core_video_state(event, request)
         reader.assert_awaited_once()
-        from astrbot_host.core_reply_perception import video_request_state
+        from digital_life_host.core_reply_perception import video_request_state
         self.assertEqual(video_request_state(request), "sampled_frames")
         self.assertIs(request.extra_user_content_parts[1], existing)
 
@@ -444,7 +444,7 @@ class CoreReplyVideoAttachTests(unittest.IsolatedAsyncioTestCase):
         reader.assert_awaited_once()
         self.assertEqual(summarize.await_args.args[:3], (original, provider, "gemini-test"))
         decode.assert_not_awaited()
-        from astrbot_host.core_reply_perception import video_request_state
+        from digital_life_host.core_reply_perception import video_request_state
         self.assertEqual(video_request_state(request), "native_summary")
         self.assertTrue(all(part._no_save for part in request.extra_user_content_parts[1:]))
 
@@ -465,5 +465,5 @@ class CoreReplyVideoAttachTests(unittest.IsolatedAsyncioTestCase):
         )
         previous_loader.assert_not_awaited()
         self.assertEqual(PLUGIN_SOURCES.take(key), ())
-        from astrbot_host.core_reply_perception import video_request_state
+        from digital_life_host.core_reply_perception import video_request_state
         self.assertEqual(video_request_state(request), "sampled_frames")

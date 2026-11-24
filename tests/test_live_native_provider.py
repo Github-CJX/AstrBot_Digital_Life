@@ -8,11 +8,11 @@ import time
 from types import SimpleNamespace
 import unittest
 
-from companion_v2.capabilities.native import parse_manifest, parse_result
-from companion_v2.execution.models import SideEffect
-from companion_v2.games.native import provider as GAME
-from companion_v2.live import provider as LIVE
-from companion_v2.product import PRODUCT_VERSION
+from digital_life_core.capabilities.native import parse_manifest, parse_result
+from digital_life_core.execution.models import SideEffect
+from digital_life_core.games.native import provider as GAME
+from digital_life_core.live import provider as LIVE
+from digital_life_core.product import PRODUCT_VERSION
 from tests.native_internal_support import internal_registry
 
 
@@ -164,9 +164,9 @@ class LiveNativeProviderTests(unittest.IsolatedAsyncioTestCase):
             self.assertEqual(registry.issues, ())
             self.assertEqual(len(registry.declarations()), 37)
             self.assertIsNotNone(registry.current_declaration(
-                "native:astrbot_plugin_private_companion.live:live.events.recent"))
+                "native:astrbot_plugin_digital_life.live:live.events.recent"))
             self.assertIsNotNone(registry.current_declaration(
-                "native:astrbot_plugin_private_companion.game:game.tictactoe.move"))
+                "native:astrbot_plugin_digital_life.game:game.tictactoe.move"))
 
     async def test_gomoku_and_tictactoe_are_separate_durable_scoped_games(self):
         plugin = SimpleNamespace(native_v2_tictactoe_enabled=True,
@@ -196,7 +196,7 @@ class LiveNativeProviderTests(unittest.IsolatedAsyncioTestCase):
             plugin.native_v2_tictactoe_enabled = False
             self.assertEqual(provider.manifest(), manifest)
             self.assertIsNotNone(registry.current_declaration(
-                "native:astrbot_plugin_private_companion.game:game.tictactoe.snapshot"))
+                "native:astrbot_plugin_digital_life.game:game.tictactoe.snapshot"))
             with self.assertRaisesRegex(GAME.NativeGameError, "game_tictactoe_disabled"):
                 await provider.execute(game_request(provider, GAME.READ, {}, "disabled-read"),
                                        before_dispatch=lambda: True)

@@ -10,14 +10,14 @@ from datetime import timedelta
 import unittest
 from unittest.mock import patch
 
-from companion_v2.conversation.models import InboundConversationEvent
-from companion_v2.execution.models import digest
-from companion_v2.foundation.refs import SourceRef, VersionRef
-from companion_v2.memory import codec
-from companion_v2.memory.management import MemoryManagement
-from companion_v2.memory.models import Proposal
-from companion_v2.proactive.service import ProactiveContacts
-from companion_v2.sources.models import SourceRecord
+from digital_life_core.conversation.models import InboundConversationEvent
+from digital_life_core.execution.models import digest
+from digital_life_core.foundation.refs import SourceRef, VersionRef
+from digital_life_core.memory import codec
+from digital_life_core.memory.management import MemoryManagement
+from digital_life_core.memory.models import Proposal
+from digital_life_core.proactive.service import ProactiveContacts
+from digital_life_core.sources.models import SourceRecord
 from tests.proactive_support import ContactFixture
 from tests.test_management_access import NOW, SCOPE
 from tests.test_role_tool_loop import answered

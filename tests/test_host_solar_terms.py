@@ -1,6 +1,6 @@
 """The host supplied solar-term table and its wiring into date context.
 
-``companion_v2`` only ever consumes an injected lookup object, so the table is
+``digital_life_core`` only ever consumes an injected lookup object, so the table is
 the producer half of that contract: until it existed the automatic source
 reported ``unavailable`` no matter how the private window was configured.
 """
@@ -10,11 +10,11 @@ from __future__ import annotations
 from datetime import date, datetime, timezone
 import unittest
 
-from astrbot_host.solar_terms import (
+from digital_life_host.solar_terms import (
     MAXIMUM_YEAR, MINIMUM_YEAR, TERM_NAMES, SolarTermTablePort, configured_solar_term_port,
 )
-from companion_v2.conversation.date_context import project_local_date
-from companion_v2.conversation.solar_terms import lookup_solar_terms, names_on
+from digital_life_core.conversation.date_context import project_local_date
+from digital_life_core.conversation.solar_terms import lookup_solar_terms, names_on
 
 
 class SolarTermTableTests(unittest.TestCase):

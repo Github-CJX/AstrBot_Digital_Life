@@ -17,21 +17,21 @@ from unittest import mock
 
 import aiohttp
 
-from astrbot_host.native_extensions.discovery import declarations_for_manifest
-from astrbot_host.native_extensions.image_native import output_routing
-from astrbot_host.native_extensions.image_native.adapter import PLUGIN_ID
-from astrbot_host.native_extensions.image_native.extension import ImageExtensionAPI
-from astrbot_host.native_extensions.image_native.output_configuration import (
+from digital_life_host.native_extensions.discovery import declarations_for_manifest
+from digital_life_host.native_extensions.image_native import output_routing
+from digital_life_host.native_extensions.image_native.adapter import PLUGIN_ID
+from digital_life_host.native_extensions.image_native.extension import ImageExtensionAPI
+from digital_life_host.native_extensions.image_native.output_configuration import (
     MAX_TASK_TIMEOUT_SECONDS, settings as output_settings)
-from astrbot_host.native_extensions.image_native.output_routing import (
+from digital_life_host.native_extensions.image_native.output_routing import (
     XAI_MAX_REFERENCE_IMAGES, OnlineImageBackend, Rejected, effective_platform, resolve_platform,
     xai_files_url)
-from astrbot_host.native_extensions.image_native.types import (MAX_REFERENCE_IMAGES as NATIVE_REFERENCE_IMAGES,
+from digital_life_host.native_extensions.image_native.types import (MAX_REFERENCE_IMAGES as NATIVE_REFERENCE_IMAGES,
                                                               ImageInvocation, NativeImageError, ReferenceImage)
-from companion_v2.capabilities.native import parse_manifest
-from companion_v2.conversation.media.models import MAX_REFERENCE_IMAGES as CORE_REFERENCE_IMAGES
-from companion_v2.legacy.image_configuration_migration import convert_image_configuration
-from companion_v2.product import PRODUCT_VERSION
+from digital_life_core.capabilities.native import parse_manifest
+from digital_life_core.conversation.media.models import MAX_REFERENCE_IMAGES as CORE_REFERENCE_IMAGES
+from digital_life_core.legacy.image_configuration_migration import convert_image_configuration
+from digital_life_core.product import PRODUCT_VERSION
 
 PNG_BYTES = b"\x89PNG\r\n\x1a\n-synthetic-image-body"
 DOWNLOADED_BYTES = b"\x89PNG\r\n\x1a\n-downloaded-image-body"
@@ -695,7 +695,7 @@ class ImageConfigurationContractTests(unittest.TestCase):
         # and the live per-task budget comes from the saved configuration.
         self.save(enabled=True, backend="online_api", endpoints=[legacy_endpoint(timeout_seconds=900)])
 
-        provider = self.api.companion_v2_native()
+        provider = self.api.digital_life_core_native()
         tools = provider.manifest()["tools"]
 
         self.assertTrue(tools)
@@ -705,7 +705,7 @@ class ImageConfigurationContractTests(unittest.TestCase):
         self.assertEqual(provider.task_timeout_seconds(), 900)
 
     def test_manifest_timeout_keeps_the_default_floor(self):
-        provider = self.api.companion_v2_native()
+        provider = self.api.digital_life_core_native()
 
         for tool in provider.manifest()["tools"]:
             self.assertEqual(tool["timeout_seconds"], MAX_TASK_TIMEOUT_SECONDS)
@@ -726,7 +726,7 @@ class ImageConfigurationContractTests(unittest.TestCase):
                                 version=PRODUCT_VERSION)
         self.addCleanup(api.close)
 
-        provider = api.companion_v2_native()
+        provider = api.digital_life_core_native()
 
         self.assertEqual(provider.wait_budget_seconds, 900)
         self.assertEqual(provider.task_timeout_seconds(), 900)
@@ -736,7 +736,7 @@ class ImageConfigurationContractTests(unittest.TestCase):
     def test_saved_timeout_raises_the_next_task_budget(self):
         self.save(enabled=True, backend="online_api", endpoints=[legacy_endpoint(timeout_seconds=1200)])
 
-        manifest = parse_manifest(self.api.companion_v2_native().manifest(),
+        manifest = parse_manifest(self.api.digital_life_core_native().manifest(),
                                   plugin_id=PLUGIN_ID, version=PRODUCT_VERSION)
         declarations = declarations_for_manifest(manifest)
 
@@ -745,12 +745,12 @@ class ImageConfigurationContractTests(unittest.TestCase):
             self.assertEqual(declaration.descriptor.timeout_seconds, MAX_TASK_TIMEOUT_SECONDS)
             self.assertEqual(declaration.descriptor.definition().timeout_seconds,
                              MAX_TASK_TIMEOUT_SECONDS)
-        self.assertEqual(self.api.companion_v2_native().task_timeout_seconds(), 1200)
+        self.assertEqual(self.api.digital_life_core_native().task_timeout_seconds(), 1200)
 
     def test_saving_does_not_pin_the_wait_budget_above_the_configured_timeout(self):
         self.save(enabled=True, backend="online_api", endpoints=[legacy_endpoint(timeout_seconds=60)])
 
-        provider = self.api.companion_v2_native()
+        provider = self.api.digital_life_core_native()
 
         self.assertEqual(provider.wait_budget_seconds, 300)
         self.assertEqual(provider.task_timeout_seconds(), 300)
@@ -762,7 +762,7 @@ class ImageConfigurationContractTests(unittest.TestCase):
                   sd_webui={"base_url": "http://127.0.0.1:7860", "timeout_seconds": 900,
                             "parameters": {}})
 
-        provider = self.api.companion_v2_native()
+        provider = self.api.digital_life_core_native()
 
         self.assertGreaterEqual(provider.wait_budget_seconds, 900)
         self.assertEqual(provider.task_timeout_seconds(), 900)

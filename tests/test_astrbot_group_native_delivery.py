@@ -111,7 +111,7 @@ class NativeGroupDeliveryTests(GroupFixture, unittest.IsolatedAsyncioTestCase):
             return NS(get_audio=synthesize)
 
         self.native.get_using_tts_provider = select
-        with patch("astrbot_host.voice.get_astrbot_temp_path", return_value=str(audio_root)):
+        with patch("digital_life_host.voice.get_astrbot_temp_path", return_value=str(audio_root)):
             await self.start_host()
             for target, identifier in (("group-a", "851"), ("group-c", "852")):
                 report = await self.reply(target, identifier)

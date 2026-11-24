@@ -12,18 +12,18 @@ from unittest.mock import patch
 
 from PIL import Image
 
-from astrbot_host.media import inspect_image, load_native_image
-from companion_v2.adapters.astrbot.model_wire import tool_alias
-from companion_v2.adapters.astrbot.native import NativeImageLocator
-from companion_v2.conversation.flow import ConversationPolicy
-from companion_v2.conversation.messages import event_from_document
-from companion_v2.conversation.media.models import ImageConversationEvent
-from companion_v2.storage.image_payloads import load_image
-from companion_v2.execution.models import TaskError, digest
-from companion_v2.foundation.refs import SubjectKind, SubjectRef
-from companion_v2.identity_policy.personas import RuntimeIdentity
-from companion_v2.model_gateway.models import Amount, BudgetPolicy
-from companion_v2.sources.dependencies import key
+from digital_life_host.media import inspect_image, load_native_image
+from digital_life_core.adapters.astrbot.model_wire import tool_alias
+from digital_life_core.adapters.astrbot.native import NativeImageLocator
+from digital_life_core.conversation.flow import ConversationPolicy
+from digital_life_core.conversation.messages import event_from_document
+from digital_life_core.conversation.media.models import ImageConversationEvent
+from digital_life_core.storage.image_payloads import load_image
+from digital_life_core.execution.models import TaskError, digest
+from digital_life_core.foundation.refs import SubjectKind, SubjectRef
+from digital_life_core.identity_policy.personas import RuntimeIdentity
+from digital_life_core.model_gateway.models import Amount, BudgetPolicy
+from digital_life_core.sources.dependencies import key
 from tests.native_adapter_support import NativeFixture, FakeEvent, completion, final_text
 from tests.image_delivery_support import (attach_originals, intercept_image_delivery_verification,
                                           user_content, user_message)
@@ -378,8 +378,8 @@ class ConversationImageTests(ImageFixture, unittest.IsolatedAsyncioTestCase):
         self.assertEqual(base64.b64decode(request.images[0].data_base64), image_bytes())
 
     async def test_same_platform_event_and_same_bytes_under_another_login_have_distinct_owners(self):
-        from companion_v2.adapters.astrbot.native import HostAccount, HostPersona, persona_instruction
-        from companion_v2.identity_policy.personas import PersonaBinding, PersonaSelector, SelectorKind
+        from digital_life_core.adapters.astrbot.native import HostAccount, HostPersona, persona_instruction
+        from digital_life_core.identity_policy.personas import PersonaBinding, PersonaSelector, SelectorKind
         from tests.test_management_access import NOW, ROLE, INSTALLATION
         self.bind_native("101", "bot-b")
         role_b = SubjectRef(INSTALLATION, SubjectKind.BOT, "persona-b")

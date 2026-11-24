@@ -2,9 +2,9 @@ from dataclasses import replace
 import json
 import unittest
 
-from companion_v2.diagnostics.models import CheckStatus, DiagnosticContext, DiagnosticQuery
-from companion_v2.diagnostics.service import DiagnosticService
-from companion_v2.execution.models import TaskResult
+from digital_life_core.diagnostics.models import CheckStatus, DiagnosticContext, DiagnosticQuery
+from digital_life_core.diagnostics.service import DiagnosticService
+from digital_life_core.execution.models import TaskResult
 from tests.test_execution import ExecutionFixture
 
 

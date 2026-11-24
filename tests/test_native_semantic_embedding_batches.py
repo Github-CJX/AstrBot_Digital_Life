@@ -3,7 +3,7 @@
 from types import SimpleNamespace as NS
 import unittest
 
-from astrbot_host.semantic_models import NativeSemanticModels
+from digital_life_host.semantic_models import NativeSemanticModels
 
 
 class BatchError(Exception):

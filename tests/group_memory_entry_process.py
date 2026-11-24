@@ -8,13 +8,13 @@ with tempfile.TemporaryDirectory(prefix='v2-group-memory-native-') as temporary:
     os.environ['ASTRBOT_ROOT'] = temporary
     from tests.group_host_support import GroupContext, group_config
     from tests.native_adapter_support import FakeProvider, completion, final_text
-    from companion_v2.adapters.astrbot.model_wire import tool_alias
+    from digital_life_core.adapters.astrbot.model_wire import tool_alias
     from tests.test_astrbot_group_native_delivery import LocalSocket
     from tests.staging_bootstrap_support import wait_for_batch
     from tests.test_management_access import NOW
-    from companion_v2.adapters.astrbot.staging import NativeAdapterTypes
-    from companion_v2.execution.models import TaskContext
-    from companion_v2.foundation.clock import DeterministicClock
+    from digital_life_core.adapters.astrbot.staging import NativeAdapterTypes
+    from digital_life_core.execution.models import TaskContext
+    from digital_life_core.foundation.clock import DeterministicClock
     from aiocqhttp import Event
     from aiocqhttp.api_impl import WebSocketReverseApi, ResultStore
     from astrbot.api.message_components import Plain
@@ -102,6 +102,6 @@ with tempfile.TemporaryDirectory(prefix='v2-group-memory-native-') as temporary:
         finally:
             await plugin.terminate()
         assert plugin.staging._terminated and plugin.staging.runtime is None and not native.registered_web_apis
-        assert not any(name == 'companion_v2' or name.startswith('companion_v2.') for name in sys.modules)
+        assert not any(name == 'digital_life_core' or name.startswith('digital_life_core.') for name in sys.modules)
         print('PASS: real SDK plugin import, two speakers, group memory tool write, attributed recall and grounded model response, two local WS ACKs, stop and route cleanup; temporary root; no real provider or QQ traffic.')
     asyncio.run(verify())

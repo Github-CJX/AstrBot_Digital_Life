@@ -2,11 +2,11 @@ from dataclasses import replace
 from datetime import timedelta
 import unittest
 
-from companion_v2.configuration.models import ConfigLayer, ConfigTarget, fingerprint
-from companion_v2.diagnostics.models import restore_target
-from companion_v2.foundation.refs import OperationRef, ReferenceValidationError, SubjectKind, SubjectRef, VersionRef
-from companion_v2.identity_policy.personas import ConversationRoute
-from companion_v2.proactive.configuration import GROUP, PURPOSES, target_for
+from digital_life_core.configuration.models import ConfigLayer, ConfigTarget, fingerprint
+from digital_life_core.diagnostics.models import restore_target
+from digital_life_core.foundation.refs import OperationRef, ReferenceValidationError, SubjectKind, SubjectRef, VersionRef
+from digital_life_core.identity_policy.personas import ConversationRoute
+from digital_life_core.proactive.configuration import GROUP, PURPOSES, target_for
 from tests.proactive_support import ContactFixture
 from tests.test_management_access import INSTALLATION, NOW, ROLE, SCOPE
 
@@ -133,7 +133,7 @@ class ContactPreferenceTests(ContactFixture, unittest.IsolatedAsyncioTestCase):
         self.assertEqual(public.values[GROUP + ".note"], "")
 
     async def test_temporary_window_switch_cannot_override_saved_global_or_personal_rhythm(self):
-        from companion_v2.proactive.management import ContactManagement
+        from digital_life_core.proactive.management import ContactManagement
 
         app = await self.enabled()
         manager = ContactManagement(app, self.contact_context())

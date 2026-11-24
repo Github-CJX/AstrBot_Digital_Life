@@ -11,12 +11,12 @@ import unittest
 
 from tests import test_astrbot_staging_host as sdk_environment
 from astrbot.core.message.components import Forward, Image, Plain, Reply
-from astrbot_host.controller import AstrBotStagingController
-from astrbot_host.media import load_native_image
-from astrbot_host.native import installed_native_types
-from astrbot_host.quotes import load_native_quote
-from companion_v2.adapters.astrbot.quotes import read_private_quote
-from companion_v2.adapters.astrbot.staging import NativeAdapterTypes
+from digital_life_host.controller import AstrBotStagingController
+from digital_life_host.media import load_native_image
+from digital_life_host.native import installed_native_types
+from digital_life_host.quotes import load_native_quote
+from digital_life_core.adapters.astrbot.quotes import read_private_quote
+from digital_life_core.adapters.astrbot.staging import NativeAdapterTypes
 from tests.native_adapter_support import FakeEvent, FakeProvider, FakeReverseApi
 from tests.forward_support import node_raw, quoted_forward_raw
 from tests.animation_support import animation_bytes

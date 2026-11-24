@@ -1,8 +1,8 @@
 import unittest
 
-from companion_v2.conversation.flow import ConversationPolicy
-from companion_v2.conversation.generation import MODEL_FAILURE_NOTICE, model_failure_notice
-from companion_v2.execution.models import TaskError
+from digital_life_core.conversation.flow import ConversationPolicy
+from digital_life_core.conversation.generation import MODEL_FAILURE_NOTICE, model_failure_notice
+from digital_life_core.execution.models import TaskError
 from tests.test_host_application import HostFixture
 
 

@@ -12,14 +12,14 @@ from unittest.mock import patch
 from types import SimpleNamespace
 import unittest
 
-from companion_v2.adapters.astrbot.provider import AstrBotTextProvider
-from companion_v2.configuration.models import ApplyMode, ConfigLayer, ConfigTarget, ConfigurationSnapshot, EffectiveValue
-from companion_v2.configuration.registry import FieldRegistry
-from companion_v2.configuration.service import ConfigurationService
-from companion_v2.execution.models import Lane, TaskError
-from companion_v2.model_gateway.management import ModelManagement
-from companion_v2.model_gateway.models import MAX_MODEL_OUTPUT_TOKENS, ModelTaskProfile
-from companion_v2.model_gateway.routing import ModelRouter, configuration_fields
+from digital_life_core.adapters.astrbot.provider import AstrBotTextProvider
+from digital_life_core.configuration.models import ApplyMode, ConfigLayer, ConfigTarget, ConfigurationSnapshot, EffectiveValue
+from digital_life_core.configuration.registry import FieldRegistry
+from digital_life_core.configuration.service import ConfigurationService
+from digital_life_core.execution.models import Lane, TaskError
+from digital_life_core.model_gateway.management import ModelManagement
+from digital_life_core.model_gateway.models import MAX_MODEL_OUTPUT_TOKENS, ModelTaskProfile
+from digital_life_core.model_gateway.routing import ModelRouter, configuration_fields
 from tests.multi_host_support import MultiFixture
 from tests.test_astrbot_staging import StagingFixture
 from tests.test_host_application import HostFixture
@@ -45,7 +45,7 @@ def video_capable(provider):
 
 class OutputDefaultTableTests(unittest.TestCase):
     def test_the_table_holds_one_default_per_kind(self):
-        from companion_v2.model_gateway import output_defaults
+        from digital_life_core.model_gateway import output_defaults
 
         table = output_defaults.THINKING_MARGIN
         self.assertTrue(table)
@@ -56,7 +56,7 @@ class OutputDefaultTableTests(unittest.TestCase):
                 self.assertGreaterEqual(floor, 0)
 
     def test_no_default_exceeds_the_product_or_a_requested_ceiling(self):
-        from companion_v2.model_gateway import output_defaults
+        from digital_life_core.model_gateway import output_defaults
 
         for kind in sorted(output_defaults.THINKING_MARGIN):
             with self.subTest(kind=kind):
@@ -67,7 +67,7 @@ class OutputDefaultTableTests(unittest.TestCase):
 
 
     def test_reply_and_verdict_kinds_keep_the_host_budget(self):
-        from companion_v2.model_gateway import output_defaults
+        from digital_life_core.model_gateway import output_defaults
 
         for kind in ("conversation.reply", "proactive.judge", "role.journal.select"):
             with self.subTest(kind=kind):
@@ -98,7 +98,7 @@ class StagingOutputDefaultTests(StagingFixture, unittest.IsolatedAsyncioTestCase
                              observed_at=NOW).unwrap()
 
     async def test_an_untouched_role_receives_the_structured_defaults(self):
-        from companion_v2.model_gateway.output_defaults import THINKING_MARGIN
+        from digital_life_core.model_gateway.output_defaults import THINKING_MARGIN
 
         session = self.staging_with_global_budget()
         profiles = session.application.router.profiles
@@ -146,7 +146,7 @@ class StagingRegistrationTests(StagingFixture, unittest.IsolatedAsyncioTestCase)
     """Every task the single-role assembly registers must carry a default."""
 
     async def test_every_staging_task_kind_has_a_thinking_margin(self):
-        from companion_v2.model_gateway.output_defaults import THINKING_MARGIN
+        from digital_life_core.model_gateway.output_defaults import THINKING_MARGIN
 
         with patch.object(AstrBotTextProvider, "local_provider", video_capable):
             profiles = self.staging(max_output_tokens=2048).application.router.profiles
@@ -157,7 +157,7 @@ class MultiHostRegistrationTests(MultiFixture, unittest.IsolatedAsyncioTestCase)
     """The multi-role host registers the whole table, and nothing outside it."""
 
     async def test_multi_host_registration_and_the_default_table_agree(self):
-        from companion_v2.model_gateway.output_defaults import THINKING_MARGIN
+        from digital_life_core.model_gateway.output_defaults import THINKING_MARGIN
 
         with patch.object(AstrBotTextProvider, "local_provider", video_capable):
             profiles = (await self.start_host()).router.profiles

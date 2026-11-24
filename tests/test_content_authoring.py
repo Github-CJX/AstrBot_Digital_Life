@@ -2,11 +2,11 @@
 
 import unittest
 
-from companion_v2.configuration.models import ConfigLayer, ConfigTarget
-from companion_v2.configuration.owners import SparseConfigurationOwner
-from companion_v2.conversation.content import access as content_access
-from companion_v2.conversation.content import authoring, authoring_service as service
-from companion_v2.execution.models import TaskError
+from digital_life_core.configuration.models import ConfigLayer, ConfigTarget
+from digital_life_core.configuration.owners import SparseConfigurationOwner
+from digital_life_core.conversation.content import access as content_access
+from digital_life_core.conversation.content import authoring, authoring_service as service
+from digital_life_core.execution.models import TaskError
 from tests.test_daily_token_soft_limit import ModelFixture
 from tests.test_management_access import NOW
 
@@ -95,7 +95,7 @@ class AuthoringContractTests(unittest.TestCase):
             self.assertEqual(error.exception.code, code)
 
     def test_writing_route_has_time_for_the_authoring_workflow(self):
-        from companion_v2.conversation.content.authoring_tasks import (AUTHORING_BUDGET_SECONDS,
+        from digital_life_core.conversation.content.authoring_tasks import (AUTHORING_BUDGET_SECONDS,
             AUTHORING_PROVIDER_TIMEOUT_SECONDS, authoring_profiles)
         self.assertEqual(authoring_profiles("primary")[0].timeout_seconds, AUTHORING_PROVIDER_TIMEOUT_SECONDS)
         self.assertGreaterEqual(AUTHORING_PROVIDER_TIMEOUT_SECONDS, 120,

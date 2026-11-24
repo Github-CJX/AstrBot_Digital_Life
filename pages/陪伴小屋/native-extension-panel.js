@@ -495,7 +495,7 @@ window.CompanionNativeExtensionPanel = (() => {
       const assembled = extension?.assembled === true && extension.desired_state !== "discarded";
       const paused = extension?.desired_state === "paused";
       const command = (action, caption) => `<button class="button small" type="button" data-native-lifecycle-action="${action}" ${this.busy || this.actionBusy ? "disabled" : ""}>${caption}</button>`;
-      const buttons = extension?.owner === "companion_v2" ? (assembled
+      const buttons = extension?.owner === "digital_life_core" ? (assembled
         ? (paused ? command("resume", "启用模块") : command("pause", "暂停模块")) + (extension.update_available ? command("update", "应用内置更新") : "")
         : command("assemble", "启用模块")) : "";
       const note = this.record.runtime?.state === "failed"
@@ -626,7 +626,7 @@ window.CompanionNativeExtensionPanel = (() => {
       const product = window.CompanionProduct;
       const extension = product.extension?.(this.name) || product.capability?.(this.name)
         || product.provider?.(this.name);
-      if (extension?.owner !== "companion_v2") return;
+      if (extension?.owner !== "digital_life_core") return;
       const revision = Number.isInteger(extension.installed_revision) ? extension.installed_revision : 0;
       const signature = `${this.name}:${action}:${revision}`;
       if (!operations.has(signature)) operations.set(signature, window.crypto?.randomUUID?.() || `extension-${Date.now()}-${Math.random().toString(16).slice(2)}`);

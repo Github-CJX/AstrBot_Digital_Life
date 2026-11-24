@@ -10,16 +10,16 @@ from unittest.mock import AsyncMock, patch
 
 from astrbot.core.agent.message import TextPart
 from astrbot.core.message.components import File, Plain, Record, Reply, Video
-from astrbot_host.core_reply_perception import (
+from digital_life_host.core_reply_perception import (
     CORE_REPLY_CONTEXT_EXTRA,
     inject_core_reply_perception_context,
 )
-from astrbot_host.files.loader import load_native_file
-from astrbot_host.media_components import group_components, private_components
-from astrbot_host.multi_session import MultiPrivateBridge
-from companion_v2.adapters.astrbot.group import NativeGroupBridge
-from companion_v2.adapters.astrbot.group_mentions import group_message_text
-from companion_v2.adapters.astrbot.voice_stt import (
+from digital_life_host.files.loader import load_native_file
+from digital_life_host.media_components import group_components, private_components
+from digital_life_host.multi_session import MultiPrivateBridge
+from digital_life_core.adapters.astrbot.group import NativeGroupBridge
+from digital_life_core.adapters.astrbot.group_mentions import group_message_text
+from digital_life_core.adapters.astrbot.voice_stt import (
     ASTRBOT_STT_TRANSCRIPTS_EXTRA,
     STT_EXTRA_KEYS,
     VOICE_TRANSCRIPT_PREFIX,
@@ -28,8 +28,8 @@ from companion_v2.adapters.astrbot.voice_stt import (
     trusted_stt_extra_with_source,
     trusted_stt_transcript,
 )
-from companion_v2.execution.models import TaskError
-from companion_v2.foundation.refs import ScopeKind, ScopeRef
+from digital_life_core.execution.models import TaskError
+from digital_life_core.foundation.refs import ScopeKind, ScopeRef
 from tests.audio_support import audio_bytes
 from tests.group_media_support import GroupMediaFixture
 from tests.test_main_no_reply import ENTRY
@@ -279,10 +279,10 @@ class GeminiSTTCompatibilityTests(GroupMediaFixture, unittest.IsolatedAsyncioTes
         self.assertNotIn("语音不可用", captured.unwrap().text)
 
     async def test_hear_voice_only_group_capture_quote_and_anti_spoofing(self):
-        from astrbot_host.audio.loader import load_native_audio
-        from astrbot_host.media import load_native_image
-        from astrbot_host.video.loader import load_native_video
-        from companion_v2.adapters.astrbot.quote_content import capture_quote_content
+        from digital_life_host.audio.loader import load_native_audio
+        from digital_life_host.media import load_native_image
+        from digital_life_host.video.loader import load_native_video
+        from digital_life_core.adapters.astrbot.quote_content import capture_quote_content
 
         await self.start_host()
         wav = audio_bytes()
@@ -566,7 +566,7 @@ class GeminiSTTCompatibilityTests(GroupMediaFixture, unittest.IsolatedAsyncioTes
     def test_voice_stt_layering_and_group_mentions_reexports(self):
         import ast
         from pathlib import Path
-        from companion_v2.adapters.astrbot import group_mentions, voice_stt
+        from digital_life_core.adapters.astrbot import group_mentions, voice_stt
 
         for name in (
             "ASTRBOT_STT_TRANSCRIPTS_EXTRA",
@@ -580,7 +580,7 @@ class GeminiSTTCompatibilityTests(GroupMediaFixture, unittest.IsolatedAsyncioTes
             self.assertIs(getattr(group_mentions, name), getattr(voice_stt, name))
 
         root = Path(__file__).resolve().parents[1]
-        for rel in ("astrbot_host/multi_session.py", "astrbot_host/core_reply_perception.py", "main.py"):
+        for rel in ("digital_life_host/multi_session.py", "digital_life_host/core_reply_perception.py", "main.py"):
             tree = ast.parse((root / rel).read_text(encoding="utf-8-sig"), filename=rel)
             for node in ast.walk(tree):
                 if isinstance(node, ast.ImportFrom) and node.module:

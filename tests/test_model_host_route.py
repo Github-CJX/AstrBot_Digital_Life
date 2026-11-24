@@ -4,8 +4,8 @@ import unittest
 from types import SimpleNamespace as NS
 
 from tests import astrbot_data_root  # noqa: F401 - isolate the SDK before import
-from astrbot_host.model_api import ModelWebAPI
-from companion_v2.foundation.refs import ScopeKind
+from digital_life_host.model_api import ModelWebAPI
+from digital_life_core.foundation.refs import ScopeKind
 
 
 class FakeProvider:

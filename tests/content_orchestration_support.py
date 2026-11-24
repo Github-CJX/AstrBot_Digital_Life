@@ -4,10 +4,10 @@ from __future__ import annotations
 
 from datetime import timezone
 
-from companion_v2.configuration.models import ConfigLayer, ConfigTarget
-from companion_v2.configuration.owners import SparseConfigurationOwner
-from companion_v2.foundation.refs import AssetRef, RoleOwnerRef, SourceRef, VersionRef
-from companion_v2.execution.models import TaskContext
+from digital_life_core.configuration.models import ConfigLayer, ConfigTarget
+from digital_life_core.configuration.owners import SparseConfigurationOwner
+from digital_life_core.foundation.refs import AssetRef, RoleOwnerRef, SourceRef, VersionRef
+from digital_life_core.execution.models import TaskContext
 from tests.test_daily_token_soft_limit import ModelFixture
 from tests.test_management_access import NOW
 

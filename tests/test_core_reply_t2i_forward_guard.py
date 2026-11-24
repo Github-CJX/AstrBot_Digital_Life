@@ -18,11 +18,11 @@ from astrbot.core.platform.astr_message_event import AstrMessageEvent
 from astrbot.core.platform.astrbot_message import AstrBotMessage, MessageMember
 from astrbot.core.platform.message_type import MessageType
 from astrbot.core.provider.entities import LLMResponse, ProviderRequest
-from companion_v2.adapters.astrbot.native import NativeConversationInput
-from companion_v2.conversation.segment_control import LLM_SEGMENT_MARKER as MARKER
-from companion_v2.conversation.segmentation import SegmentationPolicy
-from companion_v2.conversation.voice_reply import VoiceReplyPolicy
-from companion_v2.foundation.outcome import Outcome
+from digital_life_core.adapters.astrbot.native import NativeConversationInput
+from digital_life_core.conversation.segment_control import LLM_SEGMENT_MARKER as MARKER
+from digital_life_core.conversation.segmentation import SegmentationPolicy
+from digital_life_core.conversation.voice_reply import VoiceReplyPolicy
+from digital_life_core.foundation.outcome import Outcome
 
 
 class CoreDecorationEvent(AstrMessageEvent):
@@ -496,7 +496,7 @@ class CoreReplyDecorationGuardTests(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(sent_texts, [s1, s2])
 
     async def test_voice_authoring_repair_above_t2i_and_forward_threshold_preserves_speech(self):
-        from astrbot_host.core_reply_voice_authoring import _spoken_plan
+        from digital_life_host.core_reply_voice_authoring import _spoken_plan
         seg1 = "第一段没有手写标签，但由补全计划生成了对应日文朗读。" * 35
         seg2 = "第二段同样由补全计划绑定，不能在长回复转发包装中丢失。" * 35
         draft = f"{seg1}\n{MARKER}\n{seg2}"

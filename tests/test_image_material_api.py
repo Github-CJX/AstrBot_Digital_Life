@@ -28,8 +28,8 @@ class ImageMaterialUploadRouteTests(unittest.TestCase):
 
     def test_upload_decode_and_route_contract(self):
         source = r'''
-from astrbot_host.image_material_api import ImageMaterialsWebAPI
-from companion_v2.execution.models import TaskError
+from digital_life_host.image_material_api import ImageMaterialsWebAPI
+from digital_life_core.execution.models import TaskError
 
 payload, mime = ImageMaterialsWebAPI._decode_upload("data:image/png;base64,aGVsbG8=")
 assert (payload, mime) == (b"hello", "image/png")
@@ -44,7 +44,7 @@ for data_url, code in (
         assert error.code == code
     else:
         raise AssertionError("invalid upload data was accepted")
-routes = {(path.removeprefix("/astrbot_plugin_private_companion/image-materials"), tuple(methods))
+routes = {(path.removeprefix("/astrbot_plugin_digital_life/image-materials"), tuple(methods))
           for path, _handler, methods, _description in ImageMaterialsWebAPI(None).routes()}
 assert ("/references/upload", ("POST",)) in routes
 assert ("/references/update", ("POST",)) in routes
@@ -70,10 +70,10 @@ from PIL import Image
 from astrbot.api.web import PluginMultiDict
 from tests.multi_host_support import MultiFixture
 from tests.test_configuration_api import call as config_call
-from companion_v2.references.repositories import ReferenceAssetRepository
-from companion_v2.references.service import owner_key
-from companion_v2.references.usage import default_usage
-from companion_v2.storage.runtime import StorageRuntime
+from digital_life_core.references.repositories import ReferenceAssetRepository
+from digital_life_core.references.service import owner_key
+from digital_life_core.references.usage import default_usage
+from digital_life_core.storage.runtime import StorageRuntime
 
 class MaterialRoutes(MultiFixture, unittest.IsolatedAsyncioTestCase):
     async def test_materials(self):
@@ -87,7 +87,7 @@ class MaterialRoutes(MultiFixture, unittest.IsolatedAsyncioTestCase):
         async def call(path, body=None, username='materials-admin', query=()):
             async def read():
                 return json.dumps(body, ensure_ascii=False).encode('utf-8')
-            with patch('astrbot_host.image_material_api.request',
+            with patch('digital_life_host.image_material_api.request',
                        NS(username=username, query=PluginMultiDict(list(query)), body=read)):
                 return await handlers[path]()
         def data(response):

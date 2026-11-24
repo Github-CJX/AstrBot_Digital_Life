@@ -11,24 +11,24 @@ from pathlib import Path
 from types import SimpleNamespace
 import unittest
 
-from companion_v2.configuration.registry import FieldRegistry, ValueKind
-from companion_v2.conversation.style_context import (EXPRESSION_STYLE_INSTRUCTION, MAX_CANDIDATES,
+from digital_life_core.configuration.registry import FieldRegistry, ValueKind
+from digital_life_core.conversation.style_context import (EXPRESSION_STYLE_INSTRUCTION, MAX_CANDIDATES,
     SNAPSHOT_VERSION, ConversationExpressionStyleContext)
-from companion_v2.conversation.models import InboundConversationEvent
-from companion_v2.execution.models import TaskContext, TaskError, encode, stamp
-from companion_v2.expression import learning, style_rotation
-from companion_v2.expression.configuration import (GROUP, ExpressionLearningSettings,
+from digital_life_core.conversation.models import InboundConversationEvent
+from digital_life_core.execution.models import TaskContext, TaskError, encode, stamp
+from digital_life_core.expression import learning, style_rotation
+from digital_life_core.expression.configuration import (GROUP, ExpressionLearningSettings,
     POLICY_LAYERS, ROLE_DEFAULTS, ExpressionConfigurationOwner, configuration_fields, read_settings,
     target_for)
-from companion_v2.expression.style_service import ExpressionStyleService
-from companion_v2.expression.style_evidence import (DEFAULT_SAMPLE_CHARS, INPUT_SAMPLE_SOURCE, MAX_SAMPLE_CHARS,
+from digital_life_core.expression.style_service import ExpressionStyleService
+from digital_life_core.expression.style_evidence import (DEFAULT_SAMPLE_CHARS, INPUT_SAMPLE_SOURCE, MAX_SAMPLE_CHARS,
     MAX_WINDOW_HOURS, ExpressionSampleCatalog, SampleSet, StyleSample, evidence_snapshot,
     sample_document, sample_handles, sample_snapshot)
-from companion_v2.foundation.refs import (AudienceRef, ScopeKind, ScopeRef, SourceRef, SubjectKind, SubjectRef,
+from digital_life_core.foundation.refs import (AudienceRef, ScopeKind, ScopeRef, SourceRef, SubjectKind, SubjectRef,
     VersionRef)
-from companion_v2.identity_policy.group_audience import group_audience
-from companion_v2.identity_policy.models import AuthenticatedHostPrincipal, ResolvedIdentity, RoleBinding
-from companion_v2.storage.runtime import StorageRuntime
+from digital_life_core.identity_policy.group_audience import group_audience
+from digital_life_core.identity_policy.models import AuthenticatedHostPrincipal, ResolvedIdentity, RoleBinding
+from digital_life_core.storage.runtime import StorageRuntime
 from tests.test_management_access import INSTALLATION
 
 
@@ -78,7 +78,7 @@ class StyleLearningOutputTests(unittest.TestCase):
             self.parse(payload)
 
     def test_applicability_is_bounded_and_channel_specific(self):
-        from companion_v2.expression.learning import applicability_matches_channel, laya_intent_matches
+        from digital_life_core.expression.learning import applicability_matches_channel, laya_intent_matches
         applicability = {"channels": ["private"], "relationship_stages": ["close"],
             "emotion_gates": ["positive"], "intent": "question", "keywords": ["晚安"]}
         self.assertTrue(applicability_matches_channel(applicability, "private"))
@@ -507,8 +507,8 @@ class ExpressionSettingsTests(unittest.TestCase):
                          48)
 
     def test_reset_cannot_save_an_invalid_batch_minimum_combination(self):
-        from companion_v2.expression.configuration import ExpressionConfigurationOwner, target_for
-        from companion_v2.configuration.models import ConfigurationError
+        from digital_life_core.expression.configuration import ExpressionConfigurationOwner, target_for
+        from digital_life_core.configuration.models import ConfigurationError
         owner, fields = ExpressionConfigurationOwner(self.runtime), configuration_fields()
         target = target_for(self.context())
         owner.write(target, fields, changes={GROUP + ".sample_limit": 64, GROUP + ".group_min_samples": 64},
@@ -644,8 +644,8 @@ class ExpressionStorageTests(unittest.TestCase):
         from contextlib import closing
         import sqlite3
 
-        from companion_v2.storage.runtime import StorageOpenError, StorageRuntime
-        from companion_v2.storage.schema import SCHEMA_VERSION_V39
+        from digital_life_core.storage.runtime import StorageOpenError, StorageRuntime
+        from digital_life_core.storage.schema import SCHEMA_VERSION_V39
         from tests.execution_support import remove_v40
 
         def remove_versions_after_v39(connection):
@@ -669,7 +669,7 @@ class ExpressionStorageTests(unittest.TestCase):
                 connection.commit()
 
             upgraded = StorageRuntime.open(data_root=root, installation_id="style-test")
-            from companion_v2.storage.schema import SCHEMA_VERSION
+            from digital_life_core.storage.schema import SCHEMA_VERSION
             self.assertEqual(upgraded.read_one("SELECT value FROM runtime_metadata WHERE key = ?",
                                                ("schema_version",))[0], SCHEMA_VERSION)
             self.assertEqual(upgraded.read_one("SELECT value FROM runtime_metadata WHERE key = ?",

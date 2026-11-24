@@ -2,7 +2,7 @@ from pathlib import Path
 from tempfile import TemporaryDirectory
 import unittest
 
-from companion_v2.together.novel_library import NovelLibrary
+from digital_life_core.together.novel_library import NovelLibrary
 
 
 class NovelLibraryTests(unittest.TestCase):

@@ -6,14 +6,14 @@ from types import SimpleNamespace as NS
 import unittest
 from unittest.mock import AsyncMock
 
-from astrbot_host.audio.loader import load_native_audio
-from astrbot_host.media import load_native_image
-from astrbot_host.video.loader import load_native_video
-from companion_v2.adapters.astrbot.group_quotes import mention_text, read_group_quote
-from companion_v2.adapters.astrbot.quotes import NativeQuoteLocator
-from companion_v2.conversation.quotes.models import CapturedQuote
-from companion_v2.execution.models import TaskContext, TaskError
-from companion_v2.foundation.refs import ScopeKind
+from digital_life_host.audio.loader import load_native_audio
+from digital_life_host.media import load_native_image
+from digital_life_host.video.loader import load_native_video
+from digital_life_core.adapters.astrbot.group_quotes import mention_text, read_group_quote
+from digital_life_core.adapters.astrbot.quotes import NativeQuoteLocator
+from digital_life_core.conversation.quotes.models import CapturedQuote
+from digital_life_core.execution.models import TaskContext, TaskError
+from digital_life_core.foundation.refs import ScopeKind
 from tests.animation_support import animation_bytes
 from tests.audio_support import audio_bytes
 from tests.forward_support import node_raw

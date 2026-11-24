@@ -4,12 +4,12 @@ from types import SimpleNamespace as NS
 import unittest
 from unittest.mock import Mock, patch
 
-from astrbot_host.core_reply_context import build_core_reply_prompt
-from astrbot_host.core_reply_health import health_perception_snapshot
-from companion_v2.conversation.health_context import (
+from digital_life_host.core_reply_context import build_core_reply_prompt
+from digital_life_host.core_reply_health import health_perception_snapshot
+from digital_life_core.conversation.health_context import (
     HEALTH_INSTRUCTION, MAX_MEASUREMENTS, project_health_context,
 )
-from companion_v2.foundation.refs import ScopeKind
+from digital_life_core.foundation.refs import ScopeKind
 
 
 AT = datetime(2026, 10, 1, 9, 50, 1, tzinfo=timezone.utc)
@@ -95,7 +95,7 @@ class HealthPromptTests(unittest.TestCase):
                       "summary": "步数 3200 步"}
         context = NS(scope=NS(kind=ScopeKind.PRIVATE), key="health-private",
                      actor=NS(), role_binding=NS(role=NS()))
-        with patch("astrbot_host.core_reply_context.health_perception_snapshot",
+        with patch("digital_life_host.core_reply_context.health_perception_snapshot",
                    return_value=projection) as health:
             prompt = build_core_reply_prompt(
                 self._application(settings), context, NS(text="今天走了多少", event_id="health"),
@@ -106,7 +106,7 @@ class HealthPromptTests(unittest.TestCase):
         self.assertEqual(health.call_count, 1)
 
         context.scope.kind = ScopeKind.GROUP
-        with patch("astrbot_host.core_reply_context.health_perception_snapshot",
+        with patch("digital_life_host.core_reply_context.health_perception_snapshot",
                    return_value=projection) as health:
             prompt = build_core_reply_prompt(
                 self._application(settings), context, NS(text="今天走了多少", event_id="health-group"),
@@ -125,7 +125,7 @@ class HealthPromptTests(unittest.TestCase):
                     "summary": "最近睡眠：10-01 总睡 420 分，得分 82"}
         context = NS(scope=NS(kind=ScopeKind.PRIVATE), key="huawei-health",
                      actor=NS(), role_binding=NS(role=NS()))
-        with patch("astrbot_host.core_reply_context.health_perception_snapshot") as mobile:
+        with patch("digital_life_host.core_reply_context.health_perception_snapshot") as mobile:
             prompt = build_core_reply_prompt(
                 self._application(settings), context, NS(text="昨晚睡得怎么样", event_id="hw"),
                 at=AT, health_material=material)
@@ -141,7 +141,7 @@ class HealthPromptTests(unittest.TestCase):
         }
         context = NS(scope=NS(kind=ScopeKind.PRIVATE), key="health-empty",
                      actor=NS(), role_binding=NS(role=NS()))
-        with patch("astrbot_host.core_reply_context.health_perception_snapshot", return_value=None):
+        with patch("digital_life_host.core_reply_context.health_perception_snapshot", return_value=None):
             prompt = build_core_reply_prompt(self._application(settings), context,
                                              NS(text="你看到了什么", event_id="health-empty"), at=AT)
         self.assertNotIn("health_context", json.loads(prompt.perception_context))
@@ -155,7 +155,7 @@ class HealthPromptTests(unittest.TestCase):
         }
         context = NS(scope=NS(kind=ScopeKind.PRIVATE), key="health-off",
                      actor=NS(), role_binding=NS(role=NS()))
-        with patch("astrbot_host.core_reply_context.health_perception_snapshot") as health:
+        with patch("digital_life_host.core_reply_context.health_perception_snapshot") as health:
             build_core_reply_prompt(self._application(settings), context,
                                     NS(text="你看到了什么", event_id="health-off"), at=AT)
         self.assertFalse(health.called)
@@ -171,8 +171,8 @@ class HealthHostAdapterTests(unittest.TestCase):
         actor = NS(principal=NS(native_account_id="user-1"))
         context = NS(scope=NS(kind=ScopeKind.PRIVATE), actor=actor,
                      role_binding=NS(role=NS()))
-        with patch("astrbot_host.core_reply_health._role_enabled", return_value=True), \
-             patch("astrbot_host.core_reply_health._consent_active", return_value=True):
+        with patch("digital_life_host.core_reply_health._role_enabled", return_value=True), \
+             patch("digital_life_host.core_reply_health._consent_active", return_value=True):
             result = health_perception_snapshot(app, context, AT)
         self.assertEqual(result["measurements"][0]["label"], "心率")
         service.mobile_context.assert_called_once_with("user-1")

@@ -8,22 +8,22 @@ from tests import astrbot_data_root  # Isolate the SDK before importing the host
 from astrbot.core.message.components import Image, Plain, Record
 from astrbot.core.message.message_event_result import MessageChain
 
-from astrbot_host.core_reply import (
+from digital_life_host.core_reply import (
     CORE_REPLY_CONTEXT_EXTRA,
     activate_core_reply_delivery_guard,
     inject_core_reply_prompt,
     prepare_core_reply_event,
 )
-from astrbot_host.core_reply_outbound import prepare_core_reply_outbound_message
-from astrbot_host.core_reply_reaction_delivery import prepare_core_reaction_message
-from astrbot_host.core_reply_segmentation import prepare_core_reply_segmentation
-from astrbot_host.core_reply_voice import prepare_core_reply_voice_message, voice_prompt_instruction
-from astrbot_host.core_reply_voice import capture_core_voice_message, observe_core_voice_response
-from astrbot_host.core_reply_voice_authoring import _should_repair
+from digital_life_host.core_reply_outbound import prepare_core_reply_outbound_message
+from digital_life_host.core_reply_reaction_delivery import prepare_core_reaction_message
+from digital_life_host.core_reply_segmentation import prepare_core_reply_segmentation
+from digital_life_host.core_reply_voice import prepare_core_reply_voice_message, voice_prompt_instruction
+from digital_life_host.core_reply_voice import capture_core_voice_message, observe_core_voice_response
+from digital_life_host.core_reply_voice_authoring import _should_repair
 from astrbot.core.provider.entities import LLMResponse
-from companion_v2.conversation.segmentation import SegmentationPolicy
-from companion_v2.conversation.voice_reply import VoiceReplyPolicy
-from companion_v2.foundation.outcome import Outcome
+from digital_life_core.conversation.segmentation import SegmentationPolicy
+from digital_life_core.conversation.voice_reply import VoiceReplyPolicy
+from digital_life_core.foundation.outcome import Outcome
 
 
 class FakeEvent:
@@ -185,7 +185,7 @@ class CoreReplyVoiceTests(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(order, ["authorize", "render", "authorize"])
         self.assertEqual(len(event.sent), 1)
         self.assertEqual([type(part) for part in event.sent[0].chain], [Plain, Record])
-        self.assertEqual(event.sent[0].chain[1]._companion_v2_spoken_text, "你好")
+        self.assertEqual(event.sent[0].chain[1]._digital_life_core_spoken_text, "你好")
 
     async def test_whole_reply_mode_collects_all_segments_before_one_tts_render(self):
         event = FakeEvent()

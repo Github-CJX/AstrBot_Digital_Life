@@ -5,8 +5,8 @@ import json
 import unittest
 from zoneinfo import ZoneInfo
 
-from companion_v2.conversation.foreground import BackgroundPromptTrigger
-from companion_v2.proactive.meal_events import MealContactEvents
+from digital_life_core.conversation.foreground import BackgroundPromptTrigger
+from digital_life_core.proactive.meal_events import MealContactEvents
 from tests.contact_schedule_support import ContactScheduleFixture
 from tests.test_role_tool_loop import answered
 
@@ -116,7 +116,7 @@ class MealFollowupWindowTests(MealContactTests):
     async def slot_at(self, app, *, minutes_after_open):
         from datetime import datetime, timezone
         from zoneinfo import ZoneInfo
-        from companion_v2.proactive.configuration import local_time
+        from digital_life_core.proactive.configuration import local_time
         preferences = self.preferences(app)
         zone = ZoneInfo(preferences.values["quiet_timezone"])
         day = self.clock.now().astimezone(zone).date()

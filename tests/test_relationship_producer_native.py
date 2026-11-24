@@ -8,10 +8,10 @@ import unittest
 # This support module redirects ASTRBOT_ROOT before importing the host SDK.
 from tests.multi_host_support import MultiFixture, multi_config
 from tests.native_adapter_support import completion, final_text
-from astrbot_host.management_identity import dashboard_operator
-from companion_v2.adapters.astrbot.model_wire import tool_alias
-from companion_v2.adapters.astrbot.staging_config import REQUIRED_CAPABILITIES
-from companion_v2.relationships.management import RelationshipMemoryManagement
+from digital_life_host.management_identity import dashboard_operator
+from digital_life_core.adapters.astrbot.model_wire import tool_alias
+from digital_life_core.adapters.astrbot.staging_config import REQUIRED_CAPABILITIES
+from digital_life_core.relationships.management import RelationshipMemoryManagement
 
 
 class NativeRelationshipProducerTests(MultiFixture, unittest.IsolatedAsyncioTestCase):

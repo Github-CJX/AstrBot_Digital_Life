@@ -9,7 +9,7 @@ from tempfile import TemporaryDirectory
 from types import SimpleNamespace
 import unittest
 
-from companion_v2.legacy.data_migration import (
+from digital_life_core.legacy.data_migration import (
     build_data_plan,
     load_reference_image,
     load_reaction_asset,
@@ -17,9 +17,9 @@ from companion_v2.legacy.data_migration import (
     next_reaction_batch,
     next_journal_batch,
 )
-from companion_v2.foundation.refs import ScopeKind
-from companion_v2.knowledge.catalog import KnowledgeCatalog, SourceBinding
-from companion_v2.storage.runtime import StorageRuntime
+from digital_life_core.foundation.refs import ScopeKind
+from digital_life_core.knowledge.catalog import KnowledgeCatalog, SourceBinding
+from digital_life_core.storage.runtime import StorageRuntime
 
 
 ONE_PIXEL_PNG = base64.b64decode(
@@ -305,7 +305,7 @@ class LegacyDataMigrationTests(unittest.TestCase):
         self.assertNotIn("甲群成员线索", json.dumps(preview, ensure_ascii=False))
 
     def test_host_import_writes_knowledge_with_role_and_group_scope_idempotently(self):
-        from astrbot_host.legacy_api import LegacyMigrationWebAPI
+        from digital_life_host.legacy_api import LegacyMigrationWebAPI
 
         self.write_profile({"worldbook_entries": [
             {"id": "setting", "name": "海岛设定", "content": "普通世界资料",

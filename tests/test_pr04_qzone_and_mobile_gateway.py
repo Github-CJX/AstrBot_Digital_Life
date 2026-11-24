@@ -23,28 +23,28 @@ from PIL import Image
 
 from tests import astrbot_data_root  # noqa: F401 - isolate ASTRBOT_ROOT before SDK imports
 
-from astrbot_host.native_extensions.reality import mobile_gateway
-from astrbot_host.qzone_api import QzoneWebAPI
-from companion_v2.execution.models import TaskContext, TaskError
-from companion_v2.foundation.outcome import Outcome
-from companion_v2.foundation.refs import AudienceRef, ScopeKind, ScopeRef, SubjectKind, SubjectRef
-from companion_v2.identity_policy.models import AuthenticatedHostPrincipal, AuthorizationTier, RoleBinding
-from companion_v2.identity_policy.object_access import ObjectAccessPolicy
-from companion_v2.identity_policy.personas import (
+from digital_life_host.native_extensions.reality import mobile_gateway
+from digital_life_host.qzone_api import QzoneWebAPI
+from digital_life_core.execution.models import TaskContext, TaskError
+from digital_life_core.foundation.outcome import Outcome
+from digital_life_core.foundation.refs import AudienceRef, ScopeKind, ScopeRef, SubjectKind, SubjectRef
+from digital_life_core.identity_policy.models import AuthenticatedHostPrincipal, AuthorizationTier, RoleBinding
+from digital_life_core.identity_policy.object_access import ObjectAccessPolicy
+from digital_life_core.identity_policy.personas import (
     ConversationRoute,
     PersonaBinding,
     PersonaDirectory,
     PersonaSelector,
     SelectorKind,
 )
-from companion_v2.identity_policy.repository import PersistentIdentityDirectory
-from companion_v2.qzone import media as qzone_media
-from companion_v2.qzone import policy as qzone_policy
-from companion_v2.qzone import protocol as qzone_protocol
-from companion_v2.qzone.references import COMMENT, LIKE, QzonePhoto, QzonePost
-from companion_v2.qzone.service import QzoneService, owner_key
-from companion_v2.qzone.transport import TransportOutcome
-from companion_v2.storage.runtime import StorageRuntime
+from digital_life_core.identity_policy.repository import PersistentIdentityDirectory
+from digital_life_core.qzone import media as qzone_media
+from digital_life_core.qzone import policy as qzone_policy
+from digital_life_core.qzone import protocol as qzone_protocol
+from digital_life_core.qzone.references import COMMENT, LIKE, QzonePhoto, QzonePost
+from digital_life_core.qzone.service import QzoneService, owner_key
+from digital_life_core.qzone.transport import TransportOutcome
+from digital_life_core.storage.runtime import StorageRuntime
 from tests.test_qzone_extension import COOKIE, MSGLIST, PUBLISH, FakeSettings, FakeTransport, QzoneServiceFixture
 
 
@@ -640,7 +640,7 @@ class QzoneWebAPIHardeningTests(unittest.IsolatedAsyncioTestCase):
         for bad_user in ("", "   ", None, "api_key:service-token"):
             for name, template_req in endpoints:
                 req = SimpleNamespace(username=bad_user, query=template_req.query, body=template_req.body)
-                with patch("astrbot_host.qzone_api.request", req):
+                with patch("digital_life_host.qzone_api.request", req):
                     res = await getattr(self.api, name)()
                 self.assertEqual(res["status"], "error", (name, bad_user, res))
                 self.assertEqual(res["message"], "dashboard_identity_required", (name, bad_user, res))
@@ -651,8 +651,8 @@ class QzoneWebAPIHardeningTests(unittest.IsolatedAsyncioTestCase):
         for non_core in (self.standard_operator, self.important_operator):
             for name, template_req in endpoints:
                 req = SimpleNamespace(username="non-core", query=template_req.query, body=template_req.body)
-                with patch("astrbot_host.qzone_api.request", req), \
-                     patch("astrbot_host.qzone_api.dashboard_operator", return_value=non_core):
+                with patch("digital_life_host.qzone_api.request", req), \
+                     patch("digital_life_host.qzone_api.dashboard_operator", return_value=non_core):
                     res = await getattr(self.api, name)()
                 self.assertEqual(res["status"], "error", (name, non_core.subject.subject_id, res))
                 self.assertEqual(res["message"], "core_access_required", (name, res))
@@ -661,8 +661,8 @@ class QzoneWebAPIHardeningTests(unittest.IsolatedAsyncioTestCase):
 
         # 3. CORE operator passes refresh authorization and acquires credentials.
         req = self._req(username="admin")
-        with patch("astrbot_host.qzone_api.request", req), \
-             patch("astrbot_host.qzone_api.dashboard_operator", return_value=self.core_operator):
+        with patch("digital_life_host.qzone_api.request", req), \
+             patch("digital_life_host.qzone_api.dashboard_operator", return_value=self.core_operator):
             res = await self.api.refresh()
         self.assertEqual(res["status"], "ok", res)
         self.assertEqual(self.transport.acquired, 1)
@@ -678,8 +678,8 @@ class QzoneWebAPIHardeningTests(unittest.IsolatedAsyncioTestCase):
 
         self.transport.credential = slow_credential
         req = self._req(username="admin")
-        with patch("astrbot_host.qzone_api.request", req), \
-             patch("astrbot_host.qzone_api.dashboard_operator", return_value=self.core_operator):
+        with patch("digital_life_host.qzone_api.request", req), \
+             patch("digital_life_host.qzone_api.dashboard_operator", return_value=self.core_operator):
             task = asyncio.create_task(self.api.refresh())
             await asyncio.wait_for(entered.wait(), timeout=2.0)
             # Control lock MUST NOT be held while remote credential refresh awaits.
@@ -712,8 +712,8 @@ class QzoneWebAPIHardeningTests(unittest.IsolatedAsyncioTestCase):
                 if endpoint == "publish" and len(payload) == 20000:
                     continue
                 req = self._req(username="admin", body=payload)
-                with patch("astrbot_host.qzone_api.request", req), \
-                     patch("astrbot_host.qzone_api.dashboard_operator", return_value=self.core_operator):
+                with patch("digital_life_host.qzone_api.request", req), \
+                     patch("digital_life_host.qzone_api.dashboard_operator", return_value=self.core_operator):
                     res = await getattr(self.api, endpoint)()
                 self.assertEqual(res["status"], "error", (endpoint, payload[:20], res))
                 self.assertEqual(res["message"], "qzone_request_invalid", (endpoint, res))

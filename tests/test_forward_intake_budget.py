@@ -2,16 +2,16 @@
 
 import unittest
 
-from astrbot_host.audio.loader import load_native_audio
-from astrbot_host.media import load_native_image
-from astrbot_host.video.loader import load_native_video
-from companion_v2.adapters.astrbot.native import NativePrivateBridge
-from companion_v2.adapters.astrbot.quote_content import capture_quote_content
-from companion_v2.conversation.forwards.models import (
+from digital_life_host.audio.loader import load_native_audio
+from digital_life_host.media import load_native_image
+from digital_life_host.video.loader import load_native_video
+from digital_life_core.adapters.astrbot.native import NativePrivateBridge
+from digital_life_core.adapters.astrbot.quote_content import capture_quote_content
+from digital_life_core.conversation.forwards.models import (
     CapturedForward, CapturedForwardNode, ForwardIntakePolicy, MAX_FORWARDS, MAX_NODES, fits_forwards,
 )
-from companion_v2.conversation.quotes.forward_models import CapturedForwardQuote
-from companion_v2.execution.models import TaskError, digest
+from digital_life_core.conversation.quotes.forward_models import CapturedForwardQuote
+from digital_life_core.execution.models import TaskError, digest
 from tests.forward_support import ForwardFixture, node_raw, quoted_forward_raw
 from tests.group_quote_media_support import Forward, GroupQuoteMediaFixture, Reply
 from tests.test_conversation_quotes import FakeReply

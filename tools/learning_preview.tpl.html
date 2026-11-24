@@ -63,7 +63,7 @@ function envelope(value) {
   return new Promise(resolve => setTimeout(() => resolve({status: 'ok', data: value}), 110));
 }
 window.AstrBotPluginPage = {
-  ready: () => Promise.resolve({pluginName: 'astrbot_plugin_private_companion_v2'}),
+  ready: () => Promise.resolve({pluginName: 'astrbot_plugin_digital_life_legacy'}),
   apiGet: route => {
     note('GET  ' + route);
     if (route === 'growth') return envelope(JSON.parse(JSON.stringify(REPLY.list)));
@@ -97,7 +97,7 @@ window.AstrBotPluginPage = {
 window.CompanionProduct = {
   hosted: () => true,
   role: () => ({role_id: 'chengxi',
-    growth_api: '/astrbot_plugin_private_companion_v2/growth'}),
+    growth_api: '/astrbot_plugin_digital_life_legacy/growth'}),
   bridgeNow: () => window.AstrBotPluginPage,
   bridgeFor: () => Promise.resolve(window.AstrBotPluginPage),
 };

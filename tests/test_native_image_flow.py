@@ -9,14 +9,14 @@ from types import SimpleNamespace as NS
 import unittest
 from unittest.mock import AsyncMock
 
-from companion_v2.capabilities.models import CapabilityAuthorizationState
-from companion_v2.capabilities.repositories import CapabilityRepository
-from companion_v2.conversation.delivery import DeliveryReceipt
-from companion_v2.conversation.flow import ConversationPolicy
-from companion_v2.conversation.media.reply import ImageReplyDraft
-from companion_v2.execution.models import TaskContext, TaskError, digest, encode
-from companion_v2.foundation.refs import AudienceRef
-from companion_v2.model_gateway.models import Amount, BudgetPolicy, ProviderResponse, ToolCall
+from digital_life_core.capabilities.models import CapabilityAuthorizationState
+from digital_life_core.capabilities.repositories import CapabilityRepository
+from digital_life_core.conversation.delivery import DeliveryReceipt
+from digital_life_core.conversation.flow import ConversationPolicy
+from digital_life_core.conversation.media.reply import ImageReplyDraft
+from digital_life_core.execution.models import TaskContext, TaskError, digest, encode
+from digital_life_core.foundation.refs import AudienceRef
+from digital_life_core.model_gateway.models import Amount, BudgetPolicy, ProviderResponse, ToolCall
 from tests.native_image_support import NativeImageFixture
 from tests.test_conversation_images import image_bytes
 from tests.test_host_application import HostFixture
@@ -101,14 +101,14 @@ class NativeImageFlowTests(NativeImageFixture, HostFixture, unittest.IsolatedAsy
         self.assertEqual(len(self.sent), 1)
 
     async def test_daily_outfit_generates_from_persona_agenda_and_weather_with_an_empty_wardrobe(self):
-        from companion_v2.agenda.planning import planning_profile
-        from companion_v2.configuration.registry import FieldRegistry
-        from companion_v2.model_gateway.routing import configuration_fields
-        from companion_v2.proactive.external_materials import WeatherSnapshot
-        from companion_v2.references.configuration import configuration_fields as reference_fields
-        from companion_v2.references.management import ReferenceMaterialManagement
-        from companion_v2.role_profile.configuration import target_for as profile_target
-        from companion_v2.role_work.state.management import StateManagement
+        from digital_life_core.agenda.planning import planning_profile
+        from digital_life_core.configuration.registry import FieldRegistry
+        from digital_life_core.model_gateway.routing import configuration_fields
+        from digital_life_core.proactive.external_materials import WeatherSnapshot
+        from digital_life_core.references.configuration import configuration_fields as reference_fields
+        from digital_life_core.references.management import ReferenceMaterialManagement
+        from digital_life_core.role_profile.configuration import target_for as profile_target
+        from digital_life_core.role_work.state.management import StateManagement
         from tests.test_calendar_planning import output as planned_event
         from tests.test_role_state import calendar_data
 
@@ -201,7 +201,7 @@ class NativeImageFlowTests(NativeImageFixture, HostFixture, unittest.IsolatedAsy
         self.assertEqual(len(self.image_backend.calls), 2)
 
     def use_nai(self):
-        from astrbot_host.native_extensions.image_native.output_routing import OutputRoutingBackend
+        from digital_life_host.native_extensions.image_native.output_routing import OutputRoutingBackend
         path = self.root.parent / "nai-generated.png"
 
         async def generate(owner, request):
@@ -240,14 +240,14 @@ class NativeImageFlowTests(NativeImageFixture, HostFixture, unittest.IsolatedAsy
         self.nai_api.generate_for_companion.assert_awaited_once()
 
     async def test_core_reply_nai_call_uses_the_attached_supervisor_and_the_same_quota(self):
-        from astrbot_host.core_reply_tool_execution import executor_for
+        from digital_life_host.core_reply_tool_execution import executor_for
         self.use_nai()
         host = await self.image_host(budget=self.nai_budget())
         # Capture a real bound context without creating a Companion reply task.
         context = TaskContext(self.important, self.identity.resolve_role(SCOPE, observed_at=self.clock.now()).unwrap(),
                               AudienceRef(SCOPE, (self.important.subject,)))
-        from companion_v2.configuration.models import ConfigLayer, ConfigTarget
-        from companion_v2.conversation.media.quota import GROUP, QUOTA_FIELDS, ImageQuotaConfigurationOwner
+        from digital_life_core.configuration.models import ConfigLayer, ConfigTarget
+        from digital_life_core.conversation.media.quota import GROUP, QUOTA_FIELDS, ImageQuotaConfigurationOwner
         quota = ImageQuotaConfigurationOwner(self.runtime)
         target = ConfigTarget(SCOPE.installation_id, ConfigLayer.ROLE, context.role_binding.role, bot_id=SCOPE.bot_id)
         gate = host.application.messages.image_quota

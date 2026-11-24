@@ -7,9 +7,9 @@ from types import SimpleNamespace
 import time
 import unittest
 
-from astrbot_host.relay_pending import add_task, claim_private_receipts
-from astrbot_host.relay_pending_events import process_group_presence, process_private_receipts
-from companion_v2.storage.runtime import StorageRuntime
+from digital_life_host.relay_pending import add_task, claim_private_receipts
+from digital_life_host.relay_pending_events import process_group_presence, process_private_receipts
+from digital_life_core.storage.runtime import StorageRuntime
 
 
 NOW = datetime(2026, 10, 27, 12, 0, tzinfo=timezone.utc)

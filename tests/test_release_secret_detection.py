@@ -35,7 +35,7 @@ class ReleaseSecretDetectionTests(unittest.TestCase):
     def test_git_inventory_rejects_runtime_and_host_config(self):
         for name in (
             "data/cmd_config.json", "plugin_data/companion-7/state.db",
-            "AGENTS.md", ".env.local", "astrbot_plugin_private_companion_config.json",
+            "AGENTS.md", ".env.local", "astrbot_plugin_digital_life_config.json",
             "docs/private.zip", "DATA/CMD_CONFIG.JSON", "docs/private.tar.gz",
             "docs/design-preview/index.html",
         ):

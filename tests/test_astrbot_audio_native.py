@@ -9,9 +9,9 @@ from tests.multi_host_support import MultiFixture, multi_config
 from aiocqhttp.api_impl import WebSocketReverseApi
 from astrbot.core.message.components import Plain, Record
 from astrbot.core.platform.sources.aiocqhttp.aiocqhttp_message_event import AiocqhttpMessageEvent
-from astrbot_host.audio.components import private_components
-from astrbot_host.audio.loader import load_native_audio
-from companion_v2.execution.models import TaskContext
+from digital_life_host.audio.components import private_components
+from digital_life_host.audio.loader import load_native_audio
+from digital_life_core.execution.models import TaskContext
 from tests.audio_support import audio_bytes
 from tests.staging_bootstrap_support import wait_for_batch
 from tests import test_astrbot_image_delivery_native as image_native

@@ -4,7 +4,7 @@ import unittest
 from datetime import datetime, timezone
 from unittest.mock import patch
 
-from companion_v2.proactive.date_context import project_important_dates
+from digital_life_core.proactive.date_context import project_important_dates
 
 
 class ImportantDateContextTests(unittest.TestCase):
@@ -23,7 +23,7 @@ class ImportantDateContextTests(unittest.TestCase):
         at = datetime(2026, 9, 24, 16, 30, tzinfo=timezone.utc)
         settings = {"important_dates": '[{"calendar":"lunar","month":8,"day":20,"label":"农历生日"}]',
                     "lookahead_days": 0, "timezone": "Asia/Shanghai"}
-        with patch("companion_v2.proactive.date_context.lunar_date_parts", return_value=(2026, 8, 20, False)):
+        with patch("digital_life_core.proactive.date_context.lunar_date_parts", return_value=(2026, 8, 20, False)):
             result = project_important_dates(at, settings)
         self.assertEqual(result["entries"], [{"label": "农历生日", "date": "2026-09-25",
                                               "days_until": 0, "calendar": "lunar"}])

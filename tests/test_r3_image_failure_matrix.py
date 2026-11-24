@@ -40,9 +40,9 @@ from pathlib import Path
 from tempfile import TemporaryDirectory
 from unittest import mock
 
-from astrbot_host.native_extensions.image_native import output_routing
-from astrbot_host.native_extensions.image_native.owner import NativeImageOwner
-from astrbot_host.native_extensions.image_native.types import (
+from digital_life_host.native_extensions.image_native import output_routing
+from digital_life_host.native_extensions.image_native.owner import NativeImageOwner
+from digital_life_host.native_extensions.image_native.types import (
     ImageInvocation,
     NativeImageError,
 )

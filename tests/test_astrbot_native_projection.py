@@ -6,11 +6,11 @@ from unittest.mock import AsyncMock, patch
 
 from sqlalchemy import Column, MetaData, String, Table
 from astrbot.core.db import po as native_po
-from companion_v2.adapters.astrbot.native import configured_default_persona_id
+from digital_life_core.adapters.astrbot.native import configured_default_persona_id
 
 # Establish an isolated AstrBot data root before importing the host adapter.
 from tests import test_astrbot_staging_host as _support
-from astrbot_host.native import (
+from digital_life_host.native import (
     installed_native_types,
     load_persona_snapshot_selection,
     resolve_native_persona_selection,

@@ -4,10 +4,10 @@ import json
 import unittest
 from unittest.mock import patch
 
-from companion_v2.agenda.models import AgendaTarget, Schedule
-from companion_v2.conversation.flow import ConversationPolicy
-from companion_v2.execution.models import TaskError
-from companion_v2.foundation.outcome import Outcome
+from digital_life_core.agenda.models import AgendaTarget, Schedule
+from digital_life_core.conversation.flow import ConversationPolicy
+from digital_life_core.execution.models import TaskError
+from digital_life_core.foundation.outcome import Outcome
 from tests.contact_schedule_support import ContactScheduleFixture
 from tests.test_management_access import SCOPE
 from tests.test_role_tool_loop import answered
@@ -147,7 +147,7 @@ class BackgroundHistoryTests(ContactScheduleFixture, unittest.IsolatedAsyncioTes
         context = self.contact_context()
         snapshot = app.background_history.capture(context, self.clock.now())
         scope = replace(SCOPE, native_scope_id="other", conversation_id="other", session_id="other")
-        from companion_v2.identity_policy.personas import ConversationRoute
+        from digital_life_core.identity_policy.personas import ConversationRoute
         self.personas.register_route(ConversationRoute(scope, user=self.important.subject), observed_at=self.clock.now())
         self.grant(self.important, scope, "text")
         other = self.contact_context(scope)

@@ -28,7 +28,7 @@
  */
 "use strict";
 window.CompanionContactPage = (() => {
-  const HOST = "astrbot_plugin_private_companion";
+  const HOST = "astrbot_plugin_digital_life";
   const PREFIX = "/" + HOST + "/";
   const STORE = "companion-contact-page-v1:";
   const HISTORY_PENDING = "__companion_contact_pending_v1";

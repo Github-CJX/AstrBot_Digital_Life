@@ -11,18 +11,18 @@ from tests import test_astrbot_staging_host as support
 from tests.multi_host_support import MultiFixture
 from astrbot.api.web import PluginRequest, bind_request_context
 from starlette.requests import Request
-from astrbot_host.integration_registry import IntegrationRegistry, STATUS_SCHEMA
-from astrbot_host.integration_catalog import (
+from digital_life_host.integration_registry import IntegrationRegistry, STATUS_SCHEMA
+from digital_life_host.integration_catalog import (
     BUNDLED_EXTENSIONS, EXTERNAL_PROVIDERS, OPTIONAL_PROVIDERS)
-from astrbot_host.native_extensions import NativeExtensionRegistry
-from astrbot_host.native_extensions.builtins import create_bundled_extensions, MANAGED_EXTENSIONS
-from astrbot_host.management_identity import dashboard_operator
-from companion_v2.capabilities import CapabilityRepository
-from companion_v2.identity_policy.models import AuthorizationTier
-from companion_v2.identity_policy.object_access import ObjectAccessPolicy
-from companion_v2.product import PRODUCT_VERSION
+from digital_life_host.native_extensions import NativeExtensionRegistry
+from digital_life_host.native_extensions.builtins import create_bundled_extensions, MANAGED_EXTENSIONS
+from digital_life_host.management_identity import dashboard_operator
+from digital_life_core.capabilities import CapabilityRepository
+from digital_life_core.identity_policy.models import AuthorizationTier
+from digital_life_core.identity_policy.object_access import ObjectAccessPolicy
+from digital_life_core.product import PRODUCT_VERSION
 
-PREFIX = "/astrbot_plugin_private_companion"
+PREFIX = "/astrbot_plugin_digital_life"
 
 
 class RegistryTests(unittest.IsolatedAsyncioTestCase):
@@ -30,13 +30,13 @@ class RegistryTests(unittest.IsolatedAsyncioTestCase):
         self.spec = {"plugin_id": "synthetic.third_party", "capability_id": "third_party",
             "label": "Synthetic third-party provider", "description": "Metadata contract fixture",
             "furniture": {"id": "third-party", "name": "Third-party fixture", "panel_id": "third-party"}}
-        providers = (self.spec, *(item for item in OPTIONAL_PROVIDERS if item.get("owner") == "companion_v2"))
-        catalog_patch = patch("astrbot_host.integration_registry.OPTIONAL_PROVIDERS", providers)
+        providers = (self.spec, *(item for item in OPTIONAL_PROVIDERS if item.get("owner") == "digital_life_core"))
+        catalog_patch = patch("digital_life_host.integration_registry.OPTIONAL_PROVIDERS", providers)
         catalog_patch.start()
         self.addCleanup(catalog_patch.stop)
         self.provider = Mock(return_value={"schema": STATUS_SCHEMA, "plugin_id": self.spec["plugin_id"],
             "enabled": True, "runtime_ready": None, "private_record": "must-not-escape", "token": "secret"})
-        self.api = NS(companion_v2_status=self.provider, status=Mock(side_effect=AssertionError("private API")))
+        self.api = NS(digital_life_core_status=self.provider, status=Mock(side_effect=AssertionError("private API")))
         self.star = NS(root_dir_name=self.spec["plugin_id"], version="1.0", activated=True,
                        star_cls=NS(extension_api=self.api), pages=[])
         self.native = NS(get_all_stars=lambda: [self.star])
@@ -75,14 +75,14 @@ class RegistryTests(unittest.IsolatedAsyncioTestCase):
     def test_hot_replacement_missing_invalid_and_async_status(self):
         self.star.star_cls = NS(extension_api=NS())
         self.assertEqual(self.item()["integration_state"], "installed")
-        self.star.star_cls.extension_api = NS(companion_v2_status=lambda: {"schema":STATUS_SCHEMA,"enabled":"true"})
+        self.star.star_cls.extension_api = NS(digital_life_core_status=lambda: {"schema":STATUS_SCHEMA,"enabled":"true"})
         self.assertEqual(self.item()["integration_state"], "degraded")
         self.star.star_cls.extension_api = self.api
         self.provider.return_value["runtime_ready"] = False
         self.assertEqual(self.item()["integration_state"], "waiting")
         async def async_status():
             raise AssertionError("async discovery must not run")
-        self.star.star_cls.extension_api = NS(companion_v2_status=async_status)
+        self.star.star_cls.extension_api = NS(digital_life_core_status=async_status)
         self.assertEqual(self.item()["integration_state"], "installed")
         self.native.get_all_stars = lambda: []
         self.assertEqual(self.item()["integration_state"], "missing")
@@ -135,7 +135,7 @@ class RegistryTests(unittest.IsolatedAsyncioTestCase):
                 {"content", "image", "screen", "reality", "together", "game", "live"})
             for item in bundled:
                 self.assertEqual(item["kind"], "native_extension")
-                self.assertEqual(item["owner"], "companion_v2")
+                self.assertEqual(item["owner"], "digital_life_core")
                 base, separator, build = item["version"].partition("+")
                 self.assertEqual(base, PRODUCT_VERSION, item["capability_id"])
                 if separator:
@@ -286,7 +286,7 @@ class MultiIntegrationTests(MultiFixture, unittest.IsolatedAsyncioTestCase):
         by_capability = {item["capability_id"]:item for item in before["extensions"]}
         for capability, extension_id in (("image", "image"), ("screen", "companion.screen.native")):
             item = by_capability[capability]
-            self.assertEqual(item["owner"], "companion_v2")
+            self.assertEqual(item["owner"], "digital_life_core")
             self.assertEqual(item["extension_id"], extension_id)
             self.assertFalse(item["assembled"])
             self.assertFalse(item["runtime_ready"])

@@ -10,18 +10,18 @@ from types import SimpleNamespace as NS
 import unittest
 from unittest.mock import patch
 
-from astrbot_host.media import load_native_image
-from companion_v2.adapters.astrbot.forwards import read_private_forwards
-from companion_v2.adapters.astrbot.model_wire import tool_alias
-from companion_v2.adapters.astrbot.quotes import read_private_quote
-from companion_v2.conversation.quotes.forward_models import ForwardQuoteDescriptor
-from companion_v2.conversation.quotes.service import prepare_quote, quote_reference
-from companion_v2.execution.models import TaskError, digest
-from companion_v2.identity_policy.personas import RuntimeIdentity
-from companion_v2.sources.dependencies import key
-from companion_v2.sources.models import SourceRecord
-from astrbot_host.audio.loader import load_native_audio
-from astrbot_host.video.loader import load_native_video
+from digital_life_host.media import load_native_image
+from digital_life_core.adapters.astrbot.forwards import read_private_forwards
+from digital_life_core.adapters.astrbot.model_wire import tool_alias
+from digital_life_core.adapters.astrbot.quotes import read_private_quote
+from digital_life_core.conversation.quotes.forward_models import ForwardQuoteDescriptor
+from digital_life_core.conversation.quotes.service import prepare_quote, quote_reference
+from digital_life_core.execution.models import TaskError, digest
+from digital_life_core.identity_policy.personas import RuntimeIdentity
+from digital_life_core.sources.dependencies import key
+from digital_life_core.sources.models import SourceRecord
+from digital_life_host.audio.loader import load_native_audio
+from digital_life_host.video.loader import load_native_video
 from tests.animation_support import animation_bytes
 from tests.audio_support import audio_bytes
 from tests.forward_support import FakeForward, ForwardFixture, node_raw, quoted_forward_raw
@@ -289,7 +289,7 @@ class ConversationQuotedForwardTests(ForwardFixture, unittest.IsolatedAsyncioTes
         before = self.request(host.application, first)
         reads = len(self.api.calls)
         new = await self.restart(host)
-        with patch("astrbot_host.media.inspect_image", side_effect=AssertionError("recovery may not decode")):
+        with patch("digital_life_host.media.inspect_image", side_effect=AssertionError("recovery may not decode")):
             after = self.request(new.application, first)
             self.assertEqual((after.images, after.context.materials), (before.images, before.context.materials))
         self.assertEqual(len(self.api.calls), reads)

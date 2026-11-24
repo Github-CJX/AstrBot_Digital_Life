@@ -13,7 +13,7 @@ import re
 import unittest
 from pathlib import Path
 
-from companion_v2.product import PRODUCT_VERSION
+from digital_life_core.product import PRODUCT_VERSION
 from tools.build_v2_release import (
     NATIVE_CAPABILITY_BASELINE,
     ROOT,
@@ -83,7 +83,7 @@ class ReleaseVersionContractTests(unittest.TestCase):
         versions = {
             "metadata.yaml": _metadata_version(),
             "pyproject.toml": _pyproject_version(),
-            "companion_v2.product.PRODUCT_VERSION": PRODUCT_VERSION,
+            "digital_life_core.product.PRODUCT_VERSION": PRODUCT_VERSION,
             "tools.build_v2_release.VERSION": VERSION,
             "tools/native_capability_baseline.json": baseline["package_version"],
         }

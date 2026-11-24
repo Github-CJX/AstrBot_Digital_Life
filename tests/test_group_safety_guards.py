@@ -1,15 +1,15 @@
 import unittest
 from types import SimpleNamespace as NS
 
-from companion_v2.conversation.participation_prompts import group_hints
-from companion_v2.conversation.reply_settings import (
+from digital_life_core.conversation.participation_prompts import group_hints
+from digital_life_core.conversation.reply_settings import (
     GROUP_SAFETY_DEFAULTS, configuration_fields, group_safety_settings,
 )
-from companion_v2.conversation.segmentation import SegmentationPolicy
-from companion_v2.conversation.text_processing import (
+from digital_life_core.conversation.segmentation import SegmentationPolicy
+from digital_life_core.conversation.text_processing import (
     REALITY_PROMISE_GUARD_REPLACEMENT, text_policy,
 )
-from companion_v2.memory.prompts import REFLECTION_INSTRUCTION
+from digital_life_core.memory.prompts import REFLECTION_INSTRUCTION
 
 
 class GroupSafetyGuardTests(unittest.TestCase):

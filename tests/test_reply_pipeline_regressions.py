@@ -6,12 +6,12 @@ from pathlib import Path
 import unittest
 from unittest.mock import patch
 
-from companion_v2.configuration.registry import FieldRegistry
-from companion_v2.conversation.reply_preparation import prepare_reply
-from companion_v2.conversation.reply_settings import GROUP, configuration_fields
-from companion_v2.conversation.segmentation import SegmentationPolicy
-from companion_v2.conversation.text_processing import ReplyTextPolicy, text_policy
-from companion_v2.legacy.configuration_migration import (
+from digital_life_core.configuration.registry import FieldRegistry
+from digital_life_core.conversation.reply_preparation import prepare_reply
+from digital_life_core.conversation.reply_settings import GROUP, configuration_fields
+from digital_life_core.conversation.segmentation import SegmentationPolicy
+from digital_life_core.conversation.text_processing import ReplyTextPolicy, text_policy
+from digital_life_core.legacy.configuration_migration import (
     convert_configuration,
     convert_plugin_configuration,
     plugin_configuration_defaults,

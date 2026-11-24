@@ -11,14 +11,14 @@ from tests.staging_bootstrap_support import synthetic_configuration, wait_for_ba
 from tests.group_host_support import GroupFixture, group_config
 from tests.multi_host_support import multi_config
 from tests.test_management_access import NOW
-from astrbot_host.settings import HostSettings
-from astrbot_host.multi_settings import MultiHostSettings
-from astrbot_host.controller import AstrBotStagingController
-from companion_v2.adapters.astrbot.staging import NativeAdapterTypes
-from companion_v2.adapters.astrbot.staging_config import StagingConfiguration
-from companion_v2.conversation.segmentation import SegmentationPolicy, LLM_SEGMENT_MARKER as MARKER
-from companion_v2.conversation.reply_settings import SPACING_DEFAULTS
-from companion_v2.execution.models import digest
+from digital_life_host.settings import HostSettings
+from digital_life_host.multi_settings import MultiHostSettings
+from digital_life_host.controller import AstrBotStagingController
+from digital_life_core.adapters.astrbot.staging import NativeAdapterTypes
+from digital_life_core.adapters.astrbot.staging_config import StagingConfiguration
+from digital_life_core.conversation.segmentation import SegmentationPolicy, LLM_SEGMENT_MARKER as MARKER
+from digital_life_core.conversation.reply_settings import SPACING_DEFAULTS
+from digital_life_core.execution.models import digest
 
 SEGMENT_FIRST = "这是第一段完整回复"
 SEGMENT_SECOND = "这是第二段完整回复"

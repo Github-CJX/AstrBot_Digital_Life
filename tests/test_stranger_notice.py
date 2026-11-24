@@ -13,7 +13,7 @@
 import json
 import unittest
 
-from companion_v2.relationships.private_access import DENIED_REPLY
+from digital_life_core.relationships.private_access import DENIED_REPLY
 from tests.multi_host_support import MultiFixture, multi_config
 
 
@@ -62,16 +62,16 @@ class StrangerFixture(MultiFixture):
 
 class StrangerNoticeTests(StrangerFixture, unittest.IsolatedAsyncioTestCase):
     async def handle(self, event):
-        from astrbot_host.stranger_notice import refuse_stranger
+        from digital_life_host.stranger_notice import refuse_stranger
 
         return await refuse_stranger(self.controller, event)
 
     def set_config(self, app, **changes):
-        from astrbot_host.management_identity import dashboard_operator
+        from digital_life_host.management_identity import dashboard_operator
 
-        from companion_v2.configuration.models import ConfigLayer, ConfigTarget
-        from companion_v2.foundation.refs import OperationRef, VersionRef
-        from companion_v2.relationships.private_access import GROUP
+        from digital_life_core.configuration.models import ConfigLayer, ConfigTarget
+        from digital_life_core.foundation.refs import OperationRef, VersionRef
+        from digital_life_core.relationships.private_access import GROUP
 
         target = ConfigTarget(app.runtime.installation_id, ConfigLayer.INSTALLATION)
         operator = dashboard_operator(app.runtime, "tester", at=self.clock.now())
@@ -105,8 +105,8 @@ class StrangerNoticeTests(StrangerFixture, unittest.IsolatedAsyncioTestCase):
         self.assertEqual(receipt["count_today"], 1)
 
     async def test_a_blocked_stranger_is_ignored_but_stays_in_the_ledger(self):
-        from astrbot_host.stranger_notice import BLOCK_KIND, CONTACT_KIND, stranger_block_view_id
-        from companion_v2.execution.models import encode, stamp
+        from digital_life_host.stranger_notice import BLOCK_KIND, CONTACT_KIND, stranger_block_view_id
+        from digital_life_core.execution.models import encode, stamp
 
         app = await self.start_host()
         event = self.event()
@@ -210,7 +210,7 @@ class StrangerNoticeTests(StrangerFixture, unittest.IsolatedAsyncioTestCase):
 
     async def test_every_stranger_attempt_is_visible_even_when_nothing_is_sent(self):
         """被拒也是发生过的私聊：开关关掉、冷却拦住时仍要留下可解释的记录。"""
-        from astrbot_host.stranger_notice import CONTACT_KIND
+        from digital_life_host.stranger_notice import CONTACT_KIND
 
         app = await self.start_host()
 

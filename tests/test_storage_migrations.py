@@ -7,8 +7,8 @@ from tempfile import TemporaryDirectory
 import unittest
 from unittest.mock import patch
 
-from companion_v2.storage.runtime import StorageOpenError, StorageRuntime
-from companion_v2.storage.schema import (
+from digital_life_core.storage.runtime import StorageOpenError, StorageRuntime
+from digital_life_core.storage.schema import (
     MIGRATION_V1_TO_V2_FINGERPRINT, MIGRATION_V1_TO_V2_ID, MIGRATION_V19_TO_V20_ID,
     MIGRATION_V20_TO_V21_ID, MIGRATION_V21_TO_V22_ID, MIGRATION_V30_TO_V31_ID,
     MIGRATION_V30_TO_V31_FINGERPRINT, MIGRATION_V31_TO_V32_ID,
@@ -251,7 +251,7 @@ class StorageMigrationTests(unittest.TestCase):
         self.assertEqual(migration["fingerprint"], MIGRATION_V51_TO_V52_FINGERPRINT)
 
     def test_v53_upgrade_adds_stream_records_and_rolls_back_on_failure(self):
-        from companion_v2.storage.schema import V54_MIGRATION_STATEMENTS, SCHEMA_VERSION_V53, MIGRATION_V53_TO_V54_ID
+        from digital_life_core.storage.schema import V54_MIGRATION_STATEMENTS, SCHEMA_VERSION_V53, MIGRATION_V53_TO_V54_ID
         from tests.execution_support import remove_v54
         runtime = self.open_runtime()
         runtime.close()
@@ -259,7 +259,7 @@ class StorageMigrationTests(unittest.TestCase):
             remove_v54(connection)
             connection.execute("UPDATE runtime_metadata SET value = ? WHERE key = 'schema_version'", (SCHEMA_VERSION_V53,))
             connection.commit()
-        with patch("companion_v2.storage.runtime.V54_MIGRATION_STATEMENTS", V54_MIGRATION_STATEMENTS + ("INVALID UPGRADE",)):
+        with patch("digital_life_core.storage.runtime.V54_MIGRATION_STATEMENTS", V54_MIGRATION_STATEMENTS + ("INVALID UPGRADE",)):
             with self.assertRaises(StorageOpenError):
                 self.open_runtime()
         self.assertEqual(self.version(), SCHEMA_VERSION_V53)
@@ -313,7 +313,7 @@ class StorageMigrationTests(unittest.TestCase):
                                (SCHEMA_VERSION_V56,))
             connection.commit()
 
-        with patch("companion_v2.storage.runtime.V57_MIGRATION_STATEMENTS",
+        with patch("digital_life_core.storage.runtime.V57_MIGRATION_STATEMENTS",
                    ("CREATE TABLE proactive_platform_circuits (account_key TEXT PRIMARY KEY)", "INVALID UPGRADE")):
             with self.assertRaises(StorageOpenError):
                 self.open_runtime()
@@ -366,7 +366,7 @@ class StorageMigrationTests(unittest.TestCase):
                                (SCHEMA_VERSION_V58,))
             connection.commit()
 
-        with patch("companion_v2.storage.runtime.V59_MIGRATION_STATEMENTS",
+        with patch("digital_life_core.storage.runtime.V59_MIGRATION_STATEMENTS",
                    ("ALTER TABLE laya_decision_events ADD COLUMN request_json TEXT", "INVALID UPGRADE")):
             with self.assertRaises(StorageOpenError):
                 self.open_runtime()
@@ -675,7 +675,7 @@ class StorageMigrationTests(unittest.TestCase):
             connection.execute("UPDATE runtime_metadata SET value = ? WHERE key = 'schema_version'",
                                (SCHEMA_VERSION_V52,))
             connection.commit()
-        with patch("companion_v2.storage.runtime.V53_MIGRATION_STATEMENTS",
+        with patch("digital_life_core.storage.runtime.V53_MIGRATION_STATEMENTS",
                    V53_MIGRATION_STATEMENTS + ("INVALID UPGRADE",)):
             with self.assertRaises(StorageOpenError):
                 self.open_runtime()
@@ -718,7 +718,7 @@ class StorageMigrationTests(unittest.TestCase):
             remove_v22(connection)
             connection.execute("UPDATE runtime_metadata SET value = ? WHERE key = 'schema_version'", (SCHEMA_VERSION_V21,))
             connection.commit()
-        with patch("companion_v2.storage.runtime.V22_MIGRATION_STATEMENTS",
+        with patch("digital_life_core.storage.runtime.V22_MIGRATION_STATEMENTS",
                    ("CREATE TABLE role_growth_temp(id TEXT)", "INVALID UPGRADE")):
             with self.assertRaises(StorageOpenError):
                 StorageRuntime.open(data_root=self.root, installation_id="installation-a")
@@ -759,7 +759,7 @@ class StorageMigrationTests(unittest.TestCase):
             connection.execute("UPDATE runtime_metadata SET value = ? WHERE key = 'schema_version'", (SCHEMA_VERSION_V30,))
             connection.commit()
         with patch(
-            "companion_v2.storage.runtime.V31_MIGRATION_STATEMENTS",
+            "digital_life_core.storage.runtime.V31_MIGRATION_STATEMENTS",
             (V31_MIGRATION_STATEMENTS[0], "INVALID V31 MIGRATION"),
         ):
             with self.assertRaises(StorageOpenError):
@@ -794,7 +794,7 @@ class StorageMigrationTests(unittest.TestCase):
             remove_v32(connection)
             connection.execute("UPDATE runtime_metadata SET value = ? WHERE key = 'schema_version'", (SCHEMA_VERSION_V31,))
             connection.commit()
-        with patch("companion_v2.storage.runtime.V32_MIGRATION_STATEMENTS",
+        with patch("digital_life_core.storage.runtime.V32_MIGRATION_STATEMENTS",
                    (V32_MIGRATION_STATEMENTS[0], "INVALID V32 MIGRATION")):
             with self.assertRaises(StorageOpenError):
                 StorageRuntime.open(data_root=self.root, installation_id="installation-a")
@@ -826,7 +826,7 @@ class StorageMigrationTests(unittest.TestCase):
             remove_v33(connection)
             connection.execute("UPDATE runtime_metadata SET value = ? WHERE key = 'schema_version'", (SCHEMA_VERSION_V32,))
             connection.commit()
-        with patch("companion_v2.storage.runtime.V33_MIGRATION_STATEMENTS",
+        with patch("digital_life_core.storage.runtime.V33_MIGRATION_STATEMENTS",
                    (V33_MIGRATION_STATEMENTS[0], "INVALID V33 MIGRATION")):
             with self.assertRaises(StorageOpenError):
                 StorageRuntime.open(data_root=self.root, installation_id="installation-a")
@@ -859,7 +859,7 @@ class StorageMigrationTests(unittest.TestCase):
             remove_v34(connection)
             connection.execute("UPDATE runtime_metadata SET value = ? WHERE key = 'schema_version'", (SCHEMA_VERSION_V33,))
             connection.commit()
-        with patch("companion_v2.storage.runtime.V34_MIGRATION_STATEMENTS",
+        with patch("digital_life_core.storage.runtime.V34_MIGRATION_STATEMENTS",
                    (V34_MIGRATION_STATEMENTS[0], "INVALID V34 MIGRATION")):
             with self.assertRaises(StorageOpenError):
                 StorageRuntime.open(data_root=self.root, installation_id="installation-a")
@@ -892,7 +892,7 @@ class StorageMigrationTests(unittest.TestCase):
             remove_v35(connection)
             connection.execute("UPDATE runtime_metadata SET value = ? WHERE key = 'schema_version'", (SCHEMA_VERSION_V34,))
             connection.commit()
-        with patch("companion_v2.storage.runtime.V35_MIGRATION_STATEMENTS",
+        with patch("digital_life_core.storage.runtime.V35_MIGRATION_STATEMENTS",
                    (V35_MIGRATION_STATEMENTS[0], "INVALID V35 MIGRATION")):
             with self.assertRaises(StorageOpenError):
                 StorageRuntime.open(data_root=self.root, installation_id="installation-a")
@@ -911,7 +911,7 @@ class StorageMigrationTests(unittest.TestCase):
             remove_v36(connection)
             connection.execute("UPDATE runtime_metadata SET value = ? WHERE key = 'schema_version'", (SCHEMA_VERSION_V35,))
             connection.commit()
-        with patch("companion_v2.storage.runtime.V36_MIGRATION_STATEMENTS",
+        with patch("digital_life_core.storage.runtime.V36_MIGRATION_STATEMENTS",
                    (V36_MIGRATION_STATEMENTS[0], "INVALID V36 MIGRATION")):
             with self.assertRaises(StorageOpenError):
                 StorageRuntime.open(data_root=self.root, installation_id="installation-a")
@@ -945,7 +945,7 @@ class StorageMigrationTests(unittest.TestCase):
 
     def test_failed_migration_rolls_back_ddl_and_version_then_can_retry(self) -> None:
         with patch(
-            "companion_v2.storage.runtime.V2_MIGRATION_STATEMENTS",
+            "digital_life_core.storage.runtime.V2_MIGRATION_STATEMENTS",
             (*V2_MIGRATION_STATEMENTS[:3], "INVALID MIGRATION STATEMENT"),
         ):
             with self.assertRaises(StorageOpenError):

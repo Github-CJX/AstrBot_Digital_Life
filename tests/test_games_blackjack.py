@@ -2,8 +2,8 @@ from __future__ import annotations
 
 import pytest
 
-from companion_v2.games import BlackjackCard, BlackjackGame
-from companion_v2.games.blackjack import _best_value, fresh_shoe
+from digital_life_core.games import BlackjackCard, BlackjackGame
+from digital_life_core.games.blackjack import _best_value, fresh_shoe
 
 
 def fixed_shoe(ranks: list[str]) -> list[BlackjackCard]:

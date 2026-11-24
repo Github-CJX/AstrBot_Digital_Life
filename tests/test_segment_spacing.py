@@ -1,10 +1,10 @@
 import unittest
 from dataclasses import asdict
 
-from companion_v2.configuration.registry import ValueKind
-from companion_v2.configuration.models import ConfigurationError
-from companion_v2.conversation.reply_settings import configuration_fields, validate
-from companion_v2.conversation.segmentation import (
+from digital_life_core.configuration.registry import ValueKind
+from digital_life_core.configuration.models import ConfigurationError
+from digital_life_core.conversation.reply_settings import configuration_fields, validate
+from digital_life_core.conversation.segmentation import (
     SegmentationPolicy,
     minimum_part_gap_seconds,
     part_gap_seconds,

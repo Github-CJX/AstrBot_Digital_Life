@@ -6,18 +6,18 @@ import json
 import unittest
 from unittest.mock import patch
 
-from companion_v2.conversation.flow import ConversationPolicy
-from companion_v2.capabilities.models import CapabilityAuthorizationState
-from companion_v2.capabilities.repositories import CapabilityRepository
-from companion_v2.conversation.messages import source_from_document
-from companion_v2.execution.models import TaskError, digest, encode
-from companion_v2.foundation.refs import SourceRef, SubjectKind, SubjectRef, VersionRef
-from companion_v2.identity_policy.personas import ConversationRoute, PersonaBinding, PersonaSelector, SelectorKind
-from companion_v2.identity_policy.models import AuthorizationTier
-from companion_v2.model_gateway.models import ToolCall
-from companion_v2.sources.dependencies import link
-from companion_v2.sources.models import SourceRecord
-from companion_v2.sources.repositories import SourceRepository
+from digital_life_core.conversation.flow import ConversationPolicy
+from digital_life_core.capabilities.models import CapabilityAuthorizationState
+from digital_life_core.capabilities.repositories import CapabilityRepository
+from digital_life_core.conversation.messages import source_from_document
+from digital_life_core.execution.models import TaskError, digest, encode
+from digital_life_core.foundation.refs import SourceRef, SubjectKind, SubjectRef, VersionRef
+from digital_life_core.identity_policy.personas import ConversationRoute, PersonaBinding, PersonaSelector, SelectorKind
+from digital_life_core.identity_policy.models import AuthorizationTier
+from digital_life_core.model_gateway.models import ToolCall
+from digital_life_core.sources.dependencies import link
+from digital_life_core.sources.models import SourceRecord
+from digital_life_core.sources.repositories import SourceRepository
 from tests.native_content_support import NativeContentFixture
 from tests.test_host_application import HostFixture
 from tests.test_management_access import INSTALLATION, NOW, SCOPE
@@ -91,7 +91,7 @@ class NativeContentFlowTests(NativeContentFixture, HostFixture, unittest.Isolate
         self.assertEqual(host.application.messages.history(self.context(host.application, batch)).unwrap()["items"][0]["text"],
                          "已按原角色读到固定版本。")
         import sys
-        self.assertNotIn("astrbot_plugin_private_companion", sys.modules)
+        self.assertNotIn("astrbot_plugin_digital_life", sys.modules)
         self.assertTrue(receipt["operation_id"])
 
     async def test_candidate_adoption_and_both_fixed_versions_are_real_role_tools(self):
@@ -242,7 +242,7 @@ class NativeContentFlowTests(NativeContentFixture, HostFixture, unittest.Isolate
         reference = self.result_reference()
         await self.content_lease.aclose()
         self.assertIsNone(self.native_registry.current_declaration(
-            "native:astrbot_plugin_private_companion.content:content.work.read"))
+            "native:astrbot_plugin_digital_life.content:content.work.read"))
         self.assertFalse(host.application.messages.sources.validate_reference(reference, observed_at=NOW).is_success)
         await self.native_registry.aclose()
         self.assertEqual(SourceRepository(self.open_runtime()).validate_reference(reference, observed_at=NOW).failure.code,
@@ -362,8 +362,8 @@ class NativeContentContinuationTests(NativeContentFixture, HostFixture, unittest
         return host, batch, receipt
 
     async def test_a_read_pins_the_version_a_later_candidate_must_reuse(self):
-        from companion_v2.conversation.content import access as content_access
-        from companion_v2.conversation.content import authoring_service as service
+        from digital_life_core.conversation.content import access as content_access
+        from digital_life_core.conversation.content import authoring_service as service
         host, batch, receipt = await self.read_fixed_version()
         context = self.context(host.application, batch)
         stored = content_access.recorded_authoring_request(self.runtime, context, receipt["work_id"])

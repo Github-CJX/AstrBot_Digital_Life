@@ -5,15 +5,15 @@ import hashlib
 import json
 import unittest
 
-from astrbot_host.files.loader import load_native_file
-from astrbot_host.files.parsing import extract_document
-from companion_v2.adapters.astrbot.files import (
+from digital_life_host.files.loader import load_native_file
+from digital_life_host.files.parsing import extract_document
+from digital_life_core.adapters.astrbot.files import (
     NativeFileLocator,
     prepare_file_text,
 )
-from companion_v2.configuration.models import ConfigurationError
-from companion_v2.configuration.registry import FieldRegistry
-from companion_v2.conversation.media.understanding import (
+from digital_life_core.configuration.models import ConfigurationError
+from digital_life_core.configuration.registry import FieldRegistry
+from digital_life_core.conversation.media.understanding import (
     DEFAULTS,
     DOCUMENT_SUFFIXES,
     SCOPE_PERMISSION_FIELDS,
@@ -21,10 +21,10 @@ from companion_v2.conversation.media.understanding import (
     intake_fields,
     settings,
 )
-from companion_v2.conversation.reply_settings import configuration_fields as reply_configuration_fields
-from companion_v2.conversation.segmentation import SegmentationPolicy
-from companion_v2.execution.models import TaskError
-from companion_v2.foundation.refs import ScopeKind
+from digital_life_core.conversation.reply_settings import configuration_fields as reply_configuration_fields
+from digital_life_core.conversation.segmentation import SegmentationPolicy
+from digital_life_core.execution.models import TaskError
+from digital_life_core.foundation.refs import ScopeKind
 
 
 class FileUnderstandingTests(unittest.IsolatedAsyncioTestCase):

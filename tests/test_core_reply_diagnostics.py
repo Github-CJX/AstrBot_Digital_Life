@@ -3,11 +3,11 @@
 from datetime import timedelta
 import unittest
 
-from companion_v2.conversation.recalls import MessageRecall
-from companion_v2.execution.models import require
-from astrbot_host.core_reply import CORE_REPLY_CONTEXT_EXTRA
-from astrbot_host.core_reply_tools import inject_core_reply_tools, native_tool_name
-from astrbot_host.functional_commands import classify_functional_command
+from digital_life_core.conversation.recalls import MessageRecall
+from digital_life_core.execution.models import require
+from digital_life_host.core_reply import CORE_REPLY_CONTEXT_EXTRA
+from digital_life_host.core_reply_tools import inject_core_reply_tools, native_tool_name
+from digital_life_host.functional_commands import classify_functional_command
 from tests.multi_host_support import MultiFixture
 from tests.test_core_reply_owner_tools import NativeOwnerCalls
 
@@ -127,8 +127,8 @@ class CoreReplyDiagnosticToolsTests(NativeOwnerCalls, MultiFixture, unittest.Iso
         self.assert_no_reply_work()
 
     async def test_repair_proposal_is_cancelled_or_confirmed_only_by_its_exact_private_command(self):
-        from companion_v2.configuration.models import ConfigLayer, ConfigTarget
-        from companion_v2.identity_policy.models import AuthorizationTier
+        from digital_life_core.configuration.models import ConfigLayer, ConfigTarget
+        from digital_life_core.identity_policy.models import AuthorizationTier
 
         check_event = self.event(identifier="native-diagnostic-repair-check", text="陪伴 答疑 检查回复配置")
         prepared, check_request = await self.bind(check_event)

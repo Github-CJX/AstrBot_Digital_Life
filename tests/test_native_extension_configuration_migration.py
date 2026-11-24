@@ -8,13 +8,13 @@ from tempfile import TemporaryDirectory
 from types import SimpleNamespace
 from unittest import IsolatedAsyncioTestCase, TestCase
 
-from companion_v2.legacy.migration import ConfigIntent, LegacyMigration, MigrationState
-from companion_v2.legacy.native_extension_configuration import (
+from digital_life_core.legacy.migration import ConfigIntent, LegacyMigration, MigrationState
+from digital_life_core.legacy.native_extension_configuration import (
     LIVE_RENAMES, SOURCE_PLUGINS, convert_native_extension_configuration, settings_state_token,
 )
 
 
-PACKAGE = Path(__file__).resolve().parents[1] / "astrbot_host" / "native_extensions"
+PACKAGE = Path(__file__).resolve().parents[1] / "digital_life_host" / "native_extensions"
 
 
 def baseline(name):
@@ -145,7 +145,7 @@ class ConverterTests(TestCase):
 
 class HostApplyTests(IsolatedAsyncioTestCase):
     async def test_broken_optional_source_does_not_block_core_migration(self):
-        from astrbot_host.legacy_api import LegacyMigrationWebAPI
+        from digital_life_host.legacy_api import LegacyMigrationWebAPI
         findings = [
             {"source_id": "private.host_configuration", "state": "ready"},
             {"source_id": "image.configuration", "state": "absent"},
@@ -158,7 +158,7 @@ class HostApplyTests(IsolatedAsyncioTestCase):
         self.assertEqual([item["scope"] for item in errors], ["game.settings"])
 
     async def test_available_chat_and_voice_providers_can_be_reused(self):
-        from astrbot_host.legacy_api import LegacyMigrationWebAPI
+        from digital_life_host.legacy_api import LegacyMigrationWebAPI
         chat = SimpleNamespace(text_chat=lambda *args: None)
         voice = SimpleNamespace(meta=lambda: SimpleNamespace(id="voice-id"))
         context = SimpleNamespace(get_provider_by_id=lambda name: chat if name == "chat-id" else None,
@@ -168,7 +168,7 @@ class HostApplyTests(IsolatedAsyncioTestCase):
         self.assertTrue(api._legacy_provider_available("speech.tts_provider_id", "voice-id"))
 
     async def test_vision_and_stt_require_their_actual_capabilities(self):
-        from astrbot_host.legacy_api import LegacyMigrationWebAPI
+        from digital_life_host.legacy_api import LegacyMigrationWebAPI
         providers = {"text": SimpleNamespace(text_chat=lambda **kwargs: None,
                         meta=lambda: SimpleNamespace(modalities=["text"])),
                      "vision": SimpleNamespace(text_chat=lambda **kwargs: None,
@@ -182,8 +182,8 @@ class HostApplyTests(IsolatedAsyncioTestCase):
         self.assertTrue(api._legacy_provider_available("speech.stt_provider_id", "stt"))
 
     async def test_unavailable_provider_is_preserved_with_a_reselection_note(self):
-        from astrbot_host.legacy_api import LegacyMigrationWebAPI
-        from astrbot_host.native_extensions.settings import ExtensionSettings
+        from digital_life_host.legacy_api import LegacyMigrationWebAPI
+        from digital_life_host.native_extensions.settings import ExtensionSettings
         with TemporaryDirectory() as folder:
             config = ExtensionSettings(folder, "together")
             registry = SimpleNamespace(service=lambda name: SimpleNamespace(config=config),
@@ -204,8 +204,8 @@ class HostApplyTests(IsolatedAsyncioTestCase):
                                  for item in differences), 2)
 
     async def test_apply_saves_portable_values_and_preserves_newer_settings(self):
-        from astrbot_host.legacy_api import LegacyMigrationWebAPI
-        from astrbot_host.native_extensions.settings import ExtensionSettings
+        from digital_life_host.legacy_api import LegacyMigrationWebAPI
+        from digital_life_host.native_extensions.settings import ExtensionSettings
         with TemporaryDirectory() as folder:
             config = ExtensionSettings(folder, "game")
             config.update_fields({"native_v2": {"gomoku_enabled": False}})

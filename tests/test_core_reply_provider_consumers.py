@@ -11,19 +11,19 @@ from tests import test_astrbot_staging_host as _host_import
 from astrbot.core.agent.message import Message, ToolCall
 from mcp.types import CallToolResult
 
-from astrbot_host.core_reply import prepare_core_reply_event
-from astrbot_host.core_reply_tools import close_core_reply_tools, inject_core_reply_tools, native_tool_name
-from companion_v2.adapters.astrbot.native import NativeConversationInput
-from companion_v2.configuration.models import ConfigLayer, ConfigTarget
-from companion_v2.configuration.registry import FieldRegistry
-from companion_v2.conversation.native_observations import NativeConversationObservations
-from companion_v2.execution.models import TaskContext, digest, require
-from companion_v2.foundation.refs import AudienceRef
-from companion_v2.identity_policy.personas import ConversationRoute
-from companion_v2.model_gateway.routing import configuration_fields
-from companion_v2.screen.configuration import GROUP as SCREEN_GROUP
-from companion_v2.screen.models import SCREEN_EXTENSION
-from companion_v2.screen.interpretation import screen_interpretation_profile
+from digital_life_host.core_reply import prepare_core_reply_event
+from digital_life_host.core_reply_tools import close_core_reply_tools, inject_core_reply_tools, native_tool_name
+from digital_life_core.adapters.astrbot.native import NativeConversationInput
+from digital_life_core.configuration.models import ConfigLayer, ConfigTarget
+from digital_life_core.configuration.registry import FieldRegistry
+from digital_life_core.conversation.native_observations import NativeConversationObservations
+from digital_life_core.execution.models import TaskContext, digest, require
+from digital_life_core.foundation.refs import AudienceRef
+from digital_life_core.identity_policy.personas import ConversationRoute
+from digital_life_core.model_gateway.routing import configuration_fields
+from digital_life_core.screen.configuration import GROUP as SCREEN_GROUP
+from digital_life_core.screen.models import SCREEN_EXTENSION
+from digital_life_core.screen.interpretation import screen_interpretation_profile
 from tests.native_content_support import NativeContentFixture
 from tests.test_astrbot_core_reply import FakeEvent
 from tests.test_host_application import HostFixture
@@ -123,7 +123,7 @@ class CoreScreenConsumerTests(NativeProviderCalls, HostFixture, unittest.Isolate
         self.provider_directory = self.root.parent / "screen-native-v2"
         self.native_registry = self.create_screen_registry()
         self.providers = tuple(replace(provider, capabilities=("text", "tools", "image")) for provider in self.providers)
-        from companion_v2.capabilities import CapabilityAuthorizationState, CapabilityRepository
+        from digital_life_core.capabilities import CapabilityAuthorizationState, CapabilityRepository
         self.capabilities = CapabilityRepository(self.runtime)
         self.package = self.native_registry.declarations()[0].descriptor.package
         require(self.capabilities.register_descriptor(self.package, registered_at=self.clock.now()))

@@ -3,9 +3,9 @@
 import unittest
 from types import SimpleNamespace
 
-from astrbot_host.native_extensions.game.activity_methods import GameActivityMethods
-from astrbot_host.native_extensions.together.model_methods import TogetherModelMethods
-from companion_v2.reality.model_profile import reality_text_profile
+from digital_life_host.native_extensions.game.activity_methods import GameActivityMethods
+from digital_life_host.native_extensions.together.model_methods import TogetherModelMethods
+from digital_life_core.reality.model_profile import reality_text_profile
 
 
 class Provider:

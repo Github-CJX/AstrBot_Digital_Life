@@ -10,7 +10,7 @@
 
 import unittest
 
-from companion_v2.relationships.private_access import DENIED_REPLY
+from digital_life_core.relationships.private_access import DENIED_REPLY
 from tests.multi_host_support import MultiFixture, multi_config
 
 
@@ -176,11 +176,11 @@ class ConfiguredDefaultTests(SendingFixture, unittest.IsolatedAsyncioTestCase):
         操作者用 dashboard 身份（那是唯一有 configuration.write 的主体）；写在**安装层**，
         因为夹具里两个目标分属不同角色，只改一个角色测不出"默认值对新人的作用"。
         """
-        from astrbot_host.management_identity import dashboard_operator
+        from digital_life_host.management_identity import dashboard_operator
 
-        from companion_v2.configuration.models import ConfigLayer, ConfigTarget
-        from companion_v2.foundation.refs import OperationRef, VersionRef
-        from companion_v2.relationships.private_access import GROUP
+        from digital_life_core.configuration.models import ConfigLayer, ConfigTarget
+        from digital_life_core.foundation.refs import OperationRef, VersionRef
+        from digital_life_core.relationships.private_access import GROUP
 
         target = ConfigTarget(app.runtime.installation_id, ConfigLayer.INSTALLATION)
         operator = dashboard_operator(app.runtime, "tester", at=self.clock.now())

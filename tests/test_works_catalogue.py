@@ -8,7 +8,7 @@ import tempfile
 import unittest
 from pathlib import Path
 
-from companion_v2.content.catalogue import content_database, read_works
+from digital_life_core.content.catalogue import content_database, read_works
 
 COLUMNS = ("owner_key, work_id, owner_json, title, work_type, author_json, "
            "audience_json, revision, head_version, state, origin_json, created_at")

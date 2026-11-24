@@ -10,15 +10,15 @@ from types import SimpleNamespace as NS
 import unittest
 from unittest.mock import patch
 
-from companion_v2.adapters.astrbot.forwards import freeze_nodes
-from companion_v2.adapters.astrbot.model_wire import tool_alias
-from companion_v2.conversation.forwards.models import (MAX_DEPTH, MAX_FORWARDS, MAX_NODES, ForwardConversationEvent,
+from digital_life_core.adapters.astrbot.forwards import freeze_nodes
+from digital_life_core.adapters.astrbot.model_wire import tool_alias
+from digital_life_core.conversation.forwards.models import (MAX_DEPTH, MAX_FORWARDS, MAX_NODES, ForwardConversationEvent,
                                                        ForwardIntakePolicy, ForwardNodeDescriptor, NODE_OWNER)
-from companion_v2.conversation.forwards.service import forward_reference, node_reference
-from companion_v2.execution.models import TaskError
-from companion_v2.foundation.refs import SubjectKind, SubjectRef
-from companion_v2.identity_policy.personas import RuntimeIdentity
-from companion_v2.sources.dependencies import key
+from digital_life_core.conversation.forwards.service import forward_reference, node_reference
+from digital_life_core.execution.models import TaskError
+from digital_life_core.foundation.refs import SubjectKind, SubjectRef
+from digital_life_core.identity_policy.personas import RuntimeIdentity
+from digital_life_core.sources.dependencies import key
 from tests.animation_support import animation_bytes
 from tests.forward_support import ForwardFixture, FakeForward, node_raw
 from tests.native_adapter_support import completion, final_text
@@ -240,7 +240,7 @@ class ConversationForwardTests(ForwardFixture, unittest.IsolatedAsyncioTestCase)
             role_port=self.bridge.ports, providers=(self.native_model.local_provider(),), sender=self.native_sender.local_sender(),
             runtime_identity=RuntimeIdentity("companion", "runtime-2", "astrbot", "host"))
         await self.start(new, 1, 1)
-        with patch("astrbot_host.media.inspect_image", side_effect=AssertionError("never decode during recovery")):
+        with patch("digital_life_host.media.inspect_image", side_effect=AssertionError("never decode during recovery")):
             after = self.request(new.application, batch)
             self.assertEqual(after.images, before.images)
             self.assertEqual(after.context.materials, before.context.materials)
@@ -278,7 +278,7 @@ class ConversationForwardTests(ForwardFixture, unittest.IsolatedAsyncioTestCase)
             role_port=self.bridge.ports, providers=(self.native_model.local_provider(),), sender=self.native_sender.local_sender(),
             runtime_identity=RuntimeIdentity("companion", "runtime-mixed-media", "astrbot", "host"))
         await self.start(new, 1, 1)
-        with patch("astrbot_host.media.inspect_image", side_effect=AssertionError("recovery may not decode again")):
+        with patch("digital_life_host.media.inspect_image", side_effect=AssertionError("recovery may not decode again")):
             self.assertEqual(self.request(new.application, batch).images, before.images)
         self.assertEqual(len(self.api.calls), reads)
         third = new.receive(await self.capture(self.forward_event("680", with_text=False))).unwrap()

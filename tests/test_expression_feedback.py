@@ -4,11 +4,11 @@ import tempfile
 from types import SimpleNamespace
 import unittest
 
-from companion_v2.execution.models import digest, stamp
-from companion_v2.conversation.style_context import ConversationExpressionStyleContext
-from companion_v2.expression import feedback, style_rotation
-from companion_v2.foundation.refs import RoleOwnerRef, ScopeKind, ScopeRef
-from companion_v2.storage.runtime import StorageRuntime
+from digital_life_core.execution.models import digest, stamp
+from digital_life_core.conversation.style_context import ConversationExpressionStyleContext
+from digital_life_core.expression import feedback, style_rotation
+from digital_life_core.foundation.refs import RoleOwnerRef, ScopeKind, ScopeRef
+from digital_life_core.storage.runtime import StorageRuntime
 from tests.test_management_access import INSTALLATION, ROLE, SCOPE
 
 
@@ -172,7 +172,7 @@ class ExpressionFeedbackTests(unittest.TestCase):
         feedback.stage_injection(self.runtime, batch_id="reply-broken-family", owner_key=self.owner_key,
             scope_key=self.scope_key, signal_ids=(local_signal, foreign_signal), at=at)
         with self.runtime.transaction() as connection:
-            with self.assertLogs("companion_v2.expression.feedback", level="WARNING") as captured:
+            with self.assertLogs("digital_life_core.expression.feedback", level="WARNING") as captured:
                 feedback.confirm_delivery(connection, batch_id="reply-broken-family",
                     owner_key=self.owner_key, scope_key=self.scope_key,
                     family_scopes=broken_family, delivered_at=at, rotation_record=self.record)

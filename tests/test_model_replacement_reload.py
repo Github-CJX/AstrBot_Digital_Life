@@ -5,8 +5,8 @@ from tempfile import TemporaryDirectory
 from types import SimpleNamespace as NS
 import unittest
 
-from astrbot_host.controller import AstrBotStagingController
-from companion_v2.adapters.astrbot.staging import NativeAdapterTypes
+from digital_life_host.controller import AstrBotStagingController
+from digital_life_core.adapters.astrbot.staging import NativeAdapterTypes
 from tests.native_adapter_support import FakeEvent, FakeProvider, FakeReverseApi
 from tests.test_astrbot_staging_host import WebContext, host_config
 from tests.test_management_access import NOW

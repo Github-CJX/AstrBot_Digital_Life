@@ -3,10 +3,10 @@ import sqlite3
 import unittest
 from unittest.mock import patch
 
-from companion_v2.execution.models import TaskResult
-from companion_v2.model_gateway.models import Amount, ProviderResponse
-from companion_v2.storage.runtime import StorageOpenError, StorageRuntime
-from companion_v2.storage.schema import (
+from digital_life_core.execution.models import TaskResult
+from digital_life_core.model_gateway.models import Amount, ProviderResponse
+from digital_life_core.storage.runtime import StorageOpenError, StorageRuntime
+from digital_life_core.storage.schema import (
     MIGRATION_V9_TO_V10_ID, MIGRATION_V9_TO_V10_FINGERPRINT,
     MIGRATION_V10_TO_V11_ID, MIGRATION_V10_TO_V11_FINGERPRINT,
     MIGRATION_V11_TO_V12_ID, MIGRATION_V11_TO_V12_FINGERPRINT,
@@ -67,7 +67,7 @@ class ConversationStorageTests(ModelFixture):
         self.open_runtime().close()
 
     def test_failed_upgrade_rolls_back_original_tables_and_version(self):
-        with patch("companion_v2.storage.runtime.V11_MIGRATION_STATEMENTS",
+        with patch("digital_life_core.storage.runtime.V11_MIGRATION_STATEMENTS",
                    ("CREATE TABLE conversation_batches(batch_id TEXT)", "INVALID CONVERSATION MIGRATION")):
             with self.assertRaises(StorageOpenError):
                 StorageRuntime.open(data_root=self.root, installation_id=INSTALLATION)
@@ -126,7 +126,7 @@ class ConversationStorageTests(ModelFixture):
     def test_v11_to_v12_failure_rolls_back_rebuild_and_new_tables(self):
         self.stage_v11()
         self.runtime.close()
-        with patch("companion_v2.storage.runtime.V12_MIGRATION_STATEMENTS",
+        with patch("digital_life_core.storage.runtime.V12_MIGRATION_STATEMENTS",
                    V12_MIGRATION_STATEMENTS + ("INVALID V12 MIGRATION",)):
             with self.assertRaises(StorageOpenError):
                 StorageRuntime.open(data_root=self.root, installation_id=INSTALLATION)

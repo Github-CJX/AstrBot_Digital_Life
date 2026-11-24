@@ -18,29 +18,29 @@ from astrbot.core.message.components import Image
 from mcp.types import CallToolResult
 from PIL import Image as PILImage
 
-from astrbot_host.core_reply import prepare_core_reply_event
-from astrbot_host.core_reply_tools import close_core_reply_tools, inject_core_reply_tools, native_tool_name
-from companion_v2.adapters.astrbot.native import NativeConversationInput
-from companion_v2.capabilities.models import CapabilityAuthorizationState
-from companion_v2.capabilities.repositories import CapabilityRepository
-from companion_v2.configuration.models import ConfigLayer, ConfigTarget
-from companion_v2.conversation.media.quota import GROUP, QUOTA_FIELDS, ImageQuotaConfigurationOwner
-from companion_v2.conversation.media.output_settings import (
+from digital_life_host.core_reply import prepare_core_reply_event
+from digital_life_host.core_reply_tools import close_core_reply_tools, inject_core_reply_tools, native_tool_name
+from digital_life_core.adapters.astrbot.native import NativeConversationInput
+from digital_life_core.capabilities.models import CapabilityAuthorizationState
+from digital_life_core.capabilities.repositories import CapabilityRepository
+from digital_life_core.configuration.models import ConfigLayer, ConfigTarget
+from digital_life_core.conversation.media.quota import GROUP, QUOTA_FIELDS, ImageQuotaConfigurationOwner
+from digital_life_core.conversation.media.output_settings import (
     GROUP as OUTPUT_GROUP, ImageOutputConfigurationOwner, configuration_fields as output_fields,
 )
-from companion_v2.execution.models import TaskContext, TaskError, digest, encode, require
+from digital_life_core.execution.models import TaskContext, TaskError, digest, encode, require
 from datetime import timedelta
-from companion_v2.foundation.refs import AudienceRef
-from companion_v2.identity_policy.personas import ConversationRoute
-from companion_v2.references.configuration import (
+from digital_life_core.foundation.refs import AudienceRef
+from digital_life_core.identity_policy.personas import ConversationRoute
+from digital_life_core.references.configuration import (
     GROUP as REFERENCE_GROUP, ReferenceConfigurationOwner, configuration_fields as reference_fields,
     target_for as reference_target,
 )
-from companion_v2.references.models import (
+from digital_life_core.references.models import (
     ContentDigest, ReferenceAsset, ReferenceKind, ReferenceRole, ReferenceSource,
 )
-from companion_v2.references.repositories import ReferenceAssetRepository
-from companion_v2.references.service import owner_key as reference_owner_key
+from digital_life_core.references.repositories import ReferenceAssetRepository
+from digital_life_core.references.service import owner_key as reference_owner_key
 from tests.native_image_support import NativeImageFixture
 from tests.test_astrbot_core_reply import FakeEvent
 from tests.test_conversation_images import image_bytes
@@ -55,7 +55,7 @@ class CoreReplyImagesTests(NativeImageFixture, HostFixture, unittest.IsolatedAsy
         # the minimal HostFixture schema. These album tests deliberately add
         # historical context rows, so install the same schema used by the
         # runtime before exercising that projection.
-        from companion_v2.storage.native_conversation_schema import STATEMENTS
+        from digital_life_core.storage.native_conversation_schema import STATEMENTS
         with self.runtime.transaction() as connection:
             for statement in STATEMENTS:
                 connection.execute(statement)
@@ -158,8 +158,8 @@ class CoreReplyImagesTests(NativeImageFixture, HostFixture, unittest.IsolatedAsy
         from astrbot.core.pipeline.process_stage.follow_up import _ACTIVE_AGENT_RUNNERS
         from astrbot.core.provider.entities import LLMResponse, ProviderRequest
         from astrbot.core.star.context import Context
-        from astrbot_host.core_reply_native_send import SendMessageToUserTool, inject_core_reply_send_tool
-        from astrbot_host.core_reply_tool_dispatch import observe_core_tool_dispatch_begin, restore_core_tool_dispatch
+        from digital_life_host.core_reply_native_send import SendMessageToUserTool, inject_core_reply_send_tool
+        from digital_life_host.core_reply_tool_dispatch import observe_core_tool_dispatch_begin, restore_core_tool_dispatch
         from tests.test_core_reply_pipeline import PipelineEvent
 
         event, original = self.prepare("native-image-loop", event=PipelineEvent())
@@ -467,11 +467,11 @@ class CoreReplyImagesTests(NativeImageFixture, HostFixture, unittest.IsolatedAsy
         self.assert_no_reply_work(event)
 
     async def test_native_generated_image_builds_qzone_upload_request(self):
-        from companion_v2.capabilities.qzone_access import QzoneAccess
-        from companion_v2.qzone.images import album_images
-        from companion_v2.qzone.protocol import credential_from_cookies, parse_cookie_text, upload_image_request
-        from companion_v2.sharing.planner import ShareCatalog, SharePlanner
-        from companion_v2.sources.repositories import AssetRepository, SourceRepository
+        from digital_life_core.capabilities.qzone_access import QzoneAccess
+        from digital_life_core.qzone.images import album_images
+        from digital_life_core.qzone.protocol import credential_from_cookies, parse_cookie_text, upload_image_request
+        from digital_life_core.sharing.planner import ShareCatalog, SharePlanner
+        from digital_life_core.sources.repositories import AssetRepository, SourceRepository
 
         event, request = self.prepare("native-image-qzone-upload")
         received = await self.call(event, request, "image.generate", {"prompt": "自拍"}, "qzone-selfie")

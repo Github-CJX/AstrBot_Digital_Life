@@ -3,8 +3,8 @@
 Run this while AstrBot is stopped (or at least while the companion is idle):
 
     python -X utf8 tools/migrate_image_payloads.py \
-        --database data/plugin_data/astrbot_plugin_private_companion/companion-7/installations/main/runtime/companion-v2.sqlite3 \
-        --data-root data/plugin_data/astrbot_plugin_private_companion/companion-7/installations/main/runtime \
+        --database data/plugin_data/astrbot_plugin_digital_life/companion-7/installations/main/runtime/companion-v2.sqlite3 \
+        --data-root data/plugin_data/astrbot_plugin_digital_life/companion-7/installations/main/runtime \
         --vacuum
 
 The conversion is resumable: rows that already carry the file marker are
@@ -23,7 +23,7 @@ ROOT = Path(__file__).resolve().parents[1]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
-from companion_v2.storage.image_payloads import migrate_image_payloads  # noqa: E402
+from digital_life_core.storage.image_payloads import migrate_image_payloads  # noqa: E402
 
 
 def main() -> int:

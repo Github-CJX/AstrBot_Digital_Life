@@ -6,9 +6,9 @@ import sqlite3
 from tempfile import TemporaryDirectory
 import unittest
 
-from companion_v2.execution.models import TaskError
-from companion_v2.persona_designer.protocol import document, model_request, model_response
-from companion_v2.persona_designer.store import DraftStore
+from digital_life_core.execution.models import TaskError
+from digital_life_core.persona_designer.protocol import document, model_request, model_response
+from digital_life_core.persona_designer.store import DraftStore
 
 
 def state(**values):

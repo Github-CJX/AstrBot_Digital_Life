@@ -9,7 +9,7 @@ third-party registration made through the public facade raised
 
 import unittest
 
-from companion_v2.adapters.astrbot.memory_providers import (
+from digital_life_core.adapters.astrbot.memory_providers import (
     ExternalMemoryProviderRegistry, memory_provider_registry,
     shared_memory_provider_registry,
 )

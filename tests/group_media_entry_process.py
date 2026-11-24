@@ -22,8 +22,8 @@ def run(*, deliver_images=False):
         from tests.group_media_support import group_raw, sdk_image
         from tests.native_adapter_support import FakeProvider
         from tests.test_management_access import NOW
-        from astrbot_host.native import installed_native_types
-        from companion_v2.foundation.clock import DeterministicClock
+        from digital_life_host.native import installed_native_types
+        from digital_life_core.foundation.clock import DeterministicClock
         from aiocqhttp import CQHttp, Event
         from aiocqhttp.api_impl import WebSocketReverseApi, ResultStore
         from astrbot.api.message_components import At, Image, Plain, Reply
@@ -190,7 +190,7 @@ def run(*, deliver_images=False):
                         event = event_for(sender, identifier, parts)
                         await plugin.receive_companion_message(event)
                         assert not event.is_stopped() and event.is_at_or_wake_command
-                        state = event.get_extra("_companion_v2_core_reply_context")
+                        state = event.get_extra("_digital_life_core_core_reply_context")
                         assert state["prepared"]["channel"] == "group"
                         async for _ in process.process(event):
                             async for _ in decorate.process(event):
@@ -226,7 +226,7 @@ def run(*, deliver_images=False):
                 finally:
                     await db_helper.engine.dispose()
             assert plugin.staging._terminated and plugin.staging.runtime is None and not native.registered_web_apis
-            assert not any(name == "companion_v2" or name.startswith("companion_v2.") for name in sys.modules)
+            assert not any(name == "digital_life_core" or name.startswith("digital_life_core.") for name in sys.modules)
             print("PASS: AstrBot core group image delivery, cross-member Bot image quote, native attachments, local WS ACKs, termination and route cleanup; no real model or QQ traffic.")
 
         asyncio.run(verify())

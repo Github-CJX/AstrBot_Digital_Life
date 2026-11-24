@@ -7,16 +7,16 @@ import json
 from types import SimpleNamespace as NS
 import unittest
 
-from companion_v2.adapters.astrbot.native import HostPersona, persona_instruction
-from companion_v2.adapters.astrbot.staging import AstrBotStagingSession, NativeAdapterTypes, StagingProfile
-from companion_v2.adapters.astrbot.staging_config import DELIVERY_CAPABILITY, DELIVERY_GRANT_ID
-from companion_v2.conversation.flow import ConversationPolicy
-from companion_v2.conversation.messages import event_from_document
-from companion_v2.execution.models import TaskContext, digest
-from companion_v2.identity_policy.personas import RuntimeIdentity
-from companion_v2.identity_policy.models import AuthorizationTier
-from companion_v2.model_gateway.models import Amount, BudgetPolicy
-from companion_v2.adapters.astrbot.provider import UsageTariff
+from digital_life_core.adapters.astrbot.native import HostPersona, persona_instruction
+from digital_life_core.adapters.astrbot.staging import AstrBotStagingSession, NativeAdapterTypes, StagingProfile
+from digital_life_core.adapters.astrbot.staging_config import DELIVERY_CAPABILITY, DELIVERY_GRANT_ID
+from digital_life_core.conversation.flow import ConversationPolicy
+from digital_life_core.conversation.messages import event_from_document
+from digital_life_core.execution.models import TaskContext, digest
+from digital_life_core.identity_policy.personas import RuntimeIdentity
+from digital_life_core.identity_policy.models import AuthorizationTier
+from digital_life_core.model_gateway.models import Amount, BudgetPolicy
+from digital_life_core.adapters.astrbot.provider import UsageTariff
 from tests.native_adapter_support import completion, FakeEvent, FakeProvider, FakeReverseApi, NativeFixture
 from tests.test_management_access import NOW, ROLE
 

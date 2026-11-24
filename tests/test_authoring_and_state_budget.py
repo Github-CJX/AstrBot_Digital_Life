@@ -18,22 +18,22 @@ from dataclasses import dataclass, replace
 from datetime import datetime, timedelta
 import unittest
 
-from companion_v2.conversation.content.authoring_execution import AuthoringParent
-from companion_v2.conversation.content.authoring_tasks import (
+from digital_life_core.conversation.content.authoring_execution import AuthoringParent
+from digital_life_core.conversation.content.authoring_tasks import (
     AUTHORING_BUDGET_SECONDS,
     AUTHORING_MARGIN_SECONDS,
     AUTHORING_PROVIDER_TIMEOUT_SECONDS,
     DRAFT_KIND,
     authoring_profiles,
 )
-from companion_v2.conversation.content.authoring_workflow import ContentAuthoringWorkflow
-from companion_v2.conversation.foreground import BackgroundPromptTrigger, PromptRequest, SealedForegroundContext
-from companion_v2.execution.models import TaskError, encode
-from companion_v2.execution.runner import RunResult
-from companion_v2.foundation.outcome import Outcome
-from companion_v2.role_work.state.maintenance import (KIND as STATE_KIND, STATE_BUDGET_SECONDS,
+from digital_life_core.conversation.content.authoring_workflow import ContentAuthoringWorkflow
+from digital_life_core.conversation.foreground import BackgroundPromptTrigger, PromptRequest, SealedForegroundContext
+from digital_life_core.execution.models import TaskError, encode
+from digital_life_core.execution.runner import RunResult
+from digital_life_core.foundation.outcome import Outcome
+from digital_life_core.role_work.state.maintenance import (KIND as STATE_KIND, STATE_BUDGET_SECONDS,
     STATE_MARGIN_SECONDS, STATE_PROVIDER_TIMEOUT_SECONDS, StateMaintenance, state_profile)
-from companion_v2.role_work.state.service import FIELDS
+from digital_life_core.role_work.state.service import FIELDS
 from tests.test_execution import ExecutionFixture
 from tests.test_management_access import NOW
 from tests.test_role_state import StateFixture
@@ -102,7 +102,7 @@ class AuthoringBudgetRoundTests(ExecutionFixture, unittest.IsolatedAsyncioTestCa
                 - datetime.fromisoformat(row["created_at"])).total_seconds()
 
     async def draft(self, code=None):
-        from companion_v2.conversation.content import authoring_service
+        from digital_life_core.conversation.content import authoring_service
         parent = AuthoringParent(self.context, "reply-task", NOW + timedelta(seconds=600), lambda: None)
         job_id = self.workflow._job(parent, type("Call", (), {"call_id": "call-1"})(),
                                     self.request(), authoring_service.effective_settings(self.runtime, self.context),

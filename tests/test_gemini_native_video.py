@@ -9,11 +9,11 @@ import unittest
 from tests.video_support import VideoFixture, video_bytes
 from tests.native_adapter_support import final_text
 from tests.test_model_gateway import ModelFixture
-from companion_v2.adapters.astrbot.model_wire import build_wire, tool_alias
-from companion_v2.adapters.astrbot.provider import UsageTariff
-from companion_v2.adapters.astrbot.provider_catalog import TextProviderSettings
-from companion_v2.model_gateway.models import Amount, ModelEnvelope, ToolExchange, ToolSpec
-from astrbot_host.video.gemini_provider import GeminiNativeVideoProvider, _prepare_generation_config
+from digital_life_core.adapters.astrbot.model_wire import build_wire, tool_alias
+from digital_life_core.adapters.astrbot.provider import UsageTariff
+from digital_life_core.adapters.astrbot.provider_catalog import TextProviderSettings
+from digital_life_core.model_gateway.models import Amount, ModelEnvelope, ToolExchange, ToolSpec
+from digital_life_host.video.gemini_provider import GeminiNativeVideoProvider, _prepare_generation_config
 
 
 class NativeVideoTransportTests(VideoFixture, unittest.IsolatedAsyncioTestCase):

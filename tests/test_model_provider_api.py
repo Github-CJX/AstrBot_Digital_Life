@@ -13,7 +13,7 @@ from unittest.mock import AsyncMock, patch
 
 from tests import test_astrbot_staging_host as support
 from tests.multi_host_support import MultiFixture
-from astrbot_host.model_api import PREFIX, _probe_error_summary
+from digital_life_host.model_api import PREFIX, _probe_error_summary
 from astrbot.api.web import PluginMultiDict, PluginRequest, bind_request_context
 from starlette.requests import Request
 
@@ -166,8 +166,8 @@ class ProviderRouteTests(unittest.IsolatedAsyncioTestCase):
         return providers
 
     async def call(self, route, *, payload=None, username="admin", query=None):
-        prefix = "C:/Users/99505/.astrbot/data/plugins/astrbot_plugin_private_companion/astrbot_host.model_api"
-        import astrbot_host.model_api as model_api
+        prefix = "C:/Users/99505/.astrbot/data/plugins/astrbot_plugin_digital_life/digital_life_host.model_api"
+        import digital_life_host.model_api as model_api
         request = Request({"type": "http", "method": "POST" if payload is not None else "GET",
                            "path": route, "headers": [], "query_string": b""})
         pairs = list(query.items()) if isinstance(query, dict) else query or []
@@ -186,8 +186,8 @@ class ProviderRouteTests(unittest.IsolatedAsyncioTestCase):
         (await self.controller.initialize_profile()).unwrap()
         sources = {"together": {"available": True, "totals": {"tokens": 87}}}
         main = {"available": True, "totals": {"tokens": 999}, "counted_in_private_companion_budget": False}
-        with patch("astrbot_host.model_api.read_token_sources", return_value=deepcopy(sources)) as read_sources, \
-                patch("astrbot_host.model_api.read_astrbot_token_usage", new=AsyncMock(return_value=main)) as read_main:
+        with patch("digital_life_host.model_api.read_token_sources", return_value=deepcopy(sources)) as read_sources, \
+                patch("digital_life_host.model_api.read_astrbot_token_usage", new=AsyncMock(return_value=main)) as read_main:
             response = await self.call(PREFIX + "/maintenance")
         self.assertEqual(response["status"], "ok", response)
         read_sources.assert_called_once_with(self.controller)
@@ -228,7 +228,7 @@ class ProviderRouteTests(unittest.IsolatedAsyncioTestCase):
 
     async def test_global_usage_is_not_read_before_dashboard_authorization(self):
         (await self.controller.initialize_profile()).unwrap()
-        with patch("astrbot_host.model_api.read_astrbot_token_usage", new=AsyncMock()) as read_main:
+        with patch("digital_life_host.model_api.read_astrbot_token_usage", new=AsyncMock()) as read_main:
             for username in (None, "", "api_key:plugin-test"):
                 response = await self.call(PREFIX + "/maintenance", username=username)
                 self.assertEqual(response["message"], "dashboard_identity_required")
@@ -280,9 +280,9 @@ class ProviderRouteTests(unittest.IsolatedAsyncioTestCase):
 
     async def test_staging_reopen_prepares_legacy_reaction_settings_before_read_only_assembly(self):
         from dataclasses import replace
-        from companion_v2.configuration.models import ConfigLayer, ConfigTarget
-        from companion_v2.configuration.owners import SparseConfigurationOwner
-        from companion_v2.expression.reaction_configuration import GROUP, configuration_fields, read_snapshot
+        from digital_life_core.configuration.models import ConfigLayer, ConfigTarget
+        from digital_life_core.configuration.owners import SparseConfigurationOwner
+        from digital_life_core.expression.reaction_configuration import GROUP, configuration_fields, read_snapshot
 
         (await self.controller.initialize_profile()).unwrap()
         context = self.controller.session.profile.target
@@ -317,8 +317,8 @@ class ProviderRouteTests(unittest.IsolatedAsyncioTestCase):
         self.assertNotIn(PREFIX + "/pool/save", self.routes)
 
     async def test_balance_route_returns_only_the_normalized_observation(self):
-        from companion_v2.proactive.balance_events import BalanceObservation
-        import astrbot_host.model_api as model_api
+        from digital_life_core.proactive.balance_events import BalanceObservation
+        import digital_life_host.model_api as model_api
 
         class Port:
             provider = "newapi"
@@ -340,8 +340,8 @@ class ProviderRouteTests(unittest.IsolatedAsyncioTestCase):
         self.assertNotIn("api_key", str(result).lower())
 
     async def test_script_balance_status_preserves_the_amount_contract_and_unit(self):
-        from companion_v2.proactive.balance_events import BalanceObservation
-        import astrbot_host.model_api as model_api
+        from digital_life_core.proactive.balance_events import BalanceObservation
+        import digital_life_host.model_api as model_api
         class Port:
             provider, provider_label, currency_label = "script", "高级余额查询", "额度"
             async def fetch(self):
@@ -359,8 +359,8 @@ class ProviderRouteTests(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(result["data"]["plan_name"], "Synthetic plan")
 
     async def test_script_balance_invalid_account_clears_the_previous_amount(self):
-        from astrbot_host.service_balance_script import BalanceQueryError
-        import astrbot_host.model_api as model_api
+        from digital_life_host.service_balance_script import BalanceQueryError
+        import digital_life_host.model_api as model_api
         class Port:
             provider, provider_label, currency_label = "script", "高级余额查询", "额度"
             async def fetch(self):
@@ -376,8 +376,8 @@ class ProviderRouteTests(unittest.IsolatedAsyncioTestCase):
 
     async def test_tts_provider_roundtrip_masks_secrets(self):
         (await self.controller.initialize_profile()).unwrap()
-        prefix = "C:/Users/99505/.astrbot/data/plugins/astrbot_plugin_private_companion/astrbot_host.model_api"
-        import astrbot_host.model_api as model_api
+        prefix = "C:/Users/99505/.astrbot/data/plugins/astrbot_plugin_digital_life/digital_life_host.model_api"
+        import digital_life_host.model_api as model_api
         listed = await self.call(model_api.PREFIX + "/tts/providers")
         item = listed["data"]["items"][0]
         self.assertEqual(item["id"], "tts-a")
@@ -451,7 +451,7 @@ class ProviderRouteTests(unittest.IsolatedAsyncioTestCase):
         lock = self.controller._control_lock
         await lock.acquire()
         try:
-            with patch("astrbot_host.model_api.VOICE_SAVE_LOCK_WAIT_SECONDS", 0.01):
+            with patch("digital_life_host.model_api.VOICE_SAVE_LOCK_WAIT_SECONDS", 0.01):
                 busy = await asyncio.wait_for(self.call(PREFIX + "/voice/save", payload=payload), 1)
             self.assertEqual(busy["data"]["code"], "host_busy", busy)
             self.assertTrue(lock.locked(), "a refused save must not release the lifecycle owner's lock")
@@ -501,7 +501,7 @@ class ProviderRouteTests(unittest.IsolatedAsyncioTestCase):
 
     async def test_voice_test_returns_audio_for_inline_preview(self):
         (await self.controller.initialize_profile()).unwrap()
-        import astrbot_host.model_api as model_api
+        import digital_life_host.model_api as model_api
 
         class TtsProvider:
             provider_config = {"api_key": "fixture-tts-secret"}
@@ -534,7 +534,7 @@ class ProviderRouteTests(unittest.IsolatedAsyncioTestCase):
 
     async def test_voice_test_returns_sanitized_failure_details_and_suggestion(self):
         (await self.controller.initialize_profile()).unwrap()
-        import astrbot_host.model_api as model_api
+        import digital_life_host.model_api as model_api
 
         class TtsProvider:
             provider_config = {"api_key": "fixture-secret", "proxy": "http://proxy-secret"}
@@ -565,7 +565,7 @@ class ProviderRouteTests(unittest.IsolatedAsyncioTestCase):
 
     async def test_voice_test_reports_audio_read_failure_stage(self):
         (await self.controller.initialize_profile()).unwrap()
-        import astrbot_host.model_api as model_api
+        import digital_life_host.model_api as model_api
 
         class TtsProvider:
             def meta(self):
@@ -589,7 +589,7 @@ class ProviderRouteTests(unittest.IsolatedAsyncioTestCase):
 
     async def test_tts_provider_connection_test_reports_loaded_provider_result(self):
         (await self.controller.initialize_profile()).unwrap()
-        import astrbot_host.model_api as model_api
+        import digital_life_host.model_api as model_api
 
         class TtsProvider:
             async def test(self):
@@ -607,7 +607,7 @@ class ProviderRouteTests(unittest.IsolatedAsyncioTestCase):
 
     async def test_image_output_reads_the_native_configuration_contract(self):
         (await self.controller.initialize_profile()).unwrap()
-        import astrbot_host.model_api as model_api
+        import digital_life_host.model_api as model_api
         fake = FakeImageExtensionAPI()
         with patch.object(model_api.ModelWebAPI, "_image_extension_api", lambda self: fake):
             listed = await self.call(model_api.PREFIX + "/image/output")
@@ -621,7 +621,7 @@ class ProviderRouteTests(unittest.IsolatedAsyncioTestCase):
 
     async def test_image_output_accepts_a_registered_supported_subset(self):
         (await self.controller.initialize_profile()).unwrap()
-        import astrbot_host.model_api as model_api
+        import digital_life_host.model_api as model_api
 
         actions = ("image.generate", "image.edit", "image.mask_edit")
         owners = tuple(NS(
@@ -648,8 +648,8 @@ class ProviderRouteTests(unittest.IsolatedAsyncioTestCase):
 
     async def test_image_output_reconnect_reports_image_registration_separately(self):
         (await self.controller.initialize_profile()).unwrap()
-        from companion_v2.foundation.outcome import Outcome
-        import astrbot_host.model_api as model_api
+        from digital_life_core.foundation.outcome import Outcome
+        import digital_life_host.model_api as model_api
 
         result = Outcome.success({"reconnected": True, "state": "running", "report": {}})
         with patch.object(self.controller, "reconnect_native", AsyncMock(return_value=result)), \
@@ -661,7 +661,7 @@ class ProviderRouteTests(unittest.IsolatedAsyncioTestCase):
 
     async def test_image_output_test_rechecks_authority_and_calls_the_saved_endpoint(self):
         (await self.controller.initialize_profile()).unwrap()
-        import astrbot_host.model_api as model_api
+        import digital_life_host.model_api as model_api
         fake = FakeImageExtensionAPI()
         payload = b'{"endpoint_id":"primary","operation_key":"image-test-key"}'
         with patch.object(model_api.ModelWebAPI, "_image_extension_api", lambda self: fake):
@@ -675,7 +675,7 @@ class ProviderRouteTests(unittest.IsolatedAsyncioTestCase):
         registry = NS(
             image_enabled={"image.generate": True, "image.edit": True, "image.mask_edit": True},
             declarations=lambda: (), status=lambda _extension: {"state": "unavailable", "error_code": "native_extension_unavailable"},
-            issues=(("astrbot_plugin_private_companion.image", "native_configuration_invalid"),),
+            issues=(("astrbot_plugin_digital_life.image", "native_configuration_invalid"),),
         )
         with patch.object(self.controller, "native_extensions", registry):
             response = await self.call(PREFIX + "/image")
@@ -684,7 +684,7 @@ class ProviderRouteTests(unittest.IsolatedAsyncioTestCase):
 
     async def test_image_status_projects_the_first_configured_model_in_the_generate_queue(self):
         (await self.controller.initialize_profile()).unwrap()
-        import astrbot_host.model_api as model_api
+        import digital_life_host.model_api as model_api
 
         fake = FakeImageExtensionAPI()
         fake.configuration = {
@@ -717,7 +717,7 @@ class ProviderRouteTests(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(preferred["name"], "夜间线路")
 
     async def test_image_status_projects_nai_defaults_and_follows_queue_availability(self):
-        import astrbot_host.model_api as model_api
+        import digital_life_host.model_api as model_api
 
         fake = FakeImageExtensionAPI()
         fake.nai = {"available": True, "default_model": "nai-diffusion-4-5-full",
@@ -764,7 +764,7 @@ class ProviderRouteTests(unittest.IsolatedAsyncioTestCase):
 
     async def test_image_output_save_roundtrip_and_conflict(self):
         (await self.controller.initialize_profile()).unwrap()
-        import astrbot_host.model_api as model_api
+        import digital_life_host.model_api as model_api
         fake = FakeImageExtensionAPI()
         with patch.object(model_api.ModelWebAPI, "_image_extension_api", lambda self: fake):
             payload = json.dumps({"revision": "a" * 64, "changes": {
@@ -784,7 +784,7 @@ class ProviderRouteTests(unittest.IsolatedAsyncioTestCase):
 
     async def test_image_output_save_reports_missing_backend_separately(self):
         (await self.controller.initialize_profile()).unwrap()
-        import astrbot_host.model_api as model_api
+        import digital_life_host.model_api as model_api
 
         class UnconfiguredImageAPI(FakeImageExtensionAPI):
             def save_output_configuration(self, revision, changes):

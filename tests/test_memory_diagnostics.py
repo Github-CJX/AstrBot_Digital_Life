@@ -10,13 +10,13 @@ from tests import test_astrbot_staging_host as support
 
 from astrbot.api.web import PluginRequest, bind_request_context
 from starlette.requests import Request
-from astrbot_host.memory_diagnostics import process_memory_snapshot
-from astrbot_host.model_api import PREFIX
+from digital_life_host.memory_diagnostics import process_memory_snapshot
+from digital_life_host.model_api import PREFIX
 
 
 class ProcessMemorySnapshotTests(unittest.TestCase):
     def test_snapshot_does_not_enable_tracemalloc(self):
-        import astrbot_host.memory_diagnostics as diagnostics
+        import digital_life_host.memory_diagnostics as diagnostics
 
         with patch.object(diagnostics, "_read_rss_bytes", return_value=(4096, "test")), \
                 patch.object(diagnostics.tracemalloc, "is_tracing", return_value=False), \
@@ -46,7 +46,7 @@ class MemoryDiagnosticRouteTests(unittest.IsolatedAsyncioTestCase):
         self.routes = {path: handler for path, handler, _, _ in self.native.registered_web_apis}
 
     async def call(self, *, username="admin"):
-        import astrbot_host.model_api as model_api
+        import digital_life_host.model_api as model_api
 
         path = PREFIX + "/memory"
         request = Request({"type": "http", "method": "GET", "path": path,
@@ -63,7 +63,7 @@ class MemoryDiagnosticRouteTests(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(result["data"]["code"], "dashboard_identity_required")
 
     async def test_memory_route_returns_only_the_normalized_process_snapshot(self):
-        import astrbot_host.model_api as model_api
+        import digital_life_host.model_api as model_api
 
         (await self.controller.initialize_profile()).unwrap()
         sample = {"observed_at": "2026-10-05T00:00:00+00:00", "scope": "astrbot_process",

@@ -3,10 +3,10 @@
 import json
 import unittest
 
-from companion_v2.execution.models import TaskContext, TaskError
-from companion_v2.foundation.refs import AudienceRef
-from companion_v2.role_work.growth import GrowthKind, RoleGrowthRecord
-from companion_v2.role_work.models import RoleActivity, RoleActivityState, RoleReadingReceipt
+from digital_life_core.execution.models import TaskContext, TaskError
+from digital_life_core.foundation.refs import AudienceRef
+from digital_life_core.role_work.growth import GrowthKind, RoleGrowthRecord
+from digital_life_core.role_work.models import RoleActivity, RoleActivityState, RoleReadingReceipt
 from tests.test_host_application import HostFixture
 from tests.test_management_access import NOW, SCOPE
 from tests.test_role_tool_loop import answered, call, requested

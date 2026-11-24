@@ -4,12 +4,12 @@ import unittest
 from datetime import time
 from unittest.mock import patch
 
-from astrbot_host.management_identity import dashboard_operator
-from companion_v2.role_work.life.configuration import GROUP as LIFE_GROUP, target_for
-from companion_v2.role_work.life.management import RoleLifeManagement
-from companion_v2.role_work.life.scheduling import next_bedtime
-from companion_v2.role_work.state.management import StateManagement
-from companion_v2.sources.dependencies import validation_batch
+from digital_life_host.management_identity import dashboard_operator
+from digital_life_core.role_work.life.configuration import GROUP as LIFE_GROUP, target_for
+from digital_life_core.role_work.life.management import RoleLifeManagement
+from digital_life_core.role_work.life.scheduling import next_bedtime
+from digital_life_core.role_work.state.management import StateManagement
+from digital_life_core.sources.dependencies import validation_batch
 from tests.multi_host_support import multi_config
 from tests.multi_life_support import MultiLifeFixture
 

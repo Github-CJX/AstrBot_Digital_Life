@@ -3,8 +3,8 @@
 from copy import deepcopy
 import unittest
 
-from astrbot_host.shared_host_migration import migrate_single_target_config, recover_repeated_single_target
-from companion_v2.execution.models import digest
+from digital_life_host.shared_host_migration import migrate_single_target_config, recover_repeated_single_target
+from digital_life_core.execution.models import digest
 
 
 class SharedHostMigrationTests(unittest.TestCase):
@@ -106,7 +106,7 @@ class SharedHostMigrationTests(unittest.TestCase):
         self.assertFalse(migrated["multi_host"]["enabled"])
 
     def test_registered_account_identity_and_persona_win_over_old_single_target(self):
-        from astrbot_host.multi_settings import MultiHostSettings
+        from digital_life_host.multi_settings import MultiHostSettings
 
         registered = {"platform_id": "default", "account_id": "100", "bot_id": "reviewed-bot"}
         persona = {"bot_id": "reviewed-bot", "persona_id": "original", "role_id": "reviewed-role"}
@@ -137,7 +137,7 @@ class SharedHostMigrationTests(unittest.TestCase):
         self.assertEqual(repeated, migrated)
 
     def damaged_shared_config(self):
-        from astrbot_host.multi_settings import MultiHostSettings
+        from digital_life_host.multi_settings import MultiHostSettings
         from tests.multi_host_support import multi_config
         reviewed = multi_config()
         reviewed["multi_host"]["targets"][0]["participant_id"] = "*"

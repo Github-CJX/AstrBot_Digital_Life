@@ -10,17 +10,17 @@ relies on to reject bad values before they reach storage.
 
 import unittest
 
-from companion_v2.configuration.management import (AcquaintanceManagement, DiaryAndRestManagement,
+from digital_life_core.configuration.management import (AcquaintanceManagement, DiaryAndRestManagement,
                                                    KnowledgeManagement, RecallManagement,
                                                    RoleGrowthManagement, ScreenManagement)
-from companion_v2.conversation.recall_settings import DEFAULTS as RECALL_DEFAULTS
-from companion_v2.conversation.recall_settings import GROUP as RECALL_GROUP, validate as recall_validate
-from companion_v2.knowledge.configuration import KnowledgeSettings
-from companion_v2.memory.person.configuration import GROUP as PERSON_GROUP
-from companion_v2.role_work.growth.configuration import (GROUP as GROWTH_GROUP, custom_skills)
-from companion_v2.screen.configuration import DEFAULTS as SCREEN_DEFAULTS
-from companion_v2.screen.configuration import GROUP as SCREEN_GROUP, validate as screen_validate
-from companion_v2.configuration.models import ConfigLayer, ConfigurationError
+from digital_life_core.conversation.recall_settings import DEFAULTS as RECALL_DEFAULTS
+from digital_life_core.conversation.recall_settings import GROUP as RECALL_GROUP, validate as recall_validate
+from digital_life_core.knowledge.configuration import KnowledgeSettings
+from digital_life_core.memory.person.configuration import GROUP as PERSON_GROUP
+from digital_life_core.role_work.growth.configuration import (GROUP as GROWTH_GROUP, custom_skills)
+from digital_life_core.screen.configuration import DEFAULTS as SCREEN_DEFAULTS
+from digital_life_core.screen.configuration import GROUP as SCREEN_GROUP, validate as screen_validate
+from digital_life_core.configuration.models import ConfigLayer, ConfigurationError
 
 
 class NewEditorDeclarationTests(unittest.TestCase):
@@ -118,9 +118,9 @@ class KnowledgeAndLifeEditorDeclarationTests(unittest.TestCase):
     """The second batch: world-book/knowledge import, and diary/dream/rest."""
 
     def test_each_editor_binds_its_own_group_owner_and_layers(self):
-        from companion_v2.configuration.management import DiaryAndRestManagement, KnowledgeManagement
-        from companion_v2.knowledge.configuration import GROUP as KG, OWNER as KO
-        from companion_v2.role_work.life.configuration import GROUP as LG, OWNER as LO
+        from digital_life_core.configuration.management import DiaryAndRestManagement, KnowledgeManagement
+        from digital_life_core.knowledge.configuration import GROUP as KG, OWNER as KO
+        from digital_life_core.role_work.life.configuration import GROUP as LG, OWNER as LO
         expected = {
             KnowledgeManagement: (KG, KO, (ConfigLayer.INSTALLATION, ConfigLayer.ROLE,
                                            ConfigLayer.WINDOW), "knowledge"),
@@ -138,8 +138,8 @@ class KnowledgeAndLifeEditorDeclarationTests(unittest.TestCase):
         """``role_work.life.management`` already exports a ``RoleLifeManagement``
         used as an access checker by four modules; a same-named editor would be
         easy to reach for by mistake."""
-        from companion_v2.configuration import management as editors
-        from companion_v2.role_work.life.management import RoleLifeManagement as AccessChecker
+        from digital_life_core.configuration import management as editors
+        from digital_life_core.role_work.life.management import RoleLifeManagement as AccessChecker
         self.assertIsNot(editors.DiaryAndRestManagement, AccessChecker)
         self.assertFalse(hasattr(editors, "RoleLifeManagement"),
                          "the editor must not shadow the access checker's name")
@@ -150,7 +150,7 @@ class KnowledgeCrossFieldRuleTests(unittest.TestCase):
         """Each range is enforced by its own FieldDefinition; this pair is not,
         so the owner checks it. A silently defaulted pair would look saved while
         nothing was ever injected."""
-        from companion_v2.knowledge.configuration import KnowledgeSettings
+        from digital_life_core.knowledge.configuration import KnowledgeSettings
         with self.assertRaises(ConfigurationError) as caught:
             KnowledgeSettings.from_values({"inject_max_chars": 500, "entry_char_limit": 4000})
         self.assertEqual(caught.exception.code, "knowledge_settings_invalid")
@@ -180,14 +180,14 @@ class KnowledgeCrossFieldRuleTests(unittest.TestCase):
 
 class RestGateValueTests(unittest.TestCase):
     def test_the_mode_drops_unknown_text_instead_of_failing_a_turn(self):
-        from companion_v2.role_work.life.rest_gate import normalize_mode
+        from digital_life_core.role_work.life.rest_gate import normalize_mode
         self.assertEqual(normalize_mode("llm"), "llm")
         self.assertEqual(normalize_mode("模型"), "llm")
         self.assertEqual(normalize_mode("LLM_JUDGE"), "llm")
         self.assertEqual(normalize_mode("nonsense"), "probability")
 
     def test_windows_accept_the_full_width_separators_users_actually_type(self):
-        from companion_v2.role_work.life.rest_gate import parse_windows
+        from digital_life_core.role_work.life.rest_gate import parse_windows
         self.assertEqual(parse_windows("23:00-08:30"), ((1380, 1950),))
         self.assertEqual(parse_windows("23：00—08：30"), ((1380, 1950),))
         self.assertEqual(parse_windows("23:00至08:30,12:20到13:40"),
@@ -197,7 +197,7 @@ class RestGateValueTests(unittest.TestCase):
     def test_a_write_of_an_unknown_mode_is_refused_rather_than_silently_coerced(self):
         """The read path coerces; the write path must not, or an operator would
         believe a typo was saved."""
-        from companion_v2.role_work.life.rest_gate import validate_changes
+        from digital_life_core.role_work.life.rest_gate import validate_changes
         with self.assertRaises(ConfigurationError) as caught:
             validate_changes({"rest_reply_mode": "sometimes"})
         self.assertEqual(caught.exception.code, "rest_gate_settings_invalid")
@@ -207,5 +207,5 @@ class RestGateValueTests(unittest.TestCase):
 
 class LifeAfterglowModeTests(unittest.TestCase):
     def test_the_afterglow_mode_set_matches_the_writer_expects(self):
-        from companion_v2.role_work.life.configuration import AFTERGLOW_MODES
+        from digital_life_core.role_work.life.configuration import AFTERGLOW_MODES
         self.assertEqual(AFTERGLOW_MODES, ("auto", "轻", "标准", "明显"))

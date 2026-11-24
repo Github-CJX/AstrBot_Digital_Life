@@ -1,6 +1,6 @@
 "use strict";
 window.CompanionExpressionSignalsPage = (() => {
-  const PREFIX = "/astrbot_plugin_private_companion/";
+  const PREFIX = "/astrbot_plugin_digital_life/";
   const DIMENSION = {
     sentence_rhythm: "句读节奏", emoji: "表情符号", punctuation: "标点",
     directness: "直接程度", diction: "措辞", formatting: "排版", other: "其他",

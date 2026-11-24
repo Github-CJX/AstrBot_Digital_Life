@@ -12,31 +12,31 @@ from unittest.mock import patch
 
 from PIL import Image, ImageGrab
 
-from astrbot_host.native_extensions import NativeExtensionRegistry
-from astrbot_host.native_extensions.screen_provider import (
+from digital_life_host.native_extensions import NativeExtensionRegistry
+from digital_life_host.native_extensions.screen_provider import (
     NativeScreenProvider,
     PLUGIN_ID as SCREEN_PACKAGE_ID,
     capture_local_screen,
 )
-from companion_v2.adapters.astrbot.model_wire import build_wire
-from companion_v2.capabilities import CapabilityAuthorizationState, CapabilityRepository
-from companion_v2.conversation.flow import ConversationPolicy
-from companion_v2.conversation.segmentation import SegmentationPolicy
-from companion_v2.conversation.media.models import ImageDescriptor
-from companion_v2.conversation.media.screen import ScreenPromptImage
-from companion_v2.configuration.models import ConfigLayer, ConfigTarget
-from companion_v2.configuration.registry import FieldRegistry
-from companion_v2.execution.models import TaskError
-from companion_v2.model_gateway.models import ToolCall
-from companion_v2.model_gateway.routing import configuration_fields
-from companion_v2.proactive.configuration import target_for
-from companion_v2.proactive.diagnostic_models import DiagnosticSourceError
-from companion_v2.proactive.service import contact_profile
-from companion_v2.product import PRODUCT_VERSION
-from companion_v2.screen import SCREEN_EXTENSION, SCREEN_PROCESS, SCREEN_READ, ScreenOriginalStore
-from companion_v2.screen.interpretation import screen_interpretation_profile
-from companion_v2.screen.review import ScreenObservationReview
-from companion_v2.sources import SourceRepository
+from digital_life_core.adapters.astrbot.model_wire import build_wire
+from digital_life_core.capabilities import CapabilityAuthorizationState, CapabilityRepository
+from digital_life_core.conversation.flow import ConversationPolicy
+from digital_life_core.conversation.segmentation import SegmentationPolicy
+from digital_life_core.conversation.media.models import ImageDescriptor
+from digital_life_core.conversation.media.screen import ScreenPromptImage
+from digital_life_core.configuration.models import ConfigLayer, ConfigTarget
+from digital_life_core.configuration.registry import FieldRegistry
+from digital_life_core.execution.models import TaskError
+from digital_life_core.model_gateway.models import ToolCall
+from digital_life_core.model_gateway.routing import configuration_fields
+from digital_life_core.proactive.configuration import target_for
+from digital_life_core.proactive.diagnostic_models import DiagnosticSourceError
+from digital_life_core.proactive.service import contact_profile
+from digital_life_core.product import PRODUCT_VERSION
+from digital_life_core.screen import SCREEN_EXTENSION, SCREEN_PROCESS, SCREEN_READ, ScreenOriginalStore
+from digital_life_core.screen.interpretation import screen_interpretation_profile
+from digital_life_core.screen.review import ScreenObservationReview
+from digital_life_core.sources import SourceRepository
 from tests.test_host_application import HostFixture
 from tests.test_management_access import NOW, SCOPE
 from tests.test_role_tool_loop import answered, requested
@@ -99,7 +99,7 @@ class NativeScreenFlowTests(HostFixture, unittest.IsolatedAsyncioTestCase):
         star = SimpleNamespace(root_dir_name=SCREEN_PACKAGE_ID,
             name=SCREEN_PACKAGE_ID, version=PRODUCT_VERSION, activated=True,
             star_cls=SimpleNamespace(extension_api=SimpleNamespace(
-                companion_v2_native=lambda: provider)))
+                digital_life_core_native=lambda: provider)))
         registry = NativeExtensionRegistry(SimpleNamespace(get_all_stars=lambda: (star,)), now=self.clock.now)
         self.addCleanup(registry.close)
         self.assertEqual(len(registry.declarations()), 1)
@@ -267,7 +267,7 @@ class NativeScreenFlowTests(HostFixture, unittest.IsolatedAsyncioTestCase):
         self.assertTrue(ScreenOriginalStore(self.runtime.data_root)._path(saved["content_hash"]).is_file())
 
     async def test_new_failed_analysis_keeps_new_original_and_never_uses_previous_result(self):
-        from companion_v2.model_gateway.models import Amount, ProviderResponse
+        from digital_life_core.model_gateway.models import Amount, ProviderResponse
         app, context = await self.diagnostic_host()
         events = app.contact_schedule.screen_events
         await events.diagnostic(context, app.screen_peek, test_id="good-review", role_instruction="原角色设定")

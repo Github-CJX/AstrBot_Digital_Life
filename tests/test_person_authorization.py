@@ -26,36 +26,36 @@ from types import SimpleNamespace as NS
 import unittest
 from unittest.mock import patch
 
-from astrbot_host.acquaintance_api import ADMIN_NAME_PATH, AUTHORIZATION_PATH, _authorization_participants
-from astrbot_host.management_identity import dashboard_operator
-from companion_v2.execution.models import TaskContext
-from companion_v2.foundation.outcome import Outcome
-from companion_v2.foundation.refs import AudienceRef
-from companion_v2.identity_policy.grants import (
+from digital_life_host.acquaintance_api import ADMIN_NAME_PATH, AUTHORIZATION_PATH, _authorization_participants
+from digital_life_host.management_identity import dashboard_operator
+from digital_life_core.execution.models import TaskContext
+from digital_life_core.foundation.outcome import Outcome
+from digital_life_core.foundation.refs import AudienceRef
+from digital_life_core.identity_policy.grants import (
     DELIVERY_GRANT_ID,
     STAGING_CAPABILITY_GRANT_PREFIX,
     STAGING_SCREEN_GRANT_PREFIX,
 )
-from companion_v2.identity_policy.management import (
+from digital_life_core.identity_policy.management import (
     GRANT_PREFIX,
     MANAGED_BY_CONFIGURATION,
     MANAGED_BY_PAGE,
     PersonAuthorizationManagement,
 )
-from companion_v2.identity_policy.models import AuthorizationTier, GrantState
-from companion_v2.identity_policy.personas import ConversationRoute
-from companion_v2.identity_policy.interventions import (
+from digital_life_core.identity_policy.models import AuthorizationTier, GrantState
+from digital_life_core.identity_policy.personas import ConversationRoute
+from digital_life_core.identity_policy.interventions import (
     CALENDAR_INTERVENTION,
     INTERVENTION_CAPABILITIES,
     REST_WAKE_INTERVENTION,
     STATE_INTERVENTION,
     authorized_capabilities,
 )
-from companion_v2.identity_policy.object_access import ObjectAccessPolicy
-from companion_v2.screen import SCREEN_READ
-from companion_v2.execution.models import encode, stamp
-from companion_v2.memory.person.access import card_id, person_owner_key
-from companion_v2.memory.person.models import KIND as PERSON_CARD_KIND, empty_document as empty_person_card
+from digital_life_core.identity_policy.object_access import ObjectAccessPolicy
+from digital_life_core.screen import SCREEN_READ
+from digital_life_core.execution.models import encode, stamp
+from digital_life_core.memory.person.access import card_id, person_owner_key
+from digital_life_core.memory.person.models import KIND as PERSON_CARD_KIND, empty_document as empty_person_card
 from tests import test_astrbot_staging_host as support
 from tests.test_management_access import ManagementFixture, NOW, SCOPE
 
@@ -412,7 +412,7 @@ class AuthorizationRouteTests(unittest.IsolatedAsyncioTestCase):
 
     async def send(self, *, method="GET", path=AUTHORIZATION_PATH, username="admin", query="", payload=None):
         body = json.dumps(payload).encode("utf-8") if payload is not None else b""
-        with patch("astrbot_host.acquaintance_api.request",
+        with patch("digital_life_host.acquaintance_api.request",
                    NS(username=username, query=_Query(query), body=_body(body))):
             return await self.handler(method, path)()
 
@@ -505,7 +505,7 @@ class AuthorizationRouteTests(unittest.IsolatedAsyncioTestCase):
                          "enabled": True}):
             self.assertEqual((await self.send(method="POST", payload=payload))["data"]["code"],
                              "authorization_command_invalid")
-        with patch("astrbot_host.acquaintance_api.request",
+        with patch("digital_life_host.acquaintance_api.request",
                    NS(username="admin", query=_Query(), body=_body(b"not json"))):
             self.assertEqual((await self.handler("POST")())["data"]["code"], "authorization_command_invalid")
         reading = await self.send(query=f"subject_id={subject}")

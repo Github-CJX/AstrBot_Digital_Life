@@ -17,15 +17,15 @@ function harness() {
 }
 test('scope labels follow the editor endpoint and its actual write layer', () => {
   const wb = harness();
-  const object = wb.scopeObjectForEndpoint('/astrbot_plugin_private_companion/targets/group-b/roles/role-b/config');
+  const object = wb.scopeObjectForEndpoint('/astrbot_plugin_digital_life/targets/group-b/roles/role-b/config');
   assert.equal(wb.saveScopeLabel('role',object), '唯的角色默认');
   assert.equal(wb.saveScopeLabel('window',object), '测试群的覆盖设置（角色：唯）');
   assert.equal(wb.saveScopeLabel('role',{...object,account:'QQ 官方'}),'唯的角色默认（Bot：QQ 官方）');
   assert.equal(wb.saveScopeLabel('installation',{...object,account:'QQ 官方'}),'全局默认设置');
   assert.equal(wb.saveScopeLabel('installation',object), '全局默认设置');
-  const missing = wb.scopeObjectForEndpoint('/astrbot_plugin_private_companion/targets/missing/roles/role-b/config');
+  const missing = wb.scopeObjectForEndpoint('/astrbot_plugin_digital_life/targets/missing/roles/role-b/config');
   assert.equal(wb.saveScopeLabel('window', missing), '当前窗口覆盖');
-  assert.equal(wb.scopeObjectForEndpoint('/astrbot_plugin_private_companion/config').role, '');
+  assert.equal(wb.scopeObjectForEndpoint('/astrbot_plugin_digital_life/config').role, '');
 });
 test('scope details are escaped, linked to a separate non-submit disclosure and have unique IDs', () => {
   const wb = harness();

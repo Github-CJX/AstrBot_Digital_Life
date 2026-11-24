@@ -16,7 +16,7 @@ It is intentionally conservative:
 Usage (stop the plugin first, or accept a very short SQLite write lock):
 
     python tools/repair_v1_group_members.py \
-        --v1-root "C:/Users/.../plugin_data/astrbot_plugin_private_companion" \
+        --v1-root "C:/Users/.../plugin_data/astrbot_plugin_digital_life" \
         --data-root "C:/Users/.../companion-7/installations/main/runtime" \
         --installation-id "astrbot-private-companion-v2:multi:main" --apply
 """
@@ -70,12 +70,12 @@ def main() -> int:
         return 2
     raw = json.loads(raw_path.read_text(encoding="utf-8"))
 
-    from companion_v2.execution.models import digest
-    from companion_v2.foundation.refs import ScopeKind
-    from companion_v2.knowledge.catalog import KnowledgeCatalog
-    from companion_v2.legacy.data_migration import build_data_plan, map_legacy_worldbook
-    from companion_v2.storage.runtime import StorageRuntime
-    from astrbot_host.legacy_group_data_api import LegacyGroupDataWebAPI
+    from digital_life_core.execution.models import digest
+    from digital_life_core.foundation.refs import ScopeKind
+    from digital_life_core.knowledge.catalog import KnowledgeCatalog
+    from digital_life_core.legacy.data_migration import build_data_plan, map_legacy_worldbook
+    from digital_life_core.storage.runtime import StorageRuntime
+    from digital_life_host.legacy_group_data_api import LegacyGroupDataWebAPI
 
     if args.apply:
         backup = args.backup or database.with_name(

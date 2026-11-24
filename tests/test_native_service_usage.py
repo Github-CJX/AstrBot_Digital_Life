@@ -12,12 +12,12 @@ from unittest.mock import AsyncMock, patch
 
 from tests import test_astrbot_staging_host as _host_import_root
 from astrbot.core.provider.entities import LLMResponse, TokenUsage
-from astrbot_host.native_extensions.reality.activity_methods import RealityActivityMethods
-from astrbot_host.native_extensions.reality.model_methods import RealityModelMethods
-from astrbot_host.native_extensions.reality.reality_touch_camera import RealityTouchCameraMixin
-from astrbot_host.native_extensions.together.token_usage import TokenUsageTracker as TogetherUsage
-from astrbot_host.native_extensions.usage import TokenUsageTracker
-from astrbot_host.token_sources import _summary, read_token_sources
+from digital_life_host.native_extensions.reality.activity_methods import RealityActivityMethods
+from digital_life_host.native_extensions.reality.model_methods import RealityModelMethods
+from digital_life_host.native_extensions.reality.reality_touch_camera import RealityTouchCameraMixin
+from digital_life_host.native_extensions.together.token_usage import TokenUsageTracker as TogetherUsage
+from digital_life_host.native_extensions.usage import TokenUsageTracker
+from digital_life_host.token_sources import _summary, read_token_sources
 
 
 class LocalReality(RealityActivityMethods, RealityModelMethods, RealityTouchCameraMixin):

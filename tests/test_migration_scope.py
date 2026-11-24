@@ -1,6 +1,6 @@
 import unittest
 
-from companion_v2.legacy.migration_scope import (
+from digital_life_core.legacy.migration_scope import (
     AUTO_SAME_ID, REVIEW_ACCOUNT_DIFFERS, REVIEW_AMBIGUOUS, REVIEW_GROUP_MISSING,
     REVIEW_PERSONA_OTHER_ROLE, REVIEW_PERSONA_UNASSIGNED, REVIEW_PLATFORM_DIFFERS,
     REVIEW_ROLE_MISSING, build_scope, map_groups, map_personas, needs_review,

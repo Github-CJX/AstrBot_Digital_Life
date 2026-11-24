@@ -15,15 +15,15 @@ from types import SimpleNamespace
 import json
 import unittest
 
-from companion_v2.configuration.models import ConfigLayer, ConfigTarget
-from companion_v2.configuration.registry import FieldRegistry
-from companion_v2.execution.models import ProviderBinding
-from companion_v2.expression import learning
-from companion_v2.expression.review import expression_review_profile
-from companion_v2.expression.style_service import KIND, expression_learning_profile
-from companion_v2.expression.style_management import ExpressionStyleManagement
-from companion_v2.model_gateway.models import Amount, LocalProvider
-from companion_v2.model_gateway.routing import configuration_fields
+from digital_life_core.configuration.models import ConfigLayer, ConfigTarget
+from digital_life_core.configuration.registry import FieldRegistry
+from digital_life_core.execution.models import ProviderBinding
+from digital_life_core.expression import learning
+from digital_life_core.expression.review import expression_review_profile
+from digital_life_core.expression.style_service import KIND, expression_learning_profile
+from digital_life_core.expression.style_management import ExpressionStyleManagement
+from digital_life_core.model_gateway.models import Amount, LocalProvider
+from digital_life_core.model_gateway.routing import configuration_fields
 from tests import test_expression_v1_pipeline as pipeline
 from tests.test_expression_v1_pipeline import ExpressionFixture
 from tests.test_host_application import HostFixture

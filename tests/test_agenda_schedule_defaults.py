@@ -1,6 +1,6 @@
 import unittest
 
-from companion_v2.agenda.models import Frequency, GapPolicy, Schedule
+from digital_life_core.agenda.models import Frequency, GapPolicy, Schedule
 
 
 class ScheduleRestoreTests(unittest.TestCase):

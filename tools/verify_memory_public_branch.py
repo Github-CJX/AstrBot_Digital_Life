@@ -40,7 +40,7 @@ def cases(suite):
 def validators(directory):
     from jsonschema import Draft202012Validator, FormatChecker
     from referencing import Registry, Resource
-    from companion_v2.memory.stream_store import CONTRACT_FINGERPRINT
+    from digital_life_core.memory.stream_store import CONTRACT_FINGERPRINT
 
     schemas, hashes = {}, {}
     for path in sorted(directory.glob("*.schema.json")):
@@ -59,11 +59,11 @@ def validators(directory):
 
 
 def instrument(stack, schemas, counts):
-    from companion_v2.memory.proposal_wire import MemoryProposalWireV1
-    from companion_v2.memory.wire import MemoryQueryWireV1
-    from companion_v2.memory.wire_operations import MemoryOperationWireV1
-    from companion_v2.memory.subscriptions import MemorySubscriptions, SubscriptionControl
-    from companion_v2.memory.stream_consumer import MemoryReferenceConsumer
+    from digital_life_core.memory.proposal_wire import MemoryProposalWireV1
+    from digital_life_core.memory.wire import MemoryQueryWireV1
+    from digital_life_core.memory.wire_operations import MemoryOperationWireV1
+    from digital_life_core.memory.subscriptions import MemorySubscriptions, SubscriptionControl
+    from digital_life_core.memory.stream_consumer import MemoryReferenceConsumer
 
     def bind(cls, name, schema, select=lambda value: value):
         original = getattr(cls, name)

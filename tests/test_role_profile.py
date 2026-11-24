@@ -4,9 +4,9 @@ import base64
 import json
 import unittest
 
-from companion_v2.configuration.models import ConfigLayer, ConfigTarget, ConfigurationError
-from companion_v2.foundation.refs import SubjectKind, SubjectRef
-from companion_v2.role_profile.configuration import (
+from digital_life_core.configuration.models import ConfigLayer, ConfigTarget, ConfigurationError
+from digital_life_core.foundation.refs import SubjectKind, SubjectRef
+from digital_life_core.role_profile.configuration import (
     CONTROL_FIELDS,
     FIELD_DEFAULTS,
     FIELD_LIMITS,
@@ -83,7 +83,7 @@ class RoleProfileConversationTests(MessageFixture, unittest.IsolatedAsyncioTestC
         self.assertEqual(other.fields[f"{GROUP}.avatar_data_url"].value, "")
 
     def test_task_reference_uses_the_same_self_page_for_background_tasks(self):
-        from companion_v2.role_profile.task_reference import TaskRoleReference
+        from digital_life_core.role_profile.task_reference import TaskRoleReference
         self.save_profile("name", "沈知夏")
         self.save_profile("speech_style", "句子简短，先听完再回答。")
         text = TaskRoleReference(self.runtime).instruction(self.context, NOW)

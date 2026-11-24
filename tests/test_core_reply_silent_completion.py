@@ -17,16 +17,16 @@ from astrbot.core.pipeline.process_stage.follow_up import _ACTIVE_AGENT_RUNNERS
 from astrbot.core.pipeline.process_stage.method.agent_sub_stages.internal import InternalAgentSubStage
 from astrbot.core.provider.entities import ProviderRequest
 
-from astrbot_host.core_reply import CORE_REPLY_CONTEXT_EXTRA, prepare_core_reply_event
-from astrbot_host.core_reply_tool_dispatch import (
+from digital_life_host.core_reply import CORE_REPLY_CONTEXT_EXTRA, prepare_core_reply_event
+from digital_life_host.core_reply_tool_dispatch import (
     CORE_TOOL_DISPATCH_EXTRA, observe_core_tool_dispatch_begin, restore_core_tool_dispatch,
 )
-from astrbot_host.core_reply_tool_guard import install_core_reply_tool_guard, close_core_reply_tool_guard
-from astrbot_host.core_reply_tools import CoreReplyFunctionTool, CoreReplyToolSession, _OfferedTool, native_tool_name
-from astrbot_host.core_reply_turn_gate import install_core_reply_turn, close_core_reply_turn
-from companion_v2.conversation.participation import GroupParticipation
-from companion_v2.foundation.outcome import Outcome
-from companion_v2.foundation.refs import ScopeKind
+from digital_life_host.core_reply_tool_guard import install_core_reply_tool_guard, close_core_reply_tool_guard
+from digital_life_host.core_reply_tools import CoreReplyFunctionTool, CoreReplyToolSession, _OfferedTool, native_tool_name
+from digital_life_host.core_reply_turn_gate import install_core_reply_turn, close_core_reply_turn
+from digital_life_core.conversation.participation import GroupParticipation
+from digital_life_core.foundation.outcome import Outcome
+from digital_life_core.foundation.refs import ScopeKind
 from tests.test_core_reply_turn_gate import GateEvent, ScriptedProvider, plain_text
 
 
@@ -289,7 +289,7 @@ class SilentCompletionTests(unittest.IsolatedAsyncioTestCase):
             self.assertNotIn(name, vars(result.runner))
 
     async def test_failed_done_hook_still_releases_new_input(self):
-        with self.assertLogs("astrbot_host.core_reply_tool_dispatch", level="ERROR"):
+        with self.assertLogs("digital_life_host.core_reply_tool_dispatch", level="ERROR"):
             result = await self.run_turn([
                 choose_round(before=(LEARN,)),
             ], follow_up_on=LEARN, fail_done=True)

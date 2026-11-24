@@ -9,16 +9,16 @@ from datetime import datetime, timedelta, timezone
 import json
 import unittest
 
-from companion_v2.conversation.self_review_context import (MAX_ITEMS, SELF_REVIEW_INSTRUCTION,
+from digital_life_core.conversation.self_review_context import (MAX_ITEMS, SELF_REVIEW_INSTRUCTION,
     SNAPSHOT_VERSION, ConversationSelfReviewContext)
-from companion_v2.configuration.registry import FieldRegistry
-from companion_v2.execution.models import TaskError, stamp
-from companion_v2.model_gateway.routing import configuration_fields
-from companion_v2.role_work.journal import self_review
-from companion_v2.role_work.journal.self_review_evidence import (MAX_EVIDENCE, MAX_WINDOW_HOURS,
+from digital_life_core.configuration.registry import FieldRegistry
+from digital_life_core.execution.models import TaskError, stamp
+from digital_life_core.model_gateway.routing import configuration_fields
+from digital_life_core.role_work.journal import self_review
+from digital_life_core.role_work.journal.self_review_evidence import (MAX_EVIDENCE, MAX_WINDOW_HOURS,
     ReviewEvidence, ReviewWindow, SelfReviewEvidenceCatalog, evidence_handles, window_document)
-from companion_v2.role_work.journal.self_review_service import OUTPUT_FORMAT, self_review_profile
-from companion_v2.storage.schema import SCHEMA_VERSION
+from digital_life_core.role_work.journal.self_review_service import OUTPUT_FORMAT, self_review_profile
+from digital_life_core.storage.schema import SCHEMA_VERSION
 from tests.test_host_application import HostFixture
 from tests.test_role_tool_loop import answered
 
@@ -199,8 +199,8 @@ class SelfReviewStorageTests(unittest.TestCase):
         import sqlite3
         from tempfile import TemporaryDirectory
 
-        from companion_v2.storage.runtime import StorageOpenError, StorageRuntime
-        from companion_v2.storage.schema import (REQUIRED_TABLES, SCHEMA_VERSION_V38,
+        from digital_life_core.storage.runtime import StorageOpenError, StorageRuntime
+        from digital_life_core.storage.schema import (REQUIRED_TABLES, SCHEMA_VERSION_V38,
             V38_REQUIRED_TABLES)
         from tests.execution_support import remove_v39
 
@@ -252,10 +252,10 @@ class SelfReviewRegistrationTests(unittest.TestCase):
         from pathlib import Path
         from tempfile import TemporaryDirectory
 
-        from companion_v2.identity_policy.object_access import ActionRegistry
-        from companion_v2.role_work.journal.self_review_evidence import READ_ACTION
-        from companion_v2.role_work.journal.self_review_service import SelfReviewService
-        from companion_v2.storage.runtime import StorageRuntime
+        from digital_life_core.identity_policy.object_access import ActionRegistry
+        from digital_life_core.role_work.journal.self_review_evidence import READ_ACTION
+        from digital_life_core.role_work.journal.self_review_service import SelfReviewService
+        from digital_life_core.storage.runtime import StorageRuntime
 
         with TemporaryDirectory(prefix="companion-v2-self-review-registration-") as temporary:
             runtime = StorageRuntime.open(data_root=Path(temporary) / "v2-data",

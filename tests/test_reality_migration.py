@@ -6,15 +6,15 @@ from types import SimpleNamespace
 from unittest import IsolatedAsyncioTestCase, TestCase
 from unittest.mock import Mock
 
-from astrbot_host.legacy_api import LegacyMigrationWebAPI
-from astrbot_host.native_extensions.reality.settings_methods import RealitySettingsMethods
-from companion_v2.execution.models import TaskError
-from companion_v2.legacy.migration import ConfigIntent, MigrationPlan
-from companion_v2.legacy.reality_migration import (
+from digital_life_host.legacy_api import LegacyMigrationWebAPI
+from digital_life_host.native_extensions.reality.settings_methods import RealitySettingsMethods
+from digital_life_core.execution.models import TaskError
+from digital_life_core.legacy.migration import ConfigIntent, MigrationPlan
+from digital_life_core.legacy.reality_migration import (
     convert_reality_configuration,
     reality_settings_state_token,
 )
-from companion_v2.legacy.native_extension_configuration import _leaves
+from digital_life_core.legacy.native_extension_configuration import _leaves
 
 
 def base_config():

@@ -14,14 +14,14 @@ import unittest
 from unittest.mock import AsyncMock, patch
 from zoneinfo import ZoneInfo
 
-from astrbot_host.account_session_api import AccountSessionWebAPI
-from astrbot_host.functional_commands import FunctionalCommand, parse_functional_command
-from astrbot_host.multi_api import MultiHostWebAPI
-from astrbot_host.native_extensions.image_native.output_routing import (
+from digital_life_host.account_session_api import AccountSessionWebAPI
+from digital_life_host.functional_commands import FunctionalCommand, parse_functional_command
+from digital_life_host.multi_api import MultiHostWebAPI
+from digital_life_host.native_extensions.image_native.output_routing import (
     OnlineImageBackend,
     OutputRoutingBackend,
 )
-from astrbot_host.relay_pending import (
+from digital_life_host.relay_pending import (
     _read as relay_read,
     add_task as relay_add_task,
     claim_group as relay_claim_group,
@@ -29,37 +29,37 @@ from astrbot_host.relay_pending import (
     mark_waiting_permission as relay_mark_waiting_permission,
     requeue as relay_requeue,
 )
-from astrbot_host.relay_pending_events import process_group_presence, process_private_receipts
-from astrbot_host.voice import NativeVoiceReply
-from astrbot_host.web_read_material import read_page
-from companion_v2.agenda.models import Frequency, Schedule
-from companion_v2.agenda.planning_config import configured_annual_calendars
-from companion_v2.agenda.planning_inputs import planning_calendar_context
-from companion_v2.agenda.weather_reading import WeatherReading
-from companion_v2.capabilities.native import parse_result
-from companion_v2.conversation import busy_gate
-from companion_v2.conversation.participation_prompts import compact_observation_facts
-from companion_v2.conversation.voice_reply import VoiceReplyPolicy
-from companion_v2.device import adb
-from companion_v2.execution.models import Outcome, SideEffect, encode, stamp
-from companion_v2.foundation.refs import ScopeKind, ScopeRef, SubjectKind, SubjectRef
-from companion_v2.memory.search import SearchIndex
-from companion_v2.proactive.exploration import ExplorationEvents
-from companion_v2.proactive.external_materials import WeatherSnapshot
-from companion_v2.proactive.greetings import GreetingContactEvents
-from companion_v2.proactive.news_events import NewsContactEvents, ParseBatch
-from companion_v2.proactive.prompts import local_time_fields
-from companion_v2.proactive.scheduling import ContactSchedule
-from companion_v2.product import PRODUCT_VERSION
-from companion_v2.reality import provider as REALITY
-from companion_v2.relationships.profile import ConversationRelationshipProfileContext, FIELD_LIMITS
-from companion_v2.role_work.life import rest_gate
-from companion_v2.role_work.state.maintenance import StateMaintenance
-from companion_v2.screen.interpretation import ScreenInterpretationService
-from companion_v2.screen.peek import ScreenPeekService
-from companion_v2.storage.runtime import StorageRuntime
-from companion_v2.storage.sqlite_path import file_uri, readonly_uri
-from companion_v2.system_prompts.configuration import (
+from digital_life_host.relay_pending_events import process_group_presence, process_private_receipts
+from digital_life_host.voice import NativeVoiceReply
+from digital_life_host.web_read_material import read_page
+from digital_life_core.agenda.models import Frequency, Schedule
+from digital_life_core.agenda.planning_config import configured_annual_calendars
+from digital_life_core.agenda.planning_inputs import planning_calendar_context
+from digital_life_core.agenda.weather_reading import WeatherReading
+from digital_life_core.capabilities.native import parse_result
+from digital_life_core.conversation import busy_gate
+from digital_life_core.conversation.participation_prompts import compact_observation_facts
+from digital_life_core.conversation.voice_reply import VoiceReplyPolicy
+from digital_life_core.device import adb
+from digital_life_core.execution.models import Outcome, SideEffect, encode, stamp
+from digital_life_core.foundation.refs import ScopeKind, ScopeRef, SubjectKind, SubjectRef
+from digital_life_core.memory.search import SearchIndex
+from digital_life_core.proactive.exploration import ExplorationEvents
+from digital_life_core.proactive.external_materials import WeatherSnapshot
+from digital_life_core.proactive.greetings import GreetingContactEvents
+from digital_life_core.proactive.news_events import NewsContactEvents, ParseBatch
+from digital_life_core.proactive.prompts import local_time_fields
+from digital_life_core.proactive.scheduling import ContactSchedule
+from digital_life_core.product import PRODUCT_VERSION
+from digital_life_core.reality import provider as REALITY
+from digital_life_core.relationships.profile import ConversationRelationshipProfileContext, FIELD_LIMITS
+from digital_life_core.role_work.life import rest_gate
+from digital_life_core.role_work.state.maintenance import StateMaintenance
+from digital_life_core.screen.interpretation import ScreenInterpretationService
+from digital_life_core.screen.peek import ScreenPeekService
+from digital_life_core.storage.runtime import StorageRuntime
+from digital_life_core.storage.sqlite_path import file_uri, readonly_uri
+from digital_life_core.system_prompts.configuration import (
     GROUP as SYSTEM_PROMPT_GROUP,
     RoleSystemPromptConfigurationOwner,
     configuration_fields as system_prompt_fields,
@@ -109,11 +109,11 @@ class VoiceAndCommandRegressionTests(unittest.TestCase):
 
     def test_python_sources_have_no_utf8_bom(self):
         checked = (
-            "astrbot_host/core_reply_context.py",
-            "companion_v2/agenda/planning_inputs.py",
-            "companion_v2/agenda/repository.py",
-            "companion_v2/conversation/voice_reply.py",
-            "companion_v2/delivery/plan.py",
+            "digital_life_host/core_reply_context.py",
+            "digital_life_core/agenda/planning_inputs.py",
+            "digital_life_core/agenda/repository.py",
+            "digital_life_core/conversation/voice_reply.py",
+            "digital_life_core/delivery/plan.py",
         )
         for rel in checked:
             raw = (ROOT / rel).read_bytes()
@@ -166,7 +166,7 @@ class DateAndSolarTermRegressionTests(unittest.TestCase):
             get_holiday_detail=lambda _day: (True, "国庆节"),
             is_workday=lambda day: day.isoformat() != "2026-10-01",
         )
-        with patch("companion_v2.conversation.date_context._chinese_calendar", provider):
+        with patch("digital_life_core.conversation.date_context._chinese_calendar", provider):
             # Holiday without manual annual calendar falls back to chinese_calendar.
             holiday_fields = local_time_fields(
                 datetime(2026, 10, 1, 4, 0, tzinfo=timezone.utc), "Asia/Shanghai"
@@ -234,7 +234,7 @@ class HostLayerRegressionTests(unittest.IsolatedAsyncioTestCase):
         controller = NS(runtime=runtime, native_types=NS(), session=None)
         target = NS(platform_id="qq", account_id="100", participant_id="u-1", group_id="g-1")
         unrelated = NS(message_str="今天天气不错", bot=None, platform_meta=NS(name="aiocqhttp"))
-        with patch("astrbot_host.relay_pending_events._ask_permission", AsyncMock(return_value=True)) as ask_mock:
+        with patch("digital_life_host.relay_pending_events._ask_permission", AsyncMock(return_value=True)) as ask_mock:
             await process_private_receipts(controller, unrelated, target)
         ask_mock.assert_not_awaited()
         saved = relay_read(runtime)["tasks"][perm_id]
@@ -251,7 +251,7 @@ class HostLayerRegressionTests(unittest.IsolatedAsyncioTestCase):
             "expires_at": future,
         })
         ctx = NS(actor=NS(principal=NS(native_account_id="u-1")))
-        with patch("astrbot_host.relay_pending_events._send_group", AsyncMock(side_effect=RuntimeError("boom"))):
+        with patch("digital_life_host.relay_pending_events._send_group", AsyncMock(side_effect=RuntimeError("boom"))):
             await process_group_presence(controller, unrelated, target, ctx)
         self.assertEqual(relay_read(runtime)["tasks"][group_id]["state"], "failed")
 
@@ -277,8 +277,8 @@ class HostLayerRegressionTests(unittest.IsolatedAsyncioTestCase):
                 raise asyncio.CancelledError()
             return await orig_to_thread(fn, *args, **kwargs)
 
-        with patch("astrbot_host.relay_pending_events._send_group", AsyncMock(return_value={"state": "delivered"})), \
-                patch("astrbot_host.relay_pending_events.asyncio.to_thread", side_effect=cancel_on_finish):
+        with patch("digital_life_host.relay_pending_events._send_group", AsyncMock(return_value={"state": "delivered"})), \
+                patch("digital_life_host.relay_pending_events.asyncio.to_thread", side_effect=cancel_on_finish):
             with self.assertRaises(asyncio.CancelledError):
                 await process_group_presence(controller, unrelated, target, ctx)
         self.assertEqual(relay_read(runtime)["tasks"][sent_group_id]["state"], "sent")
@@ -294,15 +294,15 @@ class HostLayerRegressionTests(unittest.IsolatedAsyncioTestCase):
             "expires_at": future,
         })
         target_u2 = NS(platform_id="qq-main", account_id="100", group_id="g-1", participant_id="u-2")
-        with patch("astrbot_host.relay_pending_events._report_receipt", AsyncMock(return_value=True)), \
-                patch("astrbot_host.relay_pending_events.asyncio.to_thread", side_effect=cancel_on_finish):
+        with patch("digital_life_host.relay_pending_events._report_receipt", AsyncMock(return_value=True)), \
+                patch("digital_life_host.relay_pending_events.asyncio.to_thread", side_effect=cancel_on_finish):
             with self.assertRaises(asyncio.CancelledError):
                 await process_private_receipts(controller, NS(message_str="刚到"), target_u2)
         self.assertEqual(relay_read(runtime)["tasks"][report_id]["state"], "reported")
 
         # 6) Cancellation during finish() after confirmed permission report settles as "reported".
-        with patch("astrbot_host.relay_pending_events._report_receipt", AsyncMock(return_value=True)), \
-                patch("astrbot_host.relay_pending_events.asyncio.to_thread", side_effect=cancel_on_finish):
+        with patch("digital_life_host.relay_pending_events._report_receipt", AsyncMock(return_value=True)), \
+                patch("digital_life_host.relay_pending_events.asyncio.to_thread", side_effect=cancel_on_finish):
             with self.assertRaises(asyncio.CancelledError):
                 await process_private_receipts(controller, NS(message_str="可以"), target)
         self.assertEqual(relay_read(runtime)["tasks"][perm_id]["state"], "reported")
@@ -369,8 +369,8 @@ class HostLayerRegressionTests(unittest.IsolatedAsyncioTestCase):
             def get(self, *_args, **_kwargs):
                 return FakeResponse()
 
-        with patch("astrbot_host.web_read_material.address_allowed", return_value=True), \
-                patch("astrbot_host.files.parsing.extract_document", side_effect=fake_extract):
+        with patch("digital_life_host.web_read_material.address_allowed", return_value=True), \
+                patch("digital_life_host.files.parsing.extract_document", side_effect=fake_extract):
             result = await read_page(FakeSession(), "https://example.com/doc.pdf")
         self.assertEqual(result["status"], "full")
         self.assertEqual(result["text"], "pdf body")
@@ -767,7 +767,7 @@ class CoreStateMachineRegressionTests(unittest.IsolatedAsyncioTestCase):
         row = {"origin_key": "ctx-ol"}
         # Held by sleep gate -> must NOT claim memo-1.
         sched._sleep_hold = lambda _ctx, _origin, _at: NOW + timedelta(hours=1)
-        with patch("companion_v2.proactive.scheduling.AgendaService", return_value=NS(repository=fake_repo)):
+        with patch("digital_life_core.proactive.scheduling.AgendaService", return_value=NS(repository=fake_repo)):
             avail = sched._activate_plan(row, plan, 2, NOW)
         self.assertEqual(avail, 2)
         self.assertEqual(claimed, [])
@@ -775,7 +775,7 @@ class CoreStateMachineRegressionTests(unittest.IsolatedAsyncioTestCase):
         # Gate open -> claims memo-1 and launches worker.
         sched._sleep_hold = lambda _ctx, _origin, _at: None
         sched._run = AsyncMock(return_value=None)
-        with patch("companion_v2.proactive.scheduling.AgendaService", return_value=NS(repository=fake_repo)):
+        with patch("digital_life_core.proactive.scheduling.AgendaService", return_value=NS(repository=fake_repo)):
             avail = sched._activate_plan(row, plan, 2, NOW)
             worker = sched._workers.get("ctx-ol")
             if worker is not None:
@@ -821,8 +821,8 @@ class CoreStateMachineRegressionTests(unittest.IsolatedAsyncioTestCase):
         self.assertTrue(json.loads(row["result_json"])["retryable"])
 
     def test_clean_reply_text_preserves_repeated_segment_split_markers(self):
-        from astrbot_host.core_reply_cleanup import clean_reply_text
-        from companion_v2.conversation.segment_control import LLM_SEGMENT_MARKER
+        from digital_life_host.core_reply_cleanup import clean_reply_text
+        from digital_life_core.conversation.segment_control import LLM_SEGMENT_MARKER
 
         body = f"第一段正常内容。\n{LLM_SEGMENT_MARKER}\n第二段正常内容。\n{LLM_SEGMENT_MARKER}\n第三段正常内容。"
         cleaned, removed = clean_reply_text(body)
@@ -838,10 +838,10 @@ class CoreStateMachineRegressionTests(unittest.IsolatedAsyncioTestCase):
 
 class GenerationVoiceSilentFallbackTests(MessageFixture, unittest.IsolatedAsyncioTestCase):
     async def test_generation_silent_fallback_with_voice_enabled_does_not_crash(self):
-        from companion_v2.conversation.foreground import ModelDraft
-        from companion_v2.conversation.generation import LocalReplyGenerator
-        from companion_v2.conversation.segmentation import SegmentationPolicy
-        from companion_v2.model_gateway.models import Amount, ProviderResponse
+        from digital_life_core.conversation.foreground import ModelDraft
+        from digital_life_core.conversation.generation import LocalReplyGenerator
+        from digital_life_core.conversation.segmentation import SegmentationPolicy
+        from digital_life_core.model_gateway.models import Amount, ProviderResponse
 
         self.responses["primary"] = ProviderResponse(
             "generated", ModelDraft("visible-before-cleanup", ()), Amount(10, 10), "r-silent",
@@ -853,7 +853,7 @@ class GenerationVoiceSilentFallbackTests(MessageFixture, unittest.IsolatedAsynci
             voice_policy=VoiceReplyPolicy(probability=1.0),
             split=lambda text: tuple(text.splitlines(keepends=True)),
         )
-        with patch("companion_v2.conversation.generation.prepare_reply", side_effect=ValueError("empty")):
+        with patch("digital_life_core.conversation.generation.prepare_reply", side_effect=ValueError("empty")):
             batch = await self.generate()
         row = self.messages.batch(batch)
         self.assertEqual(row["state"], "ready")

@@ -3,8 +3,8 @@ from __future__ import annotations
 import json
 import unittest
 
-from companion_v2.adapters.astrbot.native import persona_instruction
-from companion_v2.execution.models import TaskError
+from digital_life_core.adapters.astrbot.native import persona_instruction
+from digital_life_core.execution.models import TaskError
 
 
 class PersonaExampleTests(unittest.TestCase):

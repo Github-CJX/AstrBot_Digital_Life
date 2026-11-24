@@ -4,12 +4,12 @@ from dataclasses import replace
 import unittest
 from unittest.mock import patch
 
-from companion_v2.execution.models import TaskError
-from companion_v2.foundation.refs import SubjectKind, SubjectRef
-from companion_v2.identity_policy.models import GrantState
-from companion_v2.identity_policy.personas import ConversationRoute
-from companion_v2.proactive.configuration import GROUP, PURPOSES, target_for
-from companion_v2.proactive.management import ContactManagement, GRANT_PREFIX
+from digital_life_core.execution.models import TaskError
+from digital_life_core.foundation.refs import SubjectKind, SubjectRef
+from digital_life_core.identity_policy.models import GrantState
+from digital_life_core.identity_policy.personas import ConversationRoute
+from digital_life_core.proactive.configuration import GROUP, PURPOSES, target_for
+from digital_life_core.proactive.management import ContactManagement, GRANT_PREFIX
 from tests.proactive_support import ContactFixture
 from tests.test_management_access import INSTALLATION, SCOPE
 

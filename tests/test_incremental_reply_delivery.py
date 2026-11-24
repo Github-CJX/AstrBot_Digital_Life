@@ -5,11 +5,11 @@ from dataclasses import replace
 import json
 import unittest
 
-from companion_v2.conversation.segmentation import SegmentationPolicy, LLM_SEGMENT_MARKER as MARKER
-from companion_v2.conversation.reply_settings import configuration_fields, validate
-from companion_v2.configuration.models import ConfigurationError
-from companion_v2.adapters.astrbot.model_wire import build_wire, tool_alias
-from companion_v2.adapters.astrbot.reply_stream import OrderedReplyStream
+from digital_life_core.conversation.segmentation import SegmentationPolicy, LLM_SEGMENT_MARKER as MARKER
+from digital_life_core.conversation.reply_settings import configuration_fields, validate
+from digital_life_core.configuration.models import ConfigurationError
+from digital_life_core.adapters.astrbot.model_wire import build_wire, tool_alias
+from digital_life_core.adapters.astrbot.reply_stream import OrderedReplyStream
 from tests import test_segmented_stream_delivery as segmented_support
 from tests.segmentation_stream_support import StreamingFixture, chunk, text_chunks, USAGE
 
@@ -93,7 +93,7 @@ class IncrementalReplyDeliveryTests(StreamingFixture, unittest.IsolatedAsyncioTe
         self.assertEqual(len(self.texts()), 2)
 
     async def _cleaned_mode(self, mode):
-        from companion_v2.configuration.registry import FieldRegistry
+        from digital_life_core.configuration.registry import FieldRegistry
         presentation = {"part_gap_mode": "fixed", "content_cleanup_enabled": True,
                         "content_cleanup_mode": mode, "content_cleanup_scope": "trailing",
                         "content_cleanup_words": json.dumps(["。", "，"]),
@@ -178,7 +178,7 @@ class IncrementalReplyDeliveryTests(StreamingFixture, unittest.IsolatedAsyncioTe
             streaming_mode="buffered", llm_controlled=False))
         app = host.application
         batch = host.receive(await self.capture()).unwrap()
-        with self.assertLogs("companion_v2.diagnostics.inbound", level="WARNING") as captured:
+        with self.assertLogs("digital_life_core.diagnostics.inbound", level="WARNING") as captured:
             result = await self.done(app, batch)
 
         self.assertEqual(result["state"], "blocked")
@@ -244,7 +244,7 @@ class IncrementalReplyDeliveryTests(StreamingFixture, unittest.IsolatedAsyncioTe
         self.assertEqual(self.texts(), ["第一句话完成。"])
 
     async def test_invalid_observed_evidence_sends_only_the_local_failure_notice(self):
-        from companion_v2.conversation.generation import MODEL_FAILURE_NOTICE
+        from digital_life_core.conversation.generation import MODEL_FAILURE_NOTICE
 
         text = "这是一条事实。后面也要校验。"
         self.client_state.text = ordered_text(text, claims=[{"id": "bad", "kind": "observed", "statement": text,

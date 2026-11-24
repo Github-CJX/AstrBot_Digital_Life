@@ -19,14 +19,14 @@ import unittest
 from datetime import datetime, timedelta, timezone
 from unittest.mock import patch
 
-from astrbot_host.management_identity import dashboard_operator
-from companion_v2.execution.models import TaskContext, TaskError, digest, encode, stamp
-from companion_v2.expression import feedback as style_feedback
-from companion_v2.expression import rule_details
-from companion_v2.expression.configuration import read_settings
-from companion_v2.expression.sharing import build_pack
-from companion_v2.expression.style_management import ExpressionStyleManagement
-from companion_v2.foundation.refs import AudienceRef, RoleOwnerRef
+from digital_life_host.management_identity import dashboard_operator
+from digital_life_core.execution.models import TaskContext, TaskError, digest, encode, stamp
+from digital_life_core.expression import feedback as style_feedback
+from digital_life_core.expression import rule_details
+from digital_life_core.expression.configuration import read_settings
+from digital_life_core.expression.sharing import build_pack
+from digital_life_core.expression.style_management import ExpressionStyleManagement
+from digital_life_core.foundation.refs import AudienceRef, RoleOwnerRef
 from tests.group_host_support import GroupFixture
 from tests.staging_bootstrap_support import wait_for_batch
 from tests.test_host_application import HostFixture
@@ -286,7 +286,7 @@ class ExpressionRulePageTests(HostFixture, unittest.IsolatedAsyncioTestCase):
             return {}, 0
 
         reader = None
-        with patch("companion_v2.expression.style_management.rule_scope_counts",
+        with patch("digital_life_core.expression.style_management.rule_scope_counts",
                    side_effect=pause_projection):
             listing = asyncio.create_task(asyncio.to_thread(manager.list,
                 operator=self.core, context=self.selected_context()))

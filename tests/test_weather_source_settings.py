@@ -13,9 +13,9 @@ from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PrivateKey
 from cryptography.hazmat.primitives import serialization
 
 from tests import test_host_options_api as host_fixture
-from astrbot_host.weather_settings import CachedWeatherPort, configured_weather_ports
-from companion_v2.agenda.planning_config import WeatherLocation
-from companion_v2.agenda.weather_tools import WeatherTools
+from digital_life_host.weather_settings import CachedWeatherPort, configured_weather_ports
+from digital_life_core.agenda.planning_config import WeatherLocation
+from digital_life_core.agenda.weather_tools import WeatherTools
 
 
 KEY = "0123456789abcdef0123456789abcdef"

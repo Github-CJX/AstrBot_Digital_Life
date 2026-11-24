@@ -22,7 +22,7 @@ function openCatalog(bridge, search = "?asset_token=old") {
   };
   const assigned = [];
   const location = {
-    href: "https://example.test/api/plugin/page/content/astrbot_plugin_private_companion/%E9%99%AA%E4%BC%B4%E5%B0%8F%E5%B1%8B/catalog.html" + search,
+    href: "https://example.test/api/plugin/page/content/astrbot_plugin_digital_life/%E9%99%AA%E4%BC%B4%E5%B0%8F%E5%B1%8B/catalog.html" + search,
     search,
     assign(url) {assigned.push(url);},
   };
@@ -46,12 +46,12 @@ test("catalog returns home with a fresh host asset token", async () => {
     ready: async () => {},
     apiGet: async endpoint => {
       assert.equal(endpoint, "page/workspace-entry");
-      return {content_path: "/api/plugin/page/content/astrbot_plugin_private_companion/%E9%99%AA%E4%BC%B4%E5%B0%8F%E5%B1%8B/?asset_token=fresh"};
+      return {content_path: "/api/plugin/page/content/astrbot_plugin_digital_life/%E9%99%AA%E4%BC%B4%E5%B0%8F%E5%B1%8B/?asset_token=fresh"};
     },
   });
   assert.equal(await page.click("backHome"), true);
   assert.equal(page.assigned[0],
-    "https://example.test/api/plugin/page/content/astrbot_plugin_private_companion/%E9%99%AA%E4%BC%B4%E5%B0%8F%E5%B1%8B/index.html?asset_token=fresh#life");
+    "https://example.test/api/plugin/page/content/astrbot_plugin_digital_life/%E9%99%AA%E4%BC%B4%E5%B0%8F%E5%B1%8B/index.html?asset_token=fresh#life");
 });
 
 test("catalog leaves a visible recovery path when token refresh fails", async () => {

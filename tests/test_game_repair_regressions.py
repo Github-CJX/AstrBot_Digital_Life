@@ -17,26 +17,26 @@ from astrbot.core.agent.message import Message, ToolCall
 from astrbot.core.provider.entities import ProviderRequest
 from starlette.requests import Request
 
-from astrbot_host.core_reply import prepare_core_reply_event
-from astrbot_host.core_reply_tools import close_core_reply_tools, inject_core_reply_tools, native_tool_name
-from astrbot_host.game_access import ensure_game_access
-from astrbot_host.native_extension_api import PREFIX as EXT_PREFIX
-from astrbot_host.native_extensions.game.activity_methods import GameActivityMethods
-from astrbot_host.native_extensions.game.runtime import GameRuntime
-from astrbot_host.native_extensions.game.tunnel import QuickTunnel
-from companion_v2.capabilities import CapabilityRepository
-from companion_v2.capabilities.models import CapabilityAuthorizationState
-from companion_v2.conversation.flow import ConversationPolicy
-from companion_v2.execution.models import TaskContext, require
-from companion_v2.foundation.refs import AudienceRef
-from companion_v2.identity_policy.models import AuthorizationTier
-from companion_v2.identity_policy.object_access import ObjectAccessPolicy
-from companion_v2.games.draw_guess import DrawGuessGame, DrawWord, normalize_strokes
-from companion_v2.games.native import provider as game_provider
-from companion_v2.games.native.access import GROUPS
-from companion_v2.games.pikafish import PikafishService
-from companion_v2.games.turtle_soup import _FALLBACK_PUZZLES, SoupPuzzle
-from companion_v2.product import PRODUCT_VERSION
+from digital_life_host.core_reply import prepare_core_reply_event
+from digital_life_host.core_reply_tools import close_core_reply_tools, inject_core_reply_tools, native_tool_name
+from digital_life_host.game_access import ensure_game_access
+from digital_life_host.native_extension_api import PREFIX as EXT_PREFIX
+from digital_life_host.native_extensions.game.activity_methods import GameActivityMethods
+from digital_life_host.native_extensions.game.runtime import GameRuntime
+from digital_life_host.native_extensions.game.tunnel import QuickTunnel
+from digital_life_core.capabilities import CapabilityRepository
+from digital_life_core.capabilities.models import CapabilityAuthorizationState
+from digital_life_core.conversation.flow import ConversationPolicy
+from digital_life_core.execution.models import TaskContext, require
+from digital_life_core.foundation.refs import AudienceRef
+from digital_life_core.identity_policy.models import AuthorizationTier
+from digital_life_core.identity_policy.object_access import ObjectAccessPolicy
+from digital_life_core.games.draw_guess import DrawGuessGame, DrawWord, normalize_strokes
+from digital_life_core.games.native import provider as game_provider
+from digital_life_core.games.native.access import GROUPS
+from digital_life_core.games.pikafish import PikafishService
+from digital_life_core.games.turtle_soup import _FALLBACK_PUZZLES, SoupPuzzle
+from digital_life_core.product import PRODUCT_VERSION
 from tests import test_astrbot_staging_host as staging_support
 from tests import test_game_memory_ingestion as _game_memory_support
 from tests.multi_host_support import MultiFixture, multi_config
@@ -47,7 +47,7 @@ from tests.test_game_native_xiangqi import FakeEngine
 from tests.test_management_access import SCOPE
 
 ROOT = Path(__file__).resolve().parents[1]
-GAME_EXT = ROOT / "astrbot_host" / "native_extensions" / "game"
+GAME_EXT = ROOT / "digital_life_host" / "native_extensions" / "game"
 VALID_PNG_DATA_URL = (
     "data:image/png;base64,"
     "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+aFxoAAAAASUVORK5CYII="
@@ -107,7 +107,7 @@ class GameDefaultsAndConfigTests(unittest.IsolatedAsyncioTestCase):
             )
             game = created["result"]["game"]
             self.assertEqual(game["state"]["target_score"], 22)
-            with patch("companion_v2.games.pig_dice.secrets.randbelow", side_effect=[5, 5, 5, 5]):
+            with patch("digital_life_core.games.pig_dice.secrets.randbelow", side_effect=[5, 5, 5, 5]):
                 for idx in range(4):
                     await provider.execute(
                         game_request(provider, game_provider.PIG_ROLL, {"game_id": game["game_id"]}, f"roll-{idx}"),
@@ -131,7 +131,7 @@ class GameBinaryDetectionTests(unittest.TestCase):
             managed_bin = download_dir / binary_name
             managed_bin.write_bytes(b"stub")
 
-            with patch("astrbot_host.native_extensions.game.tunnel.shutil.which", return_value=None):
+            with patch("digital_life_host.native_extensions.game.tunnel.shutil.which", return_value=None):
                 tunnel = QuickTunnel(local_url="http://127.0.0.1:8765", download_dir=download_dir)
                 self.assertEqual(tunnel.binary_path(), managed_bin.resolve())
                 self.assertEqual(tunnel.binary_source(), "managed")
@@ -651,7 +651,7 @@ class GameConversationCarryoverAndAccessTests(MultiFixture, unittest.IsolatedAsy
             order.append(("reconcile", name))
             return await original_reconcile(name)
 
-        from companion_v2.games.native.access import NativeGameAccess
+        from digital_life_core.games.native.access import NativeGameAccess
         original_status = NativeGameAccess.status
 
         def tracked_status(access_self, operator, at):
@@ -742,7 +742,7 @@ class GameConversationCarryoverAndAccessTests(MultiFixture, unittest.IsolatedAsy
         self.assertTrue(GROUPS["tictactoe"].isdisjoint(offered_core))
 
         # projection() failure must fail-closed even for core admin
-        from companion_v2.foundation.outcome import Outcome
+        from digital_life_core.foundation.outcome import Outcome
         with patch.object(
             app.tools.external.capabilities,
             "projection",

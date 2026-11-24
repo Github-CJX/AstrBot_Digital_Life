@@ -5,11 +5,11 @@ import json
 import unittest
 from unittest.mock import patch
 
-from astrbot_host.account_recovery import AccountExecutionGuard
-from companion_v2.configuration.registry import FieldRegistry
-from companion_v2.execution.models import TaskError
-from companion_v2.model_gateway.routing import configuration_fields
-from companion_v2.proactive.service import plan_profile
+from digital_life_host.account_recovery import AccountExecutionGuard
+from digital_life_core.configuration.registry import FieldRegistry
+from digital_life_core.execution.models import TaskError
+from digital_life_core.model_gateway.routing import configuration_fields
+from digital_life_core.proactive.service import plan_profile
 from tests.proactive_support import ContactFixture
 from tests.test_agenda_background import AgendaBackgroundFixture
 from tests import test_proactive_contacts

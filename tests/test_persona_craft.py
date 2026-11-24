@@ -21,10 +21,10 @@ import sqlite3
 import tempfile
 import unittest
 
-from companion_v2.execution.models import TaskError
-from companion_v2.persona_craft import (MAX_NOTE_CHARS, PersonaSnapshot, PersonaWorkshop,
+from digital_life_core.execution.models import TaskError
+from digital_life_core.persona_craft import (MAX_NOTE_CHARS, PersonaSnapshot, PersonaWorkshop,
                                         clean_note, owner_key, version_id)
-from companion_v2.storage.runtime import StorageRuntime
+from digital_life_core.storage.runtime import StorageRuntime
 
 
 INSTALLATION = "installation-a"
@@ -99,7 +99,7 @@ class AppendOnlyTests(PersonaCraftFixture):
 
     def test_no_module_in_the_new_domain_issues_update_or_delete(self):
         """除了触发器，代码里也不该出现对这张表的 UPDATE/DELETE。"""
-        root = Path(__file__).resolve().parents[1] / "companion_v2" / "persona_craft"
+        root = Path(__file__).resolve().parents[1] / "digital_life_core" / "persona_craft"
         source = "\n".join(path.read_text(encoding="utf-8").upper() for path in root.glob("*.py"))
         self.assertNotIn("UPDATE PERSONA_DRAFT_VERSIONS", source)
         self.assertNotIn("DELETE FROM PERSONA_DRAFT_VERSIONS", source)
@@ -151,7 +151,7 @@ class RestoreTests(PersonaCraftFixture):
         self.assertIsNotNone(restored.restored_from)
         # 普通保存不许伪造来源：只有撤回能带 restored_from。
         with self.assertRaises(ValueError):
-            from companion_v2.persona_craft.models import DraftVersion
+            from digital_life_core.persona_craft.models import DraftVersion
             DraftVersion("x", 1, "draft", "t", "o", "n", "note", "persona-draft-v000001",
                          self.clock[0])
 

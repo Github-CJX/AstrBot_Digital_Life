@@ -5,16 +5,16 @@ import json
 import unittest
 from unittest.mock import patch
 
-from companion_v2.configuration.registry import FieldRegistry
-from companion_v2.execution.models import TaskContext, TaskError
-from companion_v2.foundation.refs import AudienceRef
-from companion_v2.identity_policy.personas import ConversationRoute
-from companion_v2.model_gateway.routing import configuration_fields
-from companion_v2.role_work.growth.management import RoleGrowthManagement
-from companion_v2.role_work.growth.progress import growth_progress_profile, parse_progress
-from companion_v2.role_work.growth.progress_management import GrowthProgressManagement
-from companion_v2.role_work.journal.models import JournalContext, JournalDraft, JournalKey, JournalKind
-from companion_v2.role_work.models import RoleActivity, RoleActivityState
+from digital_life_core.configuration.registry import FieldRegistry
+from digital_life_core.execution.models import TaskContext, TaskError
+from digital_life_core.foundation.refs import AudienceRef
+from digital_life_core.identity_policy.personas import ConversationRoute
+from digital_life_core.model_gateway.routing import configuration_fields
+from digital_life_core.role_work.growth.management import RoleGrowthManagement
+from digital_life_core.role_work.growth.progress import growth_progress_profile, parse_progress
+from digital_life_core.role_work.growth.progress_management import GrowthProgressManagement
+from digital_life_core.role_work.journal.models import JournalContext, JournalDraft, JournalKey, JournalKind
+from digital_life_core.role_work.models import RoleActivity, RoleActivityState
 from tests.test_host_application import HostFixture
 from tests.test_management_access import NOW, SCOPE
 from tests.test_role_tool_loop import answered

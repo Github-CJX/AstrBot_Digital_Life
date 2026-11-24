@@ -4,9 +4,9 @@ from types import SimpleNamespace as NS
 import unittest
 from unittest.mock import Mock, patch
 
-from astrbot_host.core_reply_context import CURRENT_TIME_MEANING, build_core_reply_prompt
-from companion_v2.foundation.refs import ScopeKind
-from companion_v2.system_prompts.catalog import CORE_REPLY_TIME_STYLE
+from digital_life_host.core_reply_context import CURRENT_TIME_MEANING, build_core_reply_prompt
+from digital_life_core.foundation.refs import ScopeKind
+from digital_life_core.system_prompts.catalog import CORE_REPLY_TIME_STYLE
 
 
 class CoreReplyTimeContextTests(unittest.TestCase):
@@ -47,7 +47,7 @@ class CoreReplyTimeContextTests(unittest.TestCase):
         self.assertIn(CURRENT_TIME_MEANING + "\n" + CORE_REPLY_TIME_STYLE, prompt.perception_instructions)
         self.assertEqual(prompt.perception_options, (True, True, True))
         application.runtime = object()
-        with patch("astrbot_host.core_reply_context.SystemPromptContext") as prompts:
+        with patch("digital_life_host.core_reply_context.SystemPromptContext") as prompts:
             prompts.return_value.overrides.return_value = {"reply_style": "自己的风格", "reply_time_style": ""}
             configured = build_core_reply_prompt(application, context, native_input, at=at)
         self.assertEqual(configured.perception_style, "自己的风格")
@@ -96,7 +96,7 @@ class CoreReplyTimeContextTests(unittest.TestCase):
                      actor=NS(), role_binding=NS(role=NS()))
         anniversary = {"basis": "auto_relationship_anniversary", "label": "第一次认真说出喜欢",
                        "date": "2026-10-23", "days_until": 0, "calendar": "gregorian"}
-        with patch("companion_v2.relationships.anniversaries.upcoming", return_value=(anniversary,)):
+        with patch("digital_life_core.relationships.anniversaries.upcoming", return_value=(anniversary,)):
             prompt = build_core_reply_prompt(
                 application, context, NS(text="今天是什么日子", event_id="anniversary-question"),
                 at=datetime(2026, 10, 23, 8, 0, tzinfo=timezone.utc))
@@ -105,8 +105,8 @@ class CoreReplyTimeContextTests(unittest.TestCase):
         self.assertTrue(any("auto_anniversaries" in item for item in prompt.perception_instructions))
 
     def test_stable_role_guidance_is_separate_from_turn_background(self):
-        from companion_v2.conversation.reply_settings import GROUP
-        from companion_v2.conversation.foreground import ContributionState
+        from digital_life_core.conversation.reply_settings import GROUP
+        from digital_life_core.conversation.foreground import ContributionState
 
         contribution = NS(purpose="relationship_background", state=ContributionState.READY,
                           payload='{"interpretation":"今天一起聊了星星"}')

@@ -1,6 +1,6 @@
 "use strict";
 window.CompanionLearningReviewPage = (() => {
-  const PREFIX = "/astrbot_plugin_private_companion/";
+  const PREFIX = "/astrbot_plugin_digital_life/";
   const DIMENSION = {
     sentence_rhythm: "句读节奏",
     emoji: "表情符号",

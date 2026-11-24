@@ -2,16 +2,16 @@ import json
 import unittest
 from unittest.mock import patch
 
-from companion_v2.configuration.service import ConfigurationService
-from companion_v2.diagnostics.models import DiagnosticContext, DiagnosticQuery
-from companion_v2.diagnostics.service import DiagnosticService
-from companion_v2.execution.models import TaskError
-from companion_v2.model_gateway.budget import BudgetLedger
-from companion_v2.model_gateway.failures import ModelFailure
-from companion_v2.model_gateway.models import Amount, ProviderResponse
-from companion_v2.model_gateway.routing import ModelRouter
-from companion_v2.model_gateway.service import LocalModelGateway
-from companion_v2.model_gateway.response_diagnostics import ResponseDiagnostics, ResponseTextSummary
+from digital_life_core.configuration.service import ConfigurationService
+from digital_life_core.diagnostics.models import DiagnosticContext, DiagnosticQuery
+from digital_life_core.diagnostics.service import DiagnosticService
+from digital_life_core.execution.models import TaskError
+from digital_life_core.model_gateway.budget import BudgetLedger
+from digital_life_core.model_gateway.failures import ModelFailure
+from digital_life_core.model_gateway.models import Amount, ProviderResponse
+from digital_life_core.model_gateway.routing import ModelRouter
+from digital_life_core.model_gateway.service import LocalModelGateway
+from digital_life_core.model_gateway.response_diagnostics import ResponseDiagnostics, ResponseTextSummary
 from tests.test_model_gateway import ModelFixture
 
 
@@ -29,7 +29,7 @@ class ModelFailureTests(ModelFixture, unittest.IsolatedAsyncioTestCase):
             await awaitable
             raise TimeoutError
 
-        with patch("companion_v2.model_gateway.service.asyncio.wait_for", new=timeout):
+        with patch("digital_life_core.model_gateway.service.asyncio.wait_for", new=timeout):
             with self.assertRaises(TaskError) as error:
                 await self.gateway.generate(self.model_run(), self.request())
 
@@ -45,7 +45,7 @@ class ModelFailureTests(ModelFixture, unittest.IsolatedAsyncioTestCase):
         self.responses["primary"] = ProviderResponse(
             "unknown", failure=ModelFailure.NATIVE_PARSE, diagnostics=summary)
         run = self.model_run()
-        with self.assertLogs("companion_v2.model_gateway.service", level="WARNING") as captured:
+        with self.assertLogs("digital_life_core.model_gateway.service", level="WARNING") as captured:
             with self.assertRaises(TaskError) as error:
                 await self.gateway.generate(run, self.request())
         self.assertEqual(error.exception.code, "model_usage_unknown")

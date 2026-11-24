@@ -7,9 +7,9 @@ from types import SimpleNamespace
 import unittest
 from unittest.mock import AsyncMock
 
-from companion_v2.games.native import provider as game_provider
-from companion_v2.product import PRODUCT_VERSION
-from astrbot_host.native_extensions.game.rooms_methods import GameRoomsMethods
+from digital_life_core.games.native import provider as game_provider
+from digital_life_core.product import PRODUCT_VERSION
+from digital_life_host.native_extensions.game.rooms_methods import GameRoomsMethods
 
 
 def request(provider, action, arguments, invocation_id, *, subject="player-a"):

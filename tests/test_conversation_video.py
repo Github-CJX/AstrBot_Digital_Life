@@ -8,21 +8,21 @@ from types import SimpleNamespace as NS
 import unittest
 from unittest.mock import patch
 
-from companion_v2.adapters.astrbot.model_wire import build_wire, tool_alias, decode_response
-from companion_v2.execution.models import TaskError
-from companion_v2.identity_policy.personas import RuntimeIdentity
-from companion_v2.conversation.foreground import ModelDraft
-from companion_v2.configuration.registry import FieldRegistry
-from companion_v2.model_gateway.models import Amount, Lane, ModelEnvelope, ModelTaskProfile, ProviderResponse, ToolCall
-from companion_v2.model_gateway.routing import configuration_fields
-from companion_v2.sources.dependencies import key
+from digital_life_core.adapters.astrbot.model_wire import build_wire, tool_alias, decode_response
+from digital_life_core.execution.models import TaskError
+from digital_life_core.identity_policy.personas import RuntimeIdentity
+from digital_life_core.conversation.foreground import ModelDraft
+from digital_life_core.configuration.registry import FieldRegistry
+from digital_life_core.model_gateway.models import Amount, Lane, ModelEnvelope, ModelTaskProfile, ProviderResponse, ToolCall
+from digital_life_core.model_gateway.routing import configuration_fields
+from digital_life_core.sources.dependencies import key
 from tests.audio_support import FakeRecord
 from tests.animation_support import animation_bytes
 from tests.native_adapter_support import completion, final_text
 from tests.image_delivery_support import user_content
 from tests.test_conversation_images import FakeImage
 from tests.video_support import VideoFixture, FakeVideo, video_bytes
-from companion_v2.conversation.media.video.narration import (KIND, NativeVideoNarrationService,
+from digital_life_core.conversation.media.video.narration import (KIND, NativeVideoNarrationService,
     video_narration_profile)
 
 
@@ -36,7 +36,7 @@ class NativeVideoRouteTests(unittest.TestCase):
         service.tasks = NS(now=lambda: None)
         run = NS(task=NS(spec=NS(context=NS(scope=object()))))
         settings = {"video_understanding_enabled": True}
-        with patch("companion_v2.conversation.media.video.narration.media_scope_enabled",
+        with patch("digital_life_core.conversation.media.video.narration.media_scope_enabled",
                    return_value=True):
             self.assertTrue(service.can_use_reply_model(run,
                 NS(images=(), audios=()), settings))
@@ -222,7 +222,7 @@ class ConversationVideoTests(VideoFixture, unittest.IsolatedAsyncioTestCase):
         new = self.host(runtime=self.open_runtime(), event_port=self.bridge.ports, identity_port=self.bridge.ports,
             role_port=self.bridge.ports, providers=(self.native_model.local_provider(),), sender=self.native_sender.local_sender(),
             runtime_identity=RuntimeIdentity("companion", "runtime-2", "astrbot", "host"))
-        with patch("astrbot_host.video.loader.decode_video", side_effect=AssertionError("must not decode again")):
+        with patch("digital_life_host.video.loader.decode_video", side_effect=AssertionError("must not decode again")):
             await self.start(new, 1, 1)
             self.assertEqual(self.request(new.application, batch).videos, before)
             self.assertEqual(new.receive(captured).unwrap(), batch)

@@ -12,12 +12,12 @@ from tests import astrbot_data_root  # Isolate the SDK before importing the host
 from PIL import Image as PILImage
 from astrbot.core.message.components import Image, Reply
 
-from astrbot_host.core_reply import CORE_REPLY_CONTEXT_EXTRA
-from astrbot_host.core_reply_perception import (
+from digital_life_host.core_reply import CORE_REPLY_CONTEXT_EXTRA
+from digital_life_host.core_reply_perception import (
     has_animated_gif_image,
     inject_core_reply_perception_context,
 )
-from companion_v2.conversation.media.understanding import ASTRBOT_ANIMATED_IMAGE_INSTRUCTION
+from digital_life_core.conversation.media.understanding import ASTRBOT_ANIMATED_IMAGE_INSTRUCTION
 from tests.animation_support import animation_bytes
 
 
@@ -35,9 +35,9 @@ class Event:
 
 def payload(request):
     part = next(part for part in request.extra_user_content_parts
-                if part.text.startswith("<companion_v2_context>"))
-    return json.loads(part.text.removeprefix("<companion_v2_context>\n")
-                      .removesuffix("\n</companion_v2_context>"))
+                if part.text.startswith("<digital_life_core_context>"))
+    return json.loads(part.text.removeprefix("<digital_life_core_context>\n")
+                      .removesuffix("\n</digital_life_core_context>"))
 
 
 class AstrBotAnimatedImageGuidanceTests(unittest.IsolatedAsyncioTestCase):

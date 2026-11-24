@@ -8,12 +8,12 @@ from types import SimpleNamespace
 import unittest
 from unittest.mock import AsyncMock, patch
 
-from astrbot_host import core_reply
-from companion_v2.conversation.voice_reply import VoiceReplyPolicy
-from companion_v2.execution.models import TaskContext, TaskError, encode
-from companion_v2.foundation.outcome import Outcome
-from companion_v2.foundation.refs import AudienceRef, ScopeKind, ScopeRef, SubjectKind, SubjectRef
-from companion_v2.identity_policy.models import AuthenticatedHostPrincipal, ResolvedIdentity, RoleBinding
+from digital_life_host import core_reply
+from digital_life_core.conversation.voice_reply import VoiceReplyPolicy
+from digital_life_core.execution.models import TaskContext, TaskError, encode
+from digital_life_core.foundation.outcome import Outcome
+from digital_life_core.foundation.refs import AudienceRef, ScopeKind, ScopeRef, SubjectKind, SubjectRef
+from digital_life_core.identity_policy.models import AuthenticatedHostPrincipal, ResolvedIdentity, RoleBinding
 from tests.test_astrbot_core_reply import FakeEvent
 
 
@@ -22,14 +22,14 @@ def reloaded_reply_module():
     """Load fresh classes without disrupting the other tests' live import graph."""
     root = Path(__file__).resolve().parents[1]
     with ExitStack() as stack:
-        for name in ("companion_v2.foundation.outcome", "companion_v2.execution.models",
-                     "companion_v2.conversation.voice_reply"):
+        for name in ("digital_life_core.foundation.outcome", "digital_life_core.execution.models",
+                     "digital_life_core.conversation.voice_reply"):
             spec = importlib.util.spec_from_file_location(name, root / (name.replace(".", "/") + ".py"))
             module = importlib.util.module_from_spec(spec)
             stack.enter_context(patch.dict(sys.modules, {name: module}))
             spec.loader.exec_module(module)
-        name = "astrbot_host._core_reply_reload_fixture"
-        spec = importlib.util.spec_from_file_location(name, root / "astrbot_host/core_reply.py")
+        name = "digital_life_host._core_reply_reload_fixture"
+        spec = importlib.util.spec_from_file_location(name, root / "digital_life_host/core_reply.py")
         reply_module = importlib.util.module_from_spec(spec)
         with patch.dict(sys.modules, {name: reply_module}):
             spec.loader.exec_module(reply_module)

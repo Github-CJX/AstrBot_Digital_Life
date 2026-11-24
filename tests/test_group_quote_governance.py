@@ -3,8 +3,8 @@
 import json
 import unittest
 
-from companion_v2.conversation.quotes.service import quote_reference
-from companion_v2.execution.models import TaskError
+from digital_life_core.conversation.quotes.service import quote_reference
+from digital_life_core.execution.models import TaskError
 from tests.audio_support import audio_bytes
 from tests.forward_support import node_raw
 from tests.group_quote_media_support import GroupQuoteMediaFixture, Forward, Plain, Reply, FakeRecord, FakeVideo

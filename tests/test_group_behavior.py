@@ -12,17 +12,17 @@ import unittest
 from astrbot.core.agent.message import Message, ToolCall
 from astrbot.core.message.components import At, Plain, Reply
 from astrbot.core.message.message_event_result import MessageChain
-from astrbot_host.core_reply import CORE_REPLY_CONTEXT_EXTRA
-from astrbot_host.core_reply_outbound import prepare_core_reply_outbound_message
-from astrbot_host.core_reply_tools import native_tool_name
-from astrbot_host.management_identity import dashboard_operator
-from companion_v2.configuration.models import ConfigLayer, ConfigTarget
-from companion_v2.conversation.behavior import GroupBehavior
-from companion_v2.conversation.behavior.management import BehaviorManagement
-from companion_v2.conversation.behavior.service import FEEDBACK, LEARN, PLAN
-from companion_v2.conversation.behavior.store import owner_key
-from companion_v2.conversation.participation import CONFIG_GROUP, GroupParticipationConfigurationOwner, configuration_fields
-from companion_v2.execution.models import TaskError
+from digital_life_host.core_reply import CORE_REPLY_CONTEXT_EXTRA
+from digital_life_host.core_reply_outbound import prepare_core_reply_outbound_message
+from digital_life_host.core_reply_tools import native_tool_name
+from digital_life_host.management_identity import dashboard_operator
+from digital_life_core.configuration.models import ConfigLayer, ConfigTarget
+from digital_life_core.conversation.behavior import GroupBehavior
+from digital_life_core.conversation.behavior.management import BehaviorManagement
+from digital_life_core.conversation.behavior.service import FEEDBACK, LEARN, PLAN
+from digital_life_core.conversation.behavior.store import owner_key
+from digital_life_core.conversation.participation import CONFIG_GROUP, GroupParticipationConfigurationOwner, configuration_fields
+from digital_life_core.execution.models import TaskError
 
 
 class GroupBehaviorTests(GroupFixture, unittest.IsolatedAsyncioTestCase):

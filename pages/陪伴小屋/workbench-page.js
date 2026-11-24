@@ -12,7 +12,7 @@
    - 草稿：sessionStorage 按 installation + operator + 当前对象/角色 + group 隔离，切页不丢。 */
 "use strict";
 window.CompanionWorkbench = (() => {
-  const PREFIX = "/astrbot_plugin_private_companion/";
+  const PREFIX = "/astrbot_plugin_digital_life/";
   const STORE = "companion-workbench.v1:";
   /* 跳转到出错字段时跟随系统的减少动态偏好：平滑滚动对前庭敏感的用户不友好。 */
   const REDUCED = () => window.matchMedia?.("(prefers-reduced-motion: reduce)")?.matches === true
@@ -2701,7 +2701,7 @@ window.CompanionWorkbench = (() => {
             /* /config multiplexes sections for the page's selected target; without
                this the server would edit the active private profile while the page
                shows a group. Other workbench routes identify their group in the path. */
-            const selection = requestSection && endpoint === "/astrbot_plugin_private_companion/config"
+            const selection = requestSection && endpoint === "/astrbot_plugin_digital_life/config"
               ? (window.CompanionProduct?.selection?.() || {}) : {};
             const targetQuery = selection.target_id
               ? {target_id: selection.target_id, ...(selection.role_id ? {role_id: selection.role_id} : {})} : null;
@@ -2905,7 +2905,7 @@ window.CompanionWorkbench = (() => {
            reply/expression/memory routes identify their group in the path and
            reject unknown body keys. Keep the discriminator opt-in. */
         if (requestSection) body.section = request.section || requestSection;
-        if (requestSection && endpoint === "/astrbot_plugin_private_companion/config") {
+        if (requestSection && endpoint === "/astrbot_plugin_digital_life/config") {
           const selection = window.CompanionProduct?.selection?.() || {};
           if (selection.target_id) body.target_id = selection.target_id;
           if (selection.role_id) body.role_id = selection.role_id;

@@ -2,8 +2,8 @@
 
 import unittest
 
-from companion_v2.conversation.group_admission import image_wakeup_candidate
-from companion_v2.conversation.reply_settings import group_wakeup_settings
+from digital_life_core.conversation.group_admission import image_wakeup_candidate
+from digital_life_core.conversation.reply_settings import group_wakeup_settings
 
 
 def wakeup(**overrides):

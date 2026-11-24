@@ -1,7 +1,7 @@
 import unittest
 
-import companion_v2.adapters.astrbot.native as native
-from companion_v2.adapters.astrbot.native import check_version
+import digital_life_core.adapters.astrbot.native as native
+from digital_life_core.adapters.astrbot.native import check_version
 
 
 class AstrBotNativeVersionTests(unittest.TestCase):
@@ -10,14 +10,14 @@ class AstrBotNativeVersionTests(unittest.TestCase):
                         "4.29.0-beta.1"):
             with self.subTest(version=version):
                 native._REPORTED_UNVERIFIED.discard(version)
-                with self.assertNoLogs("companion_v2.adapters.astrbot.native", level="WARNING"):
+                with self.assertNoLogs("digital_life_core.adapters.astrbot.native", level="WARNING"):
                     check_version(version)
 
     def test_unreviewed_hosts_still_start_with_one_warning(self):
         for version in ("4.30.0", "5.0.0", "3.5.27", "unknown"):
             with self.subTest(version=version):
                 native._REPORTED_UNVERIFIED.discard(version)
-                with self.assertLogs("companion_v2.adapters.astrbot.native", level="WARNING") as captured:
+                with self.assertLogs("digital_life_core.adapters.astrbot.native", level="WARNING") as captured:
                     check_version(version)
                     check_version(version)
                 self.assertEqual(len(captured.records), 1)

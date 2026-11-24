@@ -5,10 +5,10 @@ from datetime import timedelta
 import json
 import unittest
 
-from companion_v2.agenda.models import Schedule
-from companion_v2.delivery.presence import PresenceCoordinator
-from companion_v2.execution.models import TaskError, encode, stamp
-from companion_v2.identity_policy.personas import ConversationRoute
+from digital_life_core.agenda.models import Schedule
+from digital_life_core.delivery.presence import PresenceCoordinator
+from digital_life_core.execution.models import TaskError, encode, stamp
+from digital_life_core.identity_policy.personas import ConversationRoute
 from tests import test_role_presence as support
 from tests.test_management_access import NOW
 from tests.test_role_state import StateFixture, calendar_data, state_data

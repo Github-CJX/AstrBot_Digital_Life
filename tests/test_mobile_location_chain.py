@@ -70,23 +70,23 @@ def _ensure_astrbot_stubs():
 
 _ensure_astrbot_stubs()
 
-from astrbot_host.core_reply import CORE_REPLY_CONTEXT_EXTRA
-from astrbot_host.core_reply_context import build_core_reply_prompt
-from astrbot_host.core_reply_mobile import location_scene_snapshot
-from astrbot_host.core_reply_perception import inject_core_reply_perception_context
-from astrbot_host.native_extensions.reality import mobile_gateway
-from astrbot_host.native_extensions.reality.host_delivery import RealityHostDelivery, _location_changed
-from astrbot_host.native_extensions.reality.mobile_gateway import (
+from digital_life_host.core_reply import CORE_REPLY_CONTEXT_EXTRA
+from digital_life_host.core_reply_context import build_core_reply_prompt
+from digital_life_host.core_reply_mobile import location_scene_snapshot
+from digital_life_host.core_reply_perception import inject_core_reply_perception_context
+from digital_life_host.native_extensions.reality import mobile_gateway
+from digital_life_host.native_extensions.reality.host_delivery import RealityHostDelivery, _location_changed
+from digital_life_host.native_extensions.reality.mobile_gateway import (
     MobileGatewayMixin, _MobileRequestState, _mobile_request_state,
 )
-from astrbot_host.native_extensions.reality.model_methods import RealityModelMethods
-from companion_v2.conversation.location_context import (
+from digital_life_host.native_extensions.reality.model_methods import RealityModelMethods
+from digital_life_core.conversation.location_context import (
     LOCATION_CONTEXT_INSTRUCTION, MAX_ACTIVITY_NOTE, SNAPSHOT_VERSION,
     project_location_context, sanitize_activity_note,
 )
-from companion_v2.execution.models import TaskError, digest, require
-from companion_v2.foundation.refs import ScopeKind
-from companion_v2.proactive.prompts import ORIGIN_INSTRUCTIONS
+from digital_life_core.execution.models import TaskError, digest, require
+from digital_life_core.foundation.refs import ScopeKind
+from digital_life_core.proactive.prompts import ORIGIN_INSTRUCTIONS
 from tests.test_proactive_appointments_and_judge import JudgeFixture
 
 
@@ -736,7 +736,7 @@ class PrivateLocationContextAndDeadCodeTests(unittest.IsolatedAsyncioTestCase):
         group_ctx = NS(scope=NS(kind=ScopeKind.GROUP, platform="qq"), key="loc-group",
                        actor=NS(), role_binding=NS(role=NS()))
 
-        with patch("astrbot_host.core_reply_context.location_scene_snapshot", return_value=projection) as loc_mock:
+        with patch("digital_life_host.core_reply_context.location_scene_snapshot", return_value=projection) as loc_mock:
             prompt = build_core_reply_prompt(
                 app, private_ctx, NS(text="猜猜我现在在哪", event_id="loc-priv-1"), at=AT)
         self.assertEqual(loc_mock.call_count, 1)
@@ -763,14 +763,14 @@ class PrivateLocationContextAndDeadCodeTests(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(len(req.extra_user_content_parts), 1)
         temp_part = req.extra_user_content_parts[0]
         self.assertTrue(temp_part.model_dump_for_context().get("_no_save"))
-        self.assertIn("<companion_v2_context>", temp_part.text)
+        self.assertIn("<digital_life_core_context>", temp_part.text)
         self.assertIn("location_context", temp_part.text)
         self.assertIn("在家看电影", temp_part.text)
         self.assertNotIn("22.765", temp_part.text)
         self.assertNotIn("108.392", temp_part.text)
 
         # Group chat must 100% refuse location_context injection.
-        with patch("astrbot_host.core_reply_context.location_scene_snapshot", return_value=projection) as loc_mock:
+        with patch("digital_life_host.core_reply_context.location_scene_snapshot", return_value=projection) as loc_mock:
             group_prompt = build_core_reply_prompt(
                 app, group_ctx, NS(text="你在哪", event_id="loc-group-1"), at=AT)
         self.assertFalse(loc_mock.called)
@@ -786,19 +786,19 @@ class PrivateLocationContextAndDeadCodeTests(unittest.IsolatedAsyncioTestCase):
         actor = NS(principal=NS(native_account_id="user-200"))
         context = NS(scope=NS(kind=ScopeKind.PRIVATE), actor=actor, role_binding=NS(role=NS()))
 
-        with patch("astrbot_host.core_reply_health._role_enabled", return_value=True), \
-             patch("astrbot_host.core_reply_health._consent_active", return_value=True):
+        with patch("digital_life_host.core_reply_health._role_enabled", return_value=True), \
+             patch("digital_life_host.core_reply_health._consent_active", return_value=True):
             result = location_scene_snapshot(app, context, AT)
         self.assertIsNotNone(result)
         self.assertEqual(result["place_name"], "家")
         service.mobile_context.assert_called_once_with("user-200")
 
-        with patch("astrbot_host.core_reply_health._role_enabled", return_value=True), \
-             patch("astrbot_host.core_reply_health._consent_active", return_value=False):
+        with patch("digital_life_host.core_reply_health._role_enabled", return_value=True), \
+             patch("digital_life_host.core_reply_health._consent_active", return_value=False):
             self.assertIsNone(location_scene_snapshot(app, context, AT))
 
-        with patch("astrbot_host.core_reply_health._role_enabled", return_value=False), \
-             patch("astrbot_host.core_reply_health._consent_active", return_value=True):
+        with patch("digital_life_host.core_reply_health._role_enabled", return_value=False), \
+             patch("digital_life_host.core_reply_health._consent_active", return_value=True):
             self.assertIsNone(location_scene_snapshot(app, context, AT))
 
         context.scope.kind = ScopeKind.GROUP

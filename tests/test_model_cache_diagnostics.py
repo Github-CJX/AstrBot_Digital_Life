@@ -2,11 +2,11 @@ import json
 from datetime import date, timedelta
 import unittest
 
-from companion_v2.model_gateway.cache_diagnostics import (
+from digital_life_core.model_gateway.cache_diagnostics import (
     checked_signature, event_severity, signature_changes, signature_for_payload, signature_snapshot,
 )
-from companion_v2.model_gateway.management import _cache_diagnostic_summary
-from companion_v2.execution.models import digest, encode
+from digital_life_core.model_gateway.management import _cache_diagnostic_summary
+from digital_life_core.execution.models import digest, encode
 
 
 class ModelCacheDiagnosticsTests(unittest.TestCase):

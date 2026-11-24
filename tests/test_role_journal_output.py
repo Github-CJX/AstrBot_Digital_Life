@@ -4,9 +4,9 @@ import json
 from types import SimpleNamespace as NS
 import unittest
 
-from companion_v2.foundation.refs import RoleOwnerRef, ScopeKind, ScopeRef
-from companion_v2.role_work.journal.models import JournalContext, JournalKey, JournalKind
-from companion_v2.role_work.journal.writing_output import JournalOutputError, draft_output
+from digital_life_core.foundation.refs import RoleOwnerRef, ScopeKind, ScopeRef
+from digital_life_core.role_work.journal.models import JournalContext, JournalKey, JournalKind
+from digital_life_core.role_work.journal.writing_output import JournalOutputError, draft_output
 
 
 class DiaryOutputTests(unittest.TestCase):

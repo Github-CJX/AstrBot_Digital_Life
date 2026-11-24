@@ -1,15 +1,15 @@
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
-from companion_v2.foundation.refs import AudienceRef, ScopeKind, ScopeRef, SubjectKind, SubjectRef
-from companion_v2.knowledge.retrieval import (
+from digital_life_core.foundation.refs import AudienceRef, ScopeKind, ScopeRef, SubjectKind, SubjectRef
+from digital_life_core.knowledge.retrieval import (
     InMemoryKnowledgeProvider,
     KnowledgeCandidate,
     KnowledgeRetriever,
     query_for_context,
 )
-from companion_v2.sources.repositories import SourceRepository
-from companion_v2.storage.runtime import StorageRuntime
+from digital_life_core.sources.repositories import SourceRepository
+from digital_life_core.storage.runtime import StorageRuntime
 
 
 NOW = datetime(2026, 9, 26, 12, tzinfo=timezone.utc)

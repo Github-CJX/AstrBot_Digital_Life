@@ -5,7 +5,7 @@ import json
 import unittest
 from zoneinfo import ZoneInfo
 
-from companion_v2.proactive.wake_detection import (
+from digital_life_core.proactive.wake_detection import (
     STATE_ASLEEP_LIKELY, STATE_AWAKE_LIKELY, STATE_CONFIRMED, STATE_STIRRING,
     STATE_UNKNOWN, contact_decision, evidence, evidence_from_mobile_snapshot,
     evidence_from_private_input, evidence_from_wakeup_session, intent_summary, observe,

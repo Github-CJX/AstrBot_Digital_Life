@@ -1,6 +1,6 @@
 "use strict";
 
-const prefix = "/astrbot_plugin_private_companion/";
+const prefix = "/astrbot_plugin_digital_life/";
 const labels = {a: "测试角色甲", b: "测试角色乙"};
 const token = "c".repeat(64);
 const roleKey = id => JSON.stringify(["bot-" + id, "shared-role"]);

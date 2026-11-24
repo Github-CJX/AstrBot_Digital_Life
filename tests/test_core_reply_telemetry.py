@@ -10,25 +10,25 @@ from unittest.mock import patch
 
 from astrbot.core.provider.entities import TokenUsage
 from astrbot.core.pipeline.process_stage.follow_up import _ACTIVE_AGENT_RUNNERS
-from astrbot_host.core_reply import (
+from digital_life_host.core_reply import (
     CORE_REPLY_CONTEXT_EXTRA, activate_core_reply_delivery_guard, prepare_core_reply_event,
     inject_core_reply_prompt,
 )
-from astrbot_host.core_reply_preparation import measure_core_preparation
-from astrbot_host.core_reply_perception import inject_core_reply_perception_context
-from astrbot_host.core_reply_telemetry import (
+from digital_life_host.core_reply_preparation import measure_core_preparation
+from digital_life_host.core_reply_perception import inject_core_reply_perception_context
+from digital_life_host.core_reply_telemetry import (
     CORE_REPLY_TELEMETRY_EXTRA, _usage, finish_core_reply_telemetry,
     observe_core_agent_begin, observe_core_agent_done, observe_core_llm_response,
     observe_core_reply_delivery, observe_core_tool_finished, observe_core_tool_started,
     observe_core_waiting_llm_request, prepare_core_reply_telemetry,
 )
-from companion_v2.execution.models import digest
-from companion_v2.foundation.outcome import Outcome
-from companion_v2.identity_policy.models import AuthorizationTier
-from companion_v2.identity_policy.object_access import ObjectAccessPolicy
-from companion_v2.model_gateway.core_observations import observations_for_role, record_observation
-from companion_v2.model_gateway.management import ModelManagement
-from companion_v2.model_gateway.reply_efficiency import _core_sample
+from digital_life_core.execution.models import digest
+from digital_life_core.foundation.outcome import Outcome
+from digital_life_core.identity_policy.models import AuthorizationTier
+from digital_life_core.identity_policy.object_access import ObjectAccessPolicy
+from digital_life_core.model_gateway.core_observations import observations_for_role, record_observation
+from digital_life_core.model_gateway.management import ModelManagement
+from digital_life_core.model_gateway.reply_efficiency import _core_sample
 from tests.multi_host_support import MultiFixture
 
 
@@ -154,8 +154,8 @@ class CoreReplyTelemetryTests(MultiFixture, unittest.IsolatedAsyncioTestCase):
         self.queued = []
 
     async def test_actual_media_request_presence_persists_without_prompt_bodies(self):
-        from astrbot_host.core_reply_media_prompt import finalize_core_reply_media_prompt
-        from companion_v2.conversation.voice_reply import VoiceReplyPolicy
+        from digital_life_host.core_reply_media_prompt import finalize_core_reply_media_prompt
+        from digital_life_core.conversation.voice_reply import VoiceReplyPolicy
         event, prepared, req = await self.prepare("media-presence-observation")
         prepared["voice_reply_policy"] = VoiceReplyPolicy(generation_mode="model_tag", language="ja")
         event.get_extra(CORE_REPLY_CONTEXT_EXTRA)["_reaction_reply"] = {"enabled": True}
@@ -182,8 +182,8 @@ class CoreReplyTelemetryTests(MultiFixture, unittest.IsolatedAsyncioTestCase):
     async def test_voice_formatting_stays_in_core_usage_and_does_not_spend_plugin_budget(self):
         from astrbot.core.agent.runners.tool_loop_agent_runner import ToolLoopAgentRunner
         from astrbot.core.provider.entities import ProviderRequest
-        from astrbot_host.core_reply_voice_authoring import bind_core_voice_authoring
-        from companion_v2.conversation.voice_reply import VoiceReplyPolicy
+        from digital_life_host.core_reply_voice_authoring import bind_core_voice_authoring
+        from digital_life_core.conversation.voice_reply import VoiceReplyPolicy
         from tests.test_core_reply_voice_authoring import Hooks, Provider
 
         event, prepared, _ = await self.prepare("core-voice-formatting-accounting")
@@ -246,7 +246,7 @@ class CoreReplyTelemetryTests(MultiFixture, unittest.IsolatedAsyncioTestCase):
 
     async def test_real_context_and_request_preparation_reach_efficiency_without_bodies_or_inline_writes(self):
         event, prepared, req = await self.prepare("preparation-observation", inject=True)
-        with patch("astrbot_host.core_reply_preparation.time.monotonic", side_effect=[10, 10.2]):
+        with patch("digital_life_host.core_reply_preparation.time.monotonic", side_effect=[10, 10.2]):
             with measure_core_preparation(event, "tool_injection", now=self.clock.now):
                 pass
         with measure_core_preparation(event, "perception_injection", now=self.clock.now):
@@ -414,7 +414,7 @@ class CoreReplyTelemetryTests(MultiFixture, unittest.IsolatedAsyncioTestCase):
         self.assertEqual(sample["stages"]["end_to_end_send_returned_ms"], 4000)
         self.assertEqual(report["reply_efficiency"]["summary"]["median_end_to_end_send_returned_ms"], 4000)
         self.assertEqual(sample["trace"]["tool_calls"][0]["elapsed_ms"], 2000)
-        from companion_v2.conversation.reply_management import ReplyManagement
+        from digital_life_core.conversation.reply_management import ReplyManagement
         reply_status = ReplyManagement(self.app, prepared["context"]).status(prepared["context"].actor).unwrap()
         recent = reply_status["recent"][0]
         self.assertEqual(recent["batch_id"], prepared["turn_id"])
@@ -456,7 +456,7 @@ class CoreReplyTelemetryTests(MultiFixture, unittest.IsolatedAsyncioTestCase):
         malformed = {**record, "tools": [{"sequence": 1, "action": "read", "arguments": "must never persist"}]}
         with self.assertRaises(ValueError):
             record_observation(self.app.runtime, prepared["context"], malformed)
-        for field, value in (("materials", [{"owner": "private_companion.v2", "purpose": "memory", "state": "ready", "payload": "private body"}]),
+        for field, value in (("materials", [{"owner": "digital_life.v2", "purpose": "memory", "state": "ready", "payload": "private body"}]),
                              ("preparation_steps", [{"name": "prompt_injection", "state": "returned", "prompt": "private body"}]),
                              ("offered_tools", [{"name": "read", "arguments": "private body"}])):
             with self.assertRaises(ValueError):
@@ -533,7 +533,7 @@ class CoreReplyTelemetryTests(MultiFixture, unittest.IsolatedAsyncioTestCase):
         state = event.get_extra(CORE_REPLY_TELEMETRY_EXTRA)
         observer = self.controller.session.core_reply_observations
         state["submit"] = observer.submit
-        with patch("astrbot_host.core_reply_telemetry.record_observation", side_effect=OSError("store unavailable")):
+        with patch("digital_life_host.core_reply_telemetry.record_observation", side_effect=OSError("store unavailable")):
             self.assertEqual([item async for item in runner.step()], [final])
             await asyncio.gather(*tuple(observer._pending), return_exceptions=True)
         self.assertEqual(observations_for_role(self.app.runtime, prepared["context"]), [])
@@ -555,7 +555,7 @@ class CoreReplyTelemetryTests(MultiFixture, unittest.IsolatedAsyncioTestCase):
             yield untouched
         runner._handle_function_tools = native_tools
         self.register(event, runner)
-        with patch("astrbot_host.core_reply_reactions.observe_core_cached_image", side_effect=OSError("optional record unavailable")) as observe:
+        with patch("digital_life_host.core_reply_reactions.observe_core_cached_image", side_effect=OSError("optional record unavailable")) as observe:
             results = [result async for result in runner._handle_function_tools(llm_response=response())]
         self.assertEqual(results, [item, untouched])
         self.assertIs(results[0], item)
@@ -628,7 +628,7 @@ class CoreReplyTelemetryTests(MultiFixture, unittest.IsolatedAsyncioTestCase):
             async def on_agent_begin(inner, context):
                 observe_core_agent_begin(event, context)
             async def on_agent_done(inner, context, response):
-                from astrbot_host.core_reply_tool_dispatch import restore_core_tool_dispatch
+                from digital_life_host.core_reply_tool_dispatch import restore_core_tool_dispatch
                 restore_core_tool_dispatch(event, context)
                 observe_core_agent_done(event, context, response)
         runner = ToolLoopAgentRunner()

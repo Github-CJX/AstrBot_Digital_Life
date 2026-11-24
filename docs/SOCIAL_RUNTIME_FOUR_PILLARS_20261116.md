@@ -1,7 +1,7 @@
 # 拟人化社交媒体运行时：并行线程 × 共享语义 × 选择性注意 × 受众边界
 
 **日期**：2026-11-16
-**适用**：`astrbot_plugin_private_companion` 7.1.x（`companion_v2`）
+**适用**：`astrbot_plugin_digital_life` 7.1.x（`digital_life_core`）
 **结论先行**：这四件事不是四个功能，而是同一个「社会性运行时」的四条约束。分开做，任何一条都会露馅；
 合起来做，才有"一个人同时在生活、在回消息、在发空间"的感觉。
 
@@ -81,7 +81,7 @@
 | 层 | 表/模块 | 归属 | 用途 |
 | --- | --- | --- | --- |
 | 角色生活 | `role_work/life`、`role_work/state`、`role_work/timeline`、`role_work/journal` | 角色级 | 日程、心情、身体、日记、时间线 |
-| 私人事实 | `memory_atoms`（`owner_key` 含 actor + `"private"`，`companion_v2/memory/models.py:145`） | 每个"角色×用户" | 对某个人的长期事实 |
+| 私人事实 | `memory_atoms`（`owner_key` 含 actor + `"private"`，`digital_life_core/memory/models.py:145`） | 每个"角色×用户" | 对某个人的长期事实 |
 | 群内陈述 | `memory/group/*`（`group_owner_key`，`memory/group/access.py:22`） | 每个"角色×群" | 群公共记忆、黑话、群事件 |
 
 这带来两个直接后果：

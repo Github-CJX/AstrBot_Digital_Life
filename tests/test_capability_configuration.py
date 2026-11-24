@@ -5,21 +5,21 @@ import asyncio
 import hashlib
 import sqlite3
 
-from companion_v2.capabilities import CapabilityRepository
-from companion_v2.capabilities.configuration import CapabilityConfigurationOwner
-from companion_v2.configuration.models import ConfigLayer, ConfigTarget
-from companion_v2.configuration.registry import FieldRegistry
-from companion_v2.configuration.service import ConfigurationService
-from companion_v2.foundation.refs import AssetRef, AudienceRef, OperationRef, SourceRef, VersionRef
-from companion_v2.identity_policy.models import AuthorizationTier
-from companion_v2.identity_policy.repository import PersistentIdentityDirectory
-from companion_v2.screen import (
+from digital_life_core.capabilities import CapabilityRepository
+from digital_life_core.capabilities.configuration import CapabilityConfigurationOwner
+from digital_life_core.configuration.models import ConfigLayer, ConfigTarget
+from digital_life_core.configuration.registry import FieldRegistry
+from digital_life_core.configuration.service import ConfigurationService
+from digital_life_core.foundation.refs import AssetRef, AudienceRef, OperationRef, SourceRef, VersionRef
+from digital_life_core.identity_policy.models import AuthorizationTier
+from digital_life_core.identity_policy.repository import PersistentIdentityDirectory
+from digital_life_core.screen import (
     SCREEN_EXTENSION, SCREEN_PROCESS, SCREEN_READ, ScreenCapture, ScreenCaptureRef,
     ScreenCoverage, ScreenFeedbackKind, ScreenInterpretation, ScreenMediaKind,
     ScreenProcessingPipeline, ScreenRepository,
 )
-from companion_v2.sources import AssetRecord, AssetRepository, SourceRecord, SourceRepository
-from companion_v2.storage.repositories import OperationRepository
+from digital_life_core.sources import AssetRecord, AssetRepository, SourceRecord, SourceRepository
+from digital_life_core.storage.repositories import OperationRepository
 
 from tests.g6_support import G6Fixture, NOW
 

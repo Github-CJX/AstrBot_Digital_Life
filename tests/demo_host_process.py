@@ -23,13 +23,13 @@ addEventListener('message',async event=>{
   if(event.source!==frame.contentWindow||m.channel!=='astrbot-plugin-page')return;
   const send=v=>frame.contentWindow.postMessage({channel:'astrbot-plugin-page',...v},location.origin);
   if(m.kind==='ready'){
-    send({kind:'context',context:{pluginName:'astrbot_plugin_private_companion',pageName:'宿主管理'}});return;
+    send({kind:'context',context:{pluginName:'astrbot_plugin_digital_life',pageName:'宿主管理'}});return;
   }
   if(m.kind!=='request')return;
   try {
     if(!['api:get','api:post'].includes(m.action)||!/^(staging|host)\\/[a-z-]+$/.test(m.endpoint))
       throw new Error('Unexpected fixture bridge request');
-    const url=new URL('/api/plug/astrbot_plugin_private_companion/'+m.endpoint,location.origin);
+    const url=new URL('/api/plug/astrbot_plugin_digital_life/'+m.endpoint,location.origin);
     for(const [key,value] of Object.entries(m.params||{}))url.searchParams.set(key,value);
     const response=await fetch(url,{method:m.action==='api:get'?'GET':'POST',
       headers:{'Content-Type':'application/json'},...(m.action==='api:post'?{body:JSON.stringify(m.body||{})}:{})});
@@ -47,7 +47,7 @@ async def verify(args):
     from tests.native_adapter_support import FakeProvider, FakeReverseApi
     from tests.staging_bootstrap_support import wait_for_batch
     from tests.test_management_access import NOW
-    from astrbot_host.native import installed_native_types
+    from digital_life_host.native import installed_native_types
     from astrbot.core.platform.astrbot_message import AstrBotMessage, MessageMember
     from astrbot.core.platform.message_type import MessageType
     from astrbot.core.utils.astrbot_path import get_astrbot_data_path
@@ -221,7 +221,7 @@ async def verify(args):
             sock.close()
             await plugin.terminate()
     assert plugin.staging.runtime is None and not native.registered_web_apis
-    assert not any(n == "companion_v2" or n.startswith("companion_v2.") for n in sys.modules)
+    assert not any(n == "digital_life_core" or n.startswith("digital_life_core.") for n in sys.modules)
     report = json.loads((args.output / "browser-results.json").read_text(encoding="utf-8"))
     report.update(mode=args.mode, phase=args.phase, teardown_verified=True, model_calls=final["model_calls"],
                   platform_calls=final["platform_calls"], batches=final["batches"], server_errors=server_errors)

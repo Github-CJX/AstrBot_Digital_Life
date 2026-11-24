@@ -15,7 +15,7 @@ const test = require('node:test');
 const vm = require('node:vm');
 
 const source = fs.readFileSync(path.resolve(__dirname, '../pages/陪伴小屋/self-review-page.js'), 'utf8');
-const HOST = 'astrbot_plugin_private_companion';
+const HOST = 'astrbot_plugin_digital_life';
 const API = '/' + HOST + '/host/targets/t-1/roles/r-1/growth';
 const flush = () => new Promise(resolve => setImmediate(resolve));
 const settle = async () => { for (let i = 0; i < 10; i++) await flush(); };

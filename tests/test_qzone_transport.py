@@ -7,7 +7,7 @@ import os
 import unittest
 from unittest.mock import patch
 
-from astrbot_host.qzone_transport import build_qzone_transport
+from digital_life_host.qzone_transport import build_qzone_transport
 
 
 class QzoneTransportAvailabilityTests(unittest.TestCase):

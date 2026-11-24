@@ -7,15 +7,15 @@ import json
 import unittest
 from unittest.mock import patch
 
-from companion_v2.execution.models import (
+from digital_life_core.execution.models import (
     Lane, ProviderBinding, SideEffect, SupervisorLimits, TaskContext, TaskDefinition,
     TaskRegistration, TaskResult, TaskSpec,
 )
-from companion_v2.execution.service import TaskSupervisor
-from companion_v2.foundation.clock import DeterministicClock
-from companion_v2.foundation.outcome import Outcome
-from companion_v2.foundation.refs import AudienceRef, SubjectKind, SubjectRef
-from companion_v2.identity_policy.personas import ConversationRoute
+from digital_life_core.execution.service import TaskSupervisor
+from digital_life_core.foundation.clock import DeterministicClock
+from digital_life_core.foundation.outcome import Outcome
+from digital_life_core.foundation.refs import AudienceRef, SubjectKind, SubjectRef
+from digital_life_core.identity_policy.personas import ConversationRoute
 from tests.test_management_access import INSTALLATION, ManagementFixture, NOW, SCOPE
 
 
@@ -517,7 +517,7 @@ class SelfReviewActionAdmissionTests(ExecutionFixture):
     """The daily review's declared action must survive real task admission."""
 
     def test_private_owner_enqueue_uses_the_registered_self_review_action(self):
-        from companion_v2.role_work.journal.self_review_evidence import READ_ACTION
+        from digital_life_core.role_work.journal.self_review_evidence import READ_ACTION
         definition = replace(self.foreground, kind="fixture.self-review", action=READ_ACTION)
         tasks = self.supervisor(registrations=(*self.registrations,
                                                TaskRegistration(definition, self.validate_inputs)))

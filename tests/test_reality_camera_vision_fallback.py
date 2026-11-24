@@ -3,7 +3,7 @@
 import asyncio
 import unittest
 
-from astrbot_host.native_extensions.reality.reality_touch_camera import RealityTouchCameraMixin
+from digital_life_host.native_extensions.reality.reality_touch_camera import RealityTouchCameraMixin
 
 COMPLETION = (
     '{"scene_description":"一张书桌和亮着的显示器","purpose_answer":"在桌边用电脑",'

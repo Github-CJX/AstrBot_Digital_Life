@@ -4,15 +4,15 @@ from tempfile import TemporaryDirectory
 from types import SimpleNamespace as NS
 import unittest
 
-from companion_v2.configuration.models import ConfigLayer, ConfigTarget
-from companion_v2.conversation.media.output_settings import (
+from digital_life_core.configuration.models import ConfigLayer, ConfigTarget
+from digital_life_core.conversation.media.output_settings import (
     DEFAULTS, GROUP, ImageOutputConfigurationOwner, apply_prompts, configuration_fields,
     effective_settings, image_request_denial, is_rule_image_request, parse_scene_presets,
     prompt_instruction,
 )
-from companion_v2.execution.models import TaskError
-from companion_v2.foundation.refs import ScopeKind, SubjectKind, SubjectRef
-from companion_v2.storage.runtime import StorageRuntime
+from digital_life_core.execution.models import TaskError
+from digital_life_core.foundation.refs import ScopeKind, SubjectKind, SubjectRef
+from digital_life_core.storage.runtime import StorageRuntime
 
 
 class ImageOutputSettingsTests(unittest.TestCase):

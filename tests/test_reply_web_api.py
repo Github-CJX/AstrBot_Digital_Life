@@ -14,10 +14,10 @@ from tests.multi_host_support import MultiFixture, multi_config
 from tests.native_adapter_support import FakeEvent, FakeProvider, FakeReverseApi
 from tests.staging_bootstrap_support import wait_for_batch
 from tests.test_management_access import NOW
-from astrbot_host.controller import AstrBotStagingController
-from astrbot_host.reply_api import ReplyWebAPI
-from companion_v2.adapters.astrbot.staging import NativeAdapterTypes
-from companion_v2.foundation.outcome import Outcome
+from digital_life_host.controller import AstrBotStagingController
+from digital_life_host.reply_api import ReplyWebAPI
+from digital_life_core.adapters.astrbot.staging import NativeAdapterTypes
+from digital_life_core.foundation.outcome import Outcome
 
 
 RECORD = {"type": "record", "data": {"file": "base64://YQ=="}}
@@ -26,7 +26,7 @@ RECORD = {"type": "record", "data": {"file": "base64://YQ=="}}
 async def request(handler, body=None, *, username="reply-admin", raw=None, query=None):
     async def read():
         return raw if raw is not None else json.dumps(body, ensure_ascii=False).encode("utf-8")
-    with patch("astrbot_host.reply_api.request", NS(username=username, query=query or {}, body=read)):
+    with patch("digital_life_host.reply_api.request", NS(username=username, query=query or {}, body=read)):
         return await handler()
 
 
@@ -37,7 +37,7 @@ class ReplyWebAPITests(MultiFixture, unittest.IsolatedAsyncioTestCase):
                                        provider_config={"key": "fixture-secret"})])
         self.native.get_all_tts_providers = catalog
         renderer = AsyncMock(return_value=RECORD)
-        with patch("astrbot_host.multi_session.NativeVoiceReply.render", renderer):
+        with patch("digital_life_host.multi_session.NativeVoiceReply.render", renderer):
             app = await self.start_host()
         (await self.controller.authorize_delivery("first")).unwrap()
         self.controller.register_routes()
@@ -141,8 +141,8 @@ class SingleReplyWebAPITests(unittest.IsolatedAsyncioTestCase):
                         profile=NS(target=object())), last_session=None,
                         runtime=object(), now=lambda: NOW)
         api = ReplyWebAPI(controller)
-        with patch("astrbot_host.reply_api.dashboard_operator", return_value=object()), patch(
-                "astrbot_host.reply_api.ExpressionStyleManagement",
+        with patch("digital_life_host.reply_api.dashboard_operator", return_value=object()), patch(
+                "digital_life_host.reply_api.ExpressionStyleManagement",
                 return_value=NS(list=slow_list)):
             listing = asyncio.create_task(request(api.style))
             try:
@@ -164,7 +164,7 @@ class SingleReplyWebAPITests(unittest.IsolatedAsyncioTestCase):
         controller = AstrBotStagingController(native, config, Path(temporary.name), native_types=types, now=lambda: NOW)
         self.addAsyncCleanup(controller.terminate)
         renderer = AsyncMock(return_value=RECORD)
-        with patch("astrbot_host.controller.NativeVoiceReply.render", renderer):
+        with patch("digital_life_host.controller.NativeVoiceReply.render", renderer):
             (await controller.initialize_profile()).unwrap()
             (await controller.authorize_delivery()).unwrap()
             (await controller.start()).unwrap()

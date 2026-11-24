@@ -7,8 +7,8 @@ from pathlib import Path
 import unittest
 from unittest.mock import patch
 
-import companion_v2.legacy.archive as archive_module
-from companion_v2.legacy.archive import (
+import digital_life_core.legacy.archive as archive_module
+from digital_life_core.legacy.archive import (
     SCHEMA,
     build_v1_archive_plan,
     copy_v1_archive,
@@ -122,7 +122,7 @@ class LegacyArchiveTests(unittest.TestCase):
 
     def test_archived_work_can_be_inspected_without_replaying_or_changing_it(self):
         import sqlite3
-        from companion_v2.legacy.archived_work import archived_work_inventory, archived_work_rows
+        from digital_life_core.legacy.archived_work import archived_work_inventory, archived_work_rows
         with tempfile.TemporaryDirectory() as temporary:
             root=Path(temporary);source=root/'v1';(source/'framework_work').mkdir(parents=True)
             database=source/'framework_work'/'work.db'

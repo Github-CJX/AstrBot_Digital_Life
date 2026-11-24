@@ -11,14 +11,14 @@ from unittest.mock import patch
 from astrbot.api.web import PluginRequest, bind_request_context
 from starlette.requests import Request
 
-from astrbot_host.legacy_group_data_api import LegacyGroupDataWebAPI
-from astrbot_host.legacy_api import LegacyMigrationWebAPI
-from astrbot_host.multi_api import PREFIX as HOST_PREFIX
-from companion_v2.execution.models import TaskError, digest
-from companion_v2.foundation.refs import ScopeKind, ScopeRef
-from companion_v2.knowledge.catalog import KnowledgeCatalog, SourceBinding
-from companion_v2.knowledge.retrieval import KnowledgeQuery, KnowledgeRetriever
-from companion_v2.relationships.group_network import GroupRelationshipStore
+from digital_life_host.legacy_group_data_api import LegacyGroupDataWebAPI
+from digital_life_host.legacy_api import LegacyMigrationWebAPI
+from digital_life_host.multi_api import PREFIX as HOST_PREFIX
+from digital_life_core.execution.models import TaskError, digest
+from digital_life_core.foundation.refs import ScopeKind, ScopeRef
+from digital_life_core.knowledge.catalog import KnowledgeCatalog, SourceBinding
+from digital_life_core.knowledge.retrieval import KnowledgeQuery, KnowledgeRetriever
+from digital_life_core.relationships.group_network import GroupRelationshipStore
 from tests.group_host_support import GroupFixture
 
 

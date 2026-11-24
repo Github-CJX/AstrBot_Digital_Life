@@ -5,7 +5,7 @@ from tempfile import TemporaryDirectory
 import unittest
 from unittest.mock import patch
 
-from astrbot_host.native_extensions.settings import ExtensionSettings
+from digital_life_host.native_extensions.settings import ExtensionSettings
 
 
 class ExtensionSettingsTests(unittest.TestCase):

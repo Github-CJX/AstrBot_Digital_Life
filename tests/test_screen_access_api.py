@@ -10,16 +10,16 @@ from unittest.mock import patch
 from astrbot.api.web import PluginRequest, bind_request_context
 from starlette.requests import Request
 
-from astrbot_host.screen_access_api import PREFIX
-from companion_v2.capabilities import CapabilityAuthorizationState, CapabilityRepository
-from companion_v2.execution.models import TaskContext
-from companion_v2.foundation.outcome import Outcome
-from companion_v2.foundation.refs import AudienceRef
-from companion_v2.identity_policy.models import AuthorizationTier, GrantState
-from companion_v2.identity_policy.object_access import ObjectAccessPolicy
-from companion_v2.identity_policy.repository import PersistentIdentityDirectory
-from companion_v2.screen import SCREEN_EXTENSION, SCREEN_PROCESS, SCREEN_READ
-from astrbot_host.management_identity import dashboard_operator
+from digital_life_host.screen_access_api import PREFIX
+from digital_life_core.capabilities import CapabilityAuthorizationState, CapabilityRepository
+from digital_life_core.execution.models import TaskContext
+from digital_life_core.foundation.outcome import Outcome
+from digital_life_core.foundation.refs import AudienceRef
+from digital_life_core.identity_policy.models import AuthorizationTier, GrantState
+from digital_life_core.identity_policy.object_access import ObjectAccessPolicy
+from digital_life_core.identity_policy.repository import PersistentIdentityDirectory
+from digital_life_core.screen import SCREEN_EXTENSION, SCREEN_PROCESS, SCREEN_READ
+from digital_life_host.management_identity import dashboard_operator
 from tests import test_astrbot_staging_host as support
 
 

@@ -7,9 +7,9 @@ from types import SimpleNamespace as NS
 import unittest
 from unittest.mock import AsyncMock, patch
 
-from astrbot_host.service_balance import configured_balance_port
-from astrbot_host.service_balance_provider import balance_provider_choices, provider_balance_settings
-from companion_v2.proactive.balance_events import BalanceObservation
+from digital_life_host.service_balance import configured_balance_port
+from digital_life_host.service_balance_provider import balance_provider_choices, provider_balance_settings
+from digital_life_core.proactive.balance_events import BalanceObservation
 from tests.test_service_balance_script import SCRIPT, settings
 
 
@@ -118,7 +118,7 @@ class HostBalanceBindingTests(unittest.TestCase):
             captured.append(script_port.api_key)
             src["key"] = ["changed-during-query"]
             return object()
-        with patch("astrbot_host.service_balance_script.ScriptServiceBalancePort.fetch", fetch):
+        with patch("digital_life_host.service_balance_script.ScriptServiceBalancePort.fetch", fetch):
             with self.assertRaises(ValueError):
                 asyncio.run(port.fetch())
         self.assertEqual(captured, ["fresh-key"])
@@ -137,13 +137,13 @@ class HostBalanceBindingTests(unittest.TestCase):
         self.assertNotIn("voice-source", json.dumps(balance_provider_choices(self.context)))
 
     def test_host_connection_change_invalidates_keyword_cache_before_it_is_reused(self):
-        from astrbot_host.service_balance import balance_keyword_material
-        from companion_v2.foundation.refs import ScopeKind
+        from digital_life_host.service_balance import balance_keyword_material
+        from digital_life_core.foundation.refs import ScopeKind
         from unittest.mock import Mock
         port = configured_balance_port({"service_balance":self.settings}, context=self.context)
         invalidate = Mock()
         app = NS(balance_port=port, runtime=object(), keyword_materials=NS(invalidate=invalidate))
-        with patch("companion_v2.expression.configuration.source_subject_allowed_for_context", return_value=True):
+        with patch("digital_life_core.expression.configuration.source_subject_allowed_for_context", return_value=True):
             spec = balance_keyword_material(app)
             private = NS(scope=NS(kind=ScopeKind.PRIVATE))
             self.assertTrue(spec.available(private))

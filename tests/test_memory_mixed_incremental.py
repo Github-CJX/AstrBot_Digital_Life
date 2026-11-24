@@ -8,14 +8,14 @@ import sqlite3
 import unittest
 from unittest.mock import patch
 
-from companion_v2.execution.models import digest, encode
-from companion_v2.memory.models import AtomRef
-from companion_v2.memory.query import MemoryQuery
-from companion_v2.memory.search import SearchIndex
-from companion_v2.memory.sent_sources import ConfirmedReplySources
-from companion_v2.memory.writer import MemoryWriter
-from companion_v2.storage.runtime import StorageOpenError, StorageRuntime
-from companion_v2.storage.schema import SCHEMA_VERSION
+from digital_life_core.execution.models import digest, encode
+from digital_life_core.memory.models import AtomRef
+from digital_life_core.memory.query import MemoryQuery
+from digital_life_core.memory.search import SearchIndex
+from digital_life_core.memory.sent_sources import ConfirmedReplySources
+from digital_life_core.memory.writer import MemoryWriter
+from digital_life_core.storage.runtime import StorageOpenError, StorageRuntime
+from digital_life_core.storage.schema import SCHEMA_VERSION
 from tests.execution_support import remove_v26
 from tests.memory_support import MemoryFixture
 
@@ -195,7 +195,7 @@ class MixedMemoryTests(MemoryFixture, unittest.IsolatedAsyncioTestCase):
         for name, other in self.other_memory_owners().items():
             self.recall.begin(other, name)
             self.assertEqual(self.recall.query(other, name, query_intent="voyager", kind="all").unwrap()["items"], [])
-        from companion_v2.execution.models import TaskError
+        from digital_life_core.execution.models import TaskError
         def denied(context, ref, **options):
             raise TaskError("source_audience_denied", "synthetic current grant change")
         with patch.object(self.memory.access, "source", side_effect=denied):
@@ -446,7 +446,7 @@ class MixedMemoryTests(MemoryFixture, unittest.IsolatedAsyncioTestCase):
             self.view("v" + str(number))
         for number in range(2):
             value = self.recall.experiences.read(self.context, "v" + str(number)).unwrap()
-            from companion_v2.memory import codec
+            from digital_life_core.memory import codec
             reference = codec.source(value["source"])
             self.memory.sources.revoke(reference, expected_governance_revision=1, observed_at=self.clock.now()).unwrap()
         self.recall.experiences.candidate_items = 2

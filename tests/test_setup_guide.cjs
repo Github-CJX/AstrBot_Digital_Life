@@ -65,12 +65,12 @@ function harness({status, responses = {}, targets = [], refreshedTargets = targe
       if (directoryError) throw directoryError;
       currentTargets = refreshedTargets;
     },
-    role: () => configEditorsAvailable ? {reply_api: '/astrbot_plugin_private_companion/reply/current',
-      model_api: '/astrbot_plugin_private_companion/model'} : null,
+    role: () => configEditorsAvailable ? {reply_api: '/astrbot_plugin_digital_life/reply/current',
+      model_api: '/astrbot_plugin_digital_life/model'} : null,
     scopeKey: () => 'installation-a:target-a:role-a',
     unwrap: response => response,
     relative(address) {
-      const prefix = '/astrbot_plugin_private_companion/';
+      const prefix = '/astrbot_plugin_digital_life/';
       assert.ok(address.startsWith(prefix));
       return address.slice(prefix.length);
     },
@@ -187,7 +187,7 @@ test('migration role setup falls back to the setup catalog before staging starts
     targets: [{target_id: 't-first', scope_kind: 'private', platform_id: 'qq-main',
                account_id: '100', bot_id: 'bot-a', participant_id: '*',
                roles: [{role_id: 'role-a', persona_ids: ['original'],
-                        legacy_api: '/astrbot_plugin_private_companion/' + route}]}],
+                        legacy_api: '/astrbot_plugin_digital_life/' + route}]}],
   };
   const error = Object.assign(new Error('staging_not_initialized'), {code: 'staging_not_initialized'});
   const page = harness({targets: [], refreshedTargets: [], directoryError: error,
@@ -231,7 +231,7 @@ test('the review is read-only and migration starts only after an explicit confir
       {kind: 'persona', persona_id: 'old', state: 'review', reason: 'persona_not_assigned_to_role'}],
     counts: {imported: 1, review: 1, failed: 0}, memory_database_skipped: true};
   const page = harness({status: readyStatus(), targets: [{target_id: 'first', roles: [
-    {role_id: 'role-a', legacy_api: '/astrbot_plugin_private_companion/' + route}]}], responses: {
+    {role_id: 'role-a', legacy_api: '/astrbot_plugin_digital_life/' + route}]}], responses: {
     ['GET ' + route]: discovery,
     ['GET ' + route + '/plan']: [plan, freshPlan, emptyPlan],
     ['POST ' + route + '/apply']: {selection_applied: true, configuration_imported: true,
@@ -315,9 +315,9 @@ test('the review is read-only and migration starts only after an explicit confir
 test('first upgrade opens migration with the newly saved destination available', async () => {
   const route = 'host/targets/t-first/roles/r-first/legacy';
   const targets = [{target_id: 't-first', scope_kind: 'private', roles: [{role_id: 'r-first',
-    legacy_api: '/astrbot_plugin_private_companion/' + route}]},
+    legacy_api: '/astrbot_plugin_digital_life/' + route}]},
     {target_id: 't-group', scope_kind: 'group', roles: [{role_id: 'r-group',
-      legacy_api: '/astrbot_plugin_private_companion/host/targets/t-group/roles/r-group/legacy'}]}];
+      legacy_api: '/astrbot_plugin_digital_life/host/targets/t-group/roles/r-group/legacy'}]}];
   const page = harness({status: {upgrade: {present: true, configured: false,
     can_prepare: true, plan_token: 'reviewed-source'}}, refreshedTargets: targets,
     responses: {'POST setup/upgrade': {saved: true, started: true}}});
@@ -421,7 +421,7 @@ test('startup guide explains when an old mapping cannot be fully verified', asyn
 test('private memory migration confirms the selected role and exposes retained work', async () => {
   const route = 'host/targets/private/roles/role/legacy';
   const page = harness({status: readyStatus(), targets: [{target_id: 'private', roles: [
-    {role_id: 'role', role_name: '星缘', legacy_api: '/astrbot_plugin_private_companion/' + route},
+    {role_id: 'role', role_name: '星缘', legacy_api: '/astrbot_plugin_digital_life/' + route},
   ]}], responses: {
     ['GET ' + route + '/private-memory-plan']: {plan_token: 'private-plan',
       matched_person_count: 1, matched_material_count: 74},
@@ -478,7 +478,7 @@ test('late private memory preview is discarded after changing the V1 source', as
   let complete;
   const pending = new Promise(resolve => { complete = resolve; });
   const page = harness({status: readyStatus(), targets: [{target_id: 'private', roles: [
-    {role_id: 'role', legacy_api: '/astrbot_plugin_private_companion/' + route},
+    {role_id: 'role', legacy_api: '/astrbot_plugin_digital_life/' + route},
   ]}], responses: {['GET ' + route + '/private-memory-plan']: pending}});
   page.mountMigration();
   await settle();
@@ -501,9 +501,9 @@ async function plannedMultiDestinationPage(firstApplyResponse) {
   const secondRoute = 'host/targets/t-second/roles/r-second/legacy';
   const targets = [
     {target_id: 't-first', display_name: '账号一', roles: [{role_id: 'r-first', role_name: '角色一',
-      legacy_api: '/astrbot_plugin_private_companion/' + firstRoute}]},
+      legacy_api: '/astrbot_plugin_digital_life/' + firstRoute}]},
     {target_id: 't-second', display_name: '账号二', roles: [{role_id: 'r-second', role_name: '角色二',
-      legacy_api: '/astrbot_plugin_private_companion/' + secondRoute}]},
+      legacy_api: '/astrbot_plugin_digital_life/' + secondRoute}]},
   ];
   const plan = (token, personaId) => ({plan_token: token, source_persona_id: personaId,
     source_fingerprint: 'source-fingerprint', archive: {fingerprint: 'archive-fingerprint'},
@@ -536,7 +536,7 @@ async function plannedMultiDestinationPage(firstApplyResponse) {
 }
 
 async function legacyPersonaMappingPage({targets, personaSources}) {
-  const prefix = '/astrbot_plugin_private_companion/';
+  const prefix = '/astrbot_plugin_digital_life/';
   const route = targets[0].roles[0].legacy_api.slice(prefix.length);
   const basePlan = {plan_token: 'persona-base-plan',
     persona_sources: personaSources, reaction_assets: {batch_count: 1},
@@ -738,7 +738,7 @@ test('a unique destination preselects the role and reads the source without writ
   ]};
   const route = 'host/targets/t-first/roles/r-first/legacy';
   const targets = [{target_id: 't-first', account_name: '账号一', roles: [{role_id: 'r-first',
-    role_name: '默认人格', legacy_api: '/astrbot_plugin_private_companion/' + route}]}];
+    role_name: '默认人格', legacy_api: '/astrbot_plugin_digital_life/' + route}]}];
   const page = harness({status: readyStatus(), targets, responses: {['GET ' + route]: discovery}});
   page.mountMigration();
   await settle();
@@ -836,7 +836,7 @@ test('the migration guide creates a role inline and selects its refreshed destin
   const secondPersona = {...persona, persona_id: '烛雨', label: '烛雨'};
   const route = 'host/targets/private-one/roles/new-role/legacy';
   const targets = [{...account, target_id: 'private-one', scope_kind: 'private', roles: [
-    {role_id: '新角色', role_name: '新角色', legacy_api: '/astrbot_plugin_private_companion/' + route}]}];
+    {role_id: '新角色', role_name: '新角色', legacy_api: '/astrbot_plugin_digital_life/' + route}]}];
   const page = harness({status: readyStatus(), targets: [], refreshedTargets: targets, responses: {
     'GET setup/targets': [{accounts: [account], personas: [persona, secondPersona]},
       {accounts: [account], personas: [persona, secondPersona].map(item =>
@@ -892,7 +892,7 @@ test('a failed inline role save keeps the form and does not claim the role exist
 test('the first-run page discovers an upgrade when there is one unambiguous V2 destination', async () => {
   const route = 'host/targets/t-first/roles/r-first/legacy';
   const targets = [{target_id: 't-first', account_name: '账号一', roles: [{role_id: 'r-first',
-    role_name: '默认人格', legacy_api: '/astrbot_plugin_private_companion/' + route}]}];
+    role_name: '默认人格', legacy_api: '/astrbot_plugin_digital_life/' + route}]}];
   const page = harness({status: readyStatus(), targets, responses: {
     ['GET ' + route]: {v1_root: 'V1-data-root', findings: [], install: {
       phase: 'upgrade_pending', pending: true, v1_present: true, v1_root: 'V1-data-root',
@@ -914,9 +914,9 @@ test('the first-run page does not guess between multiple V2 migration destinatio
   const secondRoute = 'host/targets/t-second/roles/r-second/legacy';
   const targets = [
     {target_id: 't-first', roles: [{role_id: 'r-first',
-      legacy_api: '/astrbot_plugin_private_companion/' + firstRoute}]},
+      legacy_api: '/astrbot_plugin_digital_life/' + firstRoute}]},
     {target_id: 't-second', roles: [{role_id: 'r-second',
-      legacy_api: '/astrbot_plugin_private_companion/' + secondRoute}]},
+      legacy_api: '/astrbot_plugin_digital_life/' + secondRoute}]},
   ];
   const page = harness({status: readyStatus(), targets});
   page.mount();
@@ -930,7 +930,7 @@ test('the first-run page does not guess between multiple V2 migration destinatio
 test('a slow V1 discovery does not hold up the role-first migration page', async () => {
   const route = 'host/targets/t-first/roles/r-first/legacy';
   const targets = [{target_id: 't-first', roles: [{role_id: 'r-first',
-    legacy_api: '/astrbot_plugin_private_companion/' + route}]}];
+    legacy_api: '/astrbot_plugin_digital_life/' + route}]}];
   let finishDiscovery;
   const pendingDiscovery = new Promise(resolve => { finishDiscovery = resolve; });
   const page = harness({status: readyStatus(), targets, responses: {
@@ -962,7 +962,7 @@ test('a slow V1 discovery does not hold up the role-first migration page', async
 test('upgrade confirmation keeps configuration and data migration statuses separate', async () => {
   const route = 'host/targets/t-first/roles/r-first/legacy';
   const targets = [{target_id: 't-first', roles: [{role_id: 'r-first',
-    legacy_api: '/astrbot_plugin_private_companion/' + route}]}];
+    legacy_api: '/astrbot_plugin_digital_life/' + route}]}];
   const page = harness({status: readyStatus(), targets, responses: {
     ['GET ' + route]: {v1_root: 'V1-data-root', findings: [], install: {
       phase: 'upgrade_restart_check', restart_observed: true, v1_present: true,
@@ -995,7 +995,7 @@ test('upgrade confirmation keeps configuration and data migration statuses separ
 test('upgrade guide completes discovery, config inheritance and post-restart confirmation', async () => {
   const route = 'host/targets/t-first/roles/r-first/legacy';
   const targets = [{target_id: 't-first', roles: [{role_id: 'r-first',
-    legacy_api: '/astrbot_plugin_private_companion/' + route}]}];
+    legacy_api: '/astrbot_plugin_digital_life/' + route}]}];
   const checkedSources = [
     {source_id: 'private.host_configuration', state: 'ready'},
     {source_id: 'reality.configuration', state: 'absent'},
@@ -1068,7 +1068,7 @@ test('upgrade guide completes discovery, config inheritance and post-restart con
 test('upgrade guide blocks automatic inheritance when a configuration source is unverified', async () => {
   const route = 'host/targets/t-first/roles/r-first/legacy';
   const targets = [{target_id: 't-first', roles: [{role_id: 'r-first',
-    legacy_api: '/astrbot_plugin_private_companion/' + route}]}];
+    legacy_api: '/astrbot_plugin_digital_life/' + route}]}];
 
   for (const unavailable of [
     {state: 'missing', findings: [],
@@ -1126,7 +1126,7 @@ test('upgrade guide blocks automatic inheritance when a configuration source is 
 test('upgrade guide identifies legacy imports whose configuration scope was never recorded', async () => {
   const route = 'host/targets/t-first/roles/r-first/legacy';
   const targets = [{target_id: 't-first', roles: [{role_id: 'r-first',
-    legacy_api: '/astrbot_plugin_private_companion/' + route}]}];
+    legacy_api: '/astrbot_plugin_digital_life/' + route}]}];
   const page = harness({status: readyStatus(), targets, responses: {
     ['GET ' + route]: {v1_root: 'V1-data-root', findings: [], install: {
       phase: 'upgrade_restart_check', restart_observed: true, v1_present: true,
@@ -1150,9 +1150,9 @@ test('multiple migration destinations wait for explicit target and role selectio
   const secondRoute = 'host/targets/t-second/roles/r-second/legacy';
   const catalog = [
     {target_id: 't-first', bot_id: 'bot-a', roles: [{role_id: 'r-first',
-      persona_ids: ['persona-a'], legacy_api: '/astrbot_plugin_private_companion/' + route}]},
+      persona_ids: ['persona-a'], legacy_api: '/astrbot_plugin_digital_life/' + route}]},
     {target_id: 't-second', bot_id: 'bot-b', roles: [{role_id: 'r-second',
-      persona_ids: ['persona-b'], legacy_api: '/astrbot_plugin_private_companion/' + secondRoute}]},
+      persona_ids: ['persona-b'], legacy_api: '/astrbot_plugin_digital_life/' + secondRoute}]},
   ];
   const page = harness({status: readyStatus(), targets: catalog,
     responses: {[`GET ${route}`]: {findings: [], v1_root: 'selected-root'},
@@ -1177,7 +1177,7 @@ test('multiple migration destinations wait for explicit target and role selectio
 test('a slow migration scan shows its phase while the extended request is pending', async () => {
   const route = 'host/targets/t-first/roles/r-first/legacy';
   const targets = [{target_id: 't-first', roles: [{role_id: 'r-first',
-    legacy_api: '/astrbot_plugin_private_companion/' + route}]}];
+    legacy_api: '/astrbot_plugin_digital_life/' + route}]}];
   let finishScan;
   const scanResponse = new Promise(resolve => { finishScan = resolve; });
   const page = harness({status: readyStatus(), targets, responses: {[`GET ${route}`]: scanResponse}});
@@ -1410,7 +1410,7 @@ test('a failed test displays the recorded failure and keeps the home entry avail
 test('migration apply sends the reviewed plan token and refuses locally without a plan', async () => {
   const route = 'host/targets/t-first/roles/r-first/legacy';
   const targets = [{target_id: 't-first', roles: [{role_id: 'r-first',
-    role_name: '星缘', legacy_api: '/astrbot_plugin_private_companion/' + route}]}];
+    role_name: '星缘', legacy_api: '/astrbot_plugin_digital_life/' + route}]}];
   const discovery = {v1_root: 'V1-root', findings: [{source_id: 'private.host_configuration', state: 'ready'}]};
   const plan = {v1_root: 'V1-root', findings: discovery.findings, change_count: 3, plan_token: 'reviewed-token',
     scope_status: [{scope: 'role.state', available: true}, {scope: 'plugin_config', available: true}],
@@ -1486,7 +1486,7 @@ test('configuration compatibility separates unsupported settings from actionable
     ['future_status', 'future.setting'],
   ];
   const page = harness({status: readyStatus(), targets: [{target_id: 'migration', roles: [{role_id: 'destination',
-    legacy_api: '/astrbot_plugin_private_companion/' + route}]}], responses: {
+    legacy_api: '/astrbot_plugin_digital_life/' + route}]}], responses: {
     ['GET ' + route]: {findings: []},
     ['GET ' + route + '/plan']: {plan_token: 'review-token', change_count: 0, warnings: [],
       differences: records.map(([disposition, source_key]) => ({audit: true, disposition, source_key, explain: '技术说明'}))},
@@ -1518,9 +1518,9 @@ test('configuration compatibility separates unsupported settings from actionable
 
 test('migration settings use the chosen destination and keep selections while refreshing old plans', async () => {
   const route = 'host/targets/migration/roles/destination/legacy';
-  const destination = '/astrbot_plugin_private_companion/host/targets/migration/roles/destination';
+  const destination = '/astrbot_plugin_digital_life/host/targets/migration/roles/destination';
   const page = harness({status: readyStatus(), targets: [{target_id: 'migration', roles: [{role_id: 'destination',
-    role_name: '接收角色', legacy_api: '/astrbot_plugin_private_companion/' + route,
+    role_name: '接收角色', legacy_api: '/astrbot_plugin_digital_life/' + route,
     model_api: destination + '/model', config_api: destination + '/config'}]}], responses: {
     ['GET ' + route]: {findings: [{source_id: 'private.host_configuration', state: 'ready'}]},
     ['GET ' + route + '/plan']: {plan_token: 'fresh-plan', change_count: 0, warnings: [], differences: []},
@@ -1573,11 +1573,11 @@ test('migration settings use the chosen destination and keep selections while re
 });
 
 test('migration can use an explicitly selected V1 directory through scan, plan and apply', async () => {
-  const root = 'C:\\AstrBot\\plugin_data\\astrbot_plugin_private_companion';
+  const root = 'C:\\AstrBot\\plugin_data\\astrbot_plugin_digital_life';
   const route = 'host/targets/t-first/roles/r-first/legacy';
   const planRoute = route + '/plan';
   const targets = [{target_id: 't-first', roles: [{role_id: 'r-first',
-    role_name: '星缘', legacy_api: '/astrbot_plugin_private_companion/' + route}]}];
+    role_name: '星缘', legacy_api: '/astrbot_plugin_digital_life/' + route}]}];
   const discovery = {v1_root: root, findings: [{source_id: 'private.host_configuration', state: 'ready'}]};
   const plan = {v1_root: root, findings: discovery.findings, change_count: 1, plan_token: 'selected-root-token',
     scope_status: [{scope: 'role.state', available: true}], intents: [], differences: [], warnings: []};
@@ -1613,7 +1613,7 @@ test('migration can use an explicitly selected V1 directory through scan, plan a
 test('data migration uses current-target availability and reports capped group imports', async () => {
   const route = 'host/targets/t-first/roles/r-first/legacy';
   const targets = [{target_id: 't-first', roles: [{role_id: 'r-first', role_name: '星缘',
-    legacy_api: '/astrbot_plugin_private_companion/' + route}]}];
+    legacy_api: '/astrbot_plugin_digital_life/' + route}]}];
   const plan = {
     plan_token: 'data-plan-token',
     reaction_assets: {total: 0, ready: 0, batch_count: 0, batch_bytes: 0},
@@ -1653,7 +1653,7 @@ test('data migration uses current-target availability and reports capped group i
 test('data migration does not present an unplanned memory database as empty', async () => {
   const route = 'host/targets/t-first/roles/r-first/legacy';
   const targets = [{target_id: 't-first', roles: [{role_id: 'r-first', role_name: '星缘',
-    legacy_api: '/astrbot_plugin_private_companion/' + route}]}];
+    legacy_api: '/astrbot_plugin_digital_life/' + route}]}];
   const page = harness({status: readyStatus(), targets});
   page.mountMigration();
   await settle();
@@ -1669,7 +1669,7 @@ test('data migration does not present an unplanned memory database as empty', as
 test('single-target migration exposes references and can import wardrobe text without gallery images', async () => {
   const route = 'host/targets/t-first/roles/r-first/legacy';
   const targets = [{target_id: 't-first', roles: [{role_id: 'r-first', role_name: '星缘',
-    legacy_api: '/astrbot_plugin_private_companion/' + route}]}];
+    legacy_api: '/astrbot_plugin_digital_life/' + route}]}];
   const plan = {plan_token: 'reference-plan', source_persona_id: '',
     reaction_assets: {batch_count: 0}, journals: {batch_count: 0}, worldbook: {general_count: 0, member_count: 0},
     reference_images: {ready: 1, batch_count: 1, rejected: []},
@@ -1709,7 +1709,7 @@ test('single-target migration exposes references and can import wardrobe text wi
 test('learning relationship profiles are counted and can be selected without original worldbook entries', async () => {
   const route = 'host/targets/t-first/roles/r-first/legacy';
   const targets = [{target_id: 't-first', roles: [{role_id: 'r-first', role_name: '星缘',
-    legacy_api: '/astrbot_plugin_private_companion/' + route}]}];
+    legacy_api: '/astrbot_plugin_digital_life/' + route}]}];
   const plan = {plan_token: 'learning-social-plan', reaction_assets: {}, journals: {},
     worldbook: {general_count: 0, member_entry_count: 0, member_count: 2, member_profile_count: 2,
       available_count: 2, requires_id_confirmation: true, base_members_matches: false},
@@ -1741,7 +1741,7 @@ test('learning relationship profiles are counted and can be selected without ori
 test('旧版私聊用户单独试算和迁入，不必同时选择世界书或归档', async () => {
   const route = 'host/targets/t-first/roles/r-first/legacy';
   const targets = [{target_id: 't-first', roles: [{role_id: 'r-first', role_name: '星缘',
-    legacy_api: '/astrbot_plugin_private_companion/' + route}]}];
+    legacy_api: '/astrbot_plugin_digital_life/' + route}]}];
   const plan = {plan_token: 'contacts-plan', reaction_assets: {}, journals: {}, worldbook: {},
     private_contacts: {ready: 2, already_present: 0, maintained_count: 1,
       samples: [{native_account_id: '200', nickname: '旧称呼', maintained: true, message_count: 12}]},
@@ -1770,7 +1770,7 @@ test('旧版私聊用户单独试算和迁入，不必同时选择世界书或�
 
 test('私聊用户卡已存在时，迁入页仍允许补迁管理员和私聊权限', async () => {
   const route = 'host/targets/t-first/roles/r-first/legacy';
-  const targets = [{target_id:'t-first',roles:[{role_id:'r-first',legacy_api:'/astrbot_plugin_private_companion/'+route}]}];
+  const targets = [{target_id:'t-first',roles:[{role_id:'r-first',legacy_api:'/astrbot_plugin_digital_life/'+route}]}];
   const plan = {plan_token:'authority-only',reaction_assets:{},journals:{},worldbook:{},
     private_contacts:{ready:0,already_present:4,authorization:{ready:1,core_users:1,permission_count:2}},
     persona_sources:[],group_networks:[],memory_database:{state:'absent'},target_private_available:true};
@@ -1789,7 +1789,7 @@ test('私聊用户卡已存在时，迁入页仍允许补迁管理员和私聊�
 test('关闭独立记忆库后不携带已自动选中的群记忆映射，不阻断单独迁入用户', async () => {
   const route = 'host/targets/t-first/roles/r-first/legacy';
   const targets = [{target_id: 't-first', roles: [{role_id: 'r-first',
-    legacy_api: '/astrbot_plugin_private_companion/' + route}]}];
+    legacy_api: '/astrbot_plugin_digital_life/' + route}]}];
   const ownerId = 'a'.repeat(64);
   const plan = {plan_token: 'contacts-only', reaction_assets: {}, journals: {}, worldbook: {},
     private_contacts: {ready: 4}, persona_sources: [], group_networks: [],
@@ -1828,7 +1828,7 @@ test('关闭独立记忆库后不携带已自动选中的群记忆映射，不�
 test('data migration previews the independent memory database and sends its explicit selection', async () => {
   const route = 'host/targets/t-first/roles/r-first/legacy';
   const targets = [{target_id: 't-first', roles: [{role_id: 'r-first', role_name: '星缘',
-    legacy_api: '/astrbot_plugin_private_companion/' + route}]}];
+    legacy_api: '/astrbot_plugin_digital_life/' + route}]}];
   const plan = {
     plan_token: 'memory-plan-token',
     reaction_assets: {total: 0, ready: 0, batch_count: 0, batch_bytes: 0},
@@ -1880,7 +1880,7 @@ test('an exact one-to-one persona match is only a removable candidate until the 
   const route = 'host/targets/t-first/roles/r-first/legacy';
   const targets = [{target_id: 't-first', display_name: '账号一', roles: [{role_id: 'r-first',
     role_name: '角色一', persona_ids: ['persona-a'],
-    legacy_api: '/astrbot_plugin_private_companion/' + route}]}];
+    legacy_api: '/astrbot_plugin_digital_life/' + route}]}];
   const personaSources = [{persona_id: 'persona-a', label: 'V1 人格：persona-a', state: 'ready'}];
   const {page} = await legacyPersonaMappingPage({targets, personaSources});
 
@@ -1918,7 +1918,7 @@ test('persona ID candidates stay unselected when matching is one-to-many or many
   const route = 'host/targets/t-first/roles/r-first/legacy';
   const role = (targetId, roleId, personaIds) => ({target_id: targetId, display_name: targetId, roles: [{
     role_id: roleId, persona_ids: personaIds,
-    legacy_api: '/astrbot_plugin_private_companion/' + `host/targets/${targetId}/roles/${roleId}/legacy`,
+    legacy_api: '/astrbot_plugin_digital_life/' + `host/targets/${targetId}/roles/${roleId}/legacy`,
   }]});
   const cases = [
     ['one V1 persona matches multiple V2 roles', {
@@ -2066,7 +2066,7 @@ test('mapping opens with a read-only inventory and source changes retain choices
   const changed = migrationDataFixture({plan_token: 'data-persona-b', source_persona_id: 'persona-b',
     group_networks: [{source_group_id: 'new-group', member_count: 2, edge_count: 1}]});
   const page = harness({status: readyStatus(), targets: [{target_id: 'private', scope_kind: 'private',
-    roles: [{role_id: 'role', legacy_api: '/astrbot_plugin_private_companion/' + route}]}], responses: {
+    roles: [{role_id: 'role', legacy_api: '/astrbot_plugin_digital_life/' + route}]}], responses: {
     ['GET ' + route + '/data-plan']: [initial, personaPending, {...changed, plan_token: 'data-group'}],
     ['POST ' + route + '/data-apply']: {reaction_created: 1, errors: []},
   }});
@@ -2098,7 +2098,7 @@ test('archive opt-out reaches the apply request and missing confirmations keep i
   const route = 'host/targets/private/roles/role/legacy';
   const plan = migrationDataFixture({journals: {batch_count: 2}});
   const page = harness({status: readyStatus(), targets: [{target_id: 'private', roles: [{role_id: 'role',
-    legacy_api: '/astrbot_plugin_private_companion/' + route}]}], responses: {
+    legacy_api: '/astrbot_plugin_digital_life/' + route}]}], responses: {
     ['GET ' + route + '/data-plan']: plan,
     ['POST ' + route + '/data-apply']: {reaction_created: 1, journal_created: 2, errors: []},
   }});
@@ -2127,9 +2127,9 @@ test('member-profile-only group sources can be selected and mapped through the g
   const groupRoute = 'host/targets/group/roles/role/legacy-group-data';
   const plan = migrationDataFixture({worldbook: {member_profile_groups: [{source_group_id: '789', member_count: 2}]}});
   const page = harness({status: readyStatus(), targets: [{target_id: 'private', scope_kind: 'private', roles: [
-    {role_id: 'role', legacy_api: '/astrbot_plugin_private_companion/' + route}]},
+    {role_id: 'role', legacy_api: '/astrbot_plugin_digital_life/' + route}]},
     {target_id: 'group', scope_kind: 'group', roles: [{role_id: 'role',
-      legacy_group_data_api: '/astrbot_plugin_private_companion/' + groupRoute}]}], responses: {
+      legacy_group_data_api: '/astrbot_plugin_digital_life/' + groupRoute}]}], responses: {
     ['GET ' + route + '/data-plan']: plan,
     ['GET ' + groupRoute + '/plan']: {plan_token: 'group-plan', source_group_id: '789', group_worldbook: {members: 2, entries: 0}},
     ['POST ' + groupRoute + '/apply']: {group_worldbook: {state: 'imported', members_imported: 2}},
@@ -2167,7 +2167,7 @@ test('one chosen persona can preview member-only worldbook without deciding unre
   const scoped = migrationDataFixture({source_persona_id: 'persona-b',
     worldbook: {general_count: 0, member_count: 2, requires_id_confirmation: true}});
   const page = harness({status: readyStatus(), targets: [{target_id: 'private', roles: [{role_id: 'role',
-    legacy_api: '/astrbot_plugin_private_companion/' + route}]}], responses: {
+    legacy_api: '/astrbot_plugin_digital_life/' + route}]}], responses: {
     ['GET ' + route + '/data-plan']: [base, scoped],
   }});
   page.mountMigration();
@@ -2192,7 +2192,7 @@ test('late migration responses cannot repopulate a newly mounted workspace', asy
   let finishPlan;
   const pending = new Promise(resolve => { finishPlan = resolve; });
   const page = harness({status: readyStatus(), targets: [{target_id: 'private', roles: [{role_id: 'role',
-    legacy_api: '/astrbot_plugin_private_companion/' + route}]}], responses: {['GET ' + route + '/data-plan']: pending}});
+    legacy_api: '/astrbot_plugin_digital_life/' + route}]}], responses: {['GET ' + route + '/data-plan']: pending}});
   page.mountMigration();
   await settle();
   await openLegacyManual(page);
@@ -2213,7 +2213,7 @@ test('a pending configuration scan does not block mapping navigation or inventor
   let finishScan;
   const pending = new Promise(resolve => { finishScan = resolve; });
   const page = harness({status: readyStatus(), targets: [{target_id: 'private', roles: [{role_id: 'role',
-    legacy_api: '/astrbot_plugin_private_companion/' + route}]}], responses: {
+    legacy_api: '/astrbot_plugin_digital_life/' + route}]}], responses: {
     ['GET ' + route]: pending,
     ['GET ' + route + '/data-plan']: migrationDataFixture(),
   }});
@@ -2246,7 +2246,7 @@ test('out-of-order persona and group previews preserve the latest selection and 
         const latest = migrationDataFixture({plan_token: 'latest', reaction_assets: {batch_count: 2},
           source_group_id: field === 'data-group' ? 'g2' : '', group_networks: initial.group_networks});
         const page = harness({status: readyStatus(), targets: [{target_id: 'private', roles: [{role_id: 'role',
-          legacy_api: '/astrbot_plugin_private_companion/' + route}]}], responses: {
+          legacy_api: '/astrbot_plugin_digital_life/' + route}]}], responses: {
           ['GET ' + route + '/data-plan']: [initial, pending, latest],
         }});
         page.mountMigration();
@@ -2277,7 +2277,7 @@ test('an import locks conflicting edits and duplicate writes while result naviga
   let finishImport;
   const pending = new Promise(resolve => { finishImport = resolve; });
   const page = harness({status: readyStatus(), targets: [{target_id: 'private', roles: [{role_id: 'role',
-    legacy_api: '/astrbot_plugin_private_companion/' + route}]}], responses: {
+    legacy_api: '/astrbot_plugin_digital_life/' + route}]}], responses: {
     ['GET ' + route + '/data-plan']: migrationDataFixture(),
     ['POST ' + route + '/data-apply']: pending,
   }});
@@ -2312,7 +2312,7 @@ test('one selected persona can import without mapping unrelated personas', async
   const route = 'host/targets/private/roles/role/legacy';
   const plan = migrationDataFixture({source_persona_id: 'persona-b', source_fingerprint: 'source'});
   const page = harness({status: readyStatus(), targets: [{target_id: 'private', roles: [{role_id: 'role',
-    legacy_api: '/astrbot_plugin_private_companion/' + route}]}], responses: {
+    legacy_api: '/astrbot_plugin_digital_life/' + route}]}], responses: {
     ['GET ' + route + '/data-plan']: [migrationDataFixture(), plan],
     ['POST ' + route + '/data-apply']: {source_persona_id: 'persona-b', reaction_created: 1, errors: []},
   }});
@@ -2336,7 +2336,7 @@ test('one selected persona can import without mapping unrelated personas', async
 test('review keeps three read-only blocks and a separate per-item entry', async () => {
   const route = 'host/targets/private/roles/role/legacy';
   const page = harness({status: readyStatus(), targets: [{target_id: 'private', roles: [{role_id: 'role',
-    legacy_api: '/astrbot_plugin_private_companion/' + route}]}], responses: {
+    legacy_api: '/astrbot_plugin_digital_life/' + route}]}], responses: {
     ['GET ' + route]: {findings: [{source_id: 'private.host_configuration', state: 'unreadable'}]},
     ['GET ' + route + '/data-plan']: migrationDataFixture({journals: {batch_count: 3}}),
   }});
@@ -2373,9 +2373,9 @@ test('a group preview cannot restore a mapping after its destination changes', a
   let finishOld;
   const pending = new Promise(resolve => { finishOld = resolve; });
   const page = harness({status: readyStatus(), targets: [{target_id: 'private', roles: [{role_id: 'role',
-    legacy_api: '/astrbot_plugin_private_companion/' + route}]},
+    legacy_api: '/astrbot_plugin_digital_life/' + route}]},
     {target_id: 'group', scope_kind: 'group', roles: [{role_id: 'role', legacy_group_data_api:
-      '/astrbot_plugin_private_companion/' + groupRoute}]}], responses: {
+      '/astrbot_plugin_digital_life/' + groupRoute}]}], responses: {
     ['GET ' + route + '/data-plan']: migrationDataFixture({group_networks: [{source_group_id: 'g1'}]}),
     ['GET ' + groupRoute + '/plan']: pending,
   }});
@@ -2399,7 +2399,7 @@ test('a persona preview cannot attach its plan to an edited destination', async 
   let finishOld;
   const pending = new Promise(resolve => { finishOld = resolve; });
   const page = harness({status: readyStatus(), targets: [{target_id: 'private', roles: [{role_id: 'role',
-    legacy_api: '/astrbot_plugin_private_companion/' + route}]}], responses: {
+    legacy_api: '/astrbot_plugin_digital_life/' + route}]}], responses: {
     ['GET ' + route + '/data-plan']: [migrationDataFixture(), pending],
   }});
   page.mountMigration();

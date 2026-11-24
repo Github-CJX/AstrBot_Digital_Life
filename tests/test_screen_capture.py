@@ -4,13 +4,13 @@ import asyncio
 from datetime import timedelta
 import unittest
 
-from companion_v2.capabilities import CapabilityAuthorizationState
-from companion_v2.foundation.refs import AudienceRef, ScopeKind, ScopeRef
-from companion_v2.screen import (
+from digital_life_core.capabilities import CapabilityAuthorizationState
+from digital_life_core.foundation.refs import AudienceRef, ScopeKind, ScopeRef
+from digital_life_core.screen import (
     SCREEN_EXTENSION, SCREEN_READ, ClockQuality, DeviceSnapshot,
     ScreenCaptureService, ScreenRepository,
 )
-from companion_v2.storage.repositories import OperationRepository
+from digital_life_core.storage.repositories import OperationRepository
 
 from tests.g6_support import G6Fixture, NOW
 from tests.test_screen_originals import IMAGE

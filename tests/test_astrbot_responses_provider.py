@@ -14,20 +14,20 @@ from astrbot.core.provider.sources.gemini_source import ProviderGoogleGenAI
 from astrbot.core.provider.sources.openai_responses_source import ProviderOpenAIResponses
 from astrbot.core.provider.sources.openai_source import ProviderOpenAIOfficial
 
-from companion_v2.adapters.astrbot import provider as provider_module
-from companion_v2.adapters.astrbot.model_wire import ModelWire, REPLY_CONTRACT_EXAMPLE, build_wire, tool_alias
-from companion_v2.adapters.astrbot.provider import (
+from digital_life_core.adapters.astrbot import provider as provider_module
+from digital_life_core.adapters.astrbot.model_wire import ModelWire, REPLY_CONTRACT_EXAMPLE, build_wire, tool_alias
+from digital_life_core.adapters.astrbot.provider import (
     AstrBotTextProvider, PROBE_OUTPUT_TOKENS, UsageTariff, _chat_image_urls, _responses_image_urls,
     provider_fingerprint,
 )
-from companion_v2.adapters.astrbot.provider_catalog import TextProviderSettings, assemble_providers
-from companion_v2.conversation.foreground import PromptMaterial, PromptRequest, SealedForegroundContext
-from companion_v2.conversation.models import InboundConversationEvent
-from companion_v2.execution.models import ProviderBinding, digest
-from companion_v2.foundation.refs import ScopeKind, ScopeRef, SourceRef, SubjectKind, SubjectRef, VersionRef
-from companion_v2.identity_policy.models import AuthenticatedHostPrincipal, RoleBinding
-from companion_v2.model_gateway.failures import ModelFailure
-from companion_v2.model_gateway.models import Amount, ModelEnvelope, ToolSpec
+from digital_life_core.adapters.astrbot.provider_catalog import TextProviderSettings, assemble_providers
+from digital_life_core.conversation.foreground import PromptMaterial, PromptRequest, SealedForegroundContext
+from digital_life_core.conversation.models import InboundConversationEvent
+from digital_life_core.execution.models import ProviderBinding, digest
+from digital_life_core.foundation.refs import ScopeKind, ScopeRef, SourceRef, SubjectKind, SubjectRef, VersionRef
+from digital_life_core.identity_policy.models import AuthenticatedHostPrincipal, RoleBinding
+from digital_life_core.model_gateway.failures import ModelFailure
+from digital_life_core.model_gateway.models import Amount, ModelEnvelope, ToolSpec
 from tests.native_adapter_support import NativeFixture
 
 
@@ -442,7 +442,7 @@ class ResponsesProviderTests(unittest.IsolatedAsyncioTestCase):
 
 class StagingStreamingReportTests(unittest.TestCase):
     def test_inspect_reads_the_adapter_streaming_capability(self):
-        from companion_v2.adapters.astrbot.staging import AstrBotStagingSession
+        from digital_life_core.adapters.astrbot.staging import AstrBotStagingSession
 
         native, _state = make_provider()
         adapter = make_adapter(native, streaming=True)
@@ -459,7 +459,7 @@ class StagingStreamingReportTests(unittest.TestCase):
                              NS(state="applied", generation=0)))
         session._configuration = lambda: NS(resolution_token="token")
         session._delivery_authorization_report = lambda: {"required": False}
-        with patch("companion_v2.adapters.astrbot.staging.require", lambda value: value):
+        with patch("digital_life_core.adapters.astrbot.staging.require", lambda value: value):
             report = session._inspect(None)
         self.assertEqual(report["model_transport"], "astrbot_openai_responses")
         self.assertFalse(report["streaming"]["available"])

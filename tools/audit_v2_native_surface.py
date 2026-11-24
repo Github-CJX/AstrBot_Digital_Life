@@ -11,25 +11,25 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
-from companion_v2.conversation.media.quota import configuration_fields as quota_fields
-from companion_v2.conversation.media.review import configuration_fields as review_fields
-from companion_v2.conversation.perception_settings import configuration_fields as perception_fields
-from companion_v2.conversation.reply_settings import configuration_fields as reply_fields
-from companion_v2.conversation.segmentation import SegmentationPolicy
-from companion_v2.expression.configuration import configuration_fields as expression_fields
-from companion_v2.expression.reaction_configuration import configuration_fields as reaction_fields
-from companion_v2.conversation.busy_gate import configuration_fields as busy_gate_fields
-from companion_v2.model_gateway.budget import configuration_fields as budget_fields
-from companion_v2.memory.configuration import extend_registry
-from companion_v2.memory.models import MemoryPolicy
-from companion_v2.memory.person.configuration import configuration_fields as person_fields
-from companion_v2.model_gateway.models import Lane, ModelTaskProfile
-from companion_v2.model_gateway.routing import configuration_fields as model_fields
-from companion_v2.proactive.configuration import configuration_fields as contact_fields, with_contact_fields
-from companion_v2.role_work.growth.configuration import configuration_fields as growth_fields
-from companion_v2.role_work.life.configuration import configuration_fields as life_fields
-from companion_v2.role_work.state.configuration import configuration_fields as state_fields
-from companion_v2.configuration.registry import FieldRegistry
+from digital_life_core.conversation.media.quota import configuration_fields as quota_fields
+from digital_life_core.conversation.media.review import configuration_fields as review_fields
+from digital_life_core.conversation.perception_settings import configuration_fields as perception_fields
+from digital_life_core.conversation.reply_settings import configuration_fields as reply_fields
+from digital_life_core.conversation.segmentation import SegmentationPolicy
+from digital_life_core.expression.configuration import configuration_fields as expression_fields
+from digital_life_core.expression.reaction_configuration import configuration_fields as reaction_fields
+from digital_life_core.conversation.busy_gate import configuration_fields as busy_gate_fields
+from digital_life_core.model_gateway.budget import configuration_fields as budget_fields
+from digital_life_core.memory.configuration import extend_registry
+from digital_life_core.memory.models import MemoryPolicy
+from digital_life_core.memory.person.configuration import configuration_fields as person_fields
+from digital_life_core.model_gateway.models import Lane, ModelTaskProfile
+from digital_life_core.model_gateway.routing import configuration_fields as model_fields
+from digital_life_core.proactive.configuration import configuration_fields as contact_fields, with_contact_fields
+from digital_life_core.role_work.growth.configuration import configuration_fields as growth_fields
+from digital_life_core.role_work.life.configuration import configuration_fields as life_fields
+from digital_life_core.role_work.state.configuration import configuration_fields as state_fields
+from digital_life_core.configuration.registry import FieldRegistry
 
 
 def build():

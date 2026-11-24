@@ -8,15 +8,15 @@ import unittest
 
 from tests.multi_host_support import MultiFixture
 from astrbot.core.agent.message import Message, dump_messages_with_checkpoints
-from astrbot_host.core_reply import CORE_REPLY_CONTEXT_EXTRA
-from astrbot_host.core_reply_perception import (
+from digital_life_host.core_reply import CORE_REPLY_CONTEXT_EXTRA
+from digital_life_host.core_reply_perception import (
     _compact_private_reply_context, inject_core_reply_perception_context,
     inject_core_reply_perception_policy,
 )
-from companion_v2.conversation.private_reply_context import (
+from digital_life_core.conversation.private_reply_context import (
     capture_private_reply_context, merged_input_sequence,
 )
-from companion_v2.execution.models import TaskError, stamp
+from digital_life_core.execution.models import TaskError, stamp
 
 
 class PrivateReplyContextTests(MultiFixture, unittest.IsolatedAsyncioTestCase):
@@ -124,7 +124,7 @@ class PrivateReplyContextTests(MultiFixture, unittest.IsolatedAsyncioTestCase):
         await inject_core_reply_perception_context(event, request, application=self.app)
         self.assertEqual(len(request.extra_user_content_parts), 1)
         payload = json.loads(request.extra_user_content_parts[-1].text.split("\n", 1)[1]
-                             .removesuffix("\n</companion_v2_context>"))
+                             .removesuffix("\n</digital_life_core_context>"))
         self.assertEqual(payload["private_reply_context"]["after_input"][0]["text"], "你确定要看？")
         self.assertEqual(request.system_prompt, system)
         self.assertEqual(request.prompt, "看看")
@@ -156,7 +156,7 @@ class PrivateReplyContextTests(MultiFixture, unittest.IsolatedAsyncioTestCase):
         await inject_core_reply_perception_context(event, request, application=self.app)
 
         payload = json.loads(request.extra_user_content_parts[-1].text.split("\n", 1)[1]
-                             .removesuffix("\n</companion_v2_context>"))
+                             .removesuffix("\n</digital_life_core_context>"))
         timeline = payload["private_reply_context"]
         native, first, second = [item for item in timeline["before_input"] if item["speaker"] == "assistant"]
         self.assertTrue(native["text_in_host_history"])
@@ -179,10 +179,10 @@ class PrivateReplyContextTests(MultiFixture, unittest.IsolatedAsyncioTestCase):
         self.assertEqual(material["after_input"], [])
         self.assertIsNone(material["last_sent_reply_turn_id"])
         from unittest.mock import Mock, patch
-        from companion_v2.foundation.outcome import Outcome
+        from digital_life_core.foundation.outcome import Outcome
         with patch.object(self.app.messages.tasks, "authorize_context", return_value=Outcome.failed(
                 "access_denied", "test access revoked")), patch(
-                "companion_v2.conversation.private_reply_context.dialogue", Mock()) as history:
+                "digital_life_core.conversation.private_reply_context.dialogue", Mock()) as history:
             with self.assertRaises(TaskError):
                 self.capture(current)
             history.assert_not_called()

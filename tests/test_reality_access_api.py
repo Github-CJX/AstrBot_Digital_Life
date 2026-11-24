@@ -13,20 +13,20 @@ from tests.multi_host_support import MultiFixture, MultiNativeContext, multi_con
 from astrbot.api.web import PluginRequest, bind_request_context
 from astrbot.core.agent.message import Message, ToolCall
 from astrbot.core.provider.entities import ProviderRequest
-from astrbot_host.core_reply import prepare_core_reply_event
-from astrbot_host.core_reply_tools import inject_core_reply_tools, native_tool_name
-from astrbot_host.management_identity import dashboard_operator
-from astrbot_host.multi_controller import AstrBotMultiController
-from astrbot_host.reality_access_api import CAPABILITY_PATHS, PREFIX
-from astrbot_host.native_perception_api import PREFIX as PERCEPTION_PREFIX
-from companion_v2.capabilities.reality_access import ACTION
-from companion_v2.capabilities.reality_camera import ACTION as CAMERA_ACTION
-from companion_v2.conversation.native_tool_results import operation_row, snapshot as native_snapshot
-from companion_v2.execution.models import TaskContext, TaskError, require
-from companion_v2.foundation.outcome import Outcome
-from companion_v2.foundation.refs import AudienceRef
-from companion_v2.identity_policy.models import AuthorizationTier
-from companion_v2.identity_policy.object_access import ObjectAccessPolicy
+from digital_life_host.core_reply import prepare_core_reply_event
+from digital_life_host.core_reply_tools import inject_core_reply_tools, native_tool_name
+from digital_life_host.management_identity import dashboard_operator
+from digital_life_host.multi_controller import AstrBotMultiController
+from digital_life_host.reality_access_api import CAPABILITY_PATHS, PREFIX
+from digital_life_host.native_perception_api import PREFIX as PERCEPTION_PREFIX
+from digital_life_core.capabilities.reality_access import ACTION
+from digital_life_core.capabilities.reality_camera import ACTION as CAMERA_ACTION
+from digital_life_core.conversation.native_tool_results import operation_row, snapshot as native_snapshot
+from digital_life_core.execution.models import TaskContext, TaskError, require
+from digital_life_core.foundation.outcome import Outcome
+from digital_life_core.foundation.refs import AudienceRef
+from digital_life_core.identity_policy.models import AuthorizationTier
+from digital_life_core.identity_policy.object_access import ObjectAccessPolicy
 from starlette.requests import Request
 
 

@@ -23,15 +23,15 @@ import sys
 import unittest
 from dataclasses import dataclass
 
-from astrbot_host.memory_api import PREFIX as MEMORY_PREFIX
-from astrbot_host.page_api import PageWebAPI
-from companion_v2.adapters.astrbot.memory_owner import (
+from digital_life_host.memory_api import PREFIX as MEMORY_PREFIX
+from digital_life_host.page_api import PageWebAPI
+from digital_life_core.adapters.astrbot.memory_owner import (
     MEMORY_OWNER_MODULE_NAMES,
     MEMORY_OWNER_PLUGIN_ID,
     memory_owner_provider,
     read_memory_ownership,
 )
-from companion_v2.capabilities.ownership import (
+from digital_life_core.capabilities.ownership import (
     DEFAULT_MEMORY_OWNER,
     MemoryOwnership,
     REASON_DECLARATION_ABSENT,
@@ -44,16 +44,16 @@ from companion_v2.capabilities.ownership import (
     SelfMemoryOwner,
     delegated_memory,
 )
-from companion_v2.legacy.catalog import (
+from digital_life_core.legacy.catalog import (
     CAPABILITY_DISPOSITIONS,
     LEGACY_COMPATIBILITY_CATALOG,
     CatalogAction,
     validate_capability_dispositions,
 )
-from companion_v2.memory import codec
-from companion_v2.memory.context import DELEGATED_STATE
-from companion_v2.memory.models import AtomRef, Proposal
-from companion_v2.memory.prompts import MEMORY_INSTRUCTION
+from digital_life_core.memory import codec
+from digital_life_core.memory.context import DELEGATED_STATE
+from digital_life_core.memory.models import AtomRef, Proposal
+from digital_life_core.memory.prompts import MEMORY_INSTRUCTION
 from tests.test_host_application import HostFixture
 
 PAGE = pathlib.Path(__file__).resolve().parents[1] / "pages" / "陪伴小屋"

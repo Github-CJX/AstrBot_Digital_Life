@@ -9,15 +9,15 @@ import sys
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
-from companion_v2.storage.semantic import DEFAULTS as SEMANTIC_DEFAULTS
-from companion_v2.storage.semantic import INTEGER_LIMITS as SEMANTIC_INTEGER_LIMITS
-from companion_v2.storage.semantic import PROBABILITY_FIELDS as SEMANTIC_PROBABILITY_FIELDS
-from companion_v2.storage.semantic import SETTING_OPTIONS as SEMANTIC_OPTIONS
-from companion_v2.legacy.catalog import V1_SUPPORTED_VERSION
-from companion_v2.legacy.behavior_configuration import TARGET_OVERRIDES
+from digital_life_core.storage.semantic import DEFAULTS as SEMANTIC_DEFAULTS
+from digital_life_core.storage.semantic import INTEGER_LIMITS as SEMANTIC_INTEGER_LIMITS
+from digital_life_core.storage.semantic import PROBABILITY_FIELDS as SEMANTIC_PROBABILITY_FIELDS
+from digital_life_core.storage.semantic import SETTING_OPTIONS as SEMANTIC_OPTIONS
+from digital_life_core.legacy.catalog import V1_SUPPORTED_VERSION
+from digital_life_core.legacy.behavior_configuration import TARGET_OVERRIDES
 
 SOURCE = ROOT / "docs" / "V1_V2_CONFIG_RESOLVED_20260928.csv"
-DESTINATION = ROOT / "companion_v2" / "legacy" / "configuration_rules.json"
+DESTINATION = ROOT / "digital_life_core" / "legacy" / "configuration_rules.json"
 MIGRATABLE_VERDICTS = {"already-in-v2", "renamed-equivalent"}
 SUPPORTED_CONFIDENCE = {"high", "medium"}
 PLUGIN_CONVERSIONS = {

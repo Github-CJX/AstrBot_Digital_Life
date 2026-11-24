@@ -6,15 +6,15 @@ import json
 import unittest
 from unittest.mock import patch
 
-from companion_v2.configuration.registry import ValueKind
-from companion_v2.conversation.delivery import DeliveryEnvelope
-from companion_v2.conversation.reply_management import ReplyManagement
-from companion_v2.delivery.plan import DeliveryContent, OutboundPlan, PokePlan, VoicePlan
-from companion_v2.delivery.service import DeliveryRequest
-from companion_v2.execution.models import TERMINAL, digest
-from companion_v2.foundation.outcome import Outcome
-from companion_v2.proactive.configuration import GROUP, configuration_fields
-from companion_v2.proactive.prompts import contact_output
+from digital_life_core.configuration.registry import ValueKind
+from digital_life_core.conversation.delivery import DeliveryEnvelope
+from digital_life_core.conversation.reply_management import ReplyManagement
+from digital_life_core.delivery.plan import DeliveryContent, OutboundPlan, PokePlan, VoicePlan
+from digital_life_core.delivery.service import DeliveryRequest
+from digital_life_core.execution.models import TERMINAL, digest
+from digital_life_core.foundation.outcome import Outcome
+from digital_life_core.proactive.configuration import GROUP, configuration_fields
+from digital_life_core.proactive.prompts import contact_output
 from tests.native_adapter_support import FakeReverseApi, NativeFixture
 from tests.proactive_support import ContactFixture
 from tests.test_role_tool_loop import answered

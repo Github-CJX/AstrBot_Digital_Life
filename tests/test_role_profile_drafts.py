@@ -3,7 +3,7 @@ from __future__ import annotations
 import json
 import unittest
 
-from companion_v2.role_profile.drafts import (
+from digital_life_core.role_profile.drafts import (
     DRAFT_FIELD_LIMITS,
     MAX_KNOWLEDGE_CHARS,
     MAX_KNOWLEDGE_ITEMS,
@@ -11,7 +11,7 @@ from companion_v2.role_profile.drafts import (
     normalize_knowledge_references,
     parse_role_profile_draft,
 )
-from companion_v2.relationships.profile_drafts import (
+from digital_life_core.relationships.profile_drafts import (
     build_relationship_profile_prompt,
     parse_relationship_profile_draft,
 )
@@ -68,7 +68,7 @@ class RoleProfileDraftPromptTests(unittest.TestCase):
         self.assertTrue(any("档案外字段" in note for note in stale["notes"]))
 
     def test_operator_control_fields_are_excluded_from_role_drafts(self):
-        from companion_v2.role_profile.configuration import CONTROL_FIELDS
+        from digital_life_core.role_profile.configuration import CONTROL_FIELDS
 
         controls = {name: "private-control-value" for name in CONTROL_FIELDS}
         prompt = build_role_profile_prompt("你住在海边。", current_profile=controls)

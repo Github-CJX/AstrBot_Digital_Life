@@ -172,7 +172,7 @@ window.CompanionStateMaintenance = (() => {
      界面上按「年份卡 → 节假日 / 调休上班 / 节气」填表单，
      结构化编辑即时序列化回 planning_annual_calendars；
      「高级」折叠里的原始文本框读写同一个字段，两边不会各说各话。
-     校验规则与后端 companion_v2/agenda/annual_calendar.py 对齐，
+     校验规则与后端 digital_life_core/agenda/annual_calendar.py 对齐，
      在保存前就把问题说清楚，而不是等宿主拒收再猜。*/
   const ANNUAL_SCHEMA="companion.annual-calendar.v1";
   const ANNUAL_YEARS_MAX=3;

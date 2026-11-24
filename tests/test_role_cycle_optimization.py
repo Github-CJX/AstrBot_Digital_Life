@@ -6,12 +6,12 @@ import json
 import unittest
 from unittest.mock import patch
 
-from companion_v2.conversation.state_context import ConversationStateContext
-from companion_v2.execution.models import TaskError, encode
-from companion_v2.role_work.state import cycle
-from companion_v2.role_work.state.configuration import DEFAULTS
-from companion_v2.role_work.state.cycle_prompts import INSTRUCTION, MAINTENANCE, PHASE_HINTS
-from companion_v2.role_work.state.service import RoleStateService
+from digital_life_core.conversation.state_context import ConversationStateContext
+from digital_life_core.execution.models import TaskError, encode
+from digital_life_core.role_work.state import cycle
+from digital_life_core.role_work.state.configuration import DEFAULTS
+from digital_life_core.role_work.state.cycle_prompts import INSTRUCTION, MAINTENANCE, PHASE_HINTS
+from digital_life_core.role_work.state.service import RoleStateService
 from tests.test_management_access import NOW
 from tests.test_role_cycle import assertion
 from tests.test_role_state import StateFixture, state_data

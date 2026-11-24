@@ -6,18 +6,18 @@ import json
 from types import SimpleNamespace
 import unittest
 
-from astrbot_host.native_extensions import NativeExtensionRegistry
-from astrbot_host.native_extensions.builtins import BundledNativeLease, MANAGED_EXTENSIONS
-from astrbot_host.native_extensions.screen_provider import NativeScreenProvider, PLUGIN_ID as SCREEN_PACKAGE_ID
-from companion_v2.capabilities import native_reads
-from companion_v2.capabilities.models import CapabilityAuthorizationState, CapabilityPackageDescriptor, FurnitureDescriptor
-from companion_v2.capabilities.repositories import CapabilityRepository
-from companion_v2.conversation.flow import ConversationPolicy
-from companion_v2.execution.models import encode
-from companion_v2.model_gateway.models import ToolCall
-from companion_v2.product import PRODUCT_VERSION
-from companion_v2.screen import SCREEN_EXTENSION
-from companion_v2.storage.runtime import StorageRuntime
+from digital_life_host.native_extensions import NativeExtensionRegistry
+from digital_life_host.native_extensions.builtins import BundledNativeLease, MANAGED_EXTENSIONS
+from digital_life_host.native_extensions.screen_provider import NativeScreenProvider, PLUGIN_ID as SCREEN_PACKAGE_ID
+from digital_life_core.capabilities import native_reads
+from digital_life_core.capabilities.models import CapabilityAuthorizationState, CapabilityPackageDescriptor, FurnitureDescriptor
+from digital_life_core.capabilities.repositories import CapabilityRepository
+from digital_life_core.conversation.flow import ConversationPolicy
+from digital_life_core.execution.models import encode
+from digital_life_core.model_gateway.models import ToolCall
+from digital_life_core.product import PRODUCT_VERSION
+from digital_life_core.screen import SCREEN_EXTENSION
+from digital_life_core.storage.runtime import StorageRuntime
 from tests.test_host_application import HostFixture
 from tests.test_management_access import NOW, SCOPE
 from tests.test_native_extensions_registry import Context, Port, Star, SYNTHETIC_IMAGE_PLUGIN

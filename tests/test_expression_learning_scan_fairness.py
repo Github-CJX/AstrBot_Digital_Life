@@ -36,20 +36,20 @@ from tempfile import TemporaryDirectory
 from types import SimpleNamespace
 from unittest.mock import patch
 
-from companion_v2.execution.models import digest
-from companion_v2.execution.runner import RunResult
-from companion_v2.expression.style_service import (KIND, LEASE_PREFIX, OWNER, ExpressionStyleService,
+from digital_life_core.execution.models import digest
+from digital_life_core.execution.runner import RunResult
+from digital_life_core.expression.style_service import (KIND, LEASE_PREFIX, OWNER, ExpressionStyleService,
                                                    retry_wait_seconds)
-from companion_v2.foundation.outcome import Outcome
-from companion_v2.foundation.refs import OperationRef, ScopeKind, ScopeRef, VersionRef
-from companion_v2.storage.models import OperationState
-from companion_v2.storage.repositories import OperationRepository
-from companion_v2.storage.runtime import StorageRuntime
+from digital_life_core.foundation.outcome import Outcome
+from digital_life_core.foundation.refs import OperationRef, ScopeKind, ScopeRef, VersionRef
+from digital_life_core.storage.models import OperationState
+from digital_life_core.storage.repositories import OperationRepository
+from digital_life_core.storage.runtime import StorageRuntime
 
 NOW = datetime(2026, 10, 30, 9, 0, tzinfo=timezone.utc)
-LOGGER = "companion_v2.expression.style_service"
+LOGGER = "digital_life_core.expression.style_service"
 SKIPPED = "跳过同一批素材"
-SERVICE_PASSES = "companion_v2.expression.private_scope.role_private_contexts"
+SERVICE_PASSES = "digital_life_core.expression.private_scope.role_private_contexts"
 
 
 def context(number):
@@ -537,7 +537,7 @@ class DiscoveryFairnessTests(ScanFixture, unittest.IsolatedAsyncioTestCase):
         budget bounds that, and the windows behind it are untouched: the next pass
         starts where this one stopped and serves them.
         """
-        from companion_v2.expression.style_service import MAX_SCAN_PREPARES
+        from digital_life_core.expression.style_service import MAX_SCAN_PREPARES
         service = self.service()
         binding = context(0)
         windows = tuple(context(number) for number in range(1, 201))

@@ -7,8 +7,8 @@ from tempfile import TemporaryDirectory
 import unittest
 from unittest.mock import patch
 
-from companion_v2.storage.runtime import StorageRuntime, StorageOpenError
-from companion_v2.storage.schema import SCHEMA_VERSION, SCHEMA_VERSION_V29, MIGRATION_V29_TO_V30_ID
+from digital_life_core.storage.runtime import StorageRuntime, StorageOpenError
+from digital_life_core.storage.schema import SCHEMA_VERSION, SCHEMA_VERSION_V29, MIGRATION_V29_TO_V30_ID
 from tests.execution_support import remove_v30
 
 

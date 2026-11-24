@@ -17,10 +17,10 @@ from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 
 from PIL import Image
 
-from astrbot_host.native_extensions.screen_source import DEFAULTS, ScreenSourceSettings, capture_remote, validate
+from digital_life_host.native_extensions.screen_source import DEFAULTS, ScreenSourceSettings, capture_remote, validate
 from tests import test_native_screen_flow as native
-from companion_v2.capabilities import CapabilityAuthorizationState, CapabilityRepository
-from companion_v2.screen import SCREEN_EXTENSION, SCREEN_READ, SCREEN_PROCESS
+from digital_life_core.capabilities import CapabilityAuthorizationState, CapabilityRepository
+from digital_life_core.screen import SCREEN_EXTENSION, SCREEN_READ, SCREEN_PROCESS
 from tests.test_management_access import NOW, SCOPE
 from tools.remote_screen_collector import capture_desktop, make_server
 

@@ -3,8 +3,8 @@
 from types import SimpleNamespace as NS
 import unittest
 
-from companion_v2.execution.models import TaskError
-from companion_v2.proactive.service import ProactiveContacts
+from digital_life_core.execution.models import TaskError
+from digital_life_core.proactive.service import ProactiveContacts
 
 
 class ContactProfilePreflightTests(unittest.TestCase):
@@ -28,7 +28,7 @@ class ContactProfilePreflightTests(unittest.TestCase):
         self.assertEqual(detail["limit_code"], "host_model_limit_output")
         self.assertEqual((detail["requested_output_tokens"], detail["provider_max_output_tokens"]),
                          (2048, 1024))
-        with self.assertLogs("companion_v2.proactive.service", level="WARNING") as logs:
+        with self.assertLogs("digital_life_core.proactive.service", level="WARNING") as logs:
             with self.assertRaises(TaskError) as error:
                 ProactiveContacts._contact_profile_failure(run, detail)
         self.assertEqual(error.exception.code, "contact_model_profile_exceeded")

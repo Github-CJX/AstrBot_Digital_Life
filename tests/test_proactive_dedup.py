@@ -8,14 +8,14 @@ import unittest
 from unittest.mock import patch
 from zoneinfo import ZoneInfo
 
-from companion_v2.conversation.date_context import WEEKDAYS, period_label
-from companion_v2.conversation.segmentation import SegmentationPolicy
-from companion_v2.conversation.foreground import BackgroundPromptTrigger
-from companion_v2.conversation.flow import ConversationPolicy
-from companion_v2.execution.models import TaskError
-from companion_v2.proactive.configuration import configuration_fields, dedup_policies
-from companion_v2.proactive.prompts import news_presentation_instruction
-from companion_v2.proactive.preferences import DEDUP_EVENT_POLICY, DEDUP_PURPOSE_POLICY, ContactPreferences
+from digital_life_core.conversation.date_context import WEEKDAYS, period_label
+from digital_life_core.conversation.segmentation import SegmentationPolicy
+from digital_life_core.conversation.foreground import BackgroundPromptTrigger
+from digital_life_core.conversation.flow import ConversationPolicy
+from digital_life_core.execution.models import TaskError
+from digital_life_core.proactive.configuration import configuration_fields, dedup_policies
+from digital_life_core.proactive.prompts import news_presentation_instruction
+from digital_life_core.proactive.preferences import DEDUP_EVENT_POLICY, DEDUP_PURPOSE_POLICY, ContactPreferences
 from tests.contact_schedule_support import ContactScheduleFixture
 from tests.test_management_access import NOW
 from tests.test_role_tool_loop import answered
@@ -269,7 +269,7 @@ class WeatherDedupCoverageTests(unittest.TestCase):
                 self.assertIn(route, self.enabled)
 
     def test_every_registered_contact_purpose_has_a_deduplication_route(self):
-        from companion_v2.proactive.configuration import PURPOSES
+        from digital_life_core.proactive.configuration import PURPOSES
         self.assertEqual(set(DEDUP_PURPOSE_POLICY), set(PURPOSES))
 
     def test_a_weather_window_alone_cannot_suppress_anything(self):

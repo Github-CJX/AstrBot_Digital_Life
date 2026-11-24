@@ -1,13 +1,13 @@
 import logging
 import unittest
 
-from astrbot_host.log_buffer import install_log_buffer, snapshot
+from digital_life_host.log_buffer import install_log_buffer, snapshot
 
 
 class LogBufferTests(unittest.TestCase):
     def setUp(self):
         install_log_buffer()
-        self.logger = logging.getLogger("companion_v2.tests.log-buffer")
+        self.logger = logging.getLogger("digital_life_core.tests.log-buffer")
         self.logger.setLevel(logging.DEBUG)
 
     def test_recent_records_filter_by_level_and_query(self):

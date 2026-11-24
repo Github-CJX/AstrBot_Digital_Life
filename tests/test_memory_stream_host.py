@@ -3,9 +3,9 @@ from dataclasses import replace
 import json
 import unittest
 
-from companion_v2.execution.models import stamp
-from companion_v2.memory import codec
-from companion_v2.identity_policy.personas import RuntimeIdentity
+from digital_life_core.execution.models import stamp
+from digital_life_core.memory import codec
+from digital_life_core.identity_policy.personas import RuntimeIdentity
 from tests.test_host_application import HostFixture
 from tests import test_memory_commands_host as commands_support
 from tests.memory_stream_support import StreamFixture

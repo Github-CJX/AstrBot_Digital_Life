@@ -7,7 +7,7 @@ import unittest
 from pathlib import Path
 from types import SimpleNamespace
 
-from astrbot_host.native_extensions.image_native.output_configuration import (
+from digital_life_host.native_extensions.image_native.output_configuration import (
     public_configuration,
     save_configuration,
 )

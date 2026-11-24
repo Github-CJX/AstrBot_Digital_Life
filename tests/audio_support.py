@@ -4,8 +4,8 @@ import base64
 import io
 import struct
 
-from astrbot_host.audio.decoder import inspect_audio, wave_bytes
-from astrbot_host.audio.loader import load_native_audio
+from digital_life_host.audio.decoder import inspect_audio, wave_bytes
+from digital_life_host.audio.loader import load_native_audio
 from tests.native_adapter_support import FakeEvent
 from tests.test_conversation_images import ImageFixture
 

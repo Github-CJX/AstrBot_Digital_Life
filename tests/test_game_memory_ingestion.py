@@ -9,20 +9,20 @@ from unittest.mock import patch
 
 from tests import test_astrbot_staging_host as host_support
 from astrbot.core.agent.message import Message, ToolCall as NativeCall
-from astrbot_host.core_reply import prepare_core_reply_event
-from astrbot_host.core_reply_observations import CoreReplyObservations
-from astrbot_host.core_reply_tools import close_core_reply_tools, inject_core_reply_tools, native_tool_name
-from companion_v2.adapters.astrbot.native import NativeConversationInput
-from companion_v2.games.native import provider as game_provider
-from companion_v2.capabilities.models import CapabilityAuthorizationState
-from companion_v2.capabilities.repositories import CapabilityRepository
-from companion_v2.conversation.flow import ConversationPolicy
-from companion_v2.conversation.messages import source_from_document
-from companion_v2.execution.models import TaskContext, digest, encode, require
-from companion_v2.foundation.outcome import Outcome
-from companion_v2.foundation.refs import AudienceRef
-from companion_v2.identity_policy.personas import ConversationRoute
-from companion_v2.product import PRODUCT_VERSION
+from digital_life_host.core_reply import prepare_core_reply_event
+from digital_life_host.core_reply_observations import CoreReplyObservations
+from digital_life_host.core_reply_tools import close_core_reply_tools, inject_core_reply_tools, native_tool_name
+from digital_life_core.adapters.astrbot.native import NativeConversationInput
+from digital_life_core.games.native import provider as game_provider
+from digital_life_core.capabilities.models import CapabilityAuthorizationState
+from digital_life_core.capabilities.repositories import CapabilityRepository
+from digital_life_core.conversation.flow import ConversationPolicy
+from digital_life_core.conversation.messages import source_from_document
+from digital_life_core.execution.models import TaskContext, digest, encode, require
+from digital_life_core.foundation.outcome import Outcome
+from digital_life_core.foundation.refs import AudienceRef
+from digital_life_core.identity_policy.personas import ConversationRoute
+from digital_life_core.product import PRODUCT_VERSION
 from tests.native_internal_support import internal_registry
 from tests.test_game_native_blackjack import shoe_with_draws
 from tests.test_game_native_xiangqi import FakeEngine
@@ -34,10 +34,10 @@ from tests.test_astrbot_core_reply import FakeEvent
 class GameMemoryTests(HostFixture, unittest.IsolatedAsyncioTestCase):
     async def test_core_tool_terminal_receipt_reaches_background_experience_without_reply_batch(self):
         from astrbot.core.agent.message import Message, ToolCall as NativeCall
-        from astrbot_host.core_reply import prepare_core_reply_event
-        from astrbot_host.core_reply_tools import close_core_reply_tools, inject_core_reply_tools, native_tool_name
-        from companion_v2.execution.models import TaskContext, require
-        from companion_v2.foundation.refs import AudienceRef
+        from digital_life_host.core_reply import prepare_core_reply_event
+        from digital_life_host.core_reply_tools import close_core_reply_tools, inject_core_reply_tools, native_tool_name
+        from digital_life_core.execution.models import TaskContext, require
+        from digital_life_core.foundation.refs import AudienceRef
         from tests.test_astrbot_core_reply import FakeEvent
 
         host = await self.game_host()

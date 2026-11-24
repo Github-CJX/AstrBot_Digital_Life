@@ -3,9 +3,9 @@ from datetime import timedelta
 import json
 import unittest
 
-from companion_v2.execution.models import digest
-from companion_v2.memory.models import AtomRef
-from companion_v2.memory.search import SearchIndex
+from digital_life_core.execution.models import digest
+from digital_life_core.memory.models import AtomRef
+from digital_life_core.memory.search import SearchIndex
 from tests.memory_support import MemoryFixture
 
 

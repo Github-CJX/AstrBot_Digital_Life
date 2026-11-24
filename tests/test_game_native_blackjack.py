@@ -7,11 +7,11 @@ from types import SimpleNamespace
 import unittest
 from unittest.mock import patch
 
-from companion_v2.capabilities.native import parse_manifest
-from companion_v2.memory.game_ingestion import GAME_ACTIONS
-from companion_v2.games.blackjack import BlackjackCard, RANKS, SUITS
-from companion_v2.games.native import provider as game_provider
-from companion_v2.product import PRODUCT_VERSION
+from digital_life_core.capabilities.native import parse_manifest
+from digital_life_core.memory.game_ingestion import GAME_ACTIONS
+from digital_life_core.games.blackjack import BlackjackCard, RANKS, SUITS
+from digital_life_core.games.native import provider as game_provider
+from digital_life_core.product import PRODUCT_VERSION
 
 from tests.test_game_native_pig_dice import request
 from tests.native_internal_support import internal_registry

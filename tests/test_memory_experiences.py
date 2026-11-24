@@ -1,8 +1,8 @@
 from dataclasses import replace
 import unittest
 
-from companion_v2.memory.experiences import MemoryExperiences
-from companion_v2.memory.models import AtomRef
+from digital_life_core.memory.experiences import MemoryExperiences
+from digital_life_core.memory.models import AtomRef
 from tests.memory_support import MemoryFixture
 
 

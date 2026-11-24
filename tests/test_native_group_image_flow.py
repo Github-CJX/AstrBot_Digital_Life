@@ -6,10 +6,10 @@ import json
 from types import SimpleNamespace as NS
 import unittest
 
-from companion_v2.adapters.astrbot.model_wire import tool_alias
-from companion_v2.capabilities.models import CapabilityAuthorizationState
-from companion_v2.capabilities.repositories import CapabilityRepository
-from companion_v2.conversation.tool_loop import GROUP_EXTERNAL_ACTIONS
+from digital_life_core.adapters.astrbot.model_wire import tool_alias
+from digital_life_core.capabilities.models import CapabilityAuthorizationState
+from digital_life_core.capabilities.repositories import CapabilityRepository
+from digital_life_core.conversation.tool_loop import GROUP_EXTERNAL_ACTIONS
 from tests.group_image_delivery_support import GroupImageDeliveryFixture
 from tests.group_media_support import Plain, sdk_image
 from tests.image_delivery_support import image_reply, offered_images
@@ -17,7 +17,7 @@ from tests.native_adapter_support import completion
 from tests.native_image_support import ImageBackend
 from tests.staging_bootstrap_support import wait_for_batch
 from tests.test_conversation_images import image_bytes
-from astrbot_host.native_extensions.image_native.types import BackendResult
+from digital_life_host.native_extensions.image_native.types import BackendResult
 
 
 class NativeGroupImageFlowTests(GroupImageDeliveryFixture, unittest.IsolatedAsyncioTestCase):
@@ -35,7 +35,7 @@ class NativeGroupImageFlowTests(GroupImageDeliveryFixture, unittest.IsolatedAsyn
         await self.with_delivery()
         registry = self.controller.native_extensions
         self.assertIsNotNone(registry.image_extension_api())
-        registry.image_extension_api().companion_v2_native().owner.backend = self.image_backend
+        registry.image_extension_api().digital_life_core_native().owner.backend = self.image_backend
         context, _ = await self.receive_parts([Plain("准备原生图片能力")])
         self.assertIsNotNone(self.app.tools.external)
         self.package = next(declaration.descriptor.package for declaration in registry.declarations()
@@ -89,14 +89,14 @@ class NativeGroupImageFlowTests(GroupImageDeliveryFixture, unittest.IsolatedAsyn
         return image_reply(payload, text="已使用角色参考图完成修改。")
 
     def register_group_role_reference(self, context):
-        from companion_v2.references.configuration import (
+        from digital_life_core.references.configuration import (
             GROUP, ReferenceConfigurationOwner, configuration_fields, target_for,
         )
-        from companion_v2.references.models import (
+        from digital_life_core.references.models import (
             ContentDigest, ReferenceAsset, ReferenceKind, ReferenceRole, ReferenceSource,
         )
-        from companion_v2.references.repositories import ReferenceAssetRepository
-        from companion_v2.references.service import owner_key
+        from digital_life_core.references.repositories import ReferenceAssetRepository
+        from digital_life_core.references.service import owner_key
 
         ReferenceConfigurationOwner(self.app.runtime).write(
             target_for(context), configuration_fields(),

@@ -3,12 +3,12 @@ from dataclasses import replace
 from datetime import timedelta
 import unittest
 
-from companion_v2.execution.models import require, stamp
-from companion_v2.identity_policy.models import AuthorizationTier
-from companion_v2.memory.models import AtomRef
-from companion_v2.memory.service import MemoryService
-from companion_v2.memory.subscriptions import MemorySubscriptions
-from companion_v2.memory.stream_consumer import MemoryReferenceConsumer
+from digital_life_core.execution.models import require, stamp
+from digital_life_core.identity_policy.models import AuthorizationTier
+from digital_life_core.memory.models import AtomRef
+from digital_life_core.memory.service import MemoryService
+from digital_life_core.memory.subscriptions import MemorySubscriptions
+from digital_life_core.memory.stream_consumer import MemoryReferenceConsumer
 from tests.test_memory_wire import runtime_scope
 from tests.memory_stream_support import StreamFixture
 

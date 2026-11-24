@@ -23,20 +23,20 @@ try:  # google-genai 由宿主提供；缺依赖时该用例跳过而不是假�
 except ImportError:  # pragma: no cover - the real host installs it
     genai_types = None
 
-from astrbot_host.core_reply import CORE_REPLY_CONTEXT_EXTRA, prepare_core_reply_event
-from astrbot_host.core_reply_tools import (CoreReplyToolSession, close_core_reply_tools, group_tool_manifest,
+from digital_life_host.core_reply import CORE_REPLY_CONTEXT_EXTRA, prepare_core_reply_event
+from digital_life_host.core_reply_tools import (CoreReplyToolSession, close_core_reply_tools, group_tool_manifest,
                                            inject_core_reply_tools, native_tool_name)
-from astrbot_host.core_reply_telemetry import observe_core_agent_begin, prepare_core_reply_telemetry
-from astrbot_host.core_reply_tool_dispatch import observe_core_tool_dispatch_begin, restore_core_tool_dispatch
-from companion_v2.agenda.service import AgendaService
-from companion_v2.adapters.astrbot.tools import QzoneToolPort, map_tools
-from companion_v2.capabilities.models import CapabilityAuthorizationState
-from companion_v2.execution.models import TaskError, require
-from companion_v2.foundation.outcome import Outcome
-from companion_v2.foundation.refs import ScopeKind
-from companion_v2.model_gateway.models import MAX_TOOL_CATALOG, ToolCall as ExternalToolCall
-from companion_v2.qzone.capability import CAPABILITIES, EXTENSION, PUBLISH_ACTION, package_descriptor
-from companion_v2.qzone.service import QzoneService
+from digital_life_host.core_reply_telemetry import observe_core_agent_begin, prepare_core_reply_telemetry
+from digital_life_host.core_reply_tool_dispatch import observe_core_tool_dispatch_begin, restore_core_tool_dispatch
+from digital_life_core.agenda.service import AgendaService
+from digital_life_core.adapters.astrbot.tools import QzoneToolPort, map_tools
+from digital_life_core.capabilities.models import CapabilityAuthorizationState
+from digital_life_core.execution.models import TaskError, require
+from digital_life_core.foundation.outcome import Outcome
+from digital_life_core.foundation.refs import ScopeKind
+from digital_life_core.model_gateway.models import MAX_TOOL_CATALOG, ToolCall as ExternalToolCall
+from digital_life_core.qzone.capability import CAPABILITIES, EXTENSION, PUBLISH_ACTION, package_descriptor
+from digital_life_core.qzone.service import QzoneService
 from tests.test_astrbot_core_reply import FakeEvent
 from tests.test_external_tools import ExternalFixture, tool_call as external_tool_call
 from tests.test_management_access import SCOPE
@@ -131,7 +131,7 @@ class CoreReplyToolsTests(CoreReplyToolFixture, unittest.IsolatedAsyncioTestCase
         self.assertEqual(len(self.request.func_tool.tools), len(first) + 1)
 
     def test_unadmitted_core_runner_is_never_wrapped(self):
-        from astrbot_host.core_reply_tool_dispatch import CORE_TOOL_DISPATCH_EXTRA
+        from digital_life_host.core_reply_tool_dispatch import CORE_TOOL_DISPATCH_EXTRA
         event = FakeEvent()
         event.unified_msg_origin = "unadmitted-core-runner"
         wrapper = NS(context=NS(event=event))
@@ -255,7 +255,7 @@ class CoreReplyToolsTests(CoreReplyToolFixture, unittest.IsolatedAsyncioTestCase
             error.code = "p_skey=PRIVATE_SECRET"
             raise error
         self.extension_behavior = broken
-        with self.assertLogs("astrbot_host.core_reply_tool_execution", level="WARNING") as captured:
+        with self.assertLogs("digital_life_host.core_reply_tool_execution", level="WARNING") as captured:
             result = await self.call_native("device.play", {"query": "music"})
         self.assertEqual((result["state"], result["effect"], result["code"], result["retry_disposition"]),
                          ("unknown", "unknown", "core_tool_provider_unavailable", "external_effect_unknown"))
@@ -376,7 +376,7 @@ class CoreReplyToolsTests(CoreReplyToolFixture, unittest.IsolatedAsyncioTestCase
         if telemetry == "enabled":
             prepare_core_reply_telemetry(event, req, application=self.app, now=self.tasks.now)
         elif telemetry == "failed":
-            with patch("astrbot_host.core_reply_telemetry.prepare_core_reply_telemetry", side_effect=OSError("statistics unavailable")) as prepare:
+            with patch("digital_life_host.core_reply_telemetry.prepare_core_reply_telemetry", side_effect=OSError("statistics unavailable")) as prepare:
                 try:
                     prepare(event, req, application=self.app, now=self.tasks.now)
                 except OSError:
@@ -617,7 +617,7 @@ class PrivateCatalogProviderSchemaTests(ExternalFixture, unittest.IsolatedAsynci
         declarations = self.declarations()
         names = {declaration["name"] for declaration in declarations}
         # 修复前正是这两个声明携带 schedule.fold 的整数 enum。
-        self.assertTrue({"companion_v2_memo_create", "companion_v2_reminder_reschedule"} <= names, names)
+        self.assertTrue({"digital_life_core_memo_create", "digital_life_core_reminder_reschedule"} <= names, names)
         # gemini_source builds exactly this object before sending, so a schema a
         # provider client cannot construct fails the turn before any request.
         genai_types.Tool(function_declarations=declarations)

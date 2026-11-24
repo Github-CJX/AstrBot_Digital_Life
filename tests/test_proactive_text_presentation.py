@@ -4,10 +4,10 @@ import json
 import unittest
 from dataclasses import replace
 
-from companion_v2.conversation.reply_management import ReplyManagement
-from companion_v2.execution.models import TaskError
-from companion_v2.model_gateway.models import Amount
-from companion_v2.conversation.text_processing import text_policy
+from digital_life_core.conversation.reply_management import ReplyManagement
+from digital_life_core.execution.models import TaskError
+from digital_life_core.model_gateway.models import Amount
+from digital_life_core.conversation.text_processing import text_policy
 from tests.proactive_support import ContactFixture
 from tests.test_role_tool_loop import answered
 

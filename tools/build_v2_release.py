@@ -13,92 +13,92 @@ from tempfile import TemporaryDirectory
 import zipfile
 
 ROOT = Path(__file__).resolve().parents[1]
-CORE_ID = "astrbot_plugin_private_companion"
-VERSION = "7.3.1"
+CORE_ID = "astrbot_plugin_digital_life"
+VERSION = "0.1.0"
 RELEASE_SCHEMA = "companion.v2.release.v2"
 MARKET_MAX_BYTES = 16_000_000
 NATIVE_EXTENSION_FILES = {
-    "content": ("companion_v2/content/assembly.py", "companion_v2/content/provider.py",
-                "astrbot_host/native_extensions/content.py"),
-    "image": ("astrbot_host/native_extensions/image_native/bootstrap.py",
-              "astrbot_host/native_extensions/image_native/owner.py",
-              "astrbot_host/native_extensions/image_native/extension.py",
-              "astrbot_host/native_extensions/image_native/adapter.py",
-              "astrbot_host/native_extensions/image_settings.py"),
-    "screen": ("astrbot_host/native_extensions/screen_provider.py",
-               "astrbot_host/native_extensions/screens.py"),
-    "reality": ("companion_v2/reality/provider.py",
-                "astrbot_host/native_extensions/reality/runtime.py",
-                "astrbot_host/native_extensions/reality/_mihome_login_worker.py",
-                "astrbot_host/native_extensions/reality/_mihome_spec_worker.py",
-                "astrbot_host/native_extensions/reality/mihome_arc4_compat.py",
-                "astrbot_host/native_extensions/reality/settings-schema.json",
-                "astrbot_host/native_extensions/reality/settings-defaults.json",
-                "astrbot_host/native_extensions/reality/assets/reality_touch_device_test.mp3"),
-    "together": ("companion_v2/together/provider.py",
-                 "astrbot_host/native_extensions/together/runtime.py",
-                 "astrbot_host/native_extensions/together/settings-schema.json",
-                 "astrbot_host/native_extensions/together/settings-defaults.json",
-                 "astrbot_host/native_extensions/together/web/index.html",
-                 "astrbot_host/native_extensions/together/web/app.js",
-                 "astrbot_host/native_extensions/together/web/app.css",
-                 "astrbot_host/native_extensions/together/web/default-avatar.svg",
-                 "astrbot_host/native_extensions/together/web/lucide.min.js"),
-    "game": ("companion_v2/games/native/provider.py", "companion_v2/games/native/xiangqi.py",
-             "astrbot_host/native_extensions/game/runtime.py",
-             "astrbot_host/native_extensions/game/settings-schema.json",
-             "astrbot_host/native_extensions/game/settings-defaults.json",
-             "astrbot_host/native_extensions/game/web/index.html",
-             "astrbot_host/native_extensions/game/web/app.js",
-             "astrbot_host/native_extensions/game/web/app.css",
-             "astrbot_host/native_extensions/game/web/native.html",
-             "astrbot_host/native_extensions/game/web/native.js",
-             "astrbot_host/native_extensions/game/web/native-gomoku.js",
-             "astrbot_host/native_extensions/game/web/native-gomoku-input.js",
-             "astrbot_host/native_extensions/game/web/native.css",
-             "astrbot_host/native_extensions/game/web/lucide.min.js"),
-    "live": ("companion_v2/live/provider.py",
-             "astrbot_host/native_extensions/live/runtime.py",
-             "astrbot_host/native_extensions/live/soullink_bridge.mjs",
-             "astrbot_host/native_extensions/live/settings-schema.json",
-             "astrbot_host/native_extensions/live/settings-defaults.json",
-             "astrbot_host/native_extensions/live/blivedm/__init__.py",
-             "astrbot_host/native_extensions/live/blivedm/LICENSE",
-             "astrbot_host/native_extensions/live/vendor/soullink_emotion_engine/index.mjs",
-             "astrbot_host/native_extensions/live/vendor/soullink_emotion_engine/chunk-WF7NFOHV.mjs",
-             "astrbot_host/native_extensions/live/vendor/soullink_emotion_engine/LICENSE"),
+    "content": ("digital_life_core/content/assembly.py", "digital_life_core/content/provider.py",
+                "digital_life_host/native_extensions/content.py"),
+    "image": ("digital_life_host/native_extensions/image_native/bootstrap.py",
+              "digital_life_host/native_extensions/image_native/owner.py",
+              "digital_life_host/native_extensions/image_native/extension.py",
+              "digital_life_host/native_extensions/image_native/adapter.py",
+              "digital_life_host/native_extensions/image_settings.py"),
+    "screen": ("digital_life_host/native_extensions/screen_provider.py",
+               "digital_life_host/native_extensions/screens.py"),
+    "reality": ("digital_life_core/reality/provider.py",
+                "digital_life_host/native_extensions/reality/runtime.py",
+                "digital_life_host/native_extensions/reality/_mihome_login_worker.py",
+                "digital_life_host/native_extensions/reality/_mihome_spec_worker.py",
+                "digital_life_host/native_extensions/reality/mihome_arc4_compat.py",
+                "digital_life_host/native_extensions/reality/settings-schema.json",
+                "digital_life_host/native_extensions/reality/settings-defaults.json",
+                "digital_life_host/native_extensions/reality/assets/reality_touch_device_test.mp3"),
+    "together": ("digital_life_core/together/provider.py",
+                 "digital_life_host/native_extensions/together/runtime.py",
+                 "digital_life_host/native_extensions/together/settings-schema.json",
+                 "digital_life_host/native_extensions/together/settings-defaults.json",
+                 "digital_life_host/native_extensions/together/web/index.html",
+                 "digital_life_host/native_extensions/together/web/app.js",
+                 "digital_life_host/native_extensions/together/web/app.css",
+                 "digital_life_host/native_extensions/together/web/default-avatar.svg",
+                 "digital_life_host/native_extensions/together/web/lucide.min.js"),
+    "game": ("digital_life_core/games/native/provider.py", "digital_life_core/games/native/xiangqi.py",
+             "digital_life_host/native_extensions/game/runtime.py",
+             "digital_life_host/native_extensions/game/settings-schema.json",
+             "digital_life_host/native_extensions/game/settings-defaults.json",
+             "digital_life_host/native_extensions/game/web/index.html",
+             "digital_life_host/native_extensions/game/web/app.js",
+             "digital_life_host/native_extensions/game/web/app.css",
+             "digital_life_host/native_extensions/game/web/native.html",
+             "digital_life_host/native_extensions/game/web/native.js",
+             "digital_life_host/native_extensions/game/web/native-gomoku.js",
+             "digital_life_host/native_extensions/game/web/native-gomoku-input.js",
+             "digital_life_host/native_extensions/game/web/native.css",
+             "digital_life_host/native_extensions/game/web/lucide.min.js"),
+    "live": ("digital_life_core/live/provider.py",
+             "digital_life_host/native_extensions/live/runtime.py",
+             "digital_life_host/native_extensions/live/soullink_bridge.mjs",
+             "digital_life_host/native_extensions/live/settings-schema.json",
+             "digital_life_host/native_extensions/live/settings-defaults.json",
+             "digital_life_host/native_extensions/live/blivedm/__init__.py",
+             "digital_life_host/native_extensions/live/blivedm/LICENSE",
+             "digital_life_host/native_extensions/live/vendor/soullink_emotion_engine/index.mjs",
+             "digital_life_host/native_extensions/live/vendor/soullink_emotion_engine/chunk-WF7NFOHV.mjs",
+             "digital_life_host/native_extensions/live/vendor/soullink_emotion_engine/LICENSE"),
 }
-NATIVE_ASSEMBLY_FILES = ("astrbot_host/native_extensions/__init__.py",
-                         "astrbot_host/native_extensions/builtins.py",
-                         "astrbot_host/native_extensions/settings.py",
-                         "astrbot_host/native_extensions/service.py")
+NATIVE_ASSEMBLY_FILES = ("digital_life_host/native_extensions/__init__.py",
+                         "digital_life_host/native_extensions/builtins.py",
+                         "digital_life_host/native_extensions/settings.py",
+                         "digital_life_host/native_extensions/service.py")
 NATIVE_CAPABILITY_BASELINE = "tools/native_capability_baseline.json"
 NATIVE_HASH_GLOBS = {
-    "content": "companion_v2/content",
-    "image": "astrbot_host/native_extensions/image_native",
-    "reality": "companion_v2/reality",
-    "together": "companion_v2/together",
+    "content": "digital_life_core/content",
+    "image": "digital_life_host/native_extensions/image_native",
+    "reality": "digital_life_core/reality",
+    "together": "digital_life_core/together",
 }
 NATIVE_HASH_FILES = {
-    "screen": ("astrbot_host/native_extensions/screen_provider.py",
-               "astrbot_host/native_extensions/screen_source.py"),
+    "screen": ("digital_life_host/native_extensions/screen_provider.py",
+               "digital_life_host/native_extensions/screen_source.py"),
     "game": (
-        "companion_v2/games/native/provider.py", "companion_v2/games/tictactoe.py",
-        "companion_v2/games/gomoku.py", "companion_v2/games/pig_dice.py",
-        "companion_v2/games/blackjack.py", "companion_v2/games/xiangqi.py",
-        "companion_v2/games/pikafish.py", "companion_v2/games/native/xiangqi.py",
-        "companion_v2/games/turtle_soup.py", "companion_v2/games/draw_guess.py",
-        "companion_v2/games/native/context.py",
+        "digital_life_core/games/native/provider.py", "digital_life_core/games/tictactoe.py",
+        "digital_life_core/games/gomoku.py", "digital_life_core/games/pig_dice.py",
+        "digital_life_core/games/blackjack.py", "digital_life_core/games/xiangqi.py",
+        "digital_life_core/games/pikafish.py", "digital_life_core/games/native/xiangqi.py",
+        "digital_life_core/games/turtle_soup.py", "digital_life_core/games/draw_guess.py",
+        "digital_life_core/games/native/context.py",
     ),
-    "live": ("companion_v2/live/provider.py",),
+    "live": ("digital_life_core/live/provider.py",),
 }
 LEGACY_PROVIDER_IDS = frozenset("astrbot_plugin_" + name + "_companion" for name in
     ("content", "image", "reality", "screen", "together", "game", "live_stream"))
-CORE_DIRS = ("companion_v2", "astrbot_host", "pages", "docs", "fixtures", "tools", "skills")
+CORE_DIRS = ("digital_life_core", "digital_life_host", "pages", "docs", "fixtures", "tools", "skills")
 ROOT_FILES = {
     "metadata.yaml", "_conf_schema.json", "README.md", "CHANGELOG.md", "CONTRIBUTING.md",
     "requirements.txt", "requirements-optional-input.txt", "requirements-optional-mic.txt",
-    "pyproject.toml", "LICENSE", "NOTICE", "logo.png", ".editorconfig",
+    "pyproject.toml", "LICENSE", "NOTICE", "logo.png", ".editorconfig", "AGENTS.md",
 }
 EXCLUDED_DIRS = {
     "data", ".git", "__pycache__", ".pytest_cache", "node_modules", "logs",
@@ -314,7 +314,7 @@ def verify_runtime_sources(files):
     stars, registrations = [], []
     plugin_name = product_version = None
     for name, payload in files.items():
-        if not name.endswith(".py") or not (name == "main.py" or name.startswith(("companion_v2/", "astrbot_host/"))):
+        if not name.endswith(".py") or not (name == "main.py" or name.startswith(("digital_life_core/", "digital_life_host/"))):
             continue
         tree = ast.parse(payload.decode("utf-8"), filename=name)
         star_names, register_names = {"Star"}, {"register"}
@@ -346,7 +346,7 @@ def verify_runtime_sources(files):
                 if isinstance(node, ast.Assign) and any(isinstance(target, ast.Name) and target.id == "PLUGIN_NAME" for target in node.targets):
                     if isinstance(node.value, ast.Constant):
                         plugin_name = node.value.value
-        if name == "companion_v2/product/__init__.py":
+        if name == "digital_life_core/product/__init__.py":
             for node in tree.body:
                 if isinstance(node, ast.Assign) and any(isinstance(target, ast.Name) and target.id == "PRODUCT_VERSION" for target in node.targets):
                     if isinstance(node.value, ast.Constant):
@@ -379,7 +379,7 @@ def build_plugin(root, directories, output):
     for path in sources(root, directories):
         relative_files[path.relative_to(root).as_posix()] = checked_payload(path, root)
     required = {"main.py", "metadata.yaml", "_conf_schema.json", "CHANGELOG.md", "pyproject.toml",
-                "companion_v2/legacy/configuration_rules.json",
+                "digital_life_core/legacy/configuration_rules.json",
                 "pages/陪伴小屋/index.html", "pages/陪伴小屋/page-build.json",
                 NATIVE_CAPABILITY_BASELINE}
     if not required.issubset(relative_files):
@@ -423,7 +423,7 @@ def build(output, core_only=False):
     with TemporaryDirectory(prefix="companion-v2-package-") as temporary:
         stage = Path(temporary)
         packages = [build_plugin(ROOT, CORE_DIRS, stage)]
-        manifest = {"schema": RELEASE_SCHEMA, "product": "我会永远陪着你", "version": VERSION,
+        manifest = {"schema": RELEASE_SCHEMA, "product": "Digital Life (development)", "version": VERSION,
                     "astrbot_version": packages[0]["astrbot_version"],
                     "data_policy": "隔离运行数据；仅在用户确认后读取旧版来源并写入新数据根",
                     "provider_integration": "Seven native internal extensions are bundled and owned by one plugin",

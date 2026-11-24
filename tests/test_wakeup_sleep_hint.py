@@ -1,6 +1,6 @@
 import unittest
 
-from astrbot_host.native_extensions.reality.wakeup_alarm import WakeupAlarmMixin
+from digital_life_host.native_extensions.reality.wakeup_alarm import WakeupAlarmMixin
 
 
 class _Alarm(WakeupAlarmMixin):

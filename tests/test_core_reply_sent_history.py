@@ -4,9 +4,9 @@ import json
 from types import SimpleNamespace as NS
 import unittest
 
-from astrbot_host.core_reply_context import _linked_inspiration_material, build_core_reply_prompt
-from companion_v2.conversation.foreground import ContextContribution, ContributionState
-from companion_v2.execution.models import digest, encode
+from digital_life_host.core_reply_context import _linked_inspiration_material, build_core_reply_prompt
+from digital_life_core.conversation.foreground import ContextContribution, ContributionState
+from digital_life_core.execution.models import digest, encode
 from tests.contact_schedule_support import ContactScheduleFixture
 from tests.test_role_tool_loop import answered
 

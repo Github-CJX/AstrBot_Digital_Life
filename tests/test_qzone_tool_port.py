@@ -4,10 +4,10 @@ import json
 import unittest
 from unittest.mock import AsyncMock, patch
 
-from companion_v2.adapters.astrbot.tools import QzoneToolPort
-from companion_v2.conversation.external_tools import ExternalToolInvocation
-from companion_v2.execution.models import TaskError
-from companion_v2.qzone.capability import PUBLISH_ACTION, READ_ACTION, tool_descriptors
+from digital_life_core.adapters.astrbot.tools import QzoneToolPort
+from digital_life_core.conversation.external_tools import ExternalToolInvocation
+from digital_life_core.execution.models import TaskError
+from digital_life_core.qzone.capability import PUBLISH_ACTION, READ_ACTION, tool_descriptors
 
 
 NOW = datetime(2026, 11, 16, 0, 0, tzinfo=timezone.utc)
@@ -42,7 +42,7 @@ class QzoneToolPortFailureTests(unittest.IsolatedAsyncioTestCase):
         port.application = application
         invocation = publish_invocation()
 
-        with patch("companion_v2.qzone.images.album_images",
+        with patch("digital_life_core.qzone.images.album_images",
                    side_effect=TaskError("qzone_image_invalid", "图片尚未通过读取校验")):
             response = await port.invoke("qzone:" + PUBLISH_ACTION, invocation)
 
@@ -60,7 +60,7 @@ class QzoneToolPortFailureTests(unittest.IsolatedAsyncioTestCase):
         port.application = application
         invocation = publish_invocation()
 
-        with patch("companion_v2.qzone.images.album_images", return_value=((), ())):
+        with patch("digital_life_core.qzone.images.album_images", return_value=((), ())):
             response = await port.invoke("qzone:" + PUBLISH_ACTION, invocation)
 
         self.assertEqual((response.state, response.effect, response.error_code),
@@ -76,7 +76,7 @@ class QzoneToolPortFailureTests(unittest.IsolatedAsyncioTestCase):
         port = QzoneToolPort(object())
         port.application = application
 
-        with patch("companion_v2.qzone.images.album_images", return_value=((), ())):
+        with patch("digital_life_core.qzone.images.album_images", return_value=((), ())):
             response = await port.invoke("qzone:" + PUBLISH_ACTION, publish_invocation())
 
         self.assertEqual((response.state, response.effect, response.error_code,
@@ -93,7 +93,7 @@ class QzoneToolPortFailureTests(unittest.IsolatedAsyncioTestCase):
         port = QzoneToolPort(object())
         port.application = application
 
-        with patch("companion_v2.qzone.images.album_images", return_value=((), ())):
+        with patch("digital_life_core.qzone.images.album_images", return_value=((), ())):
             response = await port.invoke("qzone:" + PUBLISH_ACTION, publish_invocation())
 
         self.assertEqual((response.state, response.effect, response.error_code,

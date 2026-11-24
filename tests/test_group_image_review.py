@@ -11,15 +11,15 @@ from dataclasses import replace
 from types import SimpleNamespace
 import unittest
 
-from companion_v2.configuration.models import ApplyMode, ConfigLayer, ConfigTarget
-from companion_v2.configuration.registry import FieldRegistry, ValueKind
-from companion_v2.conversation.media.review import (ALLOW, BLOCK, DEFAULTS, DUAL_PROVIDER_FIELD, GROUP,
+from digital_life_core.configuration.models import ApplyMode, ConfigLayer, ConfigTarget
+from digital_life_core.configuration.registry import FieldRegistry, ValueKind
+from digital_life_core.conversation.media.review import (ALLOW, BLOCK, DEFAULTS, DUAL_PROVIDER_FIELD, GROUP,
                                                     ImageReviewConfigurationOwner, LABELS, LIMITS, ReviewPlan,
                                                     WITHHOLD, check_verdict, configuration_fields, decide,
                                                     merge_answers, normalize_label, parse_answer, review_prompt,
                                                     review_settings, verdict_document)
-from companion_v2.conversation.media.fallback import ImageReviewFallback
-from companion_v2.execution.models import TaskError, stamp
+from digital_life_core.conversation.media.fallback import ImageReviewFallback
+from digital_life_core.execution.models import TaskError, stamp
 from tests.test_conversation_messages import MessageFixture
 from tests.test_management_access import NOW
 

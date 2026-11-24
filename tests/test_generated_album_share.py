@@ -12,12 +12,12 @@ from dataclasses import replace
 from datetime import datetime, timedelta, timezone
 from types import SimpleNamespace
 
-from companion_v2.conversation.media.generated import GeneratedAlbumImage, GeneratedImages, _AlbumView
-from companion_v2.conversation.media.models import ImageDescriptor
-from companion_v2.conversation.media.service import ConversationImages
-from companion_v2.execution.models import digest
-from companion_v2.foundation.refs import RoleOwnerRef, ScopeKind, ScopeRef, SourceRef, VersionRef
-from companion_v2.sharing.models import ShareMaterial, ShareMaterialKind
+from digital_life_core.conversation.media.generated import GeneratedAlbumImage, GeneratedImages, _AlbumView
+from digital_life_core.conversation.media.models import ImageDescriptor
+from digital_life_core.conversation.media.service import ConversationImages
+from digital_life_core.execution.models import digest
+from digital_life_core.foundation.refs import RoleOwnerRef, ScopeKind, ScopeRef, SourceRef, VersionRef
+from digital_life_core.sharing.models import ShareMaterial, ShareMaterialKind
 
 
 NOW = datetime(2026, 10, 2, 8, 0, tzinfo=timezone.utc)
@@ -71,7 +71,7 @@ class ReferenceTests(unittest.TestCase):
         self.assertNotEqual(first_asset.asset_id, second_asset.asset_id)
 
     def test_an_unusable_image_id_is_refused(self):
-        from companion_v2.execution.models import TaskError
+        from digital_life_core.execution.models import TaskError
         for image_id in ("", "not-an-album-image", "generated-image:", "generated-image:inv-1"):
             with self.assertRaises(TaskError):
                 GeneratedImages.album_refs(SimpleNamespace(image_id=image_id, created_at=NOW.isoformat(),
@@ -105,7 +105,7 @@ class MaterialTests(unittest.TestCase):
 
     def test_a_blank_bot_id_never_produces_a_material_that_claims_an_owner(self):
         # 没有 bot 就没有"这是谁的作品"，素材模型会拒绝——这里确认我们不静默兜底。
-        from companion_v2.foundation.refs import ReferenceValidationError
+        from digital_life_core.foundation.refs import ReferenceValidationError
         bare = ScopeRef(INSTALLATION, "onebot", ScopeKind.PRIVATE, "private-a")
         with self.assertRaises(ReferenceValidationError):
             GeneratedImages.album_share_material(album_item(), SimpleNamespace(
@@ -118,8 +118,8 @@ class CandidateTests(unittest.TestCase):
     """候选必须经 SharePlanner 复检：它真的去读源仓库与素材仓库。"""
 
     def planner(self, *, sources=True, assets=True, calls=None):
-        from companion_v2.foundation.outcome import Outcome
-        from companion_v2.sharing.planner import ShareCatalog, SharePlanner
+        from digital_life_core.foundation.outcome import Outcome
+        from digital_life_core.sharing.planner import ShareCatalog, SharePlanner
 
         class Repo:
             def __init__(self, readable):

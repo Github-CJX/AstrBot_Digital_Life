@@ -1,4 +1,4 @@
-"""Comprehensive unit & adversarial security tests for companion_v2.model_gateway.pricing_expr."""
+"""Comprehensive unit & adversarial security tests for digital_life_core.model_gateway.pricing_expr."""
 
 from __future__ import annotations
 
@@ -6,7 +6,7 @@ import ast
 from pathlib import Path
 import unittest
 
-from companion_v2.model_gateway.pricing_expr import (
+from digital_life_core.model_gateway.pricing_expr import (
     MAX_AST_DEPTH,
     MAX_EVAL_STEPS,
     PricingExprSyntaxError,
@@ -22,7 +22,7 @@ from companion_v2.model_gateway.pricing_expr import (
 
 class PricingExprStaticSecurityTests(unittest.TestCase):
     def test_module_contains_zero_eval_exec_or_compile_calls(self):
-        source_path = Path(__file__).resolve().parents[1] / "companion_v2" / "model_gateway" / "pricing_expr.py"
+        source_path = Path(__file__).resolve().parents[1] / "digital_life_core" / "model_gateway" / "pricing_expr.py"
         tree = ast.parse(source_path.read_text(encoding="utf-8"))
         forbidden = {"eval", "exec", "compile", "__import__"}
         found = []

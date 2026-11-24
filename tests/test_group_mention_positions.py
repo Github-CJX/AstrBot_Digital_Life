@@ -9,12 +9,12 @@ from astrbot.core.platform.message_type import MessageType
 from astrbot.core.platform.sources.qqofficial.qqofficial_platform_adapter import (
     QQOfficialPlatformAdapter, PatchedGroupMessage,
 )
-from astrbot_host.core_reply_mentions import restore_group_mentions
-from astrbot_host.group_admission import group_trigger_facts
-from astrbot_host.group_debounce import replace_group_plain_text
-from companion_v2.adapters.astrbot.group import NativeGroupBridge
-from companion_v2.adapters.astrbot.group_mentions import group_message_text
-from companion_v2.conversation.group_timing import short_input_wait, repeat_signature
+from digital_life_host.core_reply_mentions import restore_group_mentions
+from digital_life_host.group_admission import group_trigger_facts
+from digital_life_host.group_debounce import replace_group_plain_text
+from digital_life_core.adapters.astrbot.group import NativeGroupBridge
+from digital_life_core.adapters.astrbot.group_mentions import group_message_text
+from digital_life_core.conversation.group_timing import short_input_wait, repeat_signature
 
 
 async def official_message(content, *, mentioned=True):
@@ -124,7 +124,7 @@ class MentionRequestTests(unittest.TestCase):
         self.assertEqual(request.prompt, "提示：<提及自己>看看")
 
     def test_new_and_legacy_markers_have_same_timing_and_repeat_behavior(self):
-        from companion_v2.foundation.refs import ScopeKind
+        from digital_life_core.foundation.refs import ScopeKind
         event = NS(scope=NS(kind=ScopeKind.GROUP))
         settings = {"group_wakeup_enabled": True, "group_wakeup_short_text_wait_ms": 1500}
         self.assertEqual(short_input_wait(event, "<提及自己> 等等", settings), 1.5)

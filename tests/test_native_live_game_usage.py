@@ -10,9 +10,9 @@ from unittest.mock import AsyncMock
 
 from tests import test_astrbot_staging_host as host_support
 from astrbot.core.provider.entities import LLMResponse, TokenUsage
-from astrbot_host.native_extensions.game.runtime import GameRuntime
-from astrbot_host.native_extensions.live.bilibili_live import LiveDanmakuEvent
-from astrbot_host.native_extensions.live.runtime import LiveRuntime
+from digital_life_host.native_extensions.game.runtime import GameRuntime
+from digital_life_host.native_extensions.live.bilibili_live import LiveDanmakuEvent
+from digital_life_host.native_extensions.live.runtime import LiveRuntime
 
 
 class NativeLiveGameUsageTests(unittest.IsolatedAsyncioTestCase):

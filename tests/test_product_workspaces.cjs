@@ -6,7 +6,7 @@ const path = require("node:path");
 const test = require("node:test");
 const vm = require("node:vm");
 
-const HOST = "astrbot_plugin_private_companion";
+const HOST = "astrbot_plugin_digital_life";
 const shellHtml = fs.readFileSync(path.join(__dirname, "../pages/陪伴小屋/index.html"), "utf8");
 const shellCss = fs.readFileSync(path.join(__dirname, "../pages/陪伴小屋/shell.css"), "utf8");
 const sidebarSource = fs.readFileSync(path.join(__dirname, "../pages/陪伴小屋/home-sidebar.js"), "utf8");
@@ -105,7 +105,7 @@ async function harness(savedTheme = null, extensions = [], options = {}) {
   const navigations = [];
   let largeText = false;
   const window = {
-    location: {href: "http://localhost/api/plugin/page/content/astrbot_plugin_private_companion/cottage/"},
+    location: {href: "http://localhost/api/plugin/page/content/astrbot_plugin_digital_life/cottage/"},
     addEventListener(type, handler) { events[type] = handler; },
     CustomEvent: class { constructor(type, init) { this.type=type; this.detail=init?.detail; } },
     dispatchEvent(event) { scopeEvents.push(event); },
@@ -132,7 +132,7 @@ async function harness(savedTheme = null, extensions = [], options = {}) {
         if (endpoint === "page/display-preferences") return options.displayPreferences || {preferences: null};
         if (endpoint === "page/browser-preferences") return {preferences:readBrowserPreferences()};
         if (endpoint === "page/workspace-entry") return options.workspaceEntry || {content_path:
-          "/api/plugin/page/content/astrbot_plugin_private_companion/%E9%99%AA%E4%BC%B4%E5%B0%8F%E5%B1%8B/?asset_token=fresh"};
+          "/api/plugin/page/content/astrbot_plugin_digital_life/%E9%99%AA%E4%BC%B4%E5%B0%8F%E5%B1%8B/?asset_token=fresh"};
         if (endpoint === "page/targets") return options.directoryUnavailable
           ? {status: "error", data: {code: options.directoryError || "staging_not_initialized"}} : nextDirectory || catalog;
         if (endpoint === "integration/manifest") return {extensions, providers:[], summary: {connected_count: 0}};
@@ -397,7 +397,7 @@ test("a bundle that still fails after token refresh identifies the remaining res
   const h = await harness(null, [], {lazyBundles: true, failWorkspaceLoads: 2,
     workspaceAssetUrl: "http://localhost/workspace-bundles/host.js?v=test&asset_token=stale",
     workspaceEntry: {content_path:
-      "/api/plugin/page/content/astrbot_plugin_private_companion/%E9%99%AA%E4%BC%B4%E5%B0%8F%E5%B1%8B/?asset_token=fresh"}});
+      "/api/plugin/page/content/astrbot_plugin_digital_life/%E9%99%AA%E4%BC%B4%E5%B0%8F%E5%B1%8B/?asset_token=fresh"}});
   h.frames.splice(0);
   const host = h.addFrame("host");
   h.product.mountWorkspace();
@@ -1047,9 +1047,9 @@ test("workspace links remain inside the cottage and preserve embedded tab destin
 
 test("bundled Image and Screen furniture use the V2 lifecycle route and never link to provider plugins", async () => {
   const extensions = [
-    {capability_id: "image", owner: "companion_v2", extension_id: "image",
+    {capability_id: "image", owner: "digital_life_core", extension_id: "image",
       assembled: false, installed_revision: 0, integration_state: "unassembled", reason: "尚未装配"},
-    {capability_id: "screen", owner: "companion_v2", extension_id: "companion.screen.native",
+    {capability_id: "screen", owner: "digital_life_core", extension_id: "companion.screen.native",
       assembled: true, installed_revision: 4, version: "2.0.0", installed_package_version: "1.9.9",
       update_available: true, integration_state: "degraded", reason: "已装配内容与当前 V2 内置版不同"},
   ];
@@ -1071,7 +1071,7 @@ test("bundled Image and Screen furniture use the V2 lifecycle route and never li
 
 test("Content, Reality, Together, Game and Live share the V2 lifecycle route", async () => {
   const names = ["content", "reality", "together", "game", "live"];
-  const h = await harness(null, names.map(name => ({capability_id:name, owner:"companion_v2",
+  const h = await harness(null, names.map(name => ({capability_id:name, owner:"digital_life_core",
     extension_id:name, assembled:true, desired_state:"active", installed_revision:3})));
   for (const name of names) {
     await h.product.manageExtension(name, "pause", 3, name + "-pause");

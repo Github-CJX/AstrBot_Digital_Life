@@ -6,13 +6,13 @@ from datetime import date, datetime, time, timedelta, timezone
 import json
 from zoneinfo import ZoneInfo
 
-from companion_v2.configuration.models import ConfigLayer
-from companion_v2.configuration.owners import SparseConfigurationOwner
-from companion_v2.execution.models import digest, stamp
-from companion_v2.role_work.life.configuration import GROUP as LIFE_GROUP, OWNER as LIFE_OWNER, target_for
-from companion_v2.role_work.life.scheduling import bedtime_at, next_bedtime, sleep_rhythm, variation_for
-from companion_v2.foundation.refs import RoleOwnerRef
-from astrbot_host.management_identity import dashboard_operator
+from digital_life_core.configuration.models import ConfigLayer
+from digital_life_core.configuration.owners import SparseConfigurationOwner
+from digital_life_core.execution.models import digest, stamp
+from digital_life_core.role_work.life.configuration import GROUP as LIFE_GROUP, OWNER as LIFE_OWNER, target_for
+from digital_life_core.role_work.life.scheduling import bedtime_at, next_bedtime, sleep_rhythm, variation_for
+from digital_life_core.foundation.refs import RoleOwnerRef
+from digital_life_host.management_identity import dashboard_operator
 from tests.multi_host_support import multi_config
 from tests.multi_life_support import MultiLifeFixture
 

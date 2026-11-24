@@ -5,8 +5,8 @@ import base64
 from functools import partial
 from types import SimpleNamespace as NS
 
-from astrbot_host.media import load_native_image
-from companion_v2.adapters.astrbot.forwards import read_private_forwards
+from digital_life_host.media import load_native_image
+from digital_life_core.adapters.astrbot.forwards import read_private_forwards
 from tests.native_adapter_support import FakeEvent, FakeReverseApi
 from tests.test_conversation_images import FakeImage, image_bytes
 from tests.test_conversation_quotes import QuoteFixture, quote_raw

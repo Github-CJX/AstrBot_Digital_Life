@@ -11,8 +11,8 @@ const PAGES = path.join(ROOT, "pages", "陪伴小屋");
 const panelSource = fs.readFileSync(path.join(PAGES, "native-extension-panel.js"), "utf8");
 const panelCss = fs.readFileSync(path.join(PAGES, "native-extension-panel.css"), "utf8");
 const phoneSetupSource = fs.readFileSync(path.join(PAGES, "phone-setup.js"), "utf8");
-const schema = JSON.parse(fs.readFileSync(path.join(ROOT, "astrbot_host/native_extensions/reality/settings-schema.json"), "utf8"));
-const defaults = JSON.parse(fs.readFileSync(path.join(ROOT, "astrbot_host/native_extensions/reality/settings-defaults.json"), "utf8"));
+const schema = JSON.parse(fs.readFileSync(path.join(ROOT, "digital_life_host/native_extensions/reality/settings-schema.json"), "utf8"));
+const defaults = JSON.parse(fs.readFileSync(path.join(ROOT, "digital_life_host/native_extensions/reality/settings-defaults.json"), "utf8"));
 
 const settle = () => new Promise(resolve => setImmediate(resolve));
 
@@ -100,7 +100,7 @@ function mountMobile(overrides = {}) {
   const window = {
     CompanionProduct: {
       request: async () => ({extensions: {reality: structuredClone(record)}}),
-      extension: () => ({owner: "companion_v2", assembled: true, desired_state: "active", installed_revision: 1}),
+      extension: () => ({owner: "digital_life_core", assembled: true, desired_state: "active", installed_revision: 1}),
       errorLabel: () => "",
       refreshIntegrations: async () => {},
     },
@@ -242,7 +242,7 @@ test("手机使用页 syncStatus 为已启用状态胶囊切换 is-enabled 语�
   const sandbox = vm.createContext({window, document: {}, console});
   vm.runInContext(phoneSetupSource, sandbox);
   const setup = sandbox.window.CompanionPhoneSetup.mount(root, {
-    configApi: "/astrbot_plugin_private_companion/targets/t1/roles/r1/config",
+    configApi: "/astrbot_plugin_digital_life/targets/t1/roles/r1/config",
     editor: {state: {instances: [{state: {status: {settings: {enabled: false}}}}]}},
   });
   assert.equal(statusEl.textContent, "未启用");

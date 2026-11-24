@@ -3,9 +3,9 @@ import sqlite3
 import unittest
 from unittest.mock import patch
 
-from companion_v2.execution.models import TaskResult
-from companion_v2.storage.runtime import StorageOpenError, StorageRuntime
-from companion_v2.storage.schema import (
+from digital_life_core.execution.models import TaskResult
+from digital_life_core.storage.runtime import StorageOpenError, StorageRuntime
+from digital_life_core.storage.schema import (
     MIGRATION_V8_TO_V9_ID, MIGRATION_V8_TO_V9_FINGERPRINT,
     MIGRATION_V9_TO_V10_ID, MIGRATION_V9_TO_V10_FINGERPRINT,
     SCHEMA_VERSION, SCHEMA_VERSION_V9, SCHEMA_VERSION_V10, V9_REQUIRED_TABLES,
@@ -47,7 +47,7 @@ class ModelStorageTests(ExecutionFixture):
         self.open_runtime().close()
 
     def test_failed_upgrade_rolls_back_original_records_and_can_retry(self):
-        with patch("companion_v2.storage.runtime.V10_MIGRATION_STATEMENTS",
+        with patch("digital_life_core.storage.runtime.V10_MIGRATION_STATEMENTS",
                    ("CREATE TABLE model_calls(call_id TEXT)", "INVALID MODEL MIGRATION")):
             with self.assertRaises(StorageOpenError):
                 StorageRuntime.open(data_root=self.root, installation_id=INSTALLATION)

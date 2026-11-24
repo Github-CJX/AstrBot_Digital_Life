@@ -4,9 +4,9 @@ from dataclasses import replace
 import json
 import unittest
 
-from companion_v2.execution.models import TaskContext
-from companion_v2.foundation.refs import AudienceRef, ScopeKind, ScopeRef, SubjectKind, SubjectRef
-from companion_v2.relationships.profile import (
+from digital_life_core.execution.models import TaskContext
+from digital_life_core.foundation.refs import AudienceRef, ScopeKind, ScopeRef, SubjectKind, SubjectRef
+from digital_life_core.relationships.profile import (
     FIELD_LIMITS,
     GROUP,
     ConversationRelationshipProfileContext,

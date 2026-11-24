@@ -23,18 +23,18 @@ import json
 import sys
 import unittest
 
-from companion_v2.adapters.astrbot.memory_owner import MEMORY_OWNER_MODULE_NAMES, read_memory_owner
-from companion_v2.adapters.astrbot.memory_push import PUSH_SOURCE_PLUGIN, memory_push_provider
-from companion_v2.capabilities.memory_push import (MEMORY_PUSH_ID_PREFIX, PUSH_PERSONA_LIFE,
+from digital_life_core.adapters.astrbot.memory_owner import MEMORY_OWNER_MODULE_NAMES, read_memory_owner
+from digital_life_core.adapters.astrbot.memory_push import PUSH_SOURCE_PLUGIN, memory_push_provider
+from digital_life_core.capabilities.memory_push import (MEMORY_PUSH_ID_PREFIX, PUSH_PERSONA_LIFE,
     PUSH_PROACTIVE_MESSAGE, MemoryPushRecord, push_memory_id)
-from companion_v2.capabilities.ownership import (REASON_DECLARATION_ABSENT, REASON_EXTERNAL_ACTIVE,
+from digital_life_core.capabilities.ownership import (REASON_DECLARATION_ABSENT, REASON_EXTERNAL_ACTIVE,
     REASON_HANDLE_DISABLED, REASON_HANDLE_UNREADABLE, REASON_MODULE_ABSENT, RENDER_EXTERNAL, RENDER_SELF)
-from companion_v2.configuration.registry import FieldRegistry
-from companion_v2.execution.models import TaskContext, digest
-from companion_v2.foundation.refs import AudienceRef, RoleOwnerRef
-from companion_v2.model_gateway.routing import configuration_fields
-from companion_v2.role_work.journal import JournalContext, JournalKey, JournalKind, RoleJournalService
-from companion_v2.role_work.journal.writing import writing_profiles
+from digital_life_core.configuration.registry import FieldRegistry
+from digital_life_core.execution.models import TaskContext, digest
+from digital_life_core.foundation.refs import AudienceRef, RoleOwnerRef
+from digital_life_core.model_gateway.routing import configuration_fields
+from digital_life_core.role_work.journal import JournalContext, JournalKey, JournalKind, RoleJournalService
+from digital_life_core.role_work.journal.writing import writing_profiles
 from tests.proactive_support import ContactFixture
 from tests.test_host_application import HostFixture
 from tests.test_management_access import ROLE, SCOPE
@@ -152,7 +152,7 @@ class MemoryPushPortTests(MemoryPluginDeclaration, unittest.IsolatedAsyncioTestC
         fields = {"memory_id": push_memory_id(PUSH_PERSONA_LIFE, "journal", "identity", 1),
                   "content": "Bot 在 2026-09-21 写下了自己的日记（随记）：今天读到第三章。",
                   "kind": PUSH_PERSONA_LIFE, "scope": "unknown",
-                  "session_id": "private_companion_v2:journal:diary", "occurred_at": "2026-09-21T12:00:00+00:00",
+                  "session_id": "digital_life:journal:diary", "occurred_at": "2026-09-21T12:00:00+00:00",
                   "tags": ("journal", "diary", "persona_life"), "metadata": (("local_date", "2026-09-21"),)}
         fields.update(changes)
         return MemoryPushRecord(**fields)
@@ -293,7 +293,7 @@ class JournalMemoryPushTests(MemoryPluginDeclaration, HostFixture, unittest.Isol
         self.assertEqual(call["kwargs"]["memory_id"], self.expected_diary_identity(entry.reference.key, entry.reference.revision))
         self.assertEqual(call["kwargs"]["source_plugin"], PUSH_SOURCE_PLUGIN)
         self.assertEqual(call["kwargs"]["scope"], "unknown")
-        self.assertEqual(call["kwargs"]["session_id"], "private_companion_v2:journal:diary")
+        self.assertEqual(call["kwargs"]["session_id"], "digital_life:journal:diary")
         self.assertEqual(call["kwargs"]["tags"], ["journal", "diary", "persona_life"])
         self.assertEqual(call["kwargs"]["metadata"]["journal_kind"], "diary")
         self.assertEqual(call["kwargs"]["metadata"]["local_date"], "2026-09-21")
@@ -319,7 +319,7 @@ class JournalMemoryPushTests(MemoryPluginDeclaration, HostFixture, unittest.Isol
         self.assertEqual(dream["content"], "我在 2026-09-21 做了一个梦。"
                          "梦里记得的部分：我记得一段通向云里的窄楼梯。醒来只剩这些余韵：醒来还觉得轻松。")
         self.assertEqual(dream["kwargs"]["metadata"]["journal_kind"], "dream")
-        self.assertEqual(dream["kwargs"]["session_id"], "private_companion_v2:journal:dream")
+        self.assertEqual(dream["kwargs"]["session_id"], "digital_life:journal:dream")
         self.assertEqual(dream["kwargs"]["tags"], ["journal", "dream", "persona_life"])
         self.assertNotEqual(bridge.calls[0]["kwargs"]["memory_id"], dream["kwargs"]["memory_id"])
 

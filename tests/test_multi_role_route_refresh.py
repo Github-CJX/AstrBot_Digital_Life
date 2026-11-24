@@ -2,7 +2,7 @@
 
 import unittest
 
-from astrbot_host.multi_api import MultiHostWebAPI
+from digital_life_host.multi_api import MultiHostWebAPI
 
 
 class FakeController:
@@ -21,13 +21,13 @@ class RoleRouteRefreshTests(unittest.TestCase):
         api = MultiHostWebAPI.__new__(MultiHostWebAPI)
         api._registered_routes = []
         api.controller = FakeController()
-        inventory = [{"roles": [{"config_api": "/astrbot_plugin_private_companion/targets/t/roles/r/config"}]}]
+        inventory = [{"roles": [{"config_api": "/astrbot_plugin_digital_life/targets/t/roles/r/config"}]}]
         api._ensure_role_routes(inventory)
         self.assertEqual(api.controller.calls, ["unregister", "register"])
 
     def test_registered_route_does_not_trigger_a_refresh(self):
         api = MultiHostWebAPI.__new__(MultiHostWebAPI)
-        route = "/astrbot_plugin_private_companion/targets/t/roles/r/config"
+        route = "/astrbot_plugin_digital_life/targets/t/roles/r/config"
         api._registered_routes = [(route, object())]
         api.controller = FakeController()
         api._ensure_role_routes([{"roles": [{"config_api": route}]}])

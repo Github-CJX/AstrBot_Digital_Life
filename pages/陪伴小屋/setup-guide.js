@@ -1921,7 +1921,7 @@ window.CompanionSetup = (() => {
         + "旧版代码已被 7.0.0 替换，无需再卸载插件。");
     }
     if (install.takeover) {
-      notes.push(`当前是按旧版目录名（${escape(install.plugin_dir || "astrbot_plugin_private_companion")}）升级安装的；`
+      notes.push(`当前是按旧版目录名（${escape(install.plugin_dir || "astrbot_plugin_digital_life")}）升级安装的；`
         + "插件表单配置与旧版共用同一个配置文件，旧版原有键会保留。");
     }
     if (install.pending && install.v1_present) {
@@ -3370,7 +3370,7 @@ window.CompanionSetup = (() => {
     const productApi = product();
     const bridge = productApi?.bridgeNow?.() || (productApi?.bridgeFor ? await productApi.bridgeFor() : window.AstrBotPluginPage);
     if (!bridge?.apiPost) throw new Error("Dashboard 页面接口尚未连接。");
-    const route = productApi.relative("/astrbot_plugin_private_companion/setup/profile-draft");
+    const route = productApi.relative("/astrbot_plugin_digital_life/setup/profile-draft");
     const supplement = profileSupplement[target] || "";
     let timer;
     try {

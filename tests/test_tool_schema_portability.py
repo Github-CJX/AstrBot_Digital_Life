@@ -10,8 +10,8 @@ the stored tool definitions.
 import json
 import unittest
 
-from companion_v2.execution.models import encode
-from companion_v2.model_gateway.models import ToolSpec, portable_tool_schema
+from digital_life_core.execution.models import encode
+from digital_life_core.model_gateway.models import ToolSpec, portable_tool_schema
 
 
 def has_non_string_enum(node):

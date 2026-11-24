@@ -7,20 +7,20 @@ import json
 import unittest
 from unittest.mock import patch
 
-from companion_v2.execution.models import digest, encode
-from companion_v2.foundation.outcome import Outcome
-from companion_v2.identity_policy.models import AuthorizationTier
-from companion_v2.memory.activity_ingestion import MemoryActivityIngestion, OWNER
-from companion_v2.memory.models import AtomRef, Proposal
-from companion_v2.memory.service import MemoryService
-from companion_v2.role_work.journal.models import JournalContext, JournalDraft, JournalKey, JournalKind
-from companion_v2.role_work.journal.service import RoleJournalService
-from companion_v2.role_work.ledger import PersistentRoleLifeLedger
-from companion_v2.role_work.life.context import RoleLifeContextReader
-from companion_v2.role_work.models import RoleActivity, RoleActivityState as State, RoleReadingReceipt
-from companion_v2.role_work.work_models import RoleWorkSpec
-from companion_v2.sources.governance import bind
-from companion_v2.sources.models import SourceRecord
+from digital_life_core.execution.models import digest, encode
+from digital_life_core.foundation.outcome import Outcome
+from digital_life_core.identity_policy.models import AuthorizationTier
+from digital_life_core.memory.activity_ingestion import MemoryActivityIngestion, OWNER
+from digital_life_core.memory.models import AtomRef, Proposal
+from digital_life_core.memory.service import MemoryService
+from digital_life_core.role_work.journal.models import JournalContext, JournalDraft, JournalKey, JournalKind
+from digital_life_core.role_work.journal.service import RoleJournalService
+from digital_life_core.role_work.ledger import PersistentRoleLifeLedger
+from digital_life_core.role_work.life.context import RoleLifeContextReader
+from digital_life_core.role_work.models import RoleActivity, RoleActivityState as State, RoleReadingReceipt
+from digital_life_core.role_work.work_models import RoleWorkSpec
+from digital_life_core.sources.governance import bind
+from digital_life_core.sources.models import SourceRecord
 from tests.memory_support import MemoryFixture
 from tests.test_management_access import NOW
 from tests.test_host_application import HostFixture
@@ -216,7 +216,7 @@ class ActivityMemoryTests(MemoryFixture, unittest.IsolatedAsyncioTestCase):
         view = self.views()[0]
         self.assertIn("中文仍然保留", view["statements"][1]["text"])
         raw = view["statements"][1]["evidence"][0]
-        from companion_v2.memory.codec import evidence
+        from digital_life_core.memory.codec import evidence
         proposal = Proposal("add", predicate="喜好", object="散步", representation="用户喜欢散步", evidence=(evidence(raw),))
         result = self.service.writer.submit(self.context, proposal, operation_key="unfounded")
         self.assertEqual(result.failure.code, "memory_derived_evidence")
@@ -242,7 +242,7 @@ class ActivityMemoryTests(MemoryFixture, unittest.IsolatedAsyncioTestCase):
         self.assertIn("只确认该片段", value["statements"][2]["text"])
         self.assertEqual(value["meaning"], "derived_summary_not_independent_evidence")
         self.service.writer.sources.revoke(source, expected_governance_revision=1, observed_at=NOW).unwrap()
-        from companion_v2.execution.models import TaskError
+        from digital_life_core.execution.models import TaskError
         with self.assertRaises(TaskError):
             self.service.context.contributions(snapshot, self.context)
 
@@ -332,7 +332,7 @@ class ActivityMemoryConversationTests(HostFixture, unittest.IsolatedAsyncioTestC
         context = self.context(app, first)
         producer = app.memory.activity or app.memory.attach_life(app.life_context, require_running=app.require_running)
         self.addCleanup(producer.close)
-        from companion_v2.memory.codec import source as source_from_json
+        from digital_life_core.memory.codec import source as source_from_json
         original = app.runtime.read_one("SELECT event_json FROM conversation_inputs WHERE batch_id = ?", (first,))
         source = source_from_json(json.loads(original["event_json"])["source"])
         record = app.memory.writer.access.source(context, source)

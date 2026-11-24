@@ -8,12 +8,12 @@ from tempfile import TemporaryDirectory
 import unittest
 from unittest.mock import patch
 
-from astrbot_host.storage_location import (OWNER_NAME, PLUGIN_NAME, POINTER_NAME,
+from digital_life_host.storage_location import (OWNER_NAME, PLUGIN_NAME, POINTER_NAME,
                                            prepare_storage_root, selected_backup_directory, selected_root)
-from companion_v2.storage.backup import BACKUP_FORMAT, InstallationBackup, _policy_document
-from companion_v2.storage.management import (cleanup_backups, cleanup_plan, copy_backup_snapshots,
+from digital_life_core.storage.backup import BACKUP_FORMAT, InstallationBackup, _policy_document
+from digital_life_core.storage.management import (cleanup_backups, cleanup_plan, copy_backup_snapshots,
                                              inventory, remove_transferred_backup_snapshots)
-from companion_v2.storage.runtime import StorageRuntime
+from digital_life_core.storage.runtime import StorageRuntime
 
 
 NOW = datetime(2026, 10, 7, 12, tzinfo=timezone.utc)
@@ -125,7 +125,7 @@ class StorageManagementTests(unittest.TestCase):
             self.assertEqual(plan["remove_count"], 0)
 
     def test_retention_reports_failure_and_continues_cleaning_other_pairs(self):
-        from companion_v2.storage.management import _remove_tree
+        from digital_life_core.storage.management import _remove_tree
 
         with TemporaryDirectory() as temporary:
             root = Path(temporary)
@@ -138,7 +138,7 @@ class StorageManagementTests(unittest.TestCase):
                 if locked not in path.name:
                     _remove_tree(path)
 
-            with patch("companion_v2.storage.management._remove_tree", side_effect=partial_remove):
+            with patch("digital_life_core.storage.management._remove_tree", side_effect=partial_remove):
                 result = cleanup_backups(root, retention_count=1, retention_days=90, now=NOW)
             self.assertEqual(result["remove_count"], 2)
             self.assertEqual(result["removed_count"], 1)
@@ -221,13 +221,13 @@ class StorageManagementTests(unittest.TestCase):
             external = base / "D-drive" / PLUGIN_NAME
             external.mkdir(parents=True)
             (external / OWNER_NAME).write_text(json.dumps({
-                "format": "companion-v2.storage-location.v1", "source": str(default), "id": "test",
+                "format": "digital-life.storage-location.v1", "source": str(default), "id": "test",
             }), encoding="utf-8")
             (external / "owned.json").write_text("external", encoding="utf-8")
             default.mkdir(parents=True)
             (default / "stale-copy.json").write_text("stale", encoding="utf-8")
             (default / POINTER_NAME).write_text(json.dumps({
-                "format": "companion-v2.storage-location.v1", "path": str(external),
+                "format": "digital-life.storage-location.v1", "path": str(external),
                 "cleanup_source": str(default),
             }), encoding="utf-8")
 
@@ -236,7 +236,7 @@ class StorageManagementTests(unittest.TestCase):
             self.assertEqual(actual, external.resolve())
             self.assertFalse((default / "stale-copy.json").exists())
             self.assertEqual((default / POINTER_NAME).read_text(encoding="utf-8"),
-                             json.dumps({"format": "companion-v2.storage-location.v1",
+                             json.dumps({"format": "digital-life.storage-location.v1",
                                          "path": str(external.resolve())}, sort_keys=True))
 
     def test_cleanup_failure_after_a_successful_move_never_blocks_loading(self):
@@ -258,7 +258,7 @@ class StorageManagementTests(unittest.TestCase):
                     raise FileNotFoundError(3, "系统找不到指定的路径", str(path))
                 return real_rmtree(path, *args, **kwargs)
 
-            with patch("astrbot_host.storage_location.shutil.rmtree", side_effect=flaky_rmtree):
+            with patch("digital_life_host.storage_location.shutil.rmtree", side_effect=flaky_rmtree):
                 actual = prepare_storage_root(default, {"storage": {"path": str(selected)}})
 
             self.assertEqual(actual, external.resolve())

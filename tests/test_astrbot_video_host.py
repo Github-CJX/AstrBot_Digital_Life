@@ -13,13 +13,13 @@ from unittest.mock import AsyncMock
 from tests import test_astrbot_staging_host as sdk_environment
 from astrbot.core.message.components import Plain, Video
 from astrbot.core.provider.sources.openai_source import ProviderOpenAIOfficial
-from astrbot_host.controller import AstrBotStagingController
-from astrbot_host.native import installed_native_types
-from astrbot_host.video.loader import load_native_video
-from astrbot_host.media_components import private_components
-from companion_v2.adapters.astrbot.model_wire import build_wire
-from companion_v2.adapters.astrbot.staging import NativeAdapterTypes
-from companion_v2.model_gateway.models import ModelEnvelope
+from digital_life_host.controller import AstrBotStagingController
+from digital_life_host.native import installed_native_types
+from digital_life_host.video.loader import load_native_video
+from digital_life_host.media_components import private_components
+from digital_life_core.adapters.astrbot.model_wire import build_wire
+from digital_life_core.adapters.astrbot.staging import NativeAdapterTypes
+from digital_life_core.model_gateway.models import ModelEnvelope
 from tests.native_adapter_support import FakeEvent, FakeProvider, FakeReverseApi
 from tests.staging_bootstrap_support import wait_for_batch
 from tests.test_management_access import NOW

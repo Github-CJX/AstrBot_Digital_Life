@@ -4,11 +4,11 @@ from dataclasses import replace
 import json
 import unittest
 
-from companion_v2.conversation.media.generated import OWNER, REJECTED_ADOPTION
-from companion_v2.conversation.media.models import ImageConversationEvent
-from companion_v2.conversation.messages import source_from_document
-from companion_v2.execution.models import TaskError, digest, encode
-from companion_v2.sources.models import GovernanceState
+from digital_life_core.conversation.media.generated import OWNER, REJECTED_ADOPTION
+from digital_life_core.conversation.media.models import ImageConversationEvent
+from digital_life_core.conversation.messages import source_from_document
+from digital_life_core.execution.models import TaskError, digest, encode
+from digital_life_core.sources.models import GovernanceState
 from tests.test_generated_image_sources import capture
 from tests.test_group_native_image_tools import GroupImageToolFixture, call
 from tests.test_management_access import NOW

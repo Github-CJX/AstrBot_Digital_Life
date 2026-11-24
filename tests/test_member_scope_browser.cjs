@@ -7,7 +7,7 @@ const {fixture,labels,roleKey}=require("./fixtures/role_scope_browser.cjs");
 const {cookiePreferences}=require("./fixtures/browser_preferences_server.cjs");
 
 test("整页关系网切换角色保留目标成员，并在角色切换前处理草稿",{skip:chromium?false:"未安装 playwright"},async t=>{
-  const data=fixture();data.directory.acquaintance_api="/astrbot_plugin_private_companion/acquaintance";
+  const data=fixture();data.directory.acquaintance_api="/astrbot_plugin_digital_life/acquaintance";
   const persons=["a","b"].map(id=>({subject_id:"user-"+id,native_account_id:"user-"+id,display_name:"成员"+id,
     platform:"qq_official",account_id:id==="a"?"10001":"10002",account_name:"测试账号"+id,
     bot_id:"bot-"+id,role_id:"shared-role",role_name:labels[id],persona_ids:[labels[id]],revision:1,
@@ -43,7 +43,7 @@ test("整页关系网切换角色保留目标成员，并在角色切换前处�
   await page.addInitScript(()=>{
     if(window!==window.top)return;
     const request=(method,endpoint,params)=>fetch("/rpc",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({method,endpoint,params})}).then(response=>response.json());
-    window.AstrBotPluginPage={ready:async()=>({pluginName:"astrbot_plugin_private_companion",pageName:"陪伴小屋"}),apiGet:(endpoint,params)=>request("GET",endpoint,params),apiPost:(endpoint,params)=>request("POST",endpoint,params),onContext:()=>()=>{}};
+    window.AstrBotPluginPage={ready:async()=>({pluginName:"astrbot_plugin_digital_life",pageName:"陪伴小屋"}),apiGet:(endpoint,params)=>request("GET",endpoint,params),apiPost:(endpoint,params)=>request("POST",endpoint,params),onContext:()=>()=>{}};
   });
   await page.goto(`http://127.0.0.1:${server.address().port}/#manage/identity-people`);
   const frame=page.frameLocator('.product-workspace-frame');

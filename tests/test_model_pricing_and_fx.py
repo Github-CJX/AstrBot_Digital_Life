@@ -16,19 +16,19 @@ from unittest.mock import patch
 from astrbot.api.web import PluginMultiDict, PluginRequest, bind_request_context
 from starlette.requests import Request
 
-from astrbot_host.exchange_rate import (
+from digital_life_host.exchange_rate import (
     MAX_RESPONSE_BYTES,
     ExchangeRateService,
     parse_usd_cny_payload,
 )
-from astrbot_host.model_api import PREFIX
-from astrbot_host.pricing_inventory import build_pricing_payload
-from astrbot_host.token_sources import _bucket
-from companion_v2.adapters.astrbot.provider import AstrBotTextProvider, UsageTariff
-from companion_v2.execution.models import ProviderBinding
-from companion_v2.model_gateway.core_observations import record_observation
-from companion_v2.model_gateway.management import ModelManagement
-from companion_v2.model_gateway.pricing import (
+from digital_life_host.model_api import PREFIX
+from digital_life_host.pricing_inventory import build_pricing_payload
+from digital_life_host.token_sources import _bucket
+from digital_life_core.adapters.astrbot.provider import AstrBotTextProvider, UsageTariff
+from digital_life_core.execution.models import ProviderBinding
+from digital_life_core.model_gateway.core_observations import record_observation
+from digital_life_core.model_gateway.management import ModelManagement
+from digital_life_core.model_gateway.pricing import (
     DEFAULT_MODEL_TARIFFS,
     PricingSettingsError,
     PricingSettingsStore,
@@ -42,7 +42,7 @@ from companion_v2.model_gateway.pricing import (
     resolve_tariff,
     tariff_resolver_for,
 )
-from companion_v2.model_gateway.pricing_catalog import CatalogPrice, PriceCatalogStore, SourceStatus
+from digital_life_core.model_gateway.pricing_catalog import CatalogPrice, PriceCatalogStore, SourceStatus
 from tests import test_astrbot_staging_host as support
 from tests.test_host_application import HostFixture
 
@@ -354,7 +354,7 @@ class PricingV2EngineAndStoreTests(unittest.TestCase):
             )
 
             # 4) own_source_ids consistency across provider_needs_per_call_repricing, resolve_tariff, and pid|<other_model>
-            from companion_v2.model_gateway.pricing import provider_needs_per_call_repricing
+            from digital_life_core.model_gateway.pricing import provider_needs_per_call_repricing
             dual_catalog = {
                 "prices": {
                     "newapi:a_other:shared-m": CatalogPrice(
@@ -639,7 +639,7 @@ class PricingV2InventorySortingAndApiRoutesTests(unittest.IsolatedAsyncioTestCas
         self.routes = {(path, m): handler for path, handler, methods, _ in self.native.registered_web_apis for m in methods}
 
     async def call(self, route, *, method="GET", payload=None, username="admin", query=None):
-        import astrbot_host.model_api as model_api
+        import digital_life_host.model_api as model_api
         raw = payload if isinstance(payload, bytes) else (json.dumps(payload).encode("utf-8") if payload is not None else b"")
         request = Request({"type": "http", "method": method, "path": route, "headers": [], "query_string": b""})
         pairs = list(query.items()) if isinstance(query, dict) else query or []
@@ -939,9 +939,9 @@ class PricingV2InventorySortingAndApiRoutesTests(unittest.IsolatedAsyncioTestCas
                     )
 
     async def test_maintenance_memoizes_per_pair_pricing_and_skips_redundant_catalog_fallback(self):
-        from companion_v2.model_gateway import management as mgmt_mod
-        from companion_v2.model_gateway import pricing as pricing_mod
-        from companion_v2.model_gateway.pricing_catalog import _match_features, score_candidate_match
+        from digital_life_core.model_gateway import management as mgmt_mod
+        from digital_life_core.model_gateway import pricing as pricing_mod
+        from digital_life_core.model_gateway.pricing_catalog import _match_features, score_candidate_match
 
         # 1) Complete user per_token rule must not trigger catalog fallback scan.
         full_settings = {
@@ -987,7 +987,7 @@ class PricingV2InventorySortingAndApiRoutesTests(unittest.IsolatedAsyncioTestCas
         session = self.controller.session
         runtime = self.controller.runtime
         target_ctx = session.profile.target
-        from companion_v2.model_gateway.core_observations import record_observation
+        from digital_life_core.model_gateway.core_observations import record_observation
         from datetime import timedelta
 
         base_dt = self.controller.now() - timedelta(hours=2)

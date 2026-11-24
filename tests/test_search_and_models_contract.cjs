@@ -42,7 +42,7 @@ function createNavAndSearchContext(overrides = {}) {
     matchMedia: () => ({matches: false}),
     CompanionProduct: {
       scopeKey: () => "synthetic",
-      role: () => ({role_id: "role-1", reply_api: "/astrbot_plugin_private_companion/targets/t1/roles/role-1/reply", config_api: "/astrbot_plugin_private_companion/targets/t1/roles/role-1/config"}),
+      role: () => ({role_id: "role-1", reply_api: "/astrbot_plugin_digital_life/targets/t1/roles/role-1/reply", config_api: "/astrbot_plugin_digital_life/targets/t1/roles/role-1/config"}),
       target: () => ({target_id: "t1", scope_kind: "group"}),
       roleTarget: () => ({target_id: "t1", scope_kind: "private", bot_id: "b1"}),
       roleLabel: () => "角色",
@@ -445,8 +445,8 @@ test("Req 7: models-page mount(initialTab) & switching back to fn works when ses
   ctx.CompanionProduct = {
     hosted: () => true,
     identity: () => ({installation_id: "inst", operator_id: "op"}),
-    role: () => ({role_id: "r1", model_api: "/astrbot_plugin_private_companion/targets/t1/roles/r1/model"}),
-    roleTarget: () => ({scope_kind: "private", roles: [{role_id: "r1", model_api: "/astrbot_plugin_private_companion/targets/t1/roles/r1/model"}]}),
+    role: () => ({role_id: "r1", model_api: "/astrbot_plugin_digital_life/targets/t1/roles/r1/model"}),
+    roleTarget: () => ({scope_kind: "private", roles: [{role_id: "r1", model_api: "/astrbot_plugin_digital_life/targets/t1/roles/r1/model"}]}),
     selection: () => ({target_id: "t1", role_id: "r1"}),
     bridgeNow: () => fakeBridge,
     bridgeFor: () => Promise.resolve(fakeBridge),
@@ -585,10 +585,10 @@ test("Req 20: state-page queues openEditor while loading and auto-switches cycle
     directory: () => ({
       installation_id: "inst",
       operator_id: "op",
-      targets: [{target_id: "t1", bot_id: "b1", scope_kind: "private", roles: [{role_id: "r1", state_api: "/astrbot_plugin_private_companion/targets/t1/roles/r1/state"}]}],
+      targets: [{target_id: "t1", bot_id: "b1", scope_kind: "private", roles: [{role_id: "r1", state_api: "/astrbot_plugin_digital_life/targets/t1/roles/r1/state"}]}],
     }),
     bridgeNow: () => ({
-      ready: async () => ({pluginName: "astrbot_plugin_private_companion"}),
+      ready: async () => ({pluginName: "astrbot_plugin_digital_life"}),
       apiGet: () => new Promise(resolve => { resolveStateGet = resolve; }),
     }),
   };
@@ -698,7 +698,7 @@ test("Req 20: contact-page focusField queues while loading, clears purpose filte
     bridgeFor: () => Promise.resolve(ctx.AstrBotPluginPage),
   };
   ctx.AstrBotPluginPage = {
-    ready: () => Promise.resolve({pluginName: "astrbot_plugin_private_companion"}),
+    ready: () => Promise.resolve({pluginName: "astrbot_plugin_digital_life"}),
     apiGet: route => route === "config"
       ? new Promise(resolve => { resolveConfig = resolve; })
       : Promise.resolve({status: "ok", data: {}}),
@@ -908,10 +908,10 @@ test("Modal UX: state-home-settings and detail-dialog-settings enforce three-tie
     roleTarget: () => ({target_id: "t1", bot_id: "b1", scope_kind: "private"}),
     directory: () => ({
       installation_id: "inst", operator_id: "op",
-      targets: [{target_id: "t1", bot_id: "b1", scope_kind: "private", roles: [{role_id: "r1", state_api: "/astrbot_plugin_private_companion/targets/t1/roles/r1/state"}]}],
+      targets: [{target_id: "t1", bot_id: "b1", scope_kind: "private", roles: [{role_id: "r1", state_api: "/astrbot_plugin_digital_life/targets/t1/roles/r1/state"}]}],
     }),
     bridgeNow: () => ({
-      ready: async () => ({pluginName: "astrbot_plugin_private_companion"}),
+      ready: async () => ({pluginName: "astrbot_plugin_digital_life"}),
       apiGet: async () => ({status: "ok", data: {state: {revision: 1, values: {}}, settings: {enabled: true}, sleep_schedule: {}, calendar: {items: []}}}),
     }),
   };

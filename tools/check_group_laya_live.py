@@ -5,7 +5,7 @@ import asyncio
 import json
 from pathlib import Path
 
-from astrbot_host.laya_client import LayaDecisionClient, _load_local_model
+from digital_life_host.laya_client import LayaDecisionClient, _load_local_model
 
 
 async def check(args):

@@ -14,12 +14,12 @@ from types import SimpleNamespace
 import unittest
 from unittest.mock import patch
 
-from companion_v2.adapters.astrbot.provider import UsageTariff
-from companion_v2.adapters.astrbot.provider_catalog import TextProviderSettings, TextVideoProvider, assemble_providers
-from companion_v2.execution.models import ProviderBinding
-from companion_v2.model_gateway.models import LocalProvider
+from digital_life_core.adapters.astrbot.provider import UsageTariff
+from digital_life_core.adapters.astrbot.provider_catalog import TextProviderSettings, TextVideoProvider, assemble_providers
+from digital_life_core.execution.models import ProviderBinding
+from digital_life_core.model_gateway.models import LocalProvider
 
-LOGGER = "companion_v2.adapters.astrbot.provider_catalog"
+LOGGER = "digital_life_core.adapters.astrbot.provider_catalog"
 
 
 class CatalogProvider:
@@ -60,7 +60,7 @@ def assemble(providers, *, missing=()):
 
 def detail_of(error):
     """The bounded reason helper, imported per call so the log path stays the subject."""
-    from companion_v2.adapters.astrbot.provider_catalog import _unavailable_detail
+    from digital_life_core.adapters.astrbot.provider_catalog import _unavailable_detail
     return _unavailable_detail(error)
 
 
@@ -104,7 +104,7 @@ class CatalogUnavailableReasonTests(unittest.TestCase):
             video_provider_factory=video_factory,
             function_tool=object, tool_set=object,
         )
-        with patch("companion_v2.adapters.astrbot.provider_catalog.AstrBotTextProvider",
+        with patch("digital_life_core.adapters.astrbot.provider_catalog.AstrBotTextProvider",
                    return_value=text) as text_factory:
             adapters = assemble_providers(context([native]), bridge=None, native_types=native_types,
                 primary_id="unused-primary",

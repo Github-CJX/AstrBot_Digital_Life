@@ -8,9 +8,9 @@ from pathlib import Path
 import sys
 from types import SimpleNamespace as NS
 
-from companion_v2.adapters.astrbot.staging import NativeAdapterTypes
-from companion_v2.adapters.astrbot.staging_bootstrap import AstrBotStagingBootstrap
-from companion_v2.storage.runtime import StorageRuntime
+from digital_life_core.adapters.astrbot.staging import NativeAdapterTypes
+from digital_life_core.adapters.astrbot.staging_bootstrap import AstrBotStagingBootstrap
+from digital_life_core.storage.runtime import StorageRuntime
 from tests.native_adapter_support import FakeEvent, FakeHostContext, FakeProvider, FakeReverseApi
 from tests.staging_bootstrap_support import database_contents, synthetic_configuration, wait_for_batch
 from tests.test_management_access import INSTALLATION, NOW

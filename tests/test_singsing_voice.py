@@ -3,7 +3,7 @@
 from dataclasses import replace
 import unittest
 
-from companion_v2.conversation.voice_reply import (
+from digital_life_core.conversation.voice_reply import (
     VoiceReplyPolicy, authored_singing, eligible, separate_spoken, strip_voice_markup, voice_wrapper_pairing,
 )
 

@@ -6,7 +6,7 @@
    保留 create(kinds, rootProvider) 签名，app.js 的 mountConfigEditor 无需改动。 */
 "use strict";
 window.CompanionConfigEditors = (() => {
-  const PREFIX = "/astrbot_plugin_private_companion/";
+  const PREFIX = "/astrbot_plugin_digital_life/";
 
   /* 前端选择器只展示当前规范值；历史版本写进数据库的别名仍在极少数窗口里，
      读回时必须先归一，否则 valid() 会把它们判成非法，用户改别的字段也存不进去。
@@ -186,7 +186,7 @@ window.CompanionConfigEditors = (() => {
     .split(pattern).map(part => part.trim()).filter(Boolean);
 
   /* QQ 空间的七个主题。字段名、标签与场景目录都要与后端
-     companion_v2/qzone/topics.py 的 TOPIC_SPECS 逐字对应：
+     digital_life_core/qzone/topics.py 的 TOPIC_SPECS 逐字对应：
      字段名错一个，注册表里那一项就没有控件（审计会报，页面会静默少一项）；
      场景目录错一个，保存时会被后端整组拒掉，却只说一句「设置不合法」。 */
   const QZONE_TOPIC_SECTIONS = [

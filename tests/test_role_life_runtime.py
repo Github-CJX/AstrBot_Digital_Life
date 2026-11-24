@@ -6,15 +6,15 @@ from datetime import timedelta
 import json
 import unittest
 
-from companion_v2.configuration.registry import FieldRegistry
-from companion_v2.execution.models import TaskContext, digest
-from companion_v2.foundation.refs import AudienceRef
-from companion_v2.model_gateway.routing import configuration_fields
-from companion_v2.model_gateway.models import ProviderResponse
-from companion_v2.role_work.reader import reading_profile
-from companion_v2.role_work.life.management import RoleLifeManagement
-from companion_v2.role_work.models import RoleActivityState as State
-from companion_v2.role_work.journal.writing import writing_profiles
+from digital_life_core.configuration.registry import FieldRegistry
+from digital_life_core.execution.models import TaskContext, digest
+from digital_life_core.foundation.refs import AudienceRef
+from digital_life_core.model_gateway.routing import configuration_fields
+from digital_life_core.model_gateway.models import ProviderResponse
+from digital_life_core.role_work.reader import reading_profile
+from digital_life_core.role_work.life.management import RoleLifeManagement
+from digital_life_core.role_work.models import RoleActivityState as State
+from digital_life_core.role_work.journal.writing import writing_profiles
 from tests.test_host_application import HostFixture
 from tests.test_management_access import SCOPE
 from tests.test_role_tool_loop import answered
@@ -108,7 +108,7 @@ class LifeRuntimeTests(LifeFixture, unittest.IsolatedAsyncioTestCase):
         self.assertEqual(self.called, [])
 
     async def test_journal_archive_cursor_does_not_skip_the_other_kind_on_a_boundary_date(self):
-        from companion_v2.role_work.journal.models import JournalDraft, JournalKind, DreamRecall
+        from digital_life_core.role_work.journal.models import JournalDraft, JournalKind, DreamRecall
         await self.setup_life()
         first = self.clock.now()
         for day in range(55):
