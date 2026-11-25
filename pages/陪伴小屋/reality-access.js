@@ -35,7 +35,7 @@ window.CompanionRealityAccess = (() => {
       description:"仅按用户本轮明确请求读取单帧并返回识别摘要。", allowed:"允许摄像头单帧观察", revoke:"撤回摄像头授权",
       saved:"已允许当前私聊按明确请求读取单帧。", removed:"已撤回当前私聊的摄像头授权。",
       ready:"V2 授权已生效；Reality 侧设置和用户确认仍然有效。"},
-    deviceList:{path:"/device-list", capability:"reality.device.list", icon:"list", title:"米家设备目录",
+    deviceList:{path:"/device-list", capability:"reality.device.list", icon:"list", title:"现实设备目录",
       description:"查看已映射别名、设备类别和缓存在线状态。", allowed:"允许读取设备目录", revoke:"撤回设备目录授权",
       saved:"已允许当前私聊读取设备目录。", removed:"已撤回当前私聊的设备目录授权。", ready:"设备目录工具已进入当前对话。"},
     deviceStatus:{path:"/device-status", capability:"reality.device.status", icon:"activity", title:"单设备状态",
@@ -59,7 +59,7 @@ window.CompanionRealityAccess = (() => {
   };
   const groups = [
     ["手机与镜头", ["mobile", "camera"]],
-    ["米家设备", ["deviceList", "deviceStatus", "deviceInspect", "deviceControl", "deviceAction"]],
+    ["现实设备", ["deviceList", "deviceStatus", "deviceInspect", "deviceControl", "deviceAction"]],
     ["设备操作确认", ["operationLookup", "operationCancel"]],
   ];
   let node = null, scope = "", paths = {}, statuses = {}, pending = {}, busy = new Set(), focusKind = "";

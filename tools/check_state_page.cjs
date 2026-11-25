@@ -187,8 +187,6 @@ async function run({browser, outputDir, bridgeMode="direct", pageRoot=path.resol
   });
   await new Promise(resolve=>server.listen(0,"127.0.0.1",resolve));
   const context=await browser.newContext({viewport:{width:1366,height:980},reducedMotion:"reduce"});
-  await context.route("**/api/plugin/astrbot_plugin_mihome/**",route=>route.fulfill({
-    status:200,contentType:"application/json",body:JSON.stringify({status:"ok",data:{enabled:false,devices:[]}})}));
   const page=await context.newPage(),errors=[];page.on("pageerror",error=>errors.push(String(error.stack||error)));
   page.on("requestfailed",request=>errors.push(`REQUEST ${request.url()}: ${request.failure()?.errorText||"failed"}`));
   page.on("console",message=>{if(message.type()==="error")errors.push(`CONSOLE ${message.text()} @ ${message.location().url}:${message.location().lineNumber}`);});

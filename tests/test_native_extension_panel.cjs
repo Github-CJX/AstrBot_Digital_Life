@@ -25,8 +25,7 @@ const records = Object.fromEntries(["reality", "together", "game", "live"].map(n
     schema:JSON.parse(fs.readFileSync(path.join(base, "settings-schema.json"), "utf8")),
     revision:"revision-" + name, runtime:{state:"running", error_code:null}}];
 }));
-records.reality.management = {mihome:{auth:{logged_in:false}, login:{running:false, status:"idle", qr_available:false}, devices:[]},
-  audio_output:{selected_device_id:"system_default", label:"系统默认输出", playback_volume:35, devices:[{id:"system_default", name:"系统默认输出"}]},
+records.reality.management = {audio_output:{selected_device_id:"system_default", label:"系统默认输出", playback_volume:35, devices:[{id:"system_default", name:"系统默认输出"}]},
   camera:{devices:[], boundary:"按明确任务读取单帧，画面交给所选视觉模型。"},
   users:[{user_id:"42", label:"测试用户", consent:{confirmed:false, local_audio:false},
     policy:{proactive_voice_enabled:false, playback_volume:35}, alarm:{enabled:false, time:"07:30", days:[0,1,2,3,4], delivery_mode:"chat_on_failure"},
@@ -77,11 +76,6 @@ async function harness(name, viewport = {width:1360, height:900}, panelOptions =
         if (endpoint === "extensions/action") {
           if (window.actionError) throw window.actionError;
           const data = record.management;
-          if (body.action === "mihome_start_login") data.mihome.login = {running:true, status:"waiting", qr_available:true, qr_revision:"qr-1",
-            qr_image:"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+aFxoAAAAASUVORK5CYII="};
-          if (body.action === "mihome_login_status") { data.mihome.auth.logged_in = true; data.mihome.login = {running:false, status:"success", qr_available:false}; }
-          if (body.action === "mihome_sync_devices") data.mihome.devices = [{name:"测试灯", room_name:"书房", online:true}];
-          if (body.action === "mihome_logout") { data.mihome.auth.logged_in = false; data.mihome.login = {running:false, status:"idle", qr_available:false}; }
           if (body.action === "consent_camera") { data.users[0].camera.consented = body.payload.confirmed; data.users[0].camera.enabled = body.payload.confirmed; }
           if (body.action === "update_camera_policy") data.users[0].camera = {...data.users[0].camera, enabled:body.payload.camera_enabled,
             proactive_mode:body.payload.proactive_mode, proactive_max_daily:body.payload.proactive_max_daily};
@@ -331,34 +325,6 @@ test("mobile pairing generates and reveals a token once, while rotation is expli
     assert.equal(confirmation.title, "轮换手机配对令牌？");
     assert.equal(confirmation.danger, true);
     assert.equal(await token.inputValue(), "synthetic-mobile-token");
-  } finally { await page.close(); }
-});
-
-test("MiHome actions are explicit and QR refreshes only read local state", async () => {
-  const page = await harness("reality");
-  try {
-    assert.equal(await page.evaluate(() => window.requests.filter(row => row.method === "POST").length), 0);
-    await page.getByRole("button", {name:"扫码登录", exact:true}).click();
-    await page.getByRole("img", {name:"米家登录二维码"}).waitFor();
-    await page.waitForFunction(() => window.requests.filter(row => row.method === "GET").length > 1);
-    const login = await page.evaluate(() => window.requests.filter(row => row.method === "POST"));
-    assert.equal(login.length, 1);
-    assert.deepEqual(login[0].body, {extension_id:"reality", action:"mihome_start_login", payload:{}});
-    if (process.env.COMPANION_UI_OUTPUT) {
-      fs.mkdirSync(process.env.COMPANION_UI_OUTPUT, {recursive:true});
-      await page.screenshot({path:path.join(process.env.COMPANION_UI_OUTPUT, "native-mihome-desktop.png")});
-    }
-    await page.getByRole("button", {name:"检查登录状态", exact:true}).click();
-    await page.getByRole("button", {name:"同步设备", exact:true}).waitFor();
-    await page.getByRole("button", {name:"同步设备", exact:true}).click();
-    await page.getByText("测试灯", {exact:true}).waitFor();
-    assert.equal(await page.getByRole("img", {name:"米家登录二维码"}).count(), 0);
-    await page.getByRole("button", {name:"退出米家账号", exact:true}).click();
-    await page.getByRole("button", {name:"扫码登录", exact:true}).waitFor();
-    const actions = await page.evaluate(() => window.requests.filter(row => row.endpoint === "extensions/action").map(row => row.body));
-    assert.deepEqual(actions.map(row => row.action), ["mihome_start_login", "mihome_login_status", "mihome_sync_devices", "mihome_logout"]);
-    assert.deepEqual(actions[1].payload, {qr_revision:"qr-1"});
-    assert.equal(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth), true);
   } finally { await page.close(); }
 });
 

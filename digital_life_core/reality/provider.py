@@ -26,7 +26,9 @@ PROVIDER_ID = "reality.native"
 VERSION = "0.4.2"
 # Device verbs the provider will forward.  "power" is the original single
 # switch; the parameterised verbs are only ever allowed on properties the
-# device profile itself marks as writable (see mihome_web_api.py).
+# device profile itself marks as writable (the profile store lived in the
+# removed mihome_web_api.py).  Device reads/controls go through the neutral
+# `reality_device_web_api` seam: None until a new device source is wired in.
 DEVICE_ACTIONS = ("power", "set_mode", "set_brightness", "set_color_temperature")
 _ACTIONS = {
     "reality.snapshot.read", "reality.camera.observe", "reality.device.list", "reality.device.status",
@@ -394,22 +396,22 @@ class NativeRealityProvider:
                                 "required": ["purpose"], "additionalProperties": False},
                  "side_effect": "external_network", "timeout_seconds": 60},
                 {"action": "reality.device.list", "capability": "reality.device.list",
-                 "source_owner": PROVIDER_ID, "description": "列出已映射的米家设备别名、类别和缓存在线状态；控制白名单仅供参考，不代表当前用户可控制。",
+                 "source_owner": PROVIDER_ID, "description": "列出已映射的现实设备别名、类别和缓存在线状态；控制白名单仅供参考，不代表当前用户可控制。",
                  "parameters": {"type": "object", "properties": {}, "required": [],
                                 "additionalProperties": False}, "side_effect": "none", "timeout_seconds": 10},
                 {"action": "reality.device.status", "capability": "reality.device.status",
-                 "source_owner": PROVIDER_ID, "description": "按设备目录中的精确别名读取米家设备状态；只读查询，不控制设备。",
+                 "source_owner": PROVIDER_ID, "description": "按设备目录中的精确别名读取现实设备状态；只读查询，不控制设备。",
                  "parameters": {"type": "object", "properties": {"alias": {"type": "string"}},
                                 "required": ["alias"], "additionalProperties": False},
                  "side_effect": "none", "timeout_seconds": 30},
                 {"action": "reality.device.inspect", "capability": "reality.device.inspect",
                  "source_owner": PROVIDER_ID,
-                 "description": "按精确别名读取米家设备的静态能力：可写属性（中文名、示例值、说明）、可读属性与已声明动作。控制前先查它，只按这里出现的名称下发。",
+                 "description": "按精确别名读取现实设备的静态能力：可写属性（中文名、示例值、说明）、可读属性与已声明动作。控制前先查它，只按这里出现的名称下发。",
                  "parameters": {"type": "object", "properties": {"alias": {"type": "string"}},
                                 "required": ["alias"], "additionalProperties": False},
                  "side_effect": "none", "timeout_seconds": 10},
                 {"action": "reality.device.control", "capability": "reality.device.control",
-                 "source_owner": PROVIDER_ID, "description": "仅对米家设置中启用且列入控制白名单的设备按精确别名控制电源开关，并返回确认回执。",
+                 "source_owner": PROVIDER_ID, "description": "仅对已启用且列入控制白名单的现实设备按精确别名控制电源开关，并返回确认回执。",
                  "parameters": {"type": "object", "properties": {
                      "alias": {"type": "string"}, "is_on": {"type": "boolean"}},
                      "required": ["alias", "is_on"], "additionalProperties": False},
@@ -545,7 +547,10 @@ class NativeRealityProvider:
                         raise NativeRealityError("invalid_reality_snapshot")
                     result = {"snapshot": snapshot}
                 else:
-                    web_api = getattr(self.plugin, "mihome_web_api", None)
+                    # 米家后端已随 mihome 模块移除；设备读取走中性接缝
+                    # `reality_device_web_api`，生产无新来源时维持
+                    # 「不可用」回执（not_committed 账本路径），能力编排不变。
+                    web_api = getattr(self.plugin, "reality_device_web_api", None)
                     method_name = {"reality.device.list": "extension_device_directory",
                                    "reality.device.inspect": "extension_device_profile",
                                    }.get(value["action"], "extension_read_device_status")
@@ -641,7 +646,9 @@ class NativeRealityProvider:
         # ---- device write branches ----------------------------------------
         try:
             await _checked(before_dispatch)
-            web_api = getattr(self.plugin, "mihome_web_api", None)
+            # 米家后端已随 mihome 模块移除；设备写入走同一中性接缝，
+            # 生产无新来源时同样维持「不可用」回执。
+            web_api = getattr(self.plugin, "reality_device_web_api", None)
             alias = value["arguments"]["alias"]
             actor = _actor_subject(value["context"])
             # Argument decoding happens before dispatch: a malformed value must

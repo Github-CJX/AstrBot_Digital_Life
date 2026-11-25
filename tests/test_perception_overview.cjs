@@ -14,7 +14,7 @@ class FixedDate extends Date {
   static now() { return fixedNow.getTime(); }
 }
 
-function harness({windowKind="private",balanceSource=null,runtimeWeatherState="available",mihomeEnabled=true,balanceEnabled=true,automaticAllowed=true,balanceConfigured=false,balanceResponse=null,otherInjections=[{label:"参考资料",detail:"本轮加入 1 项"}],recallEnabled=true,recallEntries=[{local_time:"17:42",withdrawn_at:"2026-10-01T09:42:00Z",author:"user-1",text:"周末去公园走走"}],imageTask=true,imageProviderId="image-live",imagePreferred=null,huaweiBound=false,huaweiLatest=null,materialPool={state:"ready",checked_at:"2026-10-01T09:50:00Z",count:2,items:[{title:"AI 早报一",detail:"摘要一",note:"橘鸦 AI 早报",captured_at:"2026-10-01T09:50:00Z"},{title:"AI 早报二",detail:"摘要二",note:"橘鸦 AI 早报",captured_at:"2026-10-01T09:48:00Z"}]},contactDates=[{calendar:"gregorian",month:10,day:3,label:"相识纪念日"}],contactLookaheadDays=3}={}) {
+function harness({windowKind="private",balanceSource=null,runtimeWeatherState="available",balanceEnabled=true,automaticAllowed=true,balanceConfigured=false,balanceResponse=null,otherInjections=[{label:"参考资料",detail:"本轮加入 1 项"}],recallEnabled=true,recallEntries=[{local_time:"17:42",withdrawn_at:"2026-10-01T09:42:00Z",author:"user-1",text:"周末去公园走走"}],imageTask=true,imageProviderId="image-live",imagePreferred=null,huaweiBound=false,huaweiLatest=null,materialPool={state:"ready",checked_at:"2026-10-01T09:50:00Z",count:2,items:[{title:"AI 早报一",detail:"摘要一",note:"橘鸦 AI 早报",captured_at:"2026-10-01T09:50:00Z"},{title:"AI 早报二",detail:"摘要二",note:"橘鸦 AI 早报",captured_at:"2026-10-01T09:48:00Z"}]},contactDates=[{calendar:"gregorian",month:10,day:3,label:"相识纪念日"}],contactLookaheadDays=3}={}) {
   let listener = null, intervalCallback = null, cleared = false, requested = [], bridgeRequests = [];
   const runtimeQueries = [];
   const failedRequests = new Set(), tabActivations = [], focused = [];
@@ -25,8 +25,6 @@ function harness({windowKind="private",balanceSource=null,runtimeWeatherState="a
       amount:null,observed_at:null,state:"not_configured"});
   const parentNodes = {
     '[data-perception-tab="config-injection"]': {hidden:false},
-    "#perception-detail-mihome": {hidden:true},
-    "#mihomeStatusWorkspace": {innerHTML:""},
     "#perceptionRecallWorkspace": {innerHTML:""},
     "#perceptionInjectionWorkspace": {innerHTML:""},
     "#perceptionBalanceSourceWorkspace": {innerHTML:"",handlers:{},
@@ -105,10 +103,6 @@ function harness({windowKind="private",balanceSource=null,runtimeWeatherState="a
       bridgeRequests.push(route==="semantic"?["GET",route,query]:["GET", route]);
       if (failedRequests.has(route)) throw new Error("读取超时");
       if (route === "semantic") return {settings:{analysis_provider:"vision-analysis"}};
-      if (route === "extensions") return {extensions:{reality:{settings:{enabled:true,mihome:{enabled:true}},management:{mihome:{
-        tool_settings:{enable_readonly_tool:mihomeEnabled},snapshot_at:"2026-10-01 17:55",devices:[
-          {did:"sensitive-device-id-1",configured:true,name:"客厅灯",aliases:["living_light"],online:true},
-          {did:"sensitive-device-id-2",configured:true,name:"书房插座",aliases:["study_plug"],online:false}]}}}}};
       if (route === "host-options/balance") return {service_balance:balanceSource || {source:balanceConfigured?"plugin":"none",source_state:balanceConfigured?"configured":"not_configured",
         provider:"newapi",url:balanceConfigured?"https://newapi.example.com":"",user_id:"",value_divisor:"500000",has_api_key:balanceConfigured},
         edit_tokens:{balance:"b".repeat(64)}};
@@ -261,18 +255,15 @@ test("overview shows the requested context, live routes, authorized devices and 
   assert.equal((page.root.innerHTML.match(/class="perception-board-card/g) || []).length, 4);
   for (const item of ["所在地", "天气实况", "天气预警", "余额感知", "核心管理员对话", "语音模型", "生图模型",
     "视觉模型", "外部资讯", "当前定位", "识屏", "摄像头", "撤回记录", "运动健康", "语音模型",
-    "米家设备", "其他注入"]) {
+    "其他注入"]) {
     assert.match(page.root.innerHTML, new RegExp(item));
   }
   assert.match(page.root.innerHTML, /撤回记录/);
-  assert.match(page.root.innerHTML, /米家设备/);
   assert.match(page.parentNodes["#perceptionRecallWorkspace"].innerHTML, /周末去公园走走/);
-  assert.match(page.parentNodes["#mihomeStatusWorkspace"].innerHTML, /客厅灯/);
-  assert.match(page.parentNodes["#mihomeStatusWorkspace"].innerHTML, /离线/);
-  assert.doesNotMatch(page.parentNodes["#mihomeStatusWorkspace"].innerHTML, /sensitive-device-id/);
   assert.match(page.parentNodes["#perceptionInjectionWorkspace"].innerHTML, /参考资料/);
+  /* 已移除的设备观察面板不再发任何 extensions 能力探测。 */
   assert.deepEqual(page.bridgeRequests.filter(([method, route]) => method === "GET" && route === "extensions"),
-    [["GET", "extensions"]]);
+    []);
   assert.match(page.root.clockNodes.time.textContent, /18:00:00/);
   /* 今天是工作日就不该挂节假日标签：不是节日就空着，不替它找一个标签。 */
   assert.equal(page.root.clockNodes.tag.textContent, "");
@@ -361,7 +352,7 @@ test("single item previews show the item's current content, not only its form", 
 });
 
 test("the two lower cards show source-backed readings and explain absent snapshots", async () => {
-  const page=harness({mihomeEnabled:false});
+  const page=harness();
   page.page.mount(page.root);
   await new Promise(resolve=>setImmediate(resolve));
   const html=page.root.innerHTML;
@@ -490,7 +481,7 @@ test("dashboard regions directly select the configuration and model subtab below
 
   for (const destination of [
     "config-screen:perception-detail-device-access", "config-recall:perception-detail-recalls",
-    "config-screen:perception-detail-mihome", "config-injection:perception-detail-injection",
+    "config-injection:perception-detail-injection",
     "config-models:perception-detail-context", "config-environment:perception-detail-important-days",
   ]) {
     assert.match(page.root.innerHTML, new RegExp(`data-board-goto="${destination}"`));
@@ -641,7 +632,7 @@ test("balance form keeps an unsaved token through redraw and tests the draft wit
 });
 
 test("readiness count reflects available signals, and optional rows stay absent", async () => {
-  const page = harness({mihomeEnabled:false,otherInjections:[],recallEnabled:false,recallEntries:[]});
+  const page = harness({otherInjections:[],recallEnabled:false,recallEntries:[]});
   page.page.mount(page.root);
   await new Promise(resolve => setImmediate(resolve));
 
@@ -651,16 +642,10 @@ test("readiness count reflects available signals, and optional rows stay absent"
   assert.doesNotMatch(page.root.innerHTML, /id="perception-channel-ext-injection"/);
   /* 未启用的通道不作为"感知通道"列出（与没有路由的视觉模型同处理），
      也不展示任何设备明细；对应详情分区保持隐藏，且只发一次能力查询。 */
-  assert.doesNotMatch(page.root.innerHTML, /id="perception-channel-device-mihome"/);
-  assert.equal(page.parentNodes["#perception-detail-mihome"].hidden, true);
+  /* 已移除的设备观察通道不再渲染，也不再探测 extensions。 */
   assert.deepEqual(page.bridgeRequests.filter(([method, route]) => method === "GET" && route === "extensions"),
-    [["GET", "extensions"]]);
+    []);
   page.page.unmount();
-});
-
-test("the MiHome dashboard uses the authenticated V2 page bridge", () => {
-  assert.doesNotMatch(source, /window\.fetch\s*\(/);
-  assert.doesNotMatch(source, /\/api\/plugin\/astrbot_plugin_mihome\//);
 });
 
 test("the weather off state names its conversation and planning behavior", async () => {
@@ -734,7 +719,7 @@ test("perception board enumerates real perception items and keeps every count co
   // 态势板把"真实能感知到的内容"逐条铺成一行；state=ready 即实况在线。
   // 校验口径一致：每条通道只有一个出口、卡片读数之和＝页头读数，
   // 且态势板与下方明细列表沿用同一份 percepts（不存在两边各喊一个数）。
-  const page = harness({mihomeEnabled:false,otherInjections:[],recallEnabled:false,recallEntries:[]});
+  const page = harness({otherInjections:[],recallEnabled:false,recallEntries:[]});
   page.page.mount(page.root);
   await new Promise(resolve => setImmediate(resolve));
 

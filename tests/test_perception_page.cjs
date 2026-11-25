@@ -256,7 +256,7 @@ test('the current navigation keeps perception reachable and its secondary panels
   assert.match(app, /String\(destination\)\.split\(':',2\)/,
     '看板来源应能同时定位配置分区与二级面板');
   for (const slot of ['modelWorkspace', 'contextImageWorkspace', 'perceptionOnlineQueryWorkspace',
-    'perceptionRecallWorkspace', 'mihomeStatusWorkspace']) {
+    'perceptionRecallWorkspace']) {
     assert.match(app, new RegExp(`id="${slot}"`), `${slot} 应由感知配置页提供真实挂载点`);
   }
   assert.match(app, /sectionIds:\['news','web','selflink'\]/,

@@ -39,7 +39,7 @@ BUNDLED_EXTENSIONS: tuple[dict[str, Any], ...] = (
     },
     {
         "extension_id": "reality", "capability_id": "reality", "label": "现实触及",
-        "description": "V2 本体内置的摄像头、米家、移动端和现实设备拓展。",
+        "description": "V2 本体内置的摄像头、移动端和现实设备拓展。",
         "furniture": {"id": "reality", "name": "现实设备台", "panel_id": "reality"},
     },
     {

@@ -48,7 +48,7 @@ function harness({withTabs = true} = {}) {
   models.clickedTabs=[];
   models.querySelector=selector=>({click(){models.clickedTabs.push(selector);}});
   const devices=panel("config-screen",byId["config-screen"],[
-    detail("perception-detail-device-access"),detail("perception-detail-providers"),detail("perception-detail-mihome",true),
+    detail("perception-detail-device-access"),detail("perception-detail-providers"),
   ]);
   const health=panel("config-health",byId["config-health"],[detail("perception-detail-health")]);
   const news=panel("config-news",byId["config-news"],[detail("perception-detail-external")]);
@@ -142,11 +142,10 @@ test("deep links focus their real section without collapsing sibling settings",(
   assert.equal(calendar.summary.focused,true);
   assert.deepEqual([place.open,calendar.open,importantDays.open],[true,true,true]);
 
-  view.activate("config-screen:perception-detail-mihome");
+  view.activate("config-screen:perception-detail-device-access");
   assert.equal(view.pages[2].hidden,false);
   assert.equal(view.devices.details[0].open,true);
   assert.equal(view.devices.details[1].open,true);
-  assert.equal(view.devices.details[2].open,true);
 });
 
 test("configuration cards are expanded by default and grouped into the five designed pages",()=>{
@@ -232,7 +231,6 @@ test("a single board item opens only its own configuration panel",()=>{
   assert.equal(view.pages[2].hidden,false);
   assert.equal(view.devices.details[0].hidden,false);
   assert.equal(view.devices.details[1].hidden,true);
-  assert.equal(view.devices.details[2].hidden,true);
   assert.equal(view.singleHead.hidden,false);
   assert.equal(view.singleTitle.textContent,"当前定位");
 
@@ -242,5 +240,4 @@ test("a single board item opens only its own configuration panel",()=>{
   assert.equal(view.singleHead.hidden,true);
   assert.equal(view.devices.details[0].hidden,false);
   assert.equal(view.devices.details[1].hidden,false);
-  assert.equal(view.devices.details[2].hidden,true);
 });

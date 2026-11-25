@@ -4,41 +4,6 @@ from .common import *
 
 class RealityActivityMethods:
 
-    def mihome_unavailable_reason(self) -> str:
-        from ...module_gates import module_enabled
-        if not module_enabled("mihome"):
-            return '米家模块未开启（digital_life_modules.json 里把 mihome 设为 true 后重载插件可用）'
-        if _MIHOME_IMPORT_ERROR:
-            return '现实触及内置米家运行时不可用，请安装米家依赖后重载插件'
-        return '现实触及内置米家运行时尚未初始化'
-
-    def _init_embedded_mihome(self) -> None:
-        """Initialize the embedded MiHome runtime without loading the old plugin."""
-        from ...module_gates import module_enabled
-        if not module_enabled("mihome"):
-            # M2：米家已确认移除，先停注册与调度；实现保留，开关打开即可回退。
-            self.mihome_data_manager = None
-            self.mihome_client = None
-            self.mihome_web_api = None
-            return
-        if MiHomeDataManager is None or MiHomeClient is None or MiHomeWebAPI is None:
-            logger.warning('[RealityCompanion] 米家内置运行时不可用: %s', _single_line(_MIHOME_IMPORT_ERROR, 180))
-            return
-        try:
-            self.mihome_data_manager = MiHomeDataManager(PLUGIN_NAME, data_root=self.data_dir / 'mihome')
-            self.mihome_client = MiHomeClient(self.mihome_data_manager)
-            self.client = self.mihome_client
-            self.data_manager = self.mihome_data_manager
-            self.mihome_web_api = MiHomeWebAPI(self)
-        except Exception as exc:
-            self.mihome_data_manager = None
-            self.mihome_client = None
-            self.mihome_web_api = None
-            logger.warning('[RealityCompanion] 初始化内置米家运行时失败: %s', _single_line(exc, 180))
-
-    def _migrate_embedded_mihome_state(self) -> None:
-        return False
-
     def _load_data(self) -> dict[str, Any]:
         if not self.data_file.is_file():
             return {'version': 1, 'users': {}, 'reality_touch': {}, 'reality_touch_outputs': {}}
@@ -120,11 +85,6 @@ class RealityActivityMethods:
             except Exception as exc:
                 logger.warning('[RealityCompanion] 起床提醒轮询失败: %s', _single_line(exc, 160))
             await asyncio.sleep(30)
-
-    def _mihome_api(self) -> Any | None:
-        """Return the embedded MiHome API owned by Reality Companion."""
-        api = getattr(self, 'mihome_extension_api', None)
-        return api if getattr(self, 'mihome_web_api', None) is not None else None
 
     async def _try_legacy_migration(self) -> bool:
         """Import the V1 runtime records the config migration never touched.

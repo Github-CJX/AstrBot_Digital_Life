@@ -180,56 +180,13 @@ class NativeExtensionAPITests(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(refused["data"]["code"], refused["message"])
         self.assertFalse(service._reality_touch_camera_consented(service._user("200")))
 
-    async def test_mihome_device_status_and_power_actions_reach_the_page_provider(self):
-        service = await self.enable("reality")
-        calls = []
-
-        class FakeMiHome:
-            async def extension_start_login(self): return {}
-            async def extension_login_status(self, qr_revision=""): return {}
-            async def extension_sync_devices(self): return {}
-            async def extension_logout(self): return {}
-            async def extension_save_mappings(self, mappings): return {}
-            async def terminate(self): return None
-
-            async def extension_read_device_status(self, alias):
-                calls.append(("status", alias))
-                return {"alias": alias, "available": True, "reason": "", "properties": {"on": True, "brightness": 42}}
-
-            async def extension_control_power(self, alias, is_on, *, native=False):
-                calls.append(("power", alias, is_on, native))
-                return {"alias": alias, "is_on": is_on, "confirmed": True}
-
-            def extension_snapshot(self):
-                return {"available": True, "auth": {"logged_in": True}, "login": {"status": "success"},
-                        "devices": [], "tool_settings": {}, "mappings": [], "snapshot_at": ""}
-
-        service.mihome_web_api = FakeMiHome()
-        status = await self.call(PREFIX + "/action", body={"extension_id": "reality",
-            "action": "mihome_device_status", "payload": {"alias": "desk-lamp"}})
-        self.assertEqual(status["status"], "ok", status)
-        self.assertEqual(status["data"]["result"]["properties"], {"on": True, "brightness": 42})
-        power = await self.call(PREFIX + "/action", body={"extension_id": "reality",
-            "action": "mihome_control_power", "payload": {"alias": "desk-lamp", "is_on": True}})
-        self.assertEqual(power["status"], "ok", power)
-        self.assertTrue(power["data"]["result"]["confirmed"])
-        self.assertEqual(calls, [("status", "desk-lamp"), ("power", "desk-lamp", True, False)])
-
-    async def test_missing_mihome_is_unavailable_and_camera_consent_still_succeeds(self):
+    async def test_camera_consent_still_succeeds_on_fresh_reality_service(self):
         service = await self.enable("reality")
         service.authorized_user_ids.add("200")
-        with patch.object(service, "_mihome_api", return_value=None):
-            status = await self.call()
-            mi = status["data"]["extensions"]["reality"]["management"]["mihome"]
-            self.assertIs(mi["available"], False)
-            self.assertTrue(mi["reason"])
-            login = await self.call(PREFIX + "/action", body={"extension_id": "reality",
-                "action": "mihome_start_login", "payload": {}})
-            self.assertEqual(login["message"], "native_mihome_unavailable")
-            consent = await self.call(PREFIX + "/action", body={"extension_id": "reality",
-                "action": "consent_camera", "payload": {"user_id": "200", "confirmed": True}})
-            self.assertEqual(consent["status"], "ok", consent)
-            self.assertTrue(consent["data"]["management"]["users"][0]["camera"]["consented"])
+        consent = await self.call(PREFIX + "/action", body={"extension_id": "reality",
+            "action": "consent_camera", "payload": {"user_id": "200", "confirmed": True}})
+        self.assertEqual(consent["status"], "ok", consent)
+        self.assertTrue(consent["data"]["management"]["users"][0]["camera"]["consented"])
 
     async def test_camera_page_test_returns_only_an_ephemeral_preview(self):
         service = await self.enable("reality")

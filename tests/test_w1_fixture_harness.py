@@ -163,7 +163,8 @@ class FakeReality:
         self.confirmed = True
         self.fail = False
         self.targets = {"desk": "rev-1"}
-        self.mihome_web_api = self
+        # provider 设备来源接缝（原 mihome_web_api；M2.5b 移除米家后改中性名）
+        self.reality_device_web_api = self
 
     def mobile_context(self, user_id):
         return {"available": True, "user_id": user_id}

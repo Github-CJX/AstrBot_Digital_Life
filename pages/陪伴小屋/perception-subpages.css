@@ -51,7 +51,6 @@
 .perception-config-grid .perception-access-block{margin-block:var(--sp-3);padding-block:var(--sp-3)}
 .perception-config-grid .perception-access-heading{margin-bottom:var(--sp-2)}
 .perception-config-grid .perception-access-heading .perception-section-index{display:none}
-.perception-config-grid .perception-mihome-subpanel{margin-top:var(--sp-3);box-shadow:none}
 .perception-config-grid-environment{--perception-page-accent:var(--t-ok)}
 .perception-config-grid-models{--perception-page-accent:var(--t-accent)}
 .perception-config-grid-reality{--perception-page-accent:var(--t-warn-ink)}
@@ -103,7 +102,7 @@
 :root[data-motion="off"] .perception-config-nav button{transition:none}
 
 /* 现实触及：竖列分组导航 + 单列内容。
-   这一页原来把授权、屏幕解读、设备与米家全部叠在两条折叠块里，越往下越难找；
+   这一页原来把授权、屏幕解读、设备全部叠在两条折叠块里，越往下越难找；
    现在左侧固定一条分组栏，右侧只显示当前分组，分组本身仍是原来的挂载点。 */
 .reality-config-shell{display:grid;grid-template-columns:200px minmax(0,1fr);align-items:start;gap:var(--sp-4);min-width:0}
 .reality-config-rail{position:sticky;top:var(--sp-2);z-index:5;display:grid;gap:2px;padding:var(--sp-2);border:1px solid var(--t-line);border-radius:var(--r-sm);background:var(--t-surface)}

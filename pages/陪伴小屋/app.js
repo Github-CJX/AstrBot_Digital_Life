@@ -2531,7 +2531,6 @@ function renderPerceptionOriginal(){
             <button type="button" role="tab" id="reality-tab-access" aria-selected="true" aria-controls="reality-panel-access" class="active" data-reality-tab="access">${I('shield-check')}<span>授权与隐私</span></button>
             <button type="button" role="tab" id="reality-tab-screen" aria-selected="false" aria-controls="reality-panel-screen" tabindex="-1" data-reality-tab="screen">${I('monitor-dot')}<span>屏幕与感知</span></button>
             <button type="button" role="tab" id="reality-tab-devices" aria-selected="false" aria-controls="reality-panel-devices" tabindex="-1" data-reality-tab="devices">${I('camera')}<span>设备与终端</span></button>
-            <button type="button" role="tab" id="reality-tab-home" aria-selected="false" aria-controls="reality-panel-home" tabindex="-1" data-reality-tab="home">${I('house')}<span>米家与家居</span></button>
           </nav>
           <div class="reality-config-panes">
             <section class="reality-config-pane" id="reality-panel-access" role="tabpanel" aria-labelledby="reality-tab-access" data-reality-panel="access">
@@ -2562,12 +2561,6 @@ function renderPerceptionOriginal(){
               <details class="perception-subpanel" id="perception-detail-providers" open>
                 <summary><span><strong>摄像头、音响与手机终端</strong></span>${I('chevron-down')}</summary>
                 <div class="perception-subpanel-body"><div class="perception-provider-list perception-scope" id="perceptionProviderWorkspace">${perceptionProviders.map(renderPerceptionProvider).join('')}</div></div>
-              </details>
-            </section>
-            <section class="reality-config-pane" id="reality-panel-home" role="tabpanel" aria-labelledby="reality-tab-home" data-reality-panel="home" hidden>
-              <details class="perception-subpanel perception-mihome-subpanel" id="perception-detail-mihome" open>
-                <summary><span><strong>米家设备状态</strong></span>${I('chevron-down')}</summary>
-                <div class="perception-subpanel-body"><div id="mihomeStatusWorkspace" class="perception-mihome-workspace" aria-live="polite"></div></div>
               </details>
             </section>
           </div>
@@ -3689,7 +3682,7 @@ const ALL_FEATURE_INSTALLATION_SECTIONS=new Set(['proactive.contact','reaction',
 const ALL_FEATURE_NATIVE_EXTENSIONS=[
   {id:'game',name:'游戏棋桌',icon:'dices',desc:'聊天内游戏、网页房间与棋类引擎',defaultBoolCount:27,detail:'cap-game'},
   {id:'live',name:'直播与表演',icon:'mic-vocal',desc:'VTube Studio、Live2D、OBS 与字幕表演',defaultBoolCount:59,detail:'cap-live'},
-  {id:'reality',name:'现实触及',icon:'radio-tower',desc:'本机语音叫醒、摄像头、米家家居与手机端',defaultBoolCount:19,detail:'cap-reality'},
+  {id:'reality',name:'现实触及',icon:'radio-tower',desc:'本机语音叫醒、摄像头与手机端',defaultBoolCount:19,detail:'cap-reality'},
   {id:'together',name:'一起房间',icon:'phone',desc:'实时语音房间、一起看视频与一起读小说',defaultBoolCount:17,detail:'cap-together'},
 ];
 const allFeaturesState={roleKey:'',ticket:0,loading:false,loaded:false,attempted:false,error:'',notice:'',sections:{},endpoints:{},draft:{},extraRows:[],extensionsMeta:[],saving:false,domain:'all',status:'all',query:''};
@@ -4981,7 +4974,7 @@ const searchIndex=[
   ['语义目录','全局语义模型策略与观察素材分类','library','manage','learning',{subtab:'semantic',aliases:['全局语义策略','语义素材']}],
   ['每日复盘','角色每日自我复盘开关与历史复盘记录','history','manage','learning',{subtab:'reflection',aliases:['自我复盘','每日反思','插件复盘','self_review']}],
   ['感知','时空环境、模型能力、现实触及、健康与撤回记录','scan-eye','manage','perception',{aliases:['环境','历法','撤回','余额','健康感知']}],
-  ['现实触及','屏幕读取、手机摄像头授权与米家家居','radio','manage','perception',{perceptionTab:'config-screen',aliases:['屏幕','摄像头','米家','设备授权']}],
+  ['现实触及','屏幕读取、手机摄像头授权与家居设备','radio','manage','perception',{perceptionTab:'config-screen',aliases:['屏幕','摄像头','设备授权']}],
   ['理解','图片、视频、文件、网页与合并转发理解','brain-circuit','manage','understanding',{understandingTab:'overview',aliases:['图片理解','视频理解','文件理解','网页理解','合并转发']}],
   ['决策','本轮唤醒、回复节奏、安全防护与群聊参与判断','brain','manage','decision',{decisionView:'overview',aliases:['群聊参与','唤醒','插话','安全防护']}],
   ['行动','拓展行动能力与设备接入状态','play','manage','action',{aliases:['行动','拓展详情']}],

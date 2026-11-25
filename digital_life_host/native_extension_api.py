@@ -103,12 +103,7 @@ class NativeExtensionWebAPI(PerceptionWebAPI):
                 from .native_extensions.game.management import action
                 result = await action(service, data['action'], data['payload'], current)
             else:
-                allowed = {'mihome_start_login', 'mihome_login_status', 'mihome_sync_devices',
-                    'mihome_logout', 'mihome_save_mappings', 'mihome_device_status', 'mihome_control_power',
-                    'mihome_home_care_status', 'mihome_home_care_save', 'mihome_home_care_run',
-                    'mihome_care_status', 'mihome_care_save', 'mihome_care_feedback',
-                    'mihome_care_think',
-                    'scan_camera', 'test_camera', 'consent_camera', 'update_camera_policy', 'update_audio_policy',
+                allowed = {'scan_camera', 'test_camera', 'consent_camera', 'update_camera_policy', 'update_audio_policy',
                     'scan_audio', 'select_audio', 'test_audio', 'request_audio_consent',
                     'revoke_audio_consent', 'save', 'disable', 'stop_session', 'test',
                     'cancel_reminder', 'mobile_pairing_token'}
@@ -119,7 +114,7 @@ class NativeExtensionWebAPI(PerceptionWebAPI):
                 page_result = await asyncio.wait_for(service.extension_api.page_action(
                     {'action': data['action'], **data['payload']}), timeout=timeout)
                 if type(page_result) is not dict or not page_result.get('ok'):
-                    codes = {'native_mihome_unavailable', 'camera_user_ineligible',
+                    codes = {'camera_user_ineligible',
                              'camera_consent_required', 'camera_user_not_configured'}
                     code = page_result.get('code') if isinstance(page_result, dict) else None
                     if code not in codes:

@@ -27,23 +27,7 @@
     "proactive_max_daily": 1,
     "proactive_cooldown_minutes": 240
   },
-  "mihome": {
-    "enabled": true,
-    "device_map": "{}",
-    "device_category_map": "{}",
-    "control_tool": {
-      "enable": true,
-      "admin_only": true,
-      "allowed_devices": []
-    },
-    "enable_readonly_tool": true,
-    "enable_scene_tool": false,
-    "scene_tool_admin_only": true,
-    "scene_tool": {
-      "enable": false,
-      "admin_only": true
-    }
-  },
+  
   "timezone": "Asia/Shanghai",
   "mobile": {
     "enabled": false,

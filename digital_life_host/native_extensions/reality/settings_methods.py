@@ -171,27 +171,12 @@ class RealitySettingsMethods:
 
     async def _perform_page_action(self, payload: dict[str, Any]) -> dict[str, Any]:
         action = _single_line(payload.get('action'), 40).lower()
-        mihome_page_snapshot: dict[str, Any] | None = None
         try:
             if action == 'mobile_pairing_token':
                 rotate = payload.get('rotate', False)
                 if type(rotate) is not bool:
                     raise ValueError('令牌轮换参数无效')
                 result = await self._mobile_pairing_token_command(rotate=rotate)
-            elif action.startswith('mihome_'):
-                mihome_api = self._mihome_api()
-                handler = getattr(mihome_api, 'page_action', None) if mihome_api is not None else None
-                if not callable(handler):
-                    raise TaskError('native_mihome_unavailable', self.mihome_unavailable_reason())
-                mihome_payload = dict(payload)
-                mihome_payload['action'] = action.removeprefix('mihome_')
-                page_result = await handler(mihome_payload)
-                if not isinstance(page_result, dict) or page_result.get('ok') is not True:
-                    raise ValueError(str(page_result.get('message') or '米家操作未完成') if isinstance(page_result, dict) else '米家操作未完成')
-                mihome_page_snapshot = page_result.get('data') if isinstance(page_result.get('data'), dict) else {}
-                action_result = page_result.get('result') if isinstance(page_result.get('result'), dict) else {}
-                mihome_page_snapshot['mihome_action_result'] = action_result
-                result = action_result
             elif action in {'scan_camera', 'scan_cameras'}:
                 result = self._reality_touch_scan_camera_devices()
             elif action == 'scan_audio':
@@ -310,8 +295,6 @@ class RealitySettingsMethods:
             return {'ok': False, 'message': _single_line(exc, 240),
                     'code': exc.code if isinstance(exc, TaskError) else 'native_reality_action_failed'}
         snapshot = self._reality_touch_page_snapshot()
-        if mihome_page_snapshot is not None:
-            snapshot['mihome'] = mihome_page_snapshot
         if action == 'test_camera' and isinstance(result, dict):
             preview = str(result.get('preview_data_url') or '')
             if preview.startswith('data:image/jpeg;base64,'):

@@ -53,7 +53,8 @@ class FakeReality:
         self.fail = False
         self.confirmed = True
         self.users = []
-        self.mihome_web_api = self
+        # provider 设备来源接缝（原 mihome_web_api；M2.5b 移除米家后改中性名）
+        self.reality_device_web_api = self
 
     def mobile_context(self, user_id):
         self.users.append(user_id)

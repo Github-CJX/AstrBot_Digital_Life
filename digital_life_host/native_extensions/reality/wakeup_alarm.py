@@ -851,21 +851,6 @@ class WakeupAlarmMixin(RealityTouchCameraMixin, RealityTouchAudioMixin):
                         "telemetry": context.get("telemetry") if isinstance(context.get("telemetry"), dict) else {},
                     }
                 )
-        unavailable_reason = getattr(self, "mihome_unavailable_reason", None)
-        mihome_snapshot = {"available": False, "reason": unavailable_reason()
-                           if callable(unavailable_reason) else "米家运行时尚未初始化"}
-        mihome_api_getter = getattr(self, "_mihome_api", None)
-        mihome_api = mihome_api_getter() if callable(mihome_api_getter) else None
-        snapshotter = getattr(mihome_api, "page_snapshot", None) if mihome_api is not None else None
-        if callable(snapshotter):
-            try:
-                mihome_snapshot = snapshotter()
-                if not isinstance(mihome_snapshot, dict):
-                    mihome_snapshot = {"available": True}
-                else:
-                    mihome_snapshot = {"available": True, **mihome_snapshot}
-            except Exception:
-                mihome_snapshot = {"available": False, "reason": "米家运行状态暂不可读取，请重载后核对"}
         return {
             "global_enabled": bool(getattr(self, "enable_experimental_bluetooth_wakeup", False)),
             "consent_version": self._REALITY_TOUCH_CONSENT_VERSION,
@@ -875,7 +860,6 @@ class WakeupAlarmMixin(RealityTouchCameraMixin, RealityTouchAudioMixin):
             "audio_output": self._reality_touch_audio_snapshot(),
             "camera": self._reality_touch_camera_page_snapshot(),
             "configuration": configuration,
-            "mihome": mihome_snapshot,
             "mobile_observations": mobile_observations,
             "counts": {
                 "users": len(rows),

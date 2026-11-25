@@ -50,13 +50,6 @@ function extensionRecord(management = {}) {
     runtime: {state: "running"},
     management: {
       configuration: {mobile: {enabled: true, running: true, bound_port: 6322}},
-      mihome: {
-        available: true, auth: {logged_in: true},
-        login: {status: "success", running: false},
-        devices: [], tool_settings: {enable_readonly_tool: true,
-          control_tool: {enable: true, admin_only: true, allowed_devices: []}},
-        snapshot_at: "2026-10-26 20:00:00",
-      },
       camera: {devices: []}, audio_output: {devices: []}, users: [],
       ...management,
     },
@@ -129,78 +122,4 @@ test("mobile health reachability is not presented as an active pairing", async (
     assert.match(root.innerHTML, activeSessions ? /核对手机与插件使用的私聊账号/ : /健康检查成功只代表网关在线/);
     panel.stop();
   }
-});
-
-test("MiHome device rows expose status and power only after control policy permits the alias", () => {
-  function recordWithPolicy(allowed) {
-    const record = extensionRecord();
-    record.settings.mihome.control_tool.allowed_devices = [...allowed];
-    record.management.mihome.tool_settings.control_tool.allowed_devices = [...allowed];
-    record.management.mihome.devices = [{name: "书房灯", model: "lamp", online: true, configured: true,
-      aliases: ["desk-lamp"], room_name: "书房"}];
-    return record;
-  }
-  function render(record) {
-    const {window} = context(), root = fakeRoot();
-    window.CompanionProduct = {target: () => ({scope_kind: "private", participant_id: "42"}), errorLabel: () => ""};
-    const manager = window.CompanionNativeExtensionManagement.mount(root, {
-      extensionId: "reality", record: structuredClone(record), instance: 1,
-      getState: () => ({}), onRead: () => {}, onRecord: () => {}, onBusy: () => {},
-      onState: () => {}, onUseHotkey: () => {},
-    });
-    return {manager, html: root.innerHTML};
-  }
-  const pending = render(recordWithPolicy([]));
-  assert.match(pending.html, /允许此设备/);
-  assert.doesNotMatch(pending.html, /data-native-mihome-power=/);
-  pending.manager.stop();
-
-  const allowed = render(recordWithPolicy(["desk-lamp"]));
-  assert.match(allowed.html, /状态可读取|状态未读取/);
-  assert.match(allowed.html, /data-native-mihome-power-toggle="desk-lamp"/);
-  assert.match(allowed.html, /class="mihome-switch"/);
-  assert.doesNotMatch(allowed.html, /允许此设备/);
-  allowed.manager.stop();
-});
-
-test("MiHome allow button persists the alias and enables control through the settings API", async () => {
-  const {window} = context(), root = fakeRoot(), record = extensionRecord();
-  record.settings.mihome.control_tool.enable = false;
-  record.settings.mihome.control_tool.allowed_devices = [];
-  record.management.mihome.tool_settings.control_tool.enable = false;
-  record.management.mihome.tool_settings.control_tool.allowed_devices = [];
-  record.management.mihome.devices = [{name: "书房灯", model: "lamp", online: true, configured: true,
-    aliases: ["desk-lamp"], room_name: "书房"}];
-  const requests = [];
-  function merge(target, updates) {
-    for (const [key, value] of Object.entries(updates)) {
-      if (value && typeof value === "object" && !Array.isArray(value)) merge(target[key] ??= {}, value);
-      else target[key] = structuredClone(value);
-    }
-  }
-  window.CompanionProduct = {
-    target: () => ({scope_kind: "private", participant_id: "42"}), errorLabel: () => "",
-    request: async (method, endpoint, body) => {
-      requests.push({method, endpoint, body: structuredClone(body)});
-      if (method === "POST" && endpoint === "extensions/configure") {
-        merge(record.settings, body.updates);
-        record.revision = "synthetic-revision-2";
-        return structuredClone(record);
-      }
-      if (method === "GET" && endpoint === "extensions") return {extensions: {reality: structuredClone(record)}};
-      throw new Error("unexpected request");
-    },
-  };
-  const manager = window.CompanionNativeExtensionManagement.mount(root, {
-    extensionId: "reality", record: structuredClone(record), instance: 2,
-    getState: () => ({}), onRead: () => {}, onRecord: () => {}, onBusy: () => {},
-    onState: () => {}, onUseHotkey: () => {},
-  });
-  await manager.allowMihomeAlias("desk-lamp");
-  const configure = requests.find(item => item.endpoint === "extensions/configure");
-  assert.ok(configure);
-  assert.deepEqual(configure.body.updates.mihome.control_tool.allowed_devices, ["desk-lamp"]);
-  assert.equal(configure.body.updates.mihome.control_tool.enable, true);
-  assert.equal(configure.body.revision, "synthetic-revision");
-  manager.stop();
 });

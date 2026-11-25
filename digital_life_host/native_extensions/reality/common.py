@@ -30,26 +30,6 @@ except Exception:
 from .helpers import _now_ts, _safe_float, _safe_int, _single_line
 from .mobile_gateway import MOBILE_API_VERSION, MobileGatewayMixin
 from .wakeup_alarm import WakeupAlarmMixin
-from ...module_gates import module_enabled as _module_enabled
-# 米家是待移除的可选家庭自动化，和手机/摄像头/音频这些保留的现实能力不是一回事：
-# 开关关着时连模块都不导入，`mijiaAPI` 这类第三方依赖不装也不影响其它现实能力。
-if _module_enabled('mihome'):
-    try:
-        from .mihome_data_manager import MiHomeDataManager
-        from .mihome_client import MiHomeClient
-        from .mihome_web_api import MiHomeWebAPI
-    except (ImportError, OSError, RuntimeError) as exc:
-        MiHomeDataManager = None
-        MiHomeClient = None
-        MiHomeWebAPI = None
-        _MIHOME_IMPORT_ERROR = str(exc)
-    else:
-        _MIHOME_IMPORT_ERROR = ''
-else:
-    MiHomeDataManager = None
-    MiHomeClient = None
-    MiHomeWebAPI = None
-    _MIHOME_IMPORT_ERROR = 'module disabled'
 PLUGIN_NAME = 'astrbot_plugin_digital_life.reality'
 PLUGIN_VERSION = PRODUCT_VERSION
 PAGE_API_PREFIX = f'/{PLUGIN_NAME}/page'
@@ -96,28 +76,6 @@ def _reality_touch_camera_tool_payload(tool_result: Any) -> dict[str, Any] | Non
 def _reality_touch_camera_reply_needs_uncertain_fallback(text: str) -> bool:
     """Only catch explanations and guesses forbidden by an uncertain camera receipt."""
     return bool(re.search('(?:画面.{0,5}(?:黑|糊|模糊)|镜头.{0,5}(?:挡|遮)|看错了?|(?:又在)?吃(?:什么)?(?:不健康|东西)|老实交代|快点.{0,6}交代|你(?:刚才)?给我看了什么)', str(text or '')))
-
-class RealityMiHomeExtensionAPI:
-    """Embedded MiHome surface used by both Reality Companion pages."""
-
-    def __init__(self, plugin: 'RealityRuntime') -> None:
-        self._plugin = plugin
-
-    def page_snapshot(self) -> dict[str, Any]:
-        web_api = self._plugin.mihome_web_api
-        return web_api.extension_snapshot() if web_api is not None else {'available': False}
-
-    async def page_action(self, payload: dict[str, Any]) -> dict[str, Any]:
-        action = str((payload or {}).get('action') or '').strip().lower()
-        web_api = self._plugin.mihome_web_api
-        if web_api is None:
-            raise ValueError(self._plugin.mihome_unavailable_reason())
-        handlers = {'start_login': lambda: web_api.extension_start_login(), 'login_status': lambda: web_api.extension_login_status((payload or {}).get('qr_revision', '')), 'sync_devices': web_api.extension_sync_devices, 'logout': web_api.extension_logout, 'save_mappings': lambda: web_api.extension_save_mappings((payload or {}).get('mappings', [])), 'device_status': lambda: web_api.extension_read_device_status(str((payload or {}).get('alias') or '')), 'control_power': lambda: web_api.extension_control_power(str((payload or {}).get('alias') or ''), bool((payload or {}).get('is_on')))}
-        handler = handlers.get(action)
-        if handler is None:
-            raise ValueError('不支持的米家页面操作')
-        result = await handler()
-        return {'ok': True, 'result': result, 'data': web_api.extension_snapshot()}
 
 class RealityExtensionAPI:
     """Internal Reality surface owned and composed by the V2 controller."""

@@ -13,15 +13,9 @@ window.CompanionCarePage = (() => {
   let failed = false;
   let version = 0;
 
-  async function call(action, payload) {
-    const request = window.CompanionProduct?.request;
-    if (!request) throw new Error("bridge_unavailable");
-    const record = await request("POST", "extensions/action", {
-      extension_id: "reality", action: `mihome_${action}`, payload,
-    }, {timeoutMs: 65000});
-    const result = record?.result;
-    if (!result || typeof result !== "object") throw new Error("invalid_response");
-    return result;
+  /* 观察来源（米家设备画像）已随 M2.5b 移除；在意功能暂无数据源，直接降级提示。 */
+  async function call() {
+    throw new Error("care_source_removed");
   }
 
   function timeOf(value) {

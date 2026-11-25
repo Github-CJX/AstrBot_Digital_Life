@@ -41,7 +41,7 @@
         "description": "家居服务",
         "type": "string",
         "default": "home_assistant",
-        "hint": "当前支持 Home Assistant REST 兼容入口；米家设备可先通过 Home Assistant 暴露。",
+        "hint": "当前支持 Home Assistant REST 兼容入口。",
         "condition": {
           "enabled": true
         }
@@ -219,90 +219,7 @@
       }
     }
   },
-  "mihome": {
-    "description": "内置米家控制",
-    "type": "object",
-    "hint": "米家登录、凭证、设备缓存和控制能力由现实触及插件内置运行时负责，不依赖 astrbot_plugin_mihome。",
-    "items": {
-      "enabled": {
-        "description": "启用米家控制",
-        "type": "bool",
-        "default": true
-      },
-      "device_map": {
-        "description": "设备别名映射",
-        "type": "string",
-        "default": "{}",
-        "hint": "内部 JSON 映射，建议通过现实触及页面管理。"
-      },
-      "device_category_map": {
-        "description": "设备类别映射",
-        "type": "string",
-        "default": "{}"
-      },
-      "control_tool": {
-        "description": "设备控制策略",
-        "type": "object",
-        "items": {
-          "enable": {
-            "description": "允许模型控制设备",
-            "type": "bool",
-            "default": true
-          },
-          "admin_only": {
-            "description": "仅允许管理员使用",
-            "type": "bool",
-            "default": true
-          },
-          "allowed_devices": {
-            "description": "允许控制的设备别名",
-            "type": "list",
-            "default": []
-          }
-        },
-        "default": {
-          "enable": true,
-          "admin_only": true,
-          "allowed_devices": []
-        }
-      },
-      "enable_readonly_tool": {
-        "description": "允许米家只读查询",
-        "type": "bool",
-        "default": true
-      },
-      "enable_scene_tool": {
-        "description": "允许米家场景",
-        "type": "bool",
-        "default": false
-      },
-      "scene_tool_admin_only": {
-        "description": "场景仅管理员",
-        "type": "bool",
-        "default": true
-      },
-      "scene_tool": {
-        "description": "场景策略",
-        "type": "object",
-        "items": {
-          "enable": {
-            "description": "允许模型调用场景",
-            "type": "bool",
-            "default": false
-          },
-          "admin_only": {
-            "description": "仅允许管理员使用",
-            "type": "bool",
-            "default": true
-          }
-        },
-        "default": {
-          "enable": false,
-          "admin_only": true
-        }
-      }
-    }
-  },
+  
   "timezone": {
     "description": "提醒时区",
     "type": "string",

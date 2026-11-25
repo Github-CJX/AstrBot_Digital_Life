@@ -16,13 +16,6 @@ class RealityRuntime(NativeService, RealitySettingsMethods, RealitySpeechMethods
         self.context = context
         self.controller = controller
         self.config = config
-        self.mihome_config = self.config.get('mihome') if isinstance(self.config.get('mihome'), dict) else {}
-        if isinstance(self.config, dict):
-            self.config['mihome'] = self.mihome_config
-        self.mihome_data_manager = None
-        self.mihome_client = None
-        self.mihome_web_api = None
-        self.mihome_extension_api = RealityMiHomeExtensionAPI(self)
         pass
         self.extension_api = RealityExtensionAPI(self)
         self.data_dir = Path(data_root)
@@ -47,7 +40,6 @@ class RealityRuntime(NativeService, RealitySettingsMethods, RealitySpeechMethods
         self.authorized_user_ids = {_single_line(item, 120) for item in self._cfg('authorized_user_ids', []) if _single_line(item, 120)}
         pass
         self._native_provider = None
-        self._init_embedded_mihome()
 
     async def terminate(self) -> None:
         await self._set_official_reminders_paused(True)
@@ -68,16 +60,6 @@ class RealityRuntime(NativeService, RealitySettingsMethods, RealitySpeechMethods
         self._background_tasks.clear()
         self._wakeup_contact_tasks.clear()
         self._alarm_task = None
-        if self.mihome_web_api is not None:
-            try:
-                await self.mihome_web_api.terminate()
-            except Exception as exc:
-                logger.warning('[RealityCompanion] 停止内置米家 Web API 失败: %s', _single_line(exc, 160))
-        if self.mihome_client is not None:
-            try:
-                await self.mihome_client.terminate()
-            except Exception as exc:
-                logger.warning('[RealityCompanion] 停止内置米家客户端失败: %s', _single_line(exc, 160))
         await asyncio.to_thread(self._save_data_sync)
         await asyncio.to_thread(self.token_usage.save, force=True)
 
@@ -103,23 +85,10 @@ class RealityRuntime(NativeService, RealitySettingsMethods, RealitySpeechMethods
                 raise RuntimeError('移动端网关启动失败，请检查配对令牌和端口配置')
             await self._set_official_reminders_paused(False)
             self._alarm_task = self._create_lifecycle_background_task(self._alarm_loop(), label='alarms')
-            self._create_lifecycle_background_task(self._care_loop(), label='care')
             # 旧版运行记录（音响输出、摄像头设备目录、按用户的摄像头授权）只补一次；
             # 关掉这个开关时不再重复尝试。
             if not self.data.get('legacy_migration_completed'):
                 self._create_lifecycle_background_task(self._migration_loop(), label='legacy-migration')
-
-    async def _care_loop(self) -> None:
-        """Observe devices for the care layer; phase 1 records impulses, never acts."""
-        while True:
-            try:
-                if self.mihome_web_api is not None:
-                    await self.mihome_web_api.extension_care_tick()
-            except asyncio.CancelledError:
-                raise
-            except Exception as exc:
-                logger.warning('[RealityCompanion] 在意轮询失败: %s', _single_line(exc, 160))
-            await asyncio.sleep(300)
 
     async def _set_official_reminders_paused(self, paused):
         manager = self._official_cron_manager()

@@ -8,7 +8,7 @@ window.CompanionPerceptionOverviewPage = (() => {
   let root = null, scope = "", snapshot = null, runtimeSnapshot = null, runtimeState = "loading";
   let modelStatus = null, modelState = "loading", voiceStatus = null, voiceState = "loading";
   let imageStatus = null, imageState = "loading", semanticStatus = null, semanticState = "loading";
-  let recallStatus = null, recallState = "loading", recallError = "", mihomeStatus = null, mihomeState = "loading";
+  let recallStatus = null, recallState = "loading", recallError = "";
   let huaweiHealth = null, huaweiHealthState = "loading", huaweiHealthError = "";
   let materialPool = null, materialPoolState = "loading", materialPoolError = "";
   let itemPreviewMarkup = new Map(), activePreviewItemId = "";
@@ -824,16 +824,6 @@ window.CompanionPerceptionOverviewPage = (() => {
             : `读取失败（${recallError || "原因未知"}）· 检查当前角色窗口的授权与撤回转录开关。`)
         : recallStatus?.enabled === false ? "打开下方撤回转录设置后，才会显示授权范围内的记录。"
           : "仅显示当前会话授权范围内的记录，不会重新进入对话。";
-    const configuredDevices = (mihomeStatus?.devices || []).filter(item => item?.configured === true || item?.aliases?.length);
-    const onlineCount = configuredDevices.filter(item => item.online === true).length;
-    const offlineCount = configuredDevices.filter(item => item.online === false).length;
-    const unknownCount = configuredDevices.length - onlineCount - offlineCount;
-    const mihomeEnabled = mihomeState === "ready" && mihomeStatus?.enabled === true;
-    const mihomeSummary = mihomeEnabled
-      ? configuredDevices.length
-        ? `${onlineCount} 在线 · ${offlineCount} 离线 · ${unknownCount} 未核实 · ${configuredDevices.length} 台已配置`
-        : "只读设备状态已开启，尚无已映射设备"
-      : "";
     const injections = Array.isArray(runtimeSnapshot?.other_injections)
       ? runtimeSnapshot.other_injections.filter(item => typeof item === "string" || item?.label || item?.name).slice(0, 6) : [];
     const injectionLabels = injections.map(item => typeof item === "string" ? item : item.label || item.name);
@@ -994,11 +984,6 @@ window.CompanionPerceptionOverviewPage = (() => {
       value:recallValue, detail:recallDetail,
       state:recallState === "error" || recallState === "loading" ? "pending" : recalls.length ? "ready" : "off",
       tag:recallState === "error" ? "读取失败" : recallState === "loading" ? "读取中" : recallStatus?.enabled === false ? "未启用" : recalls.length ? "只读记录" : "无记录"});
-    if (mihomeEnabled) channel("device-mihome", "devices", {tab:"config-screen:perception-detail-mihome", icon:"plug-zap", title:"米家设备",
-      value:mihomeSummary,
-      detail:configuredDevices.slice(0, 3).map(item => `${item.name || item.aliases?.[0] || "设备"} ${item.online === true ? "在线" : item.online === false ? "离线" : "状态未知"}`).join(" · ")
-        + (mihomeStatus?.snapshot_at ? ` · 同步 ${mihomeStatus.snapshot_at}` : ""),
-      state:offlineCount ? "pending" : "ready", tag:offlineCount ? `${offlineCount} 台离线` : "设备正常"});
     if (injectionLabels.length) channel("ext-injection", "external", {tab:"config-injection:perception-detail-injection", icon:"layers-3", title:"其他注入",
       value:`${injectionLabels.length} 项进入本轮上下文`, detail:injectionLabels.join(" · "), state:"ready", tag:"本轮材料"});
 
@@ -1036,10 +1021,9 @@ window.CompanionPerceptionOverviewPage = (() => {
     </button>`;
     const deviceCard = (() => {
       const location = channelById("device-location"), screen = channelById("device-screen"), phone = channelById("device-phone");
-      const health = channelById("device-health"), camera = channelById("device-camera"), mihome = channelById("device-mihome");
+      const health = channelById("device-health"), camera = channelById("device-camera");
       const cameraAuthorized = cameraResult.state === "available" || cameraResult.state === "ready";
       const cameraTag = windowRequired ? "未选择窗口" : cameraAuthorized ? "已授权" : runtimeState === "error" ? "读取失败" : runtimeState === "loading" ? "读取中" : /consent/.test(cameraResult.reason || "") ? "待授权" : "未就绪";
-      const mihomeLabel = mihome ? mihomeSummary : mihomeState === "disabled" ? "未启用" : mihomeState === "loading" ? "读取中" : "暂不可读";
       return `<div class="perception-reading-card">
         <button type="button" class="perception-feature is-location is-${location.state}" ${channelAttrs(location)}>
           <span class="perception-feature-icon">${icon("map-pin")}</span>
@@ -1051,7 +1035,6 @@ window.CompanionPerceptionOverviewPage = (() => {
         ${readingRow(health, "健康摘要", healthValue, healthAvailable ? health.captured_at : null)}
         <div class="perception-board-footer"><span>设备授权</span><div class="perception-authorization-chips">
           <button type="button" class="perception-authorization-chip is-${cameraAuthorized ? "ready" : camera.state}" ${channelAttrs(camera)}><i class="perception-dot" aria-hidden="true"></i>摄像头 · ${esc(cameraTag)}</button>
-          <button type="button" class="perception-authorization-chip is-${mihome?.state || (mihomeState === "disabled" ? "off" : "pending")}" ${mihome ? channelAttrs(mihome) : destinationAttrs(tabDevice)} title="${esc(mihome?.detail || mihomeLabel)}"><i class="perception-dot" aria-hidden="true"></i>米家 · ${esc(mihomeLabel)}</button>
         </div></div>
       </div>`;
     })();
@@ -1190,7 +1173,7 @@ window.CompanionPerceptionOverviewPage = (() => {
     const realityBodyMarkup = () => {
       const location = channelById("device-location");
       const health = channelById("device-health");
-      const minis = ["device-screen", "device-phone", "device-camera", "device-mihome"]
+      const minis = ["device-screen", "device-phone", "device-camera"]
         .map(id => channelById(id)).filter(Boolean).map(item => itemMini(item)).join("");
       return `<div class="perception-hero-grid is-two">
         ${location ? itemHero(location, {title:"当前定位", tone:"location"}) : ""}
@@ -1317,9 +1300,6 @@ window.CompanionPerceptionOverviewPage = (() => {
       if (camera) itemPreviewMarkup.set("device-camera", previewCard({title:"摄像头", state:camera.state, tag:camera.tag,
         body:previewFields([["最近观察", cameraValue], ["用途", cameraResult.state === "available" ? cameraResult.purpose || "按本轮明确请求" : "只在明确请求时读取单帧"],
           ["时间", cameraResult.state === "available" ? ageLabel(cameraResult.captured_at) : "暂无已保存结果"]])}));
-      const mihome = channelById("device-mihome");
-      if (mihome) itemPreviewMarkup.set("device-mihome", previewCard({title:"米家设备", state:mihome.state, tag:mihome.tag,
-        body:configuredDevices.length ? `<ul class="perception-preview-material-list">${configuredDevices.map(item => `<li><strong>${esc(item.name || item.aliases?.[0] || "未命名设备")}</strong><span>${esc((item.aliases || []).join("、") || "未设置别名")} · ${item.online === true ? "在线" : item.online === false ? "离线" : "状态未知"}</span></li>`).join("")}</ul>` : `<p class="perception-preview-empty">只读设备状态已开启，暂无已映射设备。</p>`}));
       const external = channelById("ext-external");
       if (external) {
         const poolItems = Array.isArray(materialPool?.items) ? materialPool.items.filter(item => item && typeof item.title === "string") : [];
@@ -1346,7 +1326,7 @@ window.CompanionPerceptionOverviewPage = (() => {
     };
     buildItemPreviews();
     /* 页头保留真实的整体读数：通道数与"实况在线"都由当前 percepts 现算，
-       不写死总数——模型视觉、天气预警、米家这类通道本来就时有时无。 */
+       不写死总数——模型视觉、天气预警这类通道本来就时有时无。 */
     /* 同步状态必须说出来：日期与天气都绑在服务端快照上，读失败时页面会停在旧值，
        不给提示就等于拿过期读数冒充当前实况。 */
     const readStates = [runtimeState, modelState, voiceState, imageState, semanticState, recallState, huaweiHealthState];
@@ -1396,13 +1376,6 @@ window.CompanionPerceptionOverviewPage = (() => {
 
     // 保留工作区处理逻辑
     const page = root.parentElement;
-    const mihomePanel = page?.querySelector("#perception-detail-mihome");
-    if (mihomePanel) mihomePanel.hidden = !mihomeEnabled;
-    const mihomeWorkspace = page?.querySelector("#mihomeStatusWorkspace");
-    if (mihomeWorkspace) mihomeWorkspace.innerHTML = mihomeEnabled
-      ? `<p class="perception-mihome-note">${mihomeStatus.snapshot_at ? `设备目录最近同步 ${esc(mihomeStatus.snapshot_at)}。` : "当前展示米家扩展缓存的设备目录状态。"} 状态未知时不会调用设备接口补采。</p>${configuredDevices.length
-        ? `<ul>${configuredDevices.map(item => `<li class="perception-mihome-device"><span><strong>${esc(item.name || item.aliases?.[0] || "未命名设备")}</strong><small>${esc((item.aliases || []).join("、") || "未设置别名")}</small></span><b class="state-${item.online === true ? "online" : item.online === false ? "offline" : "unknown"}">${item.online === true ? "在线" : item.online === false ? "离线" : "未核实"}</b></li>`).join("")}</ul>`
-        : `<p class="memory-notice" role="status">只读状态已启用，暂时没有已映射设备。</p>`}` : "";
     const recallWorkspace = page?.querySelector("#perceptionRecallWorkspace");
     if (recallWorkspace) recallWorkspace.innerHTML = recallState === "loading"
       ? `<p class="memory-notice" role="status">正在读取当前窗口的撤回记录…</p>`
@@ -1561,46 +1534,6 @@ window.CompanionPerceptionOverviewPage = (() => {
         recallError = code;
         forgetOverview("recallStatus", "recallState");
       }
-    }
-    render();
-  }
-  async function refreshMihome(ticket = generation) {
-    if (!validRoot(ticket)) return;
-    mihomeState = "loading"; render();
-    try {
-      const bridge = product.bridgeNow?.() || await product.bridgeFor();
-      const value = product.unwrap(await bridge.apiGet("extensions", {}));
-      if (!validRoot(ticket)) return;
-      const reality = value?.extensions?.reality;
-      const settings = reality?.settings;
-      const mihome = reality?.management?.mihome;
-      if (!settings || !mihome || mihome.available === false || !Array.isArray(mihome.devices)
-          || typeof mihome.tool_settings?.enable_readonly_tool !== "boolean")
-        throw new Error("invalid native MiHome status");
-      if (settings.enabled === false || settings.mihome?.enabled === false
-          || !mihome.tool_settings.enable_readonly_tool) {
-        mihomeStatus = null; mihomeState = "disabled"; forgetOverview("mihomeStatus", "mihomeState");
-        render();
-        return;
-      }
-      mihomeStatus = {
-        enabled:true,
-        snapshot_at:typeof mihome.snapshot_at === "string" ? mihome.snapshot_at : "",
-        devices:mihome.devices.filter(item => item?.configured === true || item?.aliases?.length)
-          .map(item => ({
-            configured:true,
-            name:typeof item.name === "string" ? item.name.slice(0, 160) : "",
-            aliases:Array.isArray(item.aliases)
-              ? item.aliases.filter(alias => typeof alias === "string").slice(0, 20).map(alias => alias.slice(0, 120)) : [],
-            online:item.online === true ? true : item.online === false ? false : null,
-          })),
-      };
-      mihomeState = "ready";
-      rememberOverview("mihomeStatus", mihomeStatus, "mihomeState", "ready");
-    } catch (_) {
-      if (!validRoot(ticket)) return;
-      mihomeStatus = null; mihomeState = "unavailable";
-      forgetOverview("mihomeStatus", "mihomeState");
     }
     render();
   }
@@ -1862,7 +1795,7 @@ window.CompanionPerceptionOverviewPage = (() => {
     window.CompanionNativePerceptionPage?.refresh?.();
     const ticket = generation;
     refreshModel(ticket); refreshRuntime(ticket); refreshVoice(ticket); refreshImage(ticket);
-    refreshSemanticStatus(ticket); refreshRecalls(ticket); refreshMihome(ticket); refreshHuaweiHealth(ticket); refreshMaterialPool(ticket);
+    refreshSemanticStatus(ticket); refreshRecalls(ticket); refreshHuaweiHealth(ticket); refreshMaterialPool(ticket);
     void refreshCurrentBalance(ticket);
     if (!balanceConfig || balanceDraftIsCurrent()) void readBalanceConfig(ticket);
   }
@@ -1895,7 +1828,6 @@ window.CompanionPerceptionOverviewPage = (() => {
     semanticStatus = cached.semanticStatus || null; semanticState = cached.semanticState || "loading";
     recallStatus = cached.recallStatus || null; recallState = cached.recallState || "loading";
     if(!selectedWindowRole()){recallStatus=null;recallState="window_required";}
-    mihomeStatus = cached.mihomeStatus || null; mihomeState = cached.mihomeState || "loading";
     huaweiHealth = cached.huaweiHealth || null; huaweiHealthState = cached.huaweiHealthState || "loading";
     materialPool = cached.materialPool || null; materialPoolState = cached.materialPoolState || "loading";
     root.addEventListener("click", click, {signal:abort.signal});
@@ -1916,7 +1848,7 @@ window.CompanionPerceptionOverviewPage = (() => {
     }) || null;
     render();
     refreshModel(ticket); refreshRuntime(ticket); refreshVoice(ticket); refreshImage(ticket);
-    refreshSemanticStatus(ticket); refreshRecalls(ticket); refreshMihome(ticket); refreshHuaweiHealth(ticket); refreshMaterialPool(ticket); readBalanceConfig(ticket);
+    refreshSemanticStatus(ticket); refreshRecalls(ticket); refreshHuaweiHealth(ticket); refreshMaterialPool(ticket); readBalanceConfig(ticket);
     void refreshCurrentBalance(ticket);
     clockTimer = setInterval(updateClock, 1000);
   }
@@ -1927,7 +1859,7 @@ window.CompanionPerceptionOverviewPage = (() => {
     clockTimer = null; root = null; scope = ""; overviewRouteKey = ""; snapshot = null; runtimeSnapshot = null; runtimeState = "loading";
     modelStatus = null; modelState = "loading"; voiceStatus = null; voiceState = "loading";
     imageStatus = null; imageState = "loading"; semanticStatus = null; semanticState = "loading";
-    recallStatus = null; recallState = "loading"; mihomeStatus = null; mihomeState = "loading";
+    recallStatus = null; recallState = "loading";
     lastDay = ""; selectedDestination = ""; selectedModelTab = "";
     balanceWorkspace = null; balanceMarkup = "";
     balanceConfig = null; balanceDraft = null; balanceExpanded = false; balanceConfigLoading = false;

@@ -58,8 +58,9 @@ async function harness(initial = "initial") {
         const key = action === "consent_camera" ? payload.user_id === "999" ? "ineligible"
           : payload.confirmed ? "consent" : "revoke" : action === "update_camera_policy"
           ? window.currentStatus.data.extensions.reality.management.users.length ? "policy" : "missing_user"
-          : ({save:"audio_saved", update_audio_policy:"audio_policy", select_audio:"audio_output"}[action] || "no_mihome_action");
-        response = receipts[key];
+          : ({save:"audio_saved", update_audio_policy:"audio_policy", select_audio:"audio_output"}[action]);
+        response = receipts[key]
+          || {status:"error", message:"unexpected bridge action: " + action};
         if (response.status === "ok") window.currentStatus.data.extensions.reality = structuredClone(response.data);
       } else throw new Error("unexpected bridge endpoint: " + message.endpoint);
       // AstrBot's parent bridge resolves inner data and rejects with message only.
@@ -125,19 +126,16 @@ test("message-only errors explain policy prerequisites without granting camera a
   } finally { await page.close(); }
 });
 
-test("refresh shows persisted camera policy instead of default drafts when MiHome is unavailable", async () => {
+test("refresh shows persisted camera policy instead of default drafts", async () => {
   const page = await harness();
   try {
     await page.locator("[data-native-camera-details] > summary").click();
     await page.evaluate(() => {
       window.currentStatus = structuredClone(window.receipts.refreshed);
-      window.currentStatus.data.extensions.reality.management.mihome = window.receipts.no_mihome.data.extensions.reality.management.mihome;
     });
     await page.getByRole("button", {name:"刷新管理状态", exact:true}).click();
     await page.locator(".native-management-camera-state").filter({hasText:"已确认授权"}).waitFor();
     assert.equal(await page.locator("[data-native-camera-mode]").inputValue(), "auto");
-    assert.equal(await page.getByRole("button", {name:"扫码登录", exact:true}).isDisabled(), true);
-    assert.match(await page.locator(".native-management").textContent(), /米家运行时不可用/);
     await page.locator("[data-native-camera-mode]").selectOption("ask");
     await page.getByRole("button", {name:"刷新管理状态", exact:true}).click();
     assert.equal(await page.locator("[data-native-camera-mode]").inputValue(), "ask", "real edits remain drafts");

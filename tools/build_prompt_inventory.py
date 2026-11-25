@@ -228,14 +228,6 @@ CURATED = {
         "触发私聊伴侣绑定的口令文案", "用户在聊天窗口发送绑定命令时", "命令匹配文案"),
     ("native_extensions/reality/common.py", "MANAGED_PAGE_MESSAGE"): (
         "现实触及能力引导至陪伴小屋的提示文案", "旧入口或未托管页面访问现实触及功能时", "用户提示文案"),
-    ("native_extensions/reality/mihome_device_profiles.py", "CATEGORY_AIR_FRYER"): (
-        "米家设备分类标签：空气炸锅", "米家设备画像展示与归类时", "设备类别标签"),
-    ("native_extensions/reality/mihome_device_profiles.py", "CATEGORY_TH_SENSOR"): (
-        "米家设备分类标签：温湿度计", "米家设备画像展示与归类时", "设备类别标签"),
-    ("native_extensions/reality/mihome_device_profiles.py", "CATEGORY_DOOR_SENSOR"): (
-        "米家设备分类标签：门磁传感器", "米家设备画像展示与归类时", "设备类别标签"),
-    ("native_extensions/reality/mihome_device_profiles.py", "CATEGORY_GAS_SENSOR"): (
-        "米家设备分类标签：燃气传感器", "米家设备画像展示与归类时", "设备类别标签"),
     ("native_extensions/reality/reality_touch_camera.py", "_REALITY_TOUCH_CAMERA_CONFIRMATION_TEXT"): (
         "现实触及摄像头授权确认口令文案", "管理员开启摄像头能力二次确认时", "授权确认文案"),
     ("native_extensions/reality/wakeup_alarm.py", "_WAKEUP_DEFAULT_MESSAGE"): (

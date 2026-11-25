@@ -35,7 +35,8 @@ class MobileSnapshot:
         self.users = []
         self.camera_calls = []
         self.device_calls = []
-        self.mihome_web_api = self
+        # provider 设备来源接缝（原 mihome_web_api；M2.5b 移除米家后改中性名）
+        self.reality_device_web_api = self
 
     def extension_control_preflight(self, alias, *, native=False):
         if not native or alias != "desk-lamp":
@@ -71,7 +72,6 @@ class MobileSnapshot:
         # Keep the bundled provider, camera policy and lifecycle intact. Only
         # unavailable mobile/device transports and the physical frame are fake.
         runtime.mobile_context = Mock(side_effect=self.mobile_context)
-        runtime.mihome_web_api = self
         runtime._capture_reality_touch_camera_frame = Mock(side_effect=self.capture_camera_frame)
         runtime._analyze_reality_touch_camera_frame = AsyncMock(return_value={
             "summary": "桌面上有打开的笔记本电脑。", "scene_description": "桌面上有打开的笔记本电脑。",

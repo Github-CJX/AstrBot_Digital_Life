@@ -115,11 +115,11 @@ class RealityDevicePromptTests(ToolLoopFixture, unittest.IsolatedAsyncioTestCase
     async def test_natural_language_device_guidance_is_offered_with_control_tools(self):
         request = await self._request_with_external_actions("reality.device.control")
 
-        self.assertIn("用户明确要求开、关或调节米家设备时", request.instruction)
+        self.assertIn("用户明确要求开、关或调节现实设备（智能家居）时", request.instruction)
         self.assertIn("帮我把空调关了", request.instruction)
         self.assertIn("不要只说隔着屏幕够不到或让用户自己操作", request.instruction)
 
     async def test_device_guidance_is_omitted_without_control_tools(self):
         request = await self._request_with_external_actions("reality.device.list", "reality.device.status")
 
-        self.assertNotIn("用户明确要求开、关或调节米家设备时", request.instruction)
+        self.assertNotIn("用户明确要求开、关或调节现实设备（智能家居）时", request.instruction)

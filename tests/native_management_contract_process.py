@@ -35,9 +35,6 @@ async def receipts():
         result["refreshed"] = await case.call()
         result["revoke"] = await action("consent_camera", {"user_id": "200", "confirmed": False})
         result["ineligible"] = await action("consent_camera", {"user_id": "999", "confirmed": True})
-        with patch.object(service, "_mihome_api", return_value=None):
-            result["no_mihome"] = await case.call()
-            result["no_mihome_action"] = await action("mihome_start_login", {})
         # Seed existing consent in a synthetic store; no chat or device operation.
         service._user("200")["reality_touch_consent"] = {"confirmed": True,
             "version": 1, "granted_capabilities": ["local_audio"]}
