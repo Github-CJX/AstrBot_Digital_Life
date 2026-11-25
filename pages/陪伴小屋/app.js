@@ -8,6 +8,35 @@ const litePerformanceMode = document.documentElement?.dataset?.performanceMode =
 const layoutKey = () => product.scopeKey() || 'local-room-layout';
 const $ = (s, r = document) => r.querySelector(s);
 const $$ = (s, r = document) => [...r.querySelectorAll(s)];
+/* 模块开关（M2）。服务端 GET /page/modules 给出每个可选/已移除模块的最终状态，
+   没读到之前一律当作「开」：宁可多显示一个入口，也不要让页面在加载期间空一屏。
+   页面读的是同一份结果，所以左栏与面板不会各说一套。 */
+const moduleState = {modules: {}, pages: {}};
+function moduleOn(name){ return moduleState.modules[name] !== false; }
+function pageOn(name){ return moduleState.pages[name] !== false; }
+/* 把开关喂给外壳（左栏与「全部功能」浮层都读同一份分组），再接一次重绘。 */
+function applyModuleState(value){
+  if(!value||typeof value!=='object')return false;
+  const modules=value.modules&&typeof value.modules==='object'?value.modules:{};
+  const pages=value.pages&&typeof value.pages==='object'?value.pages:{};
+  const before=JSON.stringify(moduleState.modules);
+  moduleState.modules=modules;moduleState.pages=pages;
+  window.CompanionModules={modules,pages,hiddenSections:Array.isArray(value.hidden_sections)?value.hidden_sections:[]};
+  window.CompanionShell?.setVisibility?.({modules,pages});
+  return JSON.stringify(modules)!==before;
+}
+async function loadModuleState(){
+  /* 预览/离线外壳里没有桥，这时既没有开关可读，也不该在控制台留下噪声。 */
+  if(typeof product?.request!=='function')return false;
+  try{
+    const value=await product.request('GET','page/modules');
+    return applyModuleState(value);
+  }catch(error){
+    /* 读不到就让所有入口保持可见——开关是收敛可见性，不是新的失败点。 */
+    console.warn('[CompanionV2] 模块开关读取失败', error);
+    return false;
+  }
+}
 const escapeHTML = v => String(v ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const I = name => `<i data-lucide="${name}" aria-hidden="true"></i>`;
 const icons = (root=document) => window.lucide?.createIcons({root,attrs:{'aria-hidden':'true'}});
@@ -1386,11 +1415,11 @@ function mountPanelWorkspaces(){
     ?window.CompanionWeatherSourcePage?.mount(weatherSourceHost)
     :window.CompanionWeatherSourcePage?.unmount());
   const screenAccessHost=document.querySelector('[data-screen-access]');
-  guarded('屏幕读取授权',()=>screenAccessHost
+  guarded('屏幕读取授权',()=>screenAccessHost&&moduleOn('screen')
     ?window.CompanionScreenAccess?.mount(screenAccessHost)
     :window.CompanionScreenAccess?.unmount());
   const screenObservationHost=document.querySelector('[data-screen-observation]');
-  guarded('最近主动识屏',()=>screenObservationHost
+  guarded('最近主动识屏',()=>screenObservationHost&&moduleOn('screen')
     ?window.CompanionScreenObservation?.mount(screenObservationHost)
     :window.CompanionScreenObservation?.unmount());
   const realityAccessHost=document.querySelector('[data-reality-access]');
@@ -4665,7 +4694,9 @@ function renderConfigEditors(){
   if($('#groupDenoiseWorkspace'))configEditorMounts.push(mountConfigEditor('groupDenoiseWorkspace',['group_participation'],{
     group_participation:{sectionIds:['denoise'],title:'群聊表达去噪',note:'只影响群聊回复的表达腔调。'}
   }));
-  if($('#phoneAdbWorkspace')){
+  /* 手机（ADB 设备）是可选模块：关掉后既不挂配置编辑器，也不挂连接向导——
+     它的 device.phone 分节在服务端也一并不返回，这里挂上去只会得到满屏报错。 */
+  if($('#phoneAdbWorkspace')&&moduleOn('phone')){
     const setup=$('#phoneSetupWorkspace');
     const editor=mountConfigEditor('phoneAdbWorkspace',['device.phone'],{
       'device.phone':{navigationLimit:0,onStatus:status=>setup?.phoneSetup?.syncStatus(status)}
@@ -6179,7 +6210,7 @@ function openDetailDialog(title,body){
   $('#dialogContent').innerHTML=`<header class="dialog-head"><h2 id="dialogTitle">${escapeHTML(title)}</h2><button class="icon-button" data-close-detail aria-label="关闭详情">${I('x')}</button></header><div class="dialog-body">${body}</div>`;
   const nativeHost=$('#dialogContent').querySelector('[data-native-extension-host]');
   const gameAccessHost=$('#dialogContent').querySelector('[data-game-access-host]');
-  if(gameAccessHost)window.CompanionGameAccess?.mount(gameAccessHost);
+  if(gameAccessHost&&moduleOn('game'))window.CompanionGameAccess?.mount(gameAccessHost);
   if(nativeHost){
     dialog.classList.add('detail-dialog-native-extension');
     window.CompanionNativeExtensionPanel?.mount(nativeHost,{extensionId:nativeHost.dataset.nativeExtensionHost});
@@ -7520,6 +7551,9 @@ document.addEventListener('visibilitychange',()=>{
  * 为了尽早启动 whenBridgeReady()，让 SDK 的加载与 render 的 DOM 工作在
  * 同一段时间里并行。桥到位后它自己会回调 render() 重画一遍。 */
 probeHost();
+/* 开关先落地再渲染：左栏条目、手机向导、识屏面板都按它决定挂不挂。
+   失败时保持「全开」，下面的每次 render 照旧。 */
+loadModuleState().then(changed=>{ if(changed) try { render(); } catch (error) { console.warn('[CompanionV2] 模块开关落地后重绘失败', error); } });
 syncFromHash();
 armHomeAgendaClock();
 /* The full-asset bundle intentionally puts app.js before large page modules so

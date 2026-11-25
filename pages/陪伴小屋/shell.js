@@ -140,21 +140,59 @@ window.CompanionShell = (() => {
     ]],
   ];
 
+  /* 左栏条目归哪个模块开关管。没登记的条目始终可见：
+     关掉一个可选模块只收起它独占的入口，不连带隐藏别处仍在用的配置
+     （例如 image 关掉后「产出」仍在，只是产出页里没了生图分节）。 */
+  const ITEM_MODULES = {phone: "phone", mobile: "phone"};
+
+  /* 模块可见性。默认全开——读不到开关时宁可多显示，也不要让页面空白。
+     由 app.js 启动后读 GET /page/modules 填进来。 */
+  const visibility = {modules: {}, pages: {}};
+
+  function setVisibility(next) {
+    const modules = next && typeof next.modules === "object" && next.modules ? next.modules : {};
+    const pages = next && typeof next.pages === "object" && next.pages ? next.pages : {};
+    const changed = JSON.stringify(modules) !== JSON.stringify(visibility.modules);
+    visibility.modules = modules;
+    visibility.pages = pages;
+    if (changed) emit();
+    return snapshotVisibility();
+  }
+
+  function snapshotVisibility() {
+    return {modules: {...visibility.modules}, pages: {...visibility.pages}};
+  }
+
+  function moduleVisible(name) {
+    return visibility.modules[name] !== false;
+  }
+
+  function pageVisible(name) {
+    return visibility.pages[name] !== false;
+  }
+
+  function itemVisible(id) {
+    const name = ITEM_MODULES[id];
+    return !name || moduleVisible(name);
+  }
+
   /* 导航的唯一一份分组数据。左栏和「全部功能」浮层都读它，
      免得两处各维护一套名字（曾经浮层里叫「学习与成长」「资料与备份」，
-     左栏叫「学习与反思」「资料与维护」，同一个页面两个名字）。 */
+     左栏叫「学习与反思」「资料与维护」，同一个页面两个名字）。
+     关掉模块后整组条目为空的分组也一并收掉，不留一个只有标题的空壳。 */
   function railGroups() {
-    return RAIL_GROUPS.map(([group, items]) => [group, items.map(([id, icon, label, kind]) => ({
-      id, icon, label, view: kind === "view",
-    }))]);
+    return RAIL_GROUPS
+      .map(([group, items]) => [group, items.filter(([id]) => itemVisible(id))
+        .map(([id, icon, label, kind]) => ({id, icon, label, view: kind === "view"}))])
+      .filter(([, items]) => items.length);
   }
 
   function railHTML() {
-    return RAIL_GROUPS.map(([group, items]) => `
+    return railGroups().map(([group, items]) => `
       <div class="shell-nav-group">
         <span class="shell-nav-title">${group}</span>
-        ${items.map(([id, icon, label, kind]) => {
-          const isView = kind === "view";
+        ${items.map(({id, icon, label, view}) => {
+          const isView = view === true;
           const active = isView ? state.view === id : state.section === id;
           const action = isView ? `data-shell-view="${id}"` : `data-shell-section="${id}"`;
           return `
@@ -168,8 +206,9 @@ window.CompanionShell = (() => {
 
   return {
     $, $$, I,
-    STAGE_STATIONS, VIEWS,
+    STAGE_STATIONS, VIEWS, ITEM_MODULES,
     onChange, emit, paint, railHTML, railGroups,
+    setVisibility, moduleVisible, pageVisible, snapshotVisibility,
     selectFurniture, selectSection, selectView, snapshot,
     get furniture() { return state.furniture; },
     get section() { return state.section; },
