@@ -26,7 +26,6 @@ from .content_access import ensure_content_access
 from .management_identity import dashboard_operator
 from .integration_registry import UnifiedCompanionExtensionAPI
 from .native_extensions.builtins import MANAGED_EXTENSIONS
-from .native_extensions.image_native.nai_backend import NAIImageBackend
 
 logger = logging.getLogger(__name__)
 
@@ -84,7 +83,14 @@ class IntegrationWebAPI:
                         observed_at=controller.now(),
                     ))
                 data = UnifiedCompanionExtensionAPI(controller, claim=False).manifest()
-                data["nai"] = NAIImageBackend(controller.context, Path(controller.data_root) / "nai").status()
+                # 生图可选：NAI 只是它的一种远端后端，关着就没有这段状态。
+                from .module_gates import module_enabled
+
+                if module_enabled("image"):
+                    from .native_extensions.image_native.nai_backend import NAIImageBackend
+
+                    data["nai"] = NAIImageBackend(
+                        controller.context, Path(controller.data_root) / "nai").status()
                 return {"status": "ok", "message": "", "data": data}
         except TaskError as error:
             from .web_api import outcome_response

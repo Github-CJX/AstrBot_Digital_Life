@@ -41,7 +41,6 @@ from .reality_access_api import RealityAccessWebAPI, PREFIX as REALITY_ACCESS_PR
 from .screen_access_api import ScreenAccessWebAPI, PREFIX as SCREEN_ACCESS_PREFIX
 from .game_access_api import GameAccessWebAPI, PREFIX as GAME_ACCESS_PREFIX
 from .image_material_api import ImageMaterialsWebAPI, PREFIX as IMAGE_MATERIAL_PREFIX
-from .qzone_api import QzoneWebAPI, PREFIX as QZONE_PREFIX
 from .host_options_api import HostOptionsWebAPI
 from .storage_api import StorageWebAPI
 from .works_api import WorksWebAPI
@@ -49,7 +48,6 @@ from .display_names import display_names
 from .identity_derivation import role_display_name
 from .role_paths import HOST_PREFIX as PREFIX, role_legacy_paths
 from .performance_mode import performance_enabled, performance_status
-from .huawei_health.api import HuaweiHealthWebAPI
 from .module_gates import module_enabled
 
 
@@ -358,6 +356,8 @@ class MultiHostWebAPI:
         routes += PerceptionWebAPI(self.controller).routes()
         routes += NativeExtensionWebAPI(self.controller).routes()
         if module_enabled("huawei_health"):
+            from .huawei_health.api import HuaweiHealthWebAPI
+
             routes += HuaweiHealthWebAPI(self.controller).routes()
         # 备份是安装级的：它不需要目标，快照覆盖当前运行档的那棵 V2 数据根
         # （多目标下是 installations/<installation_key>/runtime）。所以这里挂一次，
@@ -427,9 +427,12 @@ class MultiHostWebAPI:
                 routes.extend((role["game_access_api"] + path.removeprefix(GAME_ACCESS_PREFIX),
                                handler, methods, description)
                               for path, handler, methods, description in GameAccessWebAPI(view).routes())
-                routes.extend((role["qzone_extension_api"] + path.removeprefix(QZONE_PREFIX),
-                               handler, methods, description)
-                              for path, handler, methods, description in QzoneWebAPI(view).routes())
+                if module_enabled("qzone"):
+                    from .qzone_api import QzoneWebAPI, PREFIX as QZONE_PREFIX
+
+                    routes.extend((role["qzone_extension_api"] + path.removeprefix(QZONE_PREFIX),
+                                   handler, methods, description)
+                                  for path, handler, methods, description in QzoneWebAPI(view).routes())
                 routes.extend((role["life_api"] + path.removeprefix(LIFE_PREFIX), handler, methods, description)
                               for path, handler, methods, description in LifeWebAPI(role_view).routes())
                 routes.extend((role["relationships_api"] + path.removeprefix(RELATIONSHIP_PREFIX), handler, methods, description)

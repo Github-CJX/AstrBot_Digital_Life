@@ -28,12 +28,45 @@ from digital_life_core.sources.models import GovernanceState, SourceRecord
 logger = logging.getLogger(__name__)
 
 from .discovery import discover
-from .image_native.types import NativeImageError
-from .images import IMAGE_ACTIONS, ImageReferenceLease, image_result_handler
-from .image_settings import read_image_settings
+from ..module_gates import module_enabled
 from .content import ACTIONS as CONTENT_ACTIONS, ContentConsumer
 from .screens import ACTION as SCREEN_ACTION, ScreenAdopter
 from .reality_camera import ACTION as REALITY_CAMERA_ACTION, RealityCameraConsumer, RealityCameraGuard
+
+# 生图是可选模块：它的工具适配层（以及它自带的宿主实现）按需导入。
+# 开关关着的时候这些名字一个都不存在，调用点看到的是空动作集和占位异常；
+# 开关是运行期可变的（环境变量/开关文件），所以这里不能用模块级 if 定死。
+class _DisabledImageError(Exception):
+    """生图模块关闭时的占位异常，保留捕获形状。"""
+    code = "image_module_disabled"
+
+
+def _image_surface():
+    """返回 (动作集, 引用租约类型, 结果处理器, 开关读取函数)。"""
+    if not module_enabled("image"):
+        return frozenset(), None, _disabled_image_result_handler, _disabled_image_settings
+    from .images import IMAGE_ACTIONS, ImageReferenceLease, image_result_handler
+    from .image_settings import read_image_settings
+    return IMAGE_ACTIONS, ImageReferenceLease, image_result_handler, read_image_settings
+
+
+def _image_actions():
+    return _image_surface()[0]
+
+
+def _image_error_type():
+    if not module_enabled("image"):
+        return _DisabledImageError
+    from .image_native.types import NativeImageError
+    return NativeImageError
+
+
+def _disabled_image_result_handler(*_args, **_kwargs):
+    raise TaskError("image_module_disabled", "the image module is switched off")
+
+
+def _disabled_image_settings(_path):
+    return {}
 
 
 TOGETHER_CREATE_ACTION = "together.room.create"
@@ -190,8 +223,9 @@ class NativeExtensionRegistry(AstrBotToolPort):
         self.together_execution = dict(together_execution or {})
         self._default_handlers = result_handlers is None
         if result_handlers is None:
-            result_handlers = {action: lambda invocation, result: image_result_handler(
-                invocation, result, observed_at=self.now()) for action in IMAGE_ACTIONS}
+            image_actions, _image_lease, adopt_image, _read_image_settings = _image_surface()
+            result_handlers = {action: (lambda invocation, result, _adopt=adopt_image: _adopt(
+                invocation, result, observed_at=self.now())) for action in image_actions}
             # Read-only providers (Reality, Live) have no artifact to adopt, but their
             # results still carry domain obligations: no credential may reach a model,
             # and a live cursor must advance instead of replaying delivered events.
@@ -212,7 +246,7 @@ class NativeExtensionRegistry(AstrBotToolPort):
         self.issues = tuple((*discovered_issues, *bundled_issues))
         self._blocked_extension_ids = frozenset()
         self.image_settings_path = image_settings_path
-        self.image_enabled = read_image_settings(image_settings_path)
+        self.image_enabled = _image_surface()[3](image_settings_path)
         self._enforcing_image_settings = False
         self._closed = False
         self._start_task = None
@@ -404,10 +438,11 @@ class NativeExtensionRegistry(AstrBotToolPort):
                 or entry[0].descriptor.package.extension_id in self._blocked_extension_ids
                 or not entry[1].current(self.context)):
             return "stale"
-        if (self._enforcing_image_settings and entry[0].descriptor.tool.action in IMAGE_ACTIONS
+        image_actions = _image_actions()
+        if (self._enforcing_image_settings and entry[0].descriptor.tool.action in image_actions
                 and not self.image_enabled[entry[0].descriptor.tool.action]):
             return "disabled"
-        if self._enforcing_image_settings and entry[0].descriptor.tool.action in IMAGE_ACTIONS:
+        if self._enforcing_image_settings and entry[0].descriptor.tool.action in image_actions:
             action = entry[0].descriptor.tool.action
             backend = getattr(getattr(entry[1].port, "owner", None), "backend", None)
             operations = getattr(backend, "operations", None)
@@ -419,13 +454,16 @@ class NativeExtensionRegistry(AstrBotToolPort):
         "The management API pinned to a current V2-native Image declaration."
         if self._closed:
             return None
+        image_actions = _image_actions()
         for declaration, lease in self._entries.values():
-            if declaration.descriptor.tool.action in IMAGE_ACTIONS and lease.current(self.context):
+            if declaration.descriptor.tool.action in image_actions and lease.current(self.context):
                 return lease.api
         return None
 
     def set_image_enabled(self, settings):
-        if self._closed or set(settings) != IMAGE_ACTIONS or any(type(value) is not bool for value in settings.values()):
+        image_actions = _image_actions()
+        if (self._closed or set(settings) != image_actions
+                or any(type(value) is not bool for value in settings.values())):
             raise ValueError("image settings require both native actions")
         self.image_enabled = dict(settings)
 
@@ -663,7 +701,10 @@ class NativeExtensionRegistry(AstrBotToolPort):
         if action == "image.mask_edit" or (action == "image.edit"
                 and json.loads(invocation.arguments_json).get("artifact_id", "") == ""):
             try:
-                reference_lease = ImageReferenceLease(self, invocation, role_references_only=role_references_only)
+                lease_type = _image_surface()[1]
+                if lease_type is None:
+                    raise TaskError("image_module_disabled", "the image module is switched off")
+                reference_lease = lease_type(self, invocation, role_references_only=role_references_only)
             except TaskError as error:
                 if error.code in _IMAGE_PREFLIGHT_LEASE_CODES:
                     return self._preflight_failure(invocation, error.code)
@@ -679,7 +720,7 @@ class NativeExtensionRegistry(AstrBotToolPort):
                 # camera requests with an unknown device effect.
                 return self._preflight_failure(invocation, error.code, prefix="astrbot.camera-preflight.")
         request = invocation_request(invocation)
-        if action in IMAGE_ACTIONS and self.runtime is not None:
+        if action in _image_actions() and self.runtime is not None:
             from digital_life_core.conversation.media.output_settings import effective_settings, apply_prompts
             preferences = effective_settings(self.runtime, invocation.context)
             prompts = apply_prompts(request["arguments"], action, preferences)
@@ -725,7 +766,7 @@ class NativeExtensionRegistry(AstrBotToolPort):
                 with binding:
                     kwargs = {"before_dispatch": before_dispatch}
                     image_session = None
-                    if (action in IMAGE_ACTIONS and self.application is not None
+                    if (action in _image_actions() and self.application is not None
                             and "model_call" in inspect.signature(method).parameters):
                         image_session = self.application.gateway.image_session(invocation.task_run, invocation)
                         kwargs["model_call"] = image_session.execute
@@ -749,7 +790,7 @@ class NativeExtensionRegistry(AstrBotToolPort):
 
         try:
             raw, guarded = await call(port.execute, request, image_references=reference_lease)
-        except NativeImageError as error:
+        except _image_error_type() as error:
             if not error.unconfirmed and error.code != "image_authority_revoked":
                 return self._preflight_failure(invocation, error.code)
             raise
@@ -787,8 +828,9 @@ class NativeExtensionRegistry(AstrBotToolPort):
             adopted = replace(native, artifacts=tuple(artifacts))
             guard()
             handler = self.result_handlers.get(invocation.descriptor.tool.action)
-            if self._default_handlers and action in IMAGE_ACTIONS:
-                handler = lambda original, received: image_result_handler(
+            if self._default_handlers and action in _image_actions():
+                adopt = _image_surface()[2]
+                handler = lambda original, received, _adopt=adopt: _adopt(
                     original, received, observed_at=self.now(),
                     input_references=() if reference_lease is None else reference_lease.used_references)
             if self._default_handlers and self.content is not None and invocation.descriptor.tool.action in CONTENT_ACTIONS:

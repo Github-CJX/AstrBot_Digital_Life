@@ -52,8 +52,21 @@ from digital_life_core.reality.model_profile import reality_text_profile
 from .settings import HostControlError
 from .display_names import event_person_names
 from .group_standing import group_sender_standing
-from .huawei_health.service import get_huawei_health_service_for_root
 from .module_gates import module_enabled
+
+
+def _huawei_health_service(runtime):
+    """Build the health service only when the module is switched on.
+
+    华为健康是待移除的独立数据源；关着的时候连模块都不导入，手机控制与
+    生理周期这些保留能力不依赖它。
+    """
+    if not module_enabled("huawei_health"):
+        return None
+    from .huawei_health.service import get_huawei_health_service_for_root
+
+    return get_huawei_health_service_for_root(runtime.data_root, logger=logger)
+
 from digital_life_core.conversation.voice_reply import VoiceReplyDelivery
 from digital_life_core.execution.models import Lane, ProviderBinding, TaskContext, TaskError, digest, require, stamp
 from digital_life_core.foundation.outcome import Failure, Outcome
@@ -513,7 +526,7 @@ class MultiHostSession:
         self.runtime, self.settings, self.authority, self.types, self.now = runtime, settings, authority, native_types, now
         self.native_tool_port = native_tool_port
         self.search_port_factory = search_port_factory
-        self.huawei_health = get_huawei_health_service_for_root(runtime.data_root, logger=logger)
+        self.huawei_health = _huawei_health_service(runtime)
         common = settings.common
         weather_port, weather_alert_port = weather_ports or configured_weather_ports(None)
         self.voice = NativeVoiceReply(native_context).render

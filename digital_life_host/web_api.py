@@ -41,12 +41,10 @@ from .game_access_api import GameAccessWebAPI
 from .native_extension_api import NativeExtensionWebAPI
 from .account_session_api import AccountSessionWebAPI
 from .image_material_api import ImageMaterialsWebAPI
-from .qzone_api import QzoneWebAPI
 from .host_options_api import HostOptionsWebAPI
 from .storage_api import StorageWebAPI
 from .log_api import LogWebAPI
 from .display_names import display_names
-from .huawei_health.api import HuaweiHealthWebAPI
 from .module_gates import module_enabled
 
 if TYPE_CHECKING:
@@ -164,6 +162,8 @@ class StagingWebAPI:
             all_routes += NativeExtensionWebAPI(self.controller).routes()
             all_routes += NativePerceptionWebAPI(self.controller).routes()
             if module_enabled("huawei_health"):
+                from .huawei_health.api import HuaweiHealthWebAPI
+
                 all_routes += HuaweiHealthWebAPI(self.controller).routes()
             all_routes += ConfigurationWebAPI(self.controller).routes()
             if self.setup is None:
@@ -182,7 +182,10 @@ class StagingWebAPI:
             all_routes += GameAccessWebAPI(self.controller).routes()
             all_routes += AccountSessionWebAPI(self.controller).routes()
             all_routes += ImageMaterialsWebAPI(self.controller).routes()
-            all_routes += QzoneWebAPI(self.controller).routes()
+            if module_enabled("qzone"):
+                from .qzone_api import QzoneWebAPI
+
+                all_routes += QzoneWebAPI(self.controller).routes()
             all_routes += HostOptionsWebAPI(self.controller).routes()
             all_routes += StorageWebAPI(self.controller).routes()
             for route, handler, methods, description in all_routes:

@@ -22,6 +22,10 @@ import sqlite3
 import time
 from typing import Any
 
+from digital_life_core.storage.artifact_blobs import (
+    count_inline_blobs,
+    offload_artifact_blobs,
+)
 from digital_life_core.storage.image_payloads import MARKER_PREFIX as CONV_IMG_MARKER, migrate_image_payloads
 from digital_life_core.storage.native_dedup import (
     CONTEXT_REF_LEN,
@@ -254,14 +258,7 @@ def database_health_report(
 
     nimg_path = paths.get("native_image")
     if nimg_path is not None and nimg_path.is_file():
-        from digital_life_host.native_extensions.image_native.store import NATIVE_IMAGE_FILE_MARKER
-
-        opportunities["inline_native_image_blobs"] = _count_inline_sidecar_blobs(
-            nimg_path,
-            f"SELECT COUNT(*) FROM artifacts WHERE length(data) > 0 "
-            f"AND substr(data, 1, {len(NATIVE_IMAGE_FILE_MARKER)}) <> ?",
-            NATIVE_IMAGE_FILE_MARKER,
-        )
+        opportunities["inline_native_image_blobs"] = count_inline_blobs(nimg_path)
 
     total_sqlite_bytes = sum(item["total_bytes"] for item in databases.values())
     total_reclaimable_bytes = sum(item["reclaimable_bytes"] for item in databases.values())
@@ -418,9 +415,11 @@ def compact_and_slim_databases(
             media_stats["reactions_gc"] = sem_store.gc_unreferenced_reaction_files()
         nimg_path = paths.get("native_image")
         if nimg_path is not None and nimg_path.is_file():
-            from digital_life_host.native_extensions.image_native.store import migrate_native_image_store_at
-
-            media_stats["native_images"] = migrate_native_image_store_at(nimg_path.parent, batch_size=64)
+            media_stats["native_images"] = offload_artifact_blobs(
+                nimg_path,
+                media_root=nimg_path.parent / "media" / "images",
+                batch_size=64,
+            )
         steps["media_offload"] = media_stats
 
     # 4. Reclaim freelist space, checkpoint WAL, and refresh SQLite query planner stats.

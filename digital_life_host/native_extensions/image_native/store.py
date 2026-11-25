@@ -1,24 +1,24 @@
 """One transaction publishes a generation receipt and its immutable originals."""
 from __future__ import annotations
 
-import hashlib
 import json
-import os
-import re
 import sqlite3
-import tempfile
 import time
 from contextlib import contextmanager
 from pathlib import Path
 from uuid import uuid4
 
-from digital_life_core.storage.image_payloads import image_extension
+from digital_life_core.storage.artifact_blobs import (
+    FILE_MARKER as NATIVE_IMAGE_FILE_MARKER,
+    MARKER_REL_PATTERN as _MARKER_REL_RE,
+    is_file_marker,
+    marker_path,
+    offload_artifact_blobs,
+    write_blob,
+)
 from digital_life_core.storage.sqlite_tuning import apply_sidecar_pragmas, tuning_profile
 
 from .types import NativeImageError, document, fingerprint, inspect_image
-
-NATIVE_IMAGE_FILE_MARKER = b"\x00PCNIMG1/"
-_MARKER_REL_RE = re.compile(r"^[0-9a-f]{2}/[0-9a-f]{64}\.(?:png|jpg|webp|gif|bin)$")
 
 
 _SCHEMA_STATEMENTS = (
@@ -65,40 +65,20 @@ class ImageStore:
 
     @staticmethod
     def is_file_marker(value) -> bool:
-        return isinstance(value, (bytes, bytearray, memoryview)) and bytes(value).startswith(NATIVE_IMAGE_FILE_MARKER)
+        return is_file_marker(value)
 
     def _store_media_bytes(self, content: bytes, *, media_type: str = "") -> bytes:
         if self.is_file_marker(content):
             return bytes(content)
-        digest_hex = hashlib.sha256(content).hexdigest()
-        ext = image_extension(content, media_type)
-        rel = f"{digest_hex[:2]}/{digest_hex}{ext}"
-        target_dir = self.media_root / digest_hex[:2]
-        target_dir.mkdir(parents=True, exist_ok=True)
-        target = target_dir / f"{digest_hex}{ext}"
-        if not target.is_file() or target.stat().st_size != len(content):
-            fd, tmp_name = tempfile.mkstemp(prefix=".nimg-", suffix=".tmp", dir=target_dir)
-            try:
-                with os.fdopen(fd, "wb") as handle:
-                    handle.write(content)
-                    handle.flush()
-                    os.fsync(handle.fileno())
-                os.replace(tmp_name, target)
-            finally:
-                if os.path.exists(tmp_name):
-                    os.unlink(tmp_name)
-        return NATIVE_IMAGE_FILE_MARKER + rel.encode("ascii")
+        return write_blob(self.media_root, content, media_type=media_type)
 
     def _load_media_bytes(self, raw: bytes) -> bytes:
         if not self.is_file_marker(raw):
             return raw
-        try:
-            rel = raw[len(NATIVE_IMAGE_FILE_MARKER):].decode("ascii", errors="strict")
-        except UnicodeDecodeError as error:
-            raise NativeImageError("image_artifact_corrupt") from error
-        if not _MARKER_REL_RE.match(rel):
+        relative = marker_path(raw)
+        if not relative:
             raise NativeImageError("image_artifact_corrupt")
-        path = self.media_root / rel
+        path = self.media_root / relative
         try:
             return path.read_bytes()
         except OSError as error:
@@ -325,12 +305,9 @@ class ImageStore:
             for row in db.execute("SELECT data FROM artifacts"):
                 raw = bytes(row["data"])
                 if self.is_file_marker(raw):
-                    try:
-                        rel = raw[len(NATIVE_IMAGE_FILE_MARKER):].decode("ascii", errors="strict")
-                    except UnicodeDecodeError:
-                        continue
-                    if _MARKER_REL_RE.match(rel):
-                        referenced.add(rel)
+                    relative = marker_path(raw)
+                    if relative:
+                        referenced.add(relative)
         removed = 0
         reclaimed = 0
         for file_path in self.media_root.rglob("*"):
@@ -355,99 +332,13 @@ def migrate_native_image_store_at(directory: Path | str, *, batch_size: int = 64
 
     Unlike instantiating ``ImageStore``, this helper does not rotate runtime
     generation or mutate in-flight operations, making it safe to invoke from
-    online maintenance/compaction jobs.
+    online maintenance/compaction jobs. The row rewrite itself lives in
+    ``digital_life_core.storage.artifact_blobs`` so storage maintenance never
+    has to import this optional extension.
     """
     base_dir = Path(directory)
-    db_path = base_dir / "native_image.sqlite3"
-    if not db_path.is_file():
-        return {"migrated": 0, "already_file_backed": 0, "bytes_offloaded": 0}
-    profile = tuning_profile()
-    media_root = base_dir / "media" / "images"
-    chunk = max(8, int(batch_size))
-    migrated = 0
-    already_file_backed = 0
-    bytes_offloaded = 0
-    last_rowid = 0
-    while True:
-        conn = sqlite3.connect(db_path, timeout=ImageStore.BUSY_TIMEOUT_MS / 1000.0, isolation_level=None)
-        conn.row_factory = sqlite3.Row
-        try:
-            apply_sidecar_pragmas(
-                conn,
-                profile=profile,
-                enable_wal=False,
-                read_only=True,
-                busy_timeout_ms=ImageStore.BUSY_TIMEOUT_MS,
-                foreign_keys=True,
-            )
-            has_table = conn.execute(
-                "SELECT 1 FROM sqlite_master WHERE type = 'table' AND name = 'artifacts'"
-            ).fetchone()
-            if has_table is None:
-                return {"migrated": 0, "already_file_backed": 0, "bytes_offloaded": 0}
-            rows = conn.execute(
-                "SELECT rowid, id, metadata, data FROM artifacts WHERE rowid > ? ORDER BY rowid ASC LIMIT ?",
-                (last_rowid, chunk),
-            ).fetchall()
-        finally:
-            conn.close()
-        if not rows:
-            break
-        updates: list[tuple[bytes, str]] = []
-        for row in rows:
-            last_rowid = int(row["rowid"])
-            raw = bytes(row["data"])
-            if ImageStore.is_file_marker(raw):
-                already_file_backed += 1
-                continue
-            media_type = ""
-            try:
-                media_type = str(json.loads(row["metadata"]).get("media_type") or "")
-            except (TypeError, ValueError):
-                pass
-            digest_hex = hashlib.sha256(raw).hexdigest()
-            ext = image_extension(raw, media_type)
-            rel = f"{digest_hex[:2]}/{digest_hex}{ext}"
-            target_dir = media_root / digest_hex[:2]
-            target_dir.mkdir(parents=True, exist_ok=True)
-            target = target_dir / f"{digest_hex}{ext}"
-            if not target.is_file() or target.stat().st_size != len(raw):
-                fd, tmp_name = tempfile.mkstemp(prefix=".nimg-", suffix=".tmp", dir=target_dir)
-                try:
-                    with os.fdopen(fd, "wb") as handle:
-                        handle.write(raw)
-                        handle.flush()
-                        os.fsync(handle.fileno())
-                    os.replace(tmp_name, target)
-                finally:
-                    if os.path.exists(tmp_name):
-                        os.unlink(tmp_name)
-            marker = NATIVE_IMAGE_FILE_MARKER + rel.encode("ascii")
-            updates.append((marker, row["id"]))
-            migrated += 1
-            bytes_offloaded += max(0, len(raw) - len(marker))
-        if updates:
-            conn = sqlite3.connect(db_path, timeout=ImageStore.BUSY_TIMEOUT_MS / 1000.0, isolation_level=None)
-            try:
-                apply_sidecar_pragmas(
-                    conn,
-                    profile=profile,
-                    enable_wal=False,
-                    read_only=False,
-                    busy_timeout_ms=ImageStore.BUSY_TIMEOUT_MS,
-                    foreign_keys=True,
-                )
-                conn.execute("BEGIN IMMEDIATE")
-                conn.executemany("UPDATE artifacts SET data = ? WHERE id = ?", updates)
-                conn.execute("COMMIT")
-            except BaseException:
-                if conn.in_transaction:
-                    conn.execute("ROLLBACK")
-                raise
-            finally:
-                conn.close()
-    return {
-        "migrated": migrated,
-        "already_file_backed": already_file_backed,
-        "bytes_offloaded": bytes_offloaded,
-    }
+    return offload_artifact_blobs(
+        base_dir / "native_image.sqlite3",
+        media_root=base_dir / "media" / "images",
+        batch_size=batch_size,
+    )

@@ -5,6 +5,9 @@ from .common import *
 class RealityActivityMethods:
 
     def mihome_unavailable_reason(self) -> str:
+        from ...module_gates import module_enabled
+        if not module_enabled("mihome"):
+            return '米家模块未开启（digital_life_modules.json 里把 mihome 设为 true 后重载插件可用）'
         if _MIHOME_IMPORT_ERROR:
             return '现实触及内置米家运行时不可用，请安装米家依赖后重载插件'
         return '现实触及内置米家运行时尚未初始化'

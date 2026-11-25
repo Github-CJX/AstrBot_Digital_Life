@@ -46,8 +46,6 @@ from .files.parsing import parser_availability
 from .service_balance import configured_balance_port
 from .news import configured_news_port, configured_search_port
 from .solar_terms import configured_solar_term_port
-from .qzone_client import QzoneHttpClient
-from .qzone_transport import build_qzone_transport
 from .web_api import StagingWebAPI
 from .recalls import is_notice_event, receive_notice
 from .pokes import is_poke_notice, receive_poke
@@ -445,7 +443,14 @@ class AstrBotStagingController:
         self.configuration = configuration
 
     def _qzone_transport(self):
+        # QQ 空间是待移除模块：关着的时候不建客户端，也不导入它的实现。
+        from .module_gates import module_enabled
+
+        if not module_enabled("qzone"):
+            return None
         if self._qzone_client is None:
+            from .qzone_transport import build_qzone_transport
+
             self._qzone_client = build_qzone_transport(self.context, data_root=getattr(self, "data_root", None))
         return self._qzone_client
 

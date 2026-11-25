@@ -30,17 +30,26 @@ except Exception:
 from .helpers import _now_ts, _safe_float, _safe_int, _single_line
 from .mobile_gateway import MOBILE_API_VERSION, MobileGatewayMixin
 from .wakeup_alarm import WakeupAlarmMixin
-try:
-    from .mihome_data_manager import MiHomeDataManager
-    from .mihome_client import MiHomeClient
-    from .mihome_web_api import MiHomeWebAPI
-except (ImportError, OSError, RuntimeError) as exc:
+from ...module_gates import module_enabled as _module_enabled
+# 米家是待移除的可选家庭自动化，和手机/摄像头/音频这些保留的现实能力不是一回事：
+# 开关关着时连模块都不导入，`mijiaAPI` 这类第三方依赖不装也不影响其它现实能力。
+if _module_enabled('mihome'):
+    try:
+        from .mihome_data_manager import MiHomeDataManager
+        from .mihome_client import MiHomeClient
+        from .mihome_web_api import MiHomeWebAPI
+    except (ImportError, OSError, RuntimeError) as exc:
+        MiHomeDataManager = None
+        MiHomeClient = None
+        MiHomeWebAPI = None
+        _MIHOME_IMPORT_ERROR = str(exc)
+    else:
+        _MIHOME_IMPORT_ERROR = ''
+else:
     MiHomeDataManager = None
     MiHomeClient = None
     MiHomeWebAPI = None
-    _MIHOME_IMPORT_ERROR = str(exc)
-else:
-    _MIHOME_IMPORT_ERROR = ''
+    _MIHOME_IMPORT_ERROR = 'module disabled'
 PLUGIN_NAME = 'astrbot_plugin_digital_life.reality'
 PLUGIN_VERSION = PRODUCT_VERSION
 PAGE_API_PREFIX = f'/{PLUGIN_NAME}/page'

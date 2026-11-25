@@ -14,10 +14,6 @@ from digital_life_core.product import PRODUCT_VERSION
 
 from ..module_gates import enabled_modules
 from .discovery import declarations_for_manifest
-from .image_native.adapter import PLUGIN_ID as IMAGE_PACKAGE_ID
-from .image_native.extension import ImageExtensionAPI
-from .image_native.package import package_hash as image_package_hash
-from .screen_provider import NativeScreenProvider, PLUGIN_ID as SCREEN_PACKAGE_ID, screen_package_hash
 from .settings import ExtensionSettings
 
 
@@ -131,6 +127,10 @@ def create_bundled_extension(data_root, name, *, now=None, context=None, control
         return BundledNativeLease(PLUGIN_ID, port, factory=factory,
             furniture=FurnitureDescriptor(name, name, "创作书架", name))
     if name == "image":
+        # 生图是可选模块：只有开关打开、真要建这条租约时才导入包体。
+        from .image_native.adapter import PLUGIN_ID as IMAGE_PACKAGE_ID
+        from .image_native.extension import ImageExtensionAPI
+        from .image_native.package import package_hash as image_package_hash
         # Rebuilt transports can differ within one public release. Keep each
         # catalog descriptor immutable without making a normal rebuild a conflict.
         # Use the same identity for provider requests and persisted declarations.
@@ -141,6 +141,7 @@ def create_bundled_extension(data_root, name, *, now=None, context=None, control
             package_version=version,
             furniture=FurnitureDescriptor(name, IMAGE_EXTENSION_ID, "画面工作室", name))
     if name == "screen":
+        from .screen_provider import NativeScreenProvider, PLUGIN_ID as SCREEN_PACKAGE_ID, screen_package_hash
         version = PRODUCT_VERSION + "+screen." + screen_package_hash()[:12]
         port = NativeScreenProvider(root / "extensions" / name, version=version, now=now)
         return BundledNativeLease(SCREEN_PACKAGE_ID, port, factory=factory, package_version=version,
