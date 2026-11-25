@@ -51,6 +51,30 @@ REMOVED_MODULES = frozenset({
 ALL_MODULES = RETAINED_MODULES | OPTIONAL_MODULES | REMOVED_MODULES
 DEFAULTS = {name: name in RETAINED_MODULES for name in sorted(ALL_MODULES)}
 
+#: 配置分节所属模块。没登记的节按保留项处理，永远可见。
+SECTION_MODULES = {
+    "quota": "image",
+    "image_review": "image",
+    "image.output": "image",
+    "wardrobe": "image",
+    "photo.reference": "image",
+    "screen": "screen",
+    "device.phone": "phone",
+    "qzone": "qzone",
+    "content.authoring": "content",
+    "library": "content",
+}
+
+#: 页面资产入口所属模块。没登记的入口按保留项处理。
+PAGE_MODULES = {
+    "workspace": "workspace",
+    "room": "workspace",
+    "multi_role": "multi_role",
+    "game": "game",
+    "phone": "phone",
+    "screen": "screen",
+}
+
 _FALSE_WORDS = frozenset({"", "0", "false", "no", "off", "disable", "disabled"})
 _state = {"settings_root": None}
 
@@ -119,3 +143,24 @@ def describe(*, settings_root=None) -> str:
     values = resolved(settings_root=settings_root)
     disabled = [name for name in sorted(values) if not values[name]]
     return ",".join(sorted(values)) + " | off=" + (",".join(disabled) or "-")
+
+
+def section_visible(section, *, settings_root=None) -> bool:
+    """配置分节是否对当前安装可见（所属模块开启才可见）。"""
+    return module_enabled(SECTION_MODULES.get(section, ""), settings_root=settings_root)
+
+
+def visible_sections(names, *, settings_root=None) -> tuple:
+    """按顺序过滤出可见的配置分节。"""
+    return tuple(name for name in names if section_visible(name, settings_root=settings_root))
+
+
+def page_visible(page, *, settings_root=None) -> bool:
+    """页面入口是否可见（3D 小屋、多角色、游戏等挂在可选模块上）。"""
+    return module_enabled(PAGE_MODULES.get(page, ""), settings_root=settings_root)
+
+
+def page_visibility(*, settings_root=None) -> dict:
+    """给前端的一份页面入口开关表。"""
+    return {name: page_visible(name, settings_root=settings_root) for name in sorted(PAGE_MODULES)}
+

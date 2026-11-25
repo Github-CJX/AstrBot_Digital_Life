@@ -51,6 +51,7 @@ from digital_life_core.storage.runtime import StorageOpenError
 from .knowledge_sources import AstrBotKnowledgeSources
 
 from .management_identity import dashboard_operator
+from .module_gates import visible_sections
 
 
 PREFIX = "/astrbot_plugin_digital_life/config"
@@ -109,12 +110,13 @@ class ConfigurationWebAPI:
         self._section_cache = OrderedDict()
         self._section_cache_lock = threading.Lock()
         if allowed_sections is None:
-            self.sections = SECTIONS
+            names = tuple(SECTIONS)
         else:
             names = tuple(allowed_sections)
             if not names or set(names) - set(SECTIONS) or len(set(names)) != len(names):
                 raise ValueError("invalid configuration section allowlist")
-            self.sections = {name: SECTIONS[name] for name in names}
+        # M2 模块开关：可选/移除模块关闭时，对应分节不再对外出现。
+        self.sections = {name: SECTIONS[name] for name in visible_sections(names)}
 
     def _invalidate_section_cache(self):
         with self._section_cache_lock:

@@ -73,6 +73,8 @@ class PageWebAPI:
                  "Read this Dashboard account's Companion display preferences"),
                 (PREFIX + "/page/display-preferences", self.save_display_preferences, ["POST"],
                  "Save this Dashboard account's Companion display preferences"),
+                (PREFIX + "/page/modules", self.modules, ["GET"],
+                 "Read which optional Companion modules this installation has switched on"),
                 (PREFIX + "/page/browser-preferences", self.browser_preferences, ["GET"],
                  "Read this browser's Companion role and card preferences"),
                 (PREFIX + "/page/browser-preferences", self.save_browser_preferences, ["POST"],
@@ -182,6 +184,29 @@ class PageWebAPI:
             if session is None:
                 raise TaskError("staging_not_initialized", "load the explicit V2 profile first")
             return outcome_response(Outcome.success(session.application.memory.context.ownership()))
+        except TaskError as error:
+            return outcome_response(Outcome.failed(error.code, str(error)))
+
+    async def modules(self):
+        """Report which optional modules this installation runs.
+
+        The cottage page uses this to hide the 3D room, the multi-role entry and
+        the game/phone/screen panels; retained management pages stay reachable.
+        """
+
+        from .configuration_api import SECTIONS
+        from .module_gates import page_visibility, resolved, section_visible
+        from .web_api import outcome_response
+
+        try:
+            self._display_preferences_identity()
+            enabled = resolved()
+            hidden = [name for name in SECTIONS if not section_visible(name)]
+            return outcome_response(Outcome.success({
+                "modules": {name: bool(value) for name, value in enabled.items()},
+                "pages": page_visibility(),
+                "hidden_sections": hidden,
+            }))
         except TaskError as error:
             return outcome_response(Outcome.failed(error.code, str(error)))
 

@@ -187,6 +187,9 @@ class ConfigurationWebAPITests(MultiFixture, unittest.IsolatedAsyncioTestCase):
                                  "relay",
                                  "relationship_profile",
                                  "role_profile", "screen", "wardrobe", "web_understanding", "proactive.contact",
+                                 # device.phone 同样是真分区（PhoneManagement），加入注册表时
+                                 # 这份按字面枚举的名单没跟上，断言就把"多了一个真分区"报红。
+                                 "device.phone",
                                  "system.prompts"}
             expected_sections.add("image.output")
             self.assertTrue(expected_sections.issubset(status))
@@ -257,7 +260,10 @@ class ConfigurationWebAPITests(MultiFixture, unittest.IsolatedAsyncioTestCase):
                                 ("conversation", "expression", "model", "screen", "person",
                                  "role", "knowledge", "library", "photo", "wardrobe",
                                  "proactive", "private_access", "relationship", "content",
-                                 "qzone", "system"), name)
+                                 "qzone", "system",
+                                 # device.phone 的组名是 device.phone（digital_life_core/
+                                 # device/configuration.py:27 GROUP），前缀就是 device。
+                                 "device"), name)
             # The workbench renders its layer rail from these, so every section
             # must publish the chain and a per-field source, not just its values.
             for name, section in status.items():

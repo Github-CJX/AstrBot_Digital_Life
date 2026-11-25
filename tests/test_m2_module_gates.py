@@ -151,5 +151,72 @@ class BundledExtensionGateTests(unittest.TestCase):
         self.assertEqual(issues, ())
 
 
+class SectionGateTests(unittest.TestCase):
+    def setUp(self):
+        configure_modules(None)
+        self.addCleanup(configure_modules, None)
+
+    def test_image_sections_hidden_by_default(self):
+        self.assertFalse(module_gates.section_visible("image.output"))
+        self.assertFalse(module_gates.section_visible("photo.reference"))
+        self.assertFalse(module_gates.section_visible("wardrobe"))
+
+    def test_removed_module_sections_hidden_by_default(self):
+        self.assertFalse(module_gates.section_visible("qzone"))
+        self.assertFalse(module_gates.section_visible("screen"))
+        self.assertFalse(module_gates.section_visible("device.phone"))
+
+    def test_retained_module_sections_stay_visible(self):
+        self.assertTrue(module_gates.section_visible("library"))
+        self.assertTrue(module_gates.section_visible("content.authoring"))
+        self.assertTrue(module_gates.section_visible("life"))
+        self.assertTrue(module_gates.section_visible("system.prompts"))
+
+    def test_sections_return_when_module_enabled(self):
+        with mock.patch.dict(os.environ, {"DIGITAL_LIFE_MODULE_IMAGE": "1"}):
+            self.assertTrue(module_gates.section_visible("image.output"))
+            self.assertIn("image.output", module_gates.visible_sections(("image.output", "life")))
+
+    def _configuration_api(self, **kwargs):
+        try:
+            from digital_life_host.configuration_api import ConfigurationWebAPI
+        except ModuleNotFoundError as error:  # 本地无 astrbot 运行时
+            raise unittest.SkipTest(f"astrbot runtime required: {error}")
+        return ConfigurationWebAPI(object(), **kwargs)
+
+    def test_configuration_api_filters_sections(self):
+        api = self._configuration_api()
+        self.assertIn("life", api.sections)
+        self.assertNotIn("qzone", api.sections)
+        self.assertNotIn("image.output", api.sections)
+        with mock.patch.dict(os.environ, {"DIGITAL_LIFE_MODULE_QZONE": "1"}):
+            self.assertIn("qzone", self._configuration_api().sections)
+
+    def test_configuration_api_still_honours_allowlist(self):
+        with mock.patch.dict(os.environ, {"DIGITAL_LIFE_MODULE_IMAGE": "1"}):
+            api = self._configuration_api(allowed_sections=("life", "image.output"))
+        self.assertEqual(tuple(api.sections), ("life", "image.output"))
+        api = self._configuration_api(allowed_sections=("life", "image.output"))
+        self.assertEqual(tuple(api.sections), ("life",))
+
+
+class PageVisibilityTests(unittest.TestCase):
+    def setUp(self):
+        configure_modules(None)
+        self.addCleanup(configure_modules, None)
+
+    def test_optional_pages_hidden_by_default(self):
+        visibility = module_gates.page_visibility()
+        self.assertFalse(visibility["workspace"])
+        self.assertFalse(visibility["multi_role"])
+        self.assertFalse(visibility["game"])
+        self.assertFalse(visibility["screen"])
+
+    def test_page_returns_when_module_enabled(self):
+        with mock.patch.dict(os.environ, {"DIGITAL_LIFE_MODULE_WORKSPACE": "1"}):
+            self.assertTrue(module_gates.page_visible("workspace"))
+            self.assertFalse(module_gates.page_visible("multi_role"))
+
+
 if __name__ == "__main__":
     unittest.main()
