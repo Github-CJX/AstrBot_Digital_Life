@@ -123,11 +123,8 @@ from digital_life_core.references.daily_outfit import DailyOutfitPhotos
 from digital_life_core.references.service import ReferenceAssetService
 from digital_life_core.references.wardrobe import (WardrobeConfigurationOwner, WardrobeSettings,
     configuration_fields as wardrobe_configuration_fields)
-from digital_life_core.qzone.configuration import (QzoneConfigurationOwner, QzoneSettings,
-    configuration_fields as qzone_configuration_fields)
 from digital_life_core.device.configuration import (PhoneConfigurationOwner,
     configuration_fields as phone_configuration_fields)
-from digital_life_core.qzone.service import QzoneService
 from digital_life_core.system_prompts.configuration import (
     RoleSystemPromptConfigurationOwner, configuration_fields as system_prompt_configuration_fields)
 from digital_life_core.relationships.private_access import (PrivateAccessSettings,
@@ -250,7 +247,7 @@ class CompanionApplication:
                  runtime_identity=None, presence_port=None, segmentation=SegmentationPolicy(), voice_policy=None,
                  weather_port=None, weather_alert_port=None, balance_port=None, news_port=None,
                  solar_term_port=None, budget_soft=None, capability_owners=(),
-                 qzone_transport=None, default_provider_resolver=None, provider_lookup=None,
+                 default_provider_resolver=None, provider_lookup=None,
                  knowledge=None, memory_owner=DEFAULT_MEMORY_OWNER, memory_push=DEFAULT_MEMORY_PUSH, wake_port=None,
                  search_port_factory=None, configuration_store=None, reference_owner_resolver=None):
         if type(owns_runtime) is not bool or not any(p.kind == REPLY_KIND and p.lane is Lane.FOREGROUND for p in profiles):
@@ -300,7 +297,6 @@ class CompanionApplication:
             *library_configuration_fields(),
             *reference_configuration_fields(),
             *wardrobe_configuration_fields(),
-            *qzone_configuration_fields(),
             *phone_configuration_fields(),
             *private_access_configuration_fields(),
             *relay_configuration_fields(),
@@ -328,7 +324,6 @@ class CompanionApplication:
                     LibraryConfigurationOwner(runtime),
                     reference_configuration_owner,
                     WardrobeConfigurationOwner(runtime),
-                    QzoneConfigurationOwner(runtime),
                     PhoneConfigurationOwner(runtime),
                     RoleSystemPromptConfigurationOwner(runtime),
                     *capability_owners))
@@ -346,11 +341,6 @@ class CompanionApplication:
                                                     owner_resolver=reference_owner_resolver)
         self.wardrobe_settings = WardrobeSettings(self.configuration,
                                                  target_resolver=self.reference_settings.target)
-        self.qzone_settings = QzoneSettings(self.configuration)
-        # Without a host transport the extension is simply absent: no credentials,
-        # no session and no partially usable Zone path.
-        self.qzone = (QzoneService(runtime, self.qzone_settings, qzone_transport, now=self.now)
-                      if qzone_transport is not None else None)
         self.proactive = ProactiveContacts(self.configuration, memory_push=memory_push)
         self.memory_push = memory_push
         self.role_life = PersistentRoleLifeLedger(runtime, now=self.now)

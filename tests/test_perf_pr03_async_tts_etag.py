@@ -29,7 +29,6 @@ from digital_life_core.host.tick_offload import (
     advance_background_async,
     advance_state_maintenance_async,
 )
-from digital_life_core.qzone.capability import CAPABILITIES as QZONE_CAPABILITIES
 
 from digital_life_host.account_session_api import AccountSessionWebAPI
 from digital_life_host.acquaintance_api import AcquaintanceWebAPI
@@ -509,11 +508,10 @@ class InitialPlatformCoalesceTests(GroupFixture, unittest.IsolatedAsyncioTestCas
         plugin.staging = self.controller
         plugin._host_start_task = None
         plugin._session_settings_warm_task = None
-        plugin._qzone_life_publisher = NS(close=AsyncMock())
         plugin._automatic_backup = NS(close=AsyncMock())
         return plugin
 
-    async def test_initialize_followed_by_platform_loaded_performs_single_cold_start_with_qzone(self):
+    async def test_initialize_followed_by_platform_loaded_performs_single_cold_start(self):
         class _DynamicPlatformManager:
             def __init__(self, mapping):
                 self._mapping = mapping
@@ -567,10 +565,6 @@ class InitialPlatformCoalesceTests(GroupFixture, unittest.IsolatedAsyncioTestCas
             self.assertEqual(assemble_count, 1, "expected exactly 1 cold-start assembly")
             self.assertEqual(close_count, 0, "expected 0 session teardowns during initial boot")
             self.assertIsNotNone(self.controller.session)
-            self.assertIsNotNone(self.controller.session.application.qzone)
-            self.assertTrue(
-                set(QZONE_CAPABILITIES).issubset(set(self.controller.session.application.external.providers))
-            )
             self.assertTrue(self.controller._accepting)
             self.assertTrue(self.controller.native_bridges_current())
 

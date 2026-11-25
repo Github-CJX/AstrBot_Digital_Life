@@ -850,7 +850,7 @@ test("华为健康：链式 setTimeout 轮询且登录阶段未变化时不重�
 
 /* ───────────────────── 4. v7.3.0 Regressions, Config I18n & Hygiene ───────────────────── */
 
-test("v7.3.0 前端修复：home-loading.css 伪元素扫光与 svg 选择器、home-sidebar 0 能量与睡眠保活、qzone.owner_uin 与 phone 错误码", () => {
+test("v7.3.0 前端修复：home-loading.css 伪元素扫光与 svg 选择器、home-sidebar 0 能量与睡眠保活、phone 错误码", () => {
   const loadingCss = read("pages", "陪伴小屋", "home-loading.css");
   assert.match(loadingCss, /\.home-state-grid::after/);
   assert.match(loadingCss, /overflow:\s*hidden/);
@@ -885,12 +885,9 @@ test("v7.3.0 前端修复：home-loading.css 伪元素扫光与 svg 选择器、
   assert.doesNotMatch(boardHtml, /home-state-hero[^>]*data-visual="loading"/, "已有睡眠态时后台刷新不得覆写睡眠展示");
   assert.match(boardHtml, /睡眠中/, "后台刷新期间已有睡眠态应保持可见");
 
-  // config-editor qzone.owner_uin + workbench-page 错误映射
-  const cfgSrc = read("pages", "陪伴小屋", "config-editor.js");
-  assert.match(cfgSrc, /owner_uin:\s*"主人 QQ 号"/);
-  assert.match(cfgSrc, /qzone_owner_uin_invalid/);
+  // workbench-page 错误映射（qzone_owner_uin_invalid 已随 M2.5b 移除）
   const wbSrc = read("pages", "陪伴小屋", "workbench-page.js");
-  for (const code of ["qzone_owner_uin_invalid", "device_phone_scope_invalid", "device_phone_target_changed", "device_phone_configuration_invalid"]) {
+  for (const code of ["device_phone_scope_invalid", "device_phone_target_changed", "device_phone_configuration_invalid"]) {
     assert.ok(wbSrc.includes(code), `workbench-page.js 必须包含 ${code} 中文映射`);
   }
 });

@@ -164,10 +164,10 @@ test("CompanionSearchEngine: 5-layer fuzzy scoring covers synonyms, pinyin, init
   assert.ok(jiaoseHits.length > 0, "Expected jiaose to match 角色 items");
 
   /* 7. Multi-word AND matching must never drop the second keyword on synonym phrases */
-  const qzoneSample = engine.prepare([
-    { field: "qzone.like_enabled", label: "QQ 空间点赞", help: "自动给好友动态点赞。", groupTitle: "QQ 空间", aliases: ["qzone"] },
-    { field: "qzone.comment_enabled", label: "QQ 空间评论", help: "自动评论或回复好友空间动态。", groupTitle: "QQ 空间", aliases: ["qzone"] },
-    { field: "qzone.post_enabled", label: "QQ 空间发说说", help: "主动发布空间说说与生活动态。", groupTitle: "QQ 空间", aliases: ["qzone"] },
+  const phoneSample = engine.prepare([
+    { field: "device.phone.message_enabled", label: "手机消息提醒", help: "自动把新消息提醒到手机。", groupTitle: "手机", aliases: ["phone"] },
+    { field: "device.phone.call_enabled", label: "手机来电提醒", help: "来电时同步提醒或回复好友。", groupTitle: "手机", aliases: ["phone"] },
+    { field: "device.phone.task_enabled", label: "手机任务提醒", help: "主动把待办任务推送到手机。", groupTitle: "手机", aliases: ["phone"] },
   ], {
     getTitle: x => x.label,
     getDesc: x => x.help,
@@ -175,12 +175,12 @@ test("CompanionSearchEngine: 5-layer fuzzy scoring covers synonyms, pinyin, init
     getAliases: x => x.aliases || [],
     getGroup: x => x.groupTitle || "",
   });
-  for (const multiQ of ["qq空间 评论", "qq 空间 评论"]) {
-    const res = engine.search(qzoneSample, multiQ);
-    assert.equal(res.length, 1, `Multi-word query "${multiQ}" must only match QQ 空间评论, got ${JSON.stringify(res.map(r => r.item.field))}`);
-    assert.equal(res[0].item.field, "qzone.comment_enabled");
+  for (const multiQ of ["手机 来电", "phone 来电"]) {
+    const res = engine.search(phoneSample, multiQ);
+    assert.equal(res.length, 1, `Multi-word query "${multiQ}" must only match 手机来电提醒, got ${JSON.stringify(res.map(r => r.item.field))}`);
+    assert.equal(res[0].item.field, "device.phone.call_enabled");
   }
-  assert.equal(engine.search(qzoneSample, "qq 空间").length, 3, 'Exact multi-word phrase "qq 空间" matches all 3 QZone entries');
+  assert.equal(engine.search(phoneSample, "手机").length, 3, 'Single phrase "手机" matches all 3 phone entries');
 
   /* 8. No false positives on unrelated gibberish */
   assert.equal(engine.search(prepared, "不存在的火星配置xyz").length, 0);

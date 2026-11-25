@@ -5,7 +5,7 @@ window.CompanionExpressionSignalsPage = (() => {
     sentence_rhythm: "句读节奏", emoji: "表情符号", punctuation: "标点",
     directness: "直接程度", diction: "措辞", formatting: "排版", other: "其他",
   };
-  const CHANNEL = {private:"私聊", group:"群聊", proactive:"主动消息", qzone:"QQ 空间", tts:"语音"};
+  const CHANNEL = {private:"私聊", group:"群聊", proactive:"主动消息", tts:"语音"};
   const RELATIONSHIP = {stranger:"陌生", familiar:"熟悉", close:"亲近", any:"不限"};
   const EMOTION = {normal:"常态", positive:"积极", low:"低落", guarded:"谨慎", any:"不限"};
   const INTENT = {acknowledgement:"确认接话", question:"提问", request:"请求", help:"求助", comfort:"安慰",

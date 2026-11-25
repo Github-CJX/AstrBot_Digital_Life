@@ -185,68 +185,7 @@ window.CompanionConfigEditors = (() => {
   const contactWords = (value, pattern) => String(value).toLowerCase()
     .split(pattern).map(part => part.trim()).filter(Boolean);
 
-  /* QQ 空间的七个主题。字段名、标签与场景目录都要与后端
-     digital_life_core/qzone/topics.py 的 TOPIC_SPECS 逐字对应：
-     字段名错一个，注册表里那一项就没有控件（审计会报，页面会静默少一项）；
-     场景目录错一个，保存时会被后端整组拒掉，却只说一句「设置不合法」。 */
-  const QZONE_TOPIC_SECTIONS = [
-    {prefix: "life_documentary", title: "生活纪实类", scenes: ["conversation", "role_activity", "date_marker"]},
-    {prefix: "emotion_reflection", title: "情绪感悟类", scenes: ["conversation", "relationship", "free_expression"]},
-    {prefix: "interest_hobby", title: "兴趣爱好类", scenes: ["conversation", "external_material", "role_activity"]},
-    {prefix: "opinion_hot", title: "观点/热点类", scenes: ["external_material", "conversation"]},
-    {prefix: "help_interaction", title: "求助/互动类",
-     scenes: ["conversation", "agenda", "external_material", "relationship"]},
-    {prefix: "ritual_memory", title: "仪式纪念类", scenes: ["date_marker", "relationship", "conversation"]},
-    {prefix: "meaningless_status", title: "无意义水动态",
-     scenes: ["free_expression", "conversation", "role_activity"]},
-  ];
-  /* 场景 id 的中文名，供 help 里写「可选值」用；与后端 topics.py 的 SCENES 一致。 */
-  const QZONE_SCENES = {conversation: "对话", external_material: "外部资讯或材料", agenda: "日程与待办",
-    role_activity: "角色活动与记录", relationship: "关系与互动", date_marker: "日期与纪念节点",
-    free_expression: "自由表达"};
-  const qzoneSceneWords = names => names.map(name => `${name}（${QZONE_SCENES[name]}）`).join("、");
-
-  const QZONE_SECTIONS = [
-    {id: "switches", title: "状态与动作",
-     help: "关闭总闸时下面所有项都不起作用：不再发任何空间请求，也不再为它花模型额度。",
-     fields: ["enabled", "like_enabled", "comment_enabled", "publish_enabled",
-              "feed_recent_posts", "comment_recent_posts", "owner_uin"]},
-    {id: "throttle", title: "发布节流",
-     help: "总闸与「允许在空间发说说」都打开后才生效。这几项限制的是频率与条数，不放宽任何一项能力开关。",
-     fields: ["action_min_interval_minutes", "max_actions_per_tick", "daily_limits_enabled", "publish_max_daily"]},
-    {id: "life", title: "生活说说",
-     help: "低频把角色自己的生活发到空间。检查到点时先记一次尝试，再写草稿、走和手动发说说完全相同的发布链路与审计；失败或结果未知都不会立刻重来。",
-     fields: ["life_publish_enabled", "life_publish_probability", "life_publish_min_interval_hours",
-              "life_publish_max_daily", "life_publish_retry_minutes", "life_publish_style_prompt"]},
-    {id: "topics", title: "主题判定",
-     help: "一条说说在写出正文之前必须先定主题与场景：这里决定谁来定、要不要人工确认，以及给模型的补充指引。",
-     fields: ["topic_auto_enabled", "topic_require_confirmation", "topic_prompt_guidance"]},
-    ...QZONE_TOPIC_SECTIONS.map(topic => ({
-      id: topic.prefix,
-      title: topic.title,
-      help: `${topic.title}的发布条件：允许的场景只有 ${qzoneSceneWords(topic.scenes)}；关掉启用后这个主题一条都不发，其他主题不受影响。`,
-      fields: [`${topic.prefix}_enabled`, `${topic.prefix}_scenes`, `${topic.prefix}_min_confidence`,
-               `${topic.prefix}_daily_max`, `${topic.prefix}_cooldown_minutes`],
-    })),
-  ];
-  /* 每个主题的 helps 里那串「可选值」是各主题自己的那一份，所以逐主题拼；
-     共用一句示例会把「只能用该主题自己的场景」说成另一个主题的场景。 */
-  function qzoneAudit(values) {
-    if (typeof values.owner_uin === "string") {
-      const ownerUin = values.owner_uin.trim();
-      if (ownerUin && !/^\d{1,20}$/.test(ownerUin)) return "qzone_owner_uin_invalid";
-    }
-    for (const topic of QZONE_TOPIC_SECTIONS) {
-      const name = `${topic.prefix}_scenes`;
-      const value = values[name];
-      /* 未改动的字段可能不在草稿里；那种情况下不判，免得把「没动过」当成错。 */
-      if (typeof value !== "string") continue;
-      const scenes = value.split(",").map(part => part.trim());
-      if (scenes.some(scene => !topic.scenes.includes(scene))
-          || new Set(scenes).size !== scenes.length) return "qzone_scene_list_invalid";
-    }
-    return null;
-  }  function updateRoleProfileSummary(status) {
+  function updateRoleProfileSummary(status) {
     const settings = status?.settings || {};
     const buttons = [...document.querySelectorAll("[data-profile-field]")];
     let filled = 0;
@@ -1273,6 +1212,7 @@ window.CompanionConfigEditors = (() => {
         group_behavior_guidance: "互动偏好与边界",
       },
       helps: {
+        mention_force_reply_enabled: "被 @ 或命中唤醒词时直接应答；关闭后仍按普通群消息参与，回复更自然但可能迟到。",
         enable_group_social_context: "关闭时下面五项氛围参考都不起作用，角色只按对话本身理解群聊。",
         enable_group_topic_threads: "按群和角色记录近 90 分钟活跃话题、消息数及 Bot 是否已接话；参与人数只从本轮授权可见窗口估算，不保存成员身份。",
         group_topic_thread_max: "3 到 40 条；超出时保留最近活跃的话题。话题在 90 分钟没有新消息后过期，示例只保留短句。",
@@ -1659,90 +1599,6 @@ window.CompanionConfigEditors = (() => {
       /* order 由段落拼出来：手写一份 174 项的 order 只会与段落声明漂移，
          而漂移的表现是「字段没有控件」或「同一个字段出现两次」，都不报错。 */
       order: CONTACT_SECTIONS.flatMap(section => section.fields),
-    },
-    /* QQ 空间：角色级的公开动作开关、节流，以及七个主题各自的发布条件。
-     *
-     * 这一组里**没有凭据字段**，一个都没有：登录态由宿主账号或手动放置的凭据
-     * 提供，页面上只能刷新它，不能在这里填。所以这些项回答三件事——角色能不能
-     * 在空间里公开动作（总闸 + 三个能力开关）、一轮能做多少（间隔、条数、
-     * 每日上限），以及一条说说要满足什么条件才发得出去（主题判定 + 七个主题）。
-     * 值按角色共享，窗口层只作为旧值的回落，
-     * 卡片右上角由内核显示实际写入层，无需另外声明 scopeNote。
-     *
-     * 七个主题各 5 项由下面两张表拼出来——所有字段名手写一遍，
-     * 漏一个不会有任何报错，只会让审计
-     * 报「没有控件声明」；场景取值也必须与后端 topics.py 的 TOPIC_SPECS 一致，
-     * 多写一个合法的场景 id 会在后端整组校验时被拒（那个场景不属于这个主题）。 */
-    qzone: {
-      title: "QQ 空间设置",
-      note: "决定角色的 QQ 空间能力放不放行公开动作、一轮能做多少，以及发说说前必须确定的主题与场景。关闭总闸时下面几项都不起作用；登录凭据不在这一组里维护。",
-      labels: {
-        enabled: "启用 QQ 空间",
-        like_enabled: "允许给空间动态点赞",
-        comment_enabled: "允许回复空间评论",
-        publish_enabled: "允许在空间发说说",
-        feed_recent_posts: "每次刷空间读取条数",
-        comment_recent_posts: "回复前回看自己的说说条数",
-        owner_uin: "主人 QQ 号",
-        action_min_interval_minutes: "两次同类公开动作最短间隔（分钟）",
-        max_actions_per_tick: "单轮公开动作上限",
-        daily_limits_enabled: "启用每日次数限制",
-        publish_max_daily: "每日说说上限",
-        topic_auto_enabled: "允许模型自行发布",
-        topic_require_confirmation: "主题必须人工确认",
-        topic_prompt_guidance: "补充表达指引",
-        life_publish_enabled: "启用生活说说",
-        life_publish_probability: "每次检查的发布概率",
-        life_publish_min_interval_hours: "两条生活说说最短间隔（小时）",
-        life_publish_max_daily: "生活说说每日上限",
-        life_publish_retry_minutes: "生活说说失败重试间隔（分钟）",
-        life_publish_style_prompt: "生活说说风格补充",
-        ...Object.fromEntries(QZONE_TOPIC_SECTIONS.flatMap(({prefix, title}) => [
-          [prefix + "_enabled", title + " · 启用"],
-          [prefix + "_scenes", title + " · 允许的场景"],
-          [prefix + "_min_confidence", title + " · 置信度门槛"],
-          [prefix + "_daily_max", title + " · 每日上限"],
-          [prefix + "_cooldown_minutes", title + " · 最短间隔（分钟）"],
-        ])),
-      },
-      helps: {
-        enabled: "关闭后不再发任何空间请求，也不再为它花模型额度；页面上手动刷空间同样会被挡。",
-        like_enabled: "关闭时点赞按钮不可用；已经点过赞的动态不受影响。",
-        comment_enabled: "关闭时空间评论回复不可用，不影响私聊或群聊。回复是公开动作，未确认的结果不会自动重发。",
-        publish_enabled: "关闭时不能发说说。发布同样是公开动作，还要受下面的间隔、每日上限与主题条件约束。",
-        feed_recent_posts: "刷空间一次最多读多少条，好友动态与我的动态都在这个范围内，1 到 30。",
-        comment_recent_posts: "回复前回看自己最近几条说说，用来判断上下文，1 到 20。",
-        owner_uin: "需要查看主人 QQ 空间动态时填写纯数字 QQ 号（不超过 20 位）；留空表示暂不指定。",
-        action_min_interval_minutes: "点赞、回复、发说说共用这一条间隔，5 到 1440 分钟；调小只是允许更频繁，不代表会真的更频繁。",
-        max_actions_per_tick: "一轮里最多做几个公开动作，1 到 5。调大不会放宽间隔，也不会放宽每日上限。",
-        daily_limits_enabled: "开启时同时执行说说总数、各主题和生活说说的每日上限；关闭后每日次数不限，冷却间隔、内容去重和发布授权仍然生效。",
-        publish_max_daily: "仅在「启用每日次数限制」开启时生效：每天最多发几条说说，1 到 10；达到上限后当天不再发。",
-        topic_auto_enabled: "开启后才允许模型在无需人工确认的情况下自行发布；默认关闭，关着时模型提出的主题必须有人确认。",
-        topic_require_confirmation: "开启时模型提出的主题必须有人确认才能发布；默认开启，只有上面那项打开且这一项关闭，模型才可能不经过确认就发。",
-        topic_prompt_guidance: "给模型的补充表达指引（例如口吻、篇幅、不要写什么）；只影响怎么写，不改主题目录、场景放行与任何授权。",
-        life_publish_enabled: "开启后按下面的间隔与概率把角色自己的生活写成说说；还需要「启用 QQ 空间」和「允许在空间发说说」同时打开，发布时仍会再查一次主题门槛与额度。",
-        life_publish_probability: "每次到点检查时的发布概率，0 到 1 之间；0 表示永不自动发，1 表示每次到点都发。",
-        life_publish_min_interval_hours: "两条成功说说的最短间隔，1 到 168 小时；只按成功发布计算，草稿或已知发布失败不会占满整个间隔。",
-        life_publish_max_daily: "仅在「启用每日次数限制」开启时生效：生活说说每天最多发几条，1 到 10；与「每日说说上限」同时生效时，先撞到哪条算哪条。",
-        life_publish_retry_minutes: "草稿或已知发布失败后，隔多少分钟允许再试，5 到 180；结果未知仍会按更长的间隔等待，避免重复发布。",
-        life_publish_style_prompt: "只影响生活说说的语气与写法（例如更口语、少用感叹号）；不改变主题、授权、间隔与任何事实边界。",
-        ...Object.fromEntries(QZONE_TOPIC_SECTIONS.flatMap(({prefix, title, scenes}) => [
-          [prefix + "_enabled", "关闭后这个主题的说说一律不发，模型提出的该主题会被拒；不影响其他主题。"],
-          [prefix + "_scenes", `这个主题允许出现在哪些场景，用半角逗号分隔，只能填该主题自己的场景：${qzoneSceneWords(scenes)}。留空、重复或写了别的场景会被后端拒绝；多个场景之间没有优先级。`],
-          [prefix + "_min_confidence", "主题判定置信度门槛，0 到 1 之间的小数；低于它就不发这一条。「发说说」里由人手动选择的主题按 1 处理。"],
-          [prefix + "_daily_max", "仅在「启用每日次数限制」开启时生效：这个主题每天最多发几条，0 到 10；0 表示这个主题一条都不发。与「每日说说上限」同时生效时，先撞到哪条算哪条。"],
-          [prefix + "_cooldown_minutes", "这个主题两次发布之间的最短间隔，0 到 1440 分钟；0 表示不按主题单独限制间隔。"],
-        ])),
-      },
-      order: QZONE_SECTIONS.flatMap(section => section.fields),
-      /* 段落就是这条链：先看能不能公开动作，再看一轮做多少，然后看主题怎么判定，
-         最后是七个主题各自的发布条件。总闸关着时后面几段调成什么都不起作用，
-         所以第一段的 help 点明这一点。 */
-      sections: QZONE_SECTIONS,
-      /* 注册表把 {id}_scenes 当普通 TEXT，但它只能填该主题自己的场景 id。
-         写错一个（例如给生活纪实类填了 free_expression）后端会拒掉整组保存，
-         却只说一句「设置不合法」，所以在页面先按主题目录查一遍。 */
-      audit: qzoneAudit,
     },
   };
 

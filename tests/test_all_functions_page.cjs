@@ -114,7 +114,8 @@ test("领域顺序覆盖 V2 真实配置分区", () => {
   assert.ok(domains.includes("群聊参与与行为"));
   assert.ok(domains.includes("日记、睡眠与休息"));
   assert.ok(domains.includes("生活节奏与防打扰"));
-  assert.ok(domains.includes("QQ 空间互动"));
+  assert.ok(!domains.includes("QQ 空间互动"),
+    "QQ 空间互动已随 M2.5b 移除，领域顺序不应再包含它");
   assert.equal(context.window.allFeatureTest.domainOf["group_participation"], "群聊参与与行为");
   assert.equal(context.window.allFeatureTest.domainOf["life"], "日记、睡眠与休息");
 });

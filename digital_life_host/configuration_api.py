@@ -35,8 +35,7 @@ from digital_life_core.configuration.management import (AcquaintanceManagement, 
                                                    ExpressionLearningManagement,
                                                    RoleProfileManagement,
                                                    RelationshipProfileManagement,
-                                                   SystemPromptManagement,
-                                                   QzoneManagement, PhoneManagement,
+                                                   SystemPromptManagement, PhoneManagement,
                                                    RelayManagement,
                                                    ScreenManagement, WardrobeManagement)
 from digital_life_core.configuration.models import ConfigurationError
@@ -66,8 +65,6 @@ SECTIONS = {"quota": ImageQuotaManagement, "image_review": ImageReviewManagement
             "recall": RecallManagement, "screen": ScreenManagement,
             "web_understanding": WebUnderstandingManagement,
             "relay": RelayManagement,
-            # QQ 空间拓展的角色级开关与节流；安装与逐会话同意不在这里，归能力安装路由。
-            "qzone": QzoneManagement,
             "device.phone": PhoneManagement,
             "person": AcquaintanceManagement,
             # Known users use role defaults; unbound accounts use installation settings.

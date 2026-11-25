@@ -19,8 +19,6 @@ from digital_life_core.foundation.refs import ScopeKind, SourceRef
 from digital_life_core.identity_policy.models import _opaque
 from digital_life_core.identity_policy.object_access import ObjectAccessPolicy
 from digital_life_core.model_gateway.models import MAX_TOOL_CATALOG, ToolCall, ToolExchange, ToolSpec
-from digital_life_core.qzone.capability import PUBLISH_ACTION as QZONE_PUBLISH_ACTION
-from digital_life_core.qzone.topic_prompt import CONVERSATION_GUIDANCE as QZONE_TOPIC_GUIDANCE
 
 from .agenda_tools import AgendaRoleSession, AgendaToolResult, CONTINUATION_INSTRUCTION, TOOL_FIELDS
 from .foreground import PromptMaterial
@@ -669,19 +667,6 @@ class LocalRoleTools:
         if self.authoring is not None and self.external is not None:
             instructions += self.authoring.instruction_for(
                 context, {tool.action for tool in self.external.catalog_for(context)})
-        # 与工具目录同一道门：只有这一轮真的能发空间时，主题与场景目录才进提示词。
-        # 目录本身是固定的判断依据（如何判断、何时发布、如何处理来源），分类由模型
-        # 依据它完成；这里不解读任何具体词句。
-        if self.external is not None and any(
-                tool.action == QZONE_PUBLISH_ACTION for tool in self.external.catalog_for(context)):
-            instructions += "\n" + QZONE_TOPIC_GUIDANCE
-            # Open questions from earlier public help posts: the answer belongs back
-            # in the agenda, so the character has to know the question is still open.
-            from digital_life_core.qzone.agenda_link import SuggestionStore
-            from digital_life_core.qzone.service import owner_key as qzone_owner_key
-            open_questions = SuggestionStore(self.runtime).material(qzone_owner_key(context))
-            if open_questions:
-                materials.append(PromptMaterial("qzone.agenda", "open_agenda_suggestions", open_questions))
         return replace(request, context=replace(request.context, materials=tuple(materials)),
                        instruction=request.instruction + "\n" + instructions)
 

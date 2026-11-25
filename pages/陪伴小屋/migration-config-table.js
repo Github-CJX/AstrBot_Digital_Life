@@ -41,7 +41,7 @@ window.CompanionMigrationConfiguration = (() => {
   const supported = () => plan?.configuration_review?.version === 1;
   const groupFor = field => /^(proactive|role\.state|life|weather|calendar|humanized_state|life_schedule|proactive_message)/.test(field)
     ? "life" : /^(memory|semantic|role\.expression|relationship|knowledge|expression|emotion_relationship)/.test(field)
-      ? "memory" : /^(image|reality|game|together|live|screen|content|conversation\.(voice|image|reaction)|qzone|poke)/.test(field)
+      ? "memory" : /^(image|reality|game|together|live|screen|content|conversation\.(voice|image|reaction)|poke)/.test(field)
         ? "external" : "role";
   const display = (value, known = true) => {
     if (!known) return "未提供当前值";

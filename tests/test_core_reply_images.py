@@ -466,48 +466,6 @@ class CoreReplyImagesTests(NativeImageFixture, HostFixture, unittest.IsolatedAsy
         self.assertIsNone(page["next_cursor"])
         self.assert_no_reply_work(event)
 
-    async def test_native_generated_image_builds_qzone_upload_request(self):
-        from digital_life_core.capabilities.qzone_access import QzoneAccess
-        from digital_life_core.qzone.images import album_images
-        from digital_life_core.qzone.protocol import credential_from_cookies, parse_cookie_text, upload_image_request
-        from digital_life_core.sharing.planner import ShareCatalog, SharePlanner
-        from digital_life_core.sources.repositories import AssetRepository, SourceRepository
-
-        event, request = self.prepare("native-image-qzone-upload")
-        received = await self.call(event, request, "image.generate", {"prompt": "自拍"}, "qzone-selfie")
-        result = self.result(received, "red")
-        artifact_id = json.loads(result["payload"])["native"]["artifacts"][0]["artifact_id"]
-        planner = SharePlanner(sources=SourceRepository(self.runtime), assets=AssetRepository(self.runtime),
-                               catalog=ShareCatalog())
-        with self.assertRaises(TaskError) as denied:
-            album_images(self.app, self.context, self.clock.now(), [artifact_id], planner=planner)
-        self.assertEqual(denied.exception.code, "authorization_denied")
-
-        access = QzoneAccess(self.app, self.context)
-        status = access.status(self.core, self.clock.now())
-        installed = access.configure(self.core, {"operation_key": "enable-image-share",
-            "edit_token": status["edit_token"], "enabled": True}, self.clock.now())["status"]
-        self.assertTrue(installed["publish_granted"])
-        images, candidates = album_images(self.app, self.context, self.clock.now(), [artifact_id], planner=planner)
-        self.assertEqual(len(images), 1)
-        self.assertEqual(len(candidates), 1)
-        self.assertEqual(images[0].content, image_bytes("red"))
-        self.assertEqual(images[0].mime_type, "image/png")
-        credential = credential_from_cookies(parse_cookie_text("uin=o123456789; p_skey=TEST; qzonetoken=TOKEN"))
-        upload = upload_image_request(credential, images[0])
-        self.assertEqual(upload.description, "image.upload")
-        self.assertEqual(base64.b64decode(upload.data["picfile"], validate=True), image_bytes("red"))
-        self.assertEqual(upload.data["filename"], f"{images[0].content_hash[:16]}.png")
-        self.assertEqual(upload.data["qzonetoken"], "TOKEN")
-
-        revoked = access.configure(self.core, {"operation_key": "revoke-image-share",
-            "edit_token": installed["edit_token"], "enabled": False}, self.clock.now())["status"]
-        self.assertFalse(revoked["publish_granted"])
-        with self.assertRaises(TaskError) as denied:
-            album_images(self.app, self.context, self.clock.now(), [artifact_id], planner=planner)
-        self.assertEqual(denied.exception.code, "authorization_revoked")
-        self.assert_no_reply_work(event)
-
     async def test_corrupt_native_artifact_receipt_is_refused_without_crashing(self):
         event, request = self.prepare("native-image-corrupt-receipt")
         generated = await self.call(event, request, "image.generate", {"prompt": "红色"}, "generate-corrupt")

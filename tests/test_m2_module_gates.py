@@ -187,10 +187,18 @@ class SectionGateTests(unittest.TestCase):
     def test_configuration_api_filters_sections(self):
         api = self._configuration_api()
         self.assertIn("life", api.sections)
+        # M2.5b 移除 qzone 实现后，配置 API 里不再存在 qzone 分区，
+        # 开关也无法让它复活（实现已删，只有 section_visible 的默认值还在）。
         self.assertNotIn("qzone", api.sections)
-        self.assertNotIn("image.output", api.sections)
         with mock.patch.dict(os.environ, {"DIGITAL_LIFE_MODULE_QZONE": "1"}):
-            self.assertIn("qzone", self._configuration_api().sections)
+            self.assertNotIn("qzone", self._configuration_api().sections)
+        # 可选模块仍然由开关控制：打开 screen / image 后分区回到列表。
+        self.assertNotIn("screen", api.sections)
+        self.assertNotIn("image.output", api.sections)
+        with mock.patch.dict(os.environ, {"DIGITAL_LIFE_MODULE_SCREEN": "1"}):
+            self.assertIn("screen", self._configuration_api().sections)
+        with mock.patch.dict(os.environ, {"DIGITAL_LIFE_MODULE_IMAGE": "1"}):
+            self.assertIn("image.output", self._configuration_api().sections)
 
     def test_configuration_api_still_honours_allowlist(self):
         with mock.patch.dict(os.environ, {"DIGITAL_LIFE_MODULE_IMAGE": "1"}):

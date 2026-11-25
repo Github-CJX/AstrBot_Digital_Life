@@ -49,8 +49,6 @@ MODULES = {
     "library": "digital_life_core.library.configuration",
     "wardrobe": "digital_life_core.references.wardrobe",
     "photo.reference": "digital_life_core.references.configuration",
-    # QQ 空间拓展的角色级开关与节流；安装与逐会话同意不在这张表里（归能力安装路由）。
-    "qzone": "digital_life_core.qzone.configuration",
     "group_participation": "digital_life_core.conversation.participation",
     # 唯一一个四层组（安装/角色/关系/窗口），160 个字段；此前不在表里，
     # 于是整组不参与自检——92 项没有控件的字段也一直是「通过」。

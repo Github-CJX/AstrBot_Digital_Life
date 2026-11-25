@@ -507,7 +507,6 @@ class AstrBotStagingBootstrap:
 
     def load(self, *, runtime_instance_id: str, native_tool_port=None, voice=None,
              voice_policy=None, weather_port=None, weather_alert_port=None, balance_port=None, news_port=None, solar_term_port=None,
-             qzone_transport=None,
              additional_providers=(), fallback_provider_id="", replacement_rules="[]",
              fallback_on_refusal=False, review_only=False, default_provider_resolver=None,
              relay_tool_port_factory=None, search_port_factory=None) -> Outcome[AstrBotStagingSession]:
@@ -517,7 +516,7 @@ class AstrBotStagingBootstrap:
                 return Outcome.success(self._load(runtime_instance_id, native_tool_port, voice, voice_policy,
                                                   weather_port, weather_alert_port, balance_port, news_port, solar_term_port, additional_providers,
                                                   fallback_provider_id, replacement_rules, fallback_on_refusal, review_only,
-                                                  qzone_transport, default_provider_resolver, relay_tool_port_factory,
+                                                  default_provider_resolver, relay_tool_port_factory,
                                                   search_port_factory))
         except TaskError as error:
             return Outcome.failed(error.code, str(error))
@@ -527,7 +526,7 @@ class AstrBotStagingBootstrap:
     def _load(self, runtime_instance_id: str, native_tool_port=None, voice=None,
               voice_policy=None, weather_port=None, weather_alert_port=None, balance_port=None, news_port=None, solar_term_port=None,
               additional_providers=(), fallback_provider_id="", replacement_rules="[]",
-              fallback_on_refusal=False, review_only=False, qzone_transport=None,
+              fallback_on_refusal=False, review_only=False,
               default_provider_resolver=None, relay_tool_port_factory=None,
               search_port_factory=None) -> AstrBotStagingSession:
         if self._marker() is None:
@@ -550,7 +549,6 @@ class AstrBotStagingBootstrap:
             now=self.now, voice=voice, voice_policy=voice_policy, weather_port=weather_port,
             weather_alert_port=weather_alert_port, balance_port=balance_port, news_port=news_port,
             solar_term_port=solar_term_port,
-            qzone_transport=qzone_transport,
             default_provider_resolver=default_provider_resolver,
             additional_providers=additional_providers,
             fallback_provider_id=fallback_provider_id, replacement_rules=replacement_rules,

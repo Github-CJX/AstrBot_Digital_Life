@@ -268,7 +268,6 @@ def _build_main_import_stubs():
         "digital_life_host.phone_command",
         "digital_life_host.private_debounce",
         "digital_life_host.private_reply_followup",
-        "digital_life_host.qzone_life_publish",
         "digital_life_host.reset_command",
         "digital_life_host.shared_host_migration",
         "digital_life_host.storage_location",
@@ -291,8 +290,6 @@ def _build_main_import_stubs():
             if item == "warm_session_settings":
                 return AsyncMock()
             if item == "AutomaticBackup":
-                return lambda _staging: NS(start=lambda: NS())
-            if item == "QzoneLifePublisher":
                 return lambda _staging: NS(start=lambda: NS())
             if item == "PrivateDebounce":
                 return NS(private_plain_text=lambda _event: None)
@@ -331,7 +328,6 @@ class MainNoticeAndHostProviderRetryTests(unittest.IsolatedAsyncioTestCase):
         plugin._host_start_task = None
         plugin._session_settings_warm_task = None
         plugin._automatic_backup = NS()
-        plugin._qzone_life_publisher = NS()
         plugin._startup_failure_key = None
         plugin._startup_failure_at = 0.0
         plugin.staging = staging

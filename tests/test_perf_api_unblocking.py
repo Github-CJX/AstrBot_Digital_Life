@@ -27,7 +27,6 @@ from digital_life_host.memory_api import MemoryWebAPI
 from digital_life_host.model_api import ModelWebAPI
 from digital_life_host.page_api import PageWebAPI
 from digital_life_host.persona_workshop_api import PersonaWorkshopWebAPI
-from digital_life_host.qzone_api import QzoneWebAPI
 from digital_life_host.reply_api import ReplyWebAPI
 from digital_life_host.state_api import StateWebAPI
 
@@ -187,7 +186,7 @@ class ControlLockReleaseAndConcurrencyTests(unittest.IsolatedAsyncioTestCase):
             )
         self.assertEqual(res["status"], "ok", res)
 
-    async def test_memory_reply_qzone_persona_page_and_behavior_reads_release_control_lock(self):
+    async def test_memory_reply_persona_page_and_behavior_reads_release_control_lock(self):
         # 1. MemoryWebAPI.list
         controller = _fake_controller(application=NS(runtime=NS(installation_id="i"), memory=object()))
         entered, release = threading.Event(), threading.Event()
@@ -220,23 +219,6 @@ class ControlLockReleaseAndConcurrencyTests(unittest.IsolatedAsyncioTestCase):
                 patch.object(ReplyWebAPI, "_tts_catalog", return_value={"state": "unavailable", "providers": []}):
             res = await _assert_off_loop_and_lock_free(
                 self, controller, ReplyWebAPI(controller).status(), entered, release
-            )
-        self.assertEqual(res["status"], "ok", res)
-
-        # 3. QzoneWebAPI.status
-        controller = _fake_controller(application=NS(runtime=NS(installation_id="i"), qzone=object()))
-        entered, release = threading.Event(), threading.Event()
-
-        def slow_qzone_status(operator, at):
-            entered.set()
-            release.wait(5)
-            return {"installed": False}
-
-        with patch("digital_life_host.qzone_api.request", _fake_request()), \
-                patch("digital_life_host.qzone_api.dashboard_operator", return_value=object()), \
-                patch("digital_life_host.qzone_api.QzoneAccess", return_value=NS(status=slow_qzone_status)):
-            res = await _assert_off_loop_and_lock_free(
-                self, controller, QzoneWebAPI(controller).status(), entered, release
             )
         self.assertEqual(res["status"], "ok", res)
 

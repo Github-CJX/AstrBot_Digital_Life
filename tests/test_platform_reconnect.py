@@ -6,7 +6,6 @@ import unittest
 from unittest.mock import patch
 
 from digital_life_host.multi_session import MultiHostSession
-from digital_life_core.qzone.capability import CAPABILITIES as QZONE_CAPABILITIES
 from tests.group_host_support import GroupFixture
 from tests.native_adapter_support import FakePlatform
 from tests.test_main_no_reply import ENTRY
@@ -311,7 +310,7 @@ class PlatformReconnectTests(GroupFixture, unittest.IsolatedAsyncioTestCase):
         self.assertIs(self.controller.session.bridge.platforms["qq-second"][0], second_online)
         self.assertTrue(self.controller.native_bridges_current())
 
-    async def test_qzone_cold_start_before_aiocqhttp_rebuilds_once_on_platform_loaded(self):
+    async def test_cold_start_latches_platform_loaded_after_assembly_without_teardown(self):
         class _DynamicPlatformManager:
             def __init__(self, mapping):
                 self._mapping = mapping
@@ -325,11 +324,7 @@ class PlatformReconnectTests(GroupFixture, unittest.IsolatedAsyncioTestCase):
 
         with patch.dict(os.environ, {"QZONE_COOKIE": ""}):
             await self.start_host()
-            initial_session = self.controller.session
-            self.assertIsNone(initial_session.application.qzone)
-            self.assertTrue(
-                set(QZONE_CAPABILITIES).isdisjoint(set(initial_session.application.external.providers))
-            )
+            session = self.controller.session
             self.assertTrue(self.controller.native_bridges_current())
 
             plugin = ENTRY.PrivateCompanionV2StagingPlugin.__new__(ENTRY.PrivateCompanionV2StagingPlugin)
@@ -341,34 +336,31 @@ class PlatformReconnectTests(GroupFixture, unittest.IsolatedAsyncioTestCase):
             waiting_main.client._wsr_api_clients.clear()
             self.native.platforms["qq-main"] = waiting_main
 
-            self.assertFalse(self.controller.native_bridges_current())
-            await plugin.on_companion_platform_loaded()
-            self.assertIsNotNone(plugin._host_start_task)
-            await asyncio.wait_for(plugin._host_start_task, timeout=10)
-
-            rebuilt = self.controller.session
-            self.assertIsNot(rebuilt, initial_session)
-            self.assertEqual(initial_session.application.state, "stopped")
-            self.assertIsNotNone(rebuilt.application.qzone)
-            self.assertTrue(
-                set(QZONE_CAPABILITIES).issubset(set(rebuilt.application.external.providers))
-            )
+            # 未连线的适配器不构成拆档理由：空桥接对没有可换的旧客户端，
+            # 新适配器也还没登录，热挂与重建都不该被这个空档触发。
             self.assertTrue(self.controller.native_bridges_current())
-
-            # Repeated platform-loaded hooks and the first WebSocket login must not loop.
-            plugin._host_start_task = None
             await plugin.on_companion_platform_loaded()
             self.assertIsNone(plugin._host_start_task)
-            self.assertIs(self.controller.session, rebuilt)
+            self.assertIs(self.controller.session, session)
 
+            # 首次 WebSocket 登录后：recover_accounts 在钩子内直接热挂桥，
+            # 桥接回到当前态后 _schedule_host_start 不再安排重建——
+            # qzone 就绪触发器移除后，「连线」本身不再是拆档理由。
             waiting_main.client._wsr_api_clients["100"] = object()
             await plugin.on_companion_platform_loaded()
             self.assertIsNone(plugin._host_start_task)
-            self.assertIs(self.controller.session, rebuilt)
-            self.assertEqual(rebuilt.native_bridge_pairs[0]["qq-main"], (waiting_main, waiting_main.client))
+            self.assertIs(self.controller.session, session)
+            self.assertEqual(session.native_bridge_pairs[0]["qq-main"], (waiting_main, waiting_main.client))
             self.assertTrue(self.controller.native_bridges_current())
 
-    async def test_existing_profile_loaded_before_aiocqhttp_mounts_qzone_on_first_start(self):
+            # Repeated platform-loaded hooks after latching must not loop.
+            plugin._host_start_task = None
+            await plugin.on_companion_platform_loaded()
+            self.assertIsNone(plugin._host_start_task)
+            self.assertIs(self.controller.session, session)
+            self.assertTrue(self.controller.native_bridges_current())
+
+    async def test_existing_profile_loaded_before_aiocqhttp_bridges_on_first_start(self):
         class _DynamicPlatformManager:
             def __init__(self, mapping):
                 self._mapping = mapping
@@ -388,15 +380,10 @@ class PlatformReconnectTests(GroupFixture, unittest.IsolatedAsyncioTestCase):
             loaded = await restored.load_existing()
             self.assertTrue(loaded.is_success, loaded.failure)
             self.assertTrue(loaded.unwrap()["loaded"])
-            self.assertIsNone(restored.session.application.qzone)
 
             self.native.platforms.update(platforms)
             started = await restored.start()
             self.assertTrue(started.is_success, started.failure)
-            self.assertIsNotNone(restored.session.application.qzone)
-            self.assertTrue(
-                set(QZONE_CAPABILITIES).issubset(set(restored.session.application.external.providers))
-            )
             self.assertTrue(restored.native_bridges_current())
 
 

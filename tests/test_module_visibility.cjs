@@ -57,7 +57,7 @@ test("保留模块的条目不受别的模块开关影响", () => {
   const shell = load();
   const before = ids(shell.railGroups());
   shell.setVisibility({modules: {phone: false, image: false, game: false, screen: false,
-    workspace: false, multi_role: false, live: false, qzone: false}, pages: {}});
+    workspace: false, multi_role: false, live: false, qzone: false, mihome: false}, pages: {}});
   const after = ids(shell.railGroups());
   for (const id of ["identity", "contact", "memory", "learning", "models", "maintenance",
     "perception", "understanding", "decision", "action", "output", "expression",

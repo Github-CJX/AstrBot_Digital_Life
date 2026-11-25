@@ -201,8 +201,6 @@ class MultiHostWebAPI:
                            PREFIX + "/targets/" + target.target_id + "/roles/" + digest(role) + "/screen-access"),
              "game_access_api": (None if isinstance(target, GroupTarget) else
                            PREFIX + "/targets/" + target.target_id + "/roles/" + digest(role) + "/game-access"),
-             "qzone_extension_api": (None if isinstance(target, GroupTarget) else
-                           PREFIX + "/targets/" + target.target_id + "/roles/" + digest(role) + "/qzone-extension"),
              "image_material_api": (None if isinstance(target, GroupTarget) else
                            PREFIX + "/targets/" + target.target_id + "/roles/" + digest(role) + "/image-materials"),
              # 人格草稿按「角色 + 宿主人格」归属，所以群目标没有这一项：
@@ -423,12 +421,6 @@ class MultiHostWebAPI:
                 routes.extend((role["game_access_api"] + path.removeprefix(GAME_ACCESS_PREFIX),
                                handler, methods, description)
                               for path, handler, methods, description in GameAccessWebAPI(view).routes())
-                if module_enabled("qzone"):
-                    from .qzone_api import QzoneWebAPI, PREFIX as QZONE_PREFIX
-
-                    routes.extend((role["qzone_extension_api"] + path.removeprefix(QZONE_PREFIX),
-                                   handler, methods, description)
-                                  for path, handler, methods, description in QzoneWebAPI(view).routes())
                 routes.extend((role["life_api"] + path.removeprefix(LIFE_PREFIX), handler, methods, description)
                               for path, handler, methods, description in LifeWebAPI(role_view).routes())
                 routes.extend((role["relationships_api"] + path.removeprefix(RELATIONSHIP_PREFIX), handler, methods, description)

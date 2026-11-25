@@ -75,8 +75,6 @@ class SinglePageTests(PageRequests, unittest.IsolatedAsyncioTestCase):
             "perception_native_api": PREFIX + "/perception-native",
             "reality_access_api": PREFIX + "/reality-access",
             "screen_access_api": PREFIX + "/screen-access",
-            # QQ 空间拓展与 Reality/Screen 同层：按角色安装与授权，所以地址跟角色走。
-            "qzone_extension_api": PREFIX + "/qzone-extension",
             "game_access_api": PREFIX + "/game-access",
             "image_material_api": PREFIX + "/image-materials"}])
         self.assertNotIn("provider", json.dumps(listed))

@@ -47,7 +47,6 @@ from .news import configured_news_port, configured_search_port
 from .service_balance import configured_balance_port
 from .weather_settings import configured_weather_ports
 from .files.parsing import parser_availability
-from .qzone_transport import build_qzone_transport
 from .solar_terms import configured_solar_term_port
 from .session_topology import SessionTopology
 from .shared_host_migration import recover_repeated_single_target
@@ -233,7 +232,7 @@ class AstrBotMultiController:
                     return False
             except Exception:
                 continue
-        return not self._qzone_transport_ready()
+        return True
 
     def all_configured_platforms_loaded(self) -> bool:
         """Whether every configured account's platform adapter is currently instantiated."""
@@ -256,8 +255,6 @@ class AstrBotMultiController:
         """Whether a running session can latch newly online accounts without teardown."""
         if (session is None or not self._accepting
                 or session.application.state != "running"):
-            return False
-        if self._session_missing_ready_qzone(session):
             return False
         snapshots = getattr(session, "native_bridge_pairs", ())
         if len(snapshots) != 2:
@@ -290,20 +287,6 @@ class AstrBotMultiController:
         if callable(sync):
             sync()
 
-    def _qzone_transport_ready(self):
-        """Whether a QQ Zone transport can now be built from loaded adapters or cookie."""
-        try:
-            return build_qzone_transport(
-                self.context, data_root=getattr(self, "data_root", None)
-            ) is not None
-        except Exception:
-            return False
-
-    def _session_missing_ready_qzone(self, session):
-        """Whether a session was assembled without QQ Zone even though a transport is ready."""
-        return (getattr(getattr(session, "application", None), "qzone", _UNSET) is None
-                and self._qzone_transport_ready())
-
     def _has_unlatched_online_platform(self, snapshots):
         """Whether a configured account is online while no native bridge pair is latched yet."""
         if any(snapshots):
@@ -325,7 +308,7 @@ class AstrBotMultiController:
         return False
 
     def native_bridges_current(self):
-        """Whether bound native bridges and optional QQ Zone transport match loaded clients."""
+        """Whether bound native bridges match loaded clients."""
         session = self.session
         if session is None or session.application.state != "running":
             return False
@@ -342,8 +325,6 @@ class AstrBotMultiController:
                         return False
                 except Exception:
                     return False
-        if self._session_missing_ready_qzone(session):
-            return False
         if self._has_unlatched_online_platform(snapshots):
             return False
         return True
@@ -995,7 +976,6 @@ class AstrBotMultiController:
             search_port_factory=search_port_factory,
             balance_port=configured_balance_port(self.config, context=self.context),
             weather_ports=configured_weather_ports(self.config),
-            qzone_transport=build_qzone_transport(self.context, data_root=self.data_root),
             solar_term_port=configured_solar_term_port(
                 self.config.get("solar_terms") if isinstance(self.config, dict) else None))
         from .worker_lifecycle import AstrBotWorkerLifecycle
@@ -1443,8 +1423,7 @@ class AstrBotMultiController:
                             await asyncio.to_thread(self._adopt_confirmed_mapping, manifest)
                         else:
                             raise
-                    if (self.session is None or self.session.application.state != "new"
-                            or self._session_missing_ready_qzone(self.session)):
+                    if self.session is None or self.session.application.state != "new":
                         await self._assemble(manifest)
                     else:
                         self._sync_session_native_bridges(self.session)

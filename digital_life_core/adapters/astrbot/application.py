@@ -14,7 +14,7 @@ from digital_life_core.host.application import CompanionApplication
 from digital_life_core.identity_policy.personas import PersonaDirectory
 
 from .inbound import AstrBotInboundAdapter
-from .tools import CompositeAstrBotToolPort, QzoneToolPort, map_tools
+from .tools import map_tools
 
 
 class AstrBotRolePort(Protocol):
@@ -26,13 +26,8 @@ class AstrBotCompanionHost:
     def __init__(self, runtime, *, event_port, identity_port, role_port, runtime_identity,
                  tool_port=None, memory_owner=None, memory_push=None, configuration_store=None,
                  **application_options):
-        # Native providers and the included QQ Zone provider share one supervised
-        # executor.  The latter is optional and is absent when the host supplied no
-        # transport, so a missing account never creates model-visible declarations.
-        qzone_transport = application_options.get("qzone_transport")
-        qzone_port = QzoneToolPort(qzone_transport) if qzone_transport is not None else None
-        if qzone_port is not None:
-            tool_port = CompositeAstrBotToolPort(tool_port, qzone_port)
+        # Native providers share one supervised executor; the port is optional and
+        # is absent when the host supplies no provider at all.
         declarations = tool_port.declarations() if tool_port is not None else ()
         external = map_tools(runtime, tool_port) if declarations else None
         # Every declared extension keeps its own scope preferences (proactive sharing

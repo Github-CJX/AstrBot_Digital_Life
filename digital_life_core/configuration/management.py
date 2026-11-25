@@ -67,8 +67,6 @@ from ..role_work.life.configuration import (GROUP as LIFE_GROUP, OWNER as LIFE_O
     configuration_fields as life_fields)
 from ..screen.configuration import (GROUP as SCREEN_GROUP, OWNER as SCREEN_OWNER,
     configuration_fields as screen_fields)
-from ..qzone.configuration import (GROUP as QZONE_GROUP, OWNER as QZONE_OWNER,
-    configuration_fields as qzone_fields)
 from ..device.configuration import (GROUP as PHONE_GROUP, OWNER as PHONE_OWNER,
     configuration_fields as phone_fields)
 from ..library.configuration import (GROUP as LIBRARY_GROUP, OWNER as LIBRARY_OWNER,
@@ -341,19 +339,6 @@ class ScreenManagement(GroupEditor):
     group, owner = SCREEN_GROUP, SCREEN_OWNER
     layers = screen_fields()[0].layers
     error_prefix = "screen"
-
-
-class QzoneManagement(GroupEditor):
-    """Which public Zone actions the role may take, and how fast.
-
-    The group is role-shared like ``role.life``: the Zone account belongs to the
-    role, so ``RoleSharedSettingsOwner`` keeps a window value only as the legacy
-    fallback and the editor just names the group.
-    """
-
-    group, owner = QZONE_GROUP, QZONE_OWNER
-    layers = qzone_fields()[0].layers
-    error_prefix = "qzone"
 
 
 class PhoneManagement(GroupEditor):

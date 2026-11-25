@@ -112,9 +112,6 @@ class AstrBotStagingController:
         self._lifecycle_lock = asyncio.Lock()
         self.session_topology = SessionTopology(self)
         self.native_extensions = None
-        # The QQ Zone extension only exists once a host transport is attached; it
-        # is created lazily so an unused Zone never opens a session or reads a cookie.
-        self._qzone_client = None
         # The product manifest is assembled from V2 core modules and public
         # extension APIs. It does not read another plugin's files or objects.
         self.integration = IntegrationRegistry(context)
@@ -442,18 +439,6 @@ class AstrBotStagingController:
         self.bootstrap = bootstrap
         self.configuration = configuration
 
-    def _qzone_transport(self):
-        # QQ 空间是待移除模块：关着的时候不建客户端，也不导入它的实现。
-        from .module_gates import module_enabled
-
-        if not module_enabled("qzone"):
-            return None
-        if self._qzone_client is None:
-            from .qzone_transport import build_qzone_transport
-
-            self._qzone_client = build_qzone_transport(self.context, data_root=getattr(self, "data_root", None))
-        return self._qzone_client
-
     async def _load_session(self, *, review_only=False) -> object:
         if self.bootstrap is None:
             raise HostControlError("staging_not_initialized", "initialize the staging profile first")
@@ -486,7 +471,6 @@ class AstrBotStagingController:
                                          deepseek_provider_resolver=search_provider_resolver,
                                          search_priority_resolver=search_settings.source_priority),
                                      search_port_factory=search_port_factory,
-                                     qzone_transport=self._qzone_transport(),
                                      solar_term_port=configured_solar_term_port(
                                          self.config.get("solar_terms") if isinstance(self.config, dict) else None),
                                      voice=NativeVoiceReply(self.context).render,

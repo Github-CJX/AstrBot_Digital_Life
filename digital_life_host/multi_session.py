@@ -506,7 +506,7 @@ class MultiHostSession:
 
     def __init__(self, runtime, native_context, *, settings, personas, authority, native_types,
                  provider_fingerprint, runtime_instance_id, now, native_tool_port=None, news_port=None,
-                 solar_term_port=None, qzone_transport=None, balance_port=None, weather_ports=None,
+                 solar_term_port=None, balance_port=None, weather_ports=None,
                  persona_window_snapshot_lookup=None, persona_window_snapshot_update=None, private_session_lookup=None,
                  search_port_factory=None, connection_manager=None):
         self.runtime, self.settings, self.authority, self.types, self.now = runtime, settings, authority, native_types, now
@@ -635,7 +635,6 @@ class MultiHostSession:
             news_port=news_port,
             search_port_factory=search_port_factory,
             solar_term_port=solar_term_port,
-            qzone_transport=qzone_transport,
             voice_policy=common.voice_reply_policy if common.voice_reply_enabled else None,
             configuration_store=configuration_store,
             wake_port=self._wake_snapshot,

@@ -12,7 +12,7 @@ window.CompanionLearningReviewPage = (() => {
   };
   const ACTION = {accept:"确认申报",reject:"驳回",adopt:"采纳建议"};
   const FILTERS = [["all","全部"],["growth","进展核实"],["style","风格采纳"],["self","复盘确认"]];
-  const CHANNEL = {private:"私聊",group:"群聊",proactive:"主动消息",qzone:"QQ 空间",tts:"语音"};
+  const CHANNEL = {private:"私聊",group:"群聊",proactive:"主动消息",tts:"语音"};
   const RELATIONSHIP = {stranger:"陌生",familiar:"熟悉",close:"亲近",any:"不限"};
   const EMOTION = {normal:"常态",positive:"积极",low:"低落",guarded:"谨慎",any:"不限"};
   const INTENT = {acknowledgement:"确认接话",question:"提问",request:"请求",help:"求助",comfort:"安慰",

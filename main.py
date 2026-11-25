@@ -309,7 +309,6 @@ class PrivateCompanionV2StagingPlugin(Star):
             self._startup_failure_key = None
             self._startup_failure_at = 0.0
             self._session_settings_warm_task = None
-            self._qzone_life_publisher = None
             self.config = config if config is not None else {}
             raw_data_root = Path(StarTools.get_data_dir(PLUGIN_NAME))
             from .digital_life_host.fork_guard import validate_default_data_root
@@ -731,9 +730,6 @@ class PrivateCompanionV2StagingPlugin(Star):
         if getattr(self, "_automatic_backup", None) is None:
             from .digital_life_host.automatic_backup import AutomaticBackup
             self._automatic_backup = AutomaticBackup(self.staging).start()
-        if self._qzone_life_publisher is None and module_enabled("qzone"):
-            from .digital_life_host.qzone_life_publish import QzoneLifePublisher
-            self._qzone_life_publisher = QzoneLifePublisher(self.staging).start()
         if self.staging.settings is None or not self.staging.settings.enabled:
             logger.info("[CompanionV2] 共享宿主已加载，等待账号与人格配置")
             return
@@ -2546,13 +2542,6 @@ class PrivateCompanionV2StagingPlugin(Star):
                 await settings_task
             except asyncio.CancelledError:
                 pass
-        qzone_publisher = getattr(self, "_qzone_life_publisher", None)
-        self._qzone_life_publisher = None
-        if qzone_publisher is not None:
-            try:
-                await qzone_publisher.close()
-            except Exception as error:
-                logger.warning("[CompanionV2] 生活说说停机清理失败 error_type=%s", type(error).__name__)
         video_fusion = getattr(self, "_video_fusion_service", None)
         self._video_fusion_service = None
         if video_fusion is not None:

@@ -125,7 +125,6 @@ function collectKnownDomIdsAndClasses(ctx) {
     ctx.run("renderUnderstanding()"),
     ctx.run("renderDecision()"),
     ctx.run("['overview','strategy','behavior'].map(t => { learningTab = t; return renderLearningPage(); }).join('\\n')"),
-    ctx.run("qzoneConfigMarkup()"),
     ctx.run("(() => { memoryWorkspaceRoute = 'settings'; const h = renderMemoryPage(); memoryWorkspaceRoute = 'records'; return h; })()"),
     ctx.run("renderViewPanel('diary')"),
     ctx.run("renderViewPanel('state')"),
@@ -248,7 +247,8 @@ test("Contract: ALL config search entries resolve to valid routes, subtabs, DOM 
     }
   }
 
-  assert.ok(total >= 795, `Expected at least 795 searchable config entries, got ${total}`);
+  /* M2.5b 移除 qzone 分区后可搜索条目从 795 降到 750。 */
+  assert.ok(total >= 750, `Expected at least 750 searchable config entries, got ${total}`);
   for (const v of ["dial", "morning", "purposes", "gates", "budgets", "sources"]) {
     assert.ok(contactViewsSeen.has(v), `Expected proactive.contact to map into contactView=${v}`);
   }

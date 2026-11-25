@@ -103,7 +103,9 @@ test("pages/陪伴小屋/*.css 不再存在未定义的语义/尺度/兼容 CSS 
   assert.doesNotMatch(readPage("migration-config-table.css"), /var\(--t-warn-soft\b|#fff4df|#946020/i);
   assert.doesNotMatch(readPage("weather-source.css"), /var\(--font-mono\b/);
   assert.doesNotMatch(readPage("screen-access.js"), /var\(--fs-small\b/);
-  assert.doesNotMatch(readPage("styles.css"), /-\s*var\(--/);
+  /* 「负号紧贴 var(」是无效 CSS（如 padding:0-var(--x)）；calc(100vw - var(--sp-4))
+     这类减法运算是合法的，早年宽匹配误伤过它，这里只拦紧贴写法。 */
+  assert.doesNotMatch(readPage("styles.css"), /-var\(--/);
   assert.doesNotMatch(readPage("styles.css"), /\.all-functions-error\{[^}]*var\(--danger\)/);
   assert.doesNotMatch(readPage("styles.css"), /#87521f/i);
 });
@@ -260,7 +262,8 @@ test("全部功能筛选分隔线、导航弹层网格与死样式清理均保�
   const action = stripComments(readPage("action-page.css"));
   assert.doesNotMatch(action, /\.action-overview\b|\.action-config-card\b/,
     "action-page.css 已废弃的旧概览/旧配置卡规则不应回流");
-  assert.match(action, /\.action-qzone\{/);
+  assert.doesNotMatch(action, /\.action-qzone\b/,
+    "QQ 空间拓展已随 M2.5b 移除，action-page.css 不应再保留其样式");
   assert.match(action, /\.action-capability-row\{/);
   assert.match(action, /\.action-kicker\{/);
 });

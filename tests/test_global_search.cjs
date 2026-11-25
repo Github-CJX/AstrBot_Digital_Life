@@ -1,4 +1,4 @@
-﻿/* 全局搜索的索引、排序、截断与命中高亮，直接从 app.js 的真实函数段求值。
+/* 全局搜索的索引、排序、截断与命中高亮，直接从 app.js 的真实函数段求值。
    断言的是搜索契约本身：分词归一化、页面项与配置项都能被搜到、排序与截断、
    高亮后仍然转义正文。不对内部辅助函数的名字做假设。 */
 "use strict";
@@ -98,8 +98,8 @@ test("分词按统一口径切开中英文标点，并归一化全角与大小�
   const page = harness();
   assert.deepEqual(Array.from(page.api.searchTerms("日记，生活/睡眠|阅读")),
     ["日记", "生活", "睡眠", "阅读"]);
-  assert.deepEqual(Array.from(page.api.searchTerms("Ｑｚｏｎｅ 设置；语音、投递")),
-    ["qzone", "设置", "语音", "投递"]);
+  assert.deepEqual(Array.from(page.api.searchTerms("Ｑｑｄａｓｈ 设置；语音、投递")),
+    ["qqdash", "设置", "语音", "投递"]);
   /* 全空白不是一个关键词，空查询走的是"列出全部页面入口"的分支。 */
   assert.deepEqual(Array.from(page.api.searchTerms("   ")), []);
 });
@@ -237,7 +237,7 @@ test("高亮保留原始大小写、转义正文，并把正则元字符当作�
 
   assert.match(highlightSearchText("日记与生活 <草稿>", ["日记"]), /<mark>日记<\/mark>/);
   assert.match(highlightSearchText("日记与生活 <草稿>", ["日记"]), /&lt;草稿&gt;/);
-  assert.equal(highlightSearchText("QZone 设置", ["qzone"]), "<mark>QZone</mark> 设置",
+  assert.equal(highlightSearchText("Screen 设置", ["screen"]), "<mark>Screen</mark> 设置",
     "匹配不区分大小写，但标记里保留原文");
   assert.equal(highlightSearchText("日记与生活", ["日记", "生活"]),
     "<mark>日记</mark>与<mark>生活</mark>", "一次扫描标出全部关键词");

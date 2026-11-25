@@ -246,12 +246,6 @@ CURATED = {
         "现实触及闹钟授权确认口令文案", "管理员开启现实触及能力二次确认时", "授权确认文案"),
     ("digital_life_host/news.py", "DEFAULT_AI_NEWS_FEED_LABEL"): (
         "默认 AI 资讯源显示名称", "资讯源未自定义名称时展示", "默认标签文案"),
-    ("digital_life_host/qzone_client.py", "_MANUAL_INVALID"): (
-        "手动配置 QZone Cookie 格式无效的错误提示", "QZone 客户端校验手动 Cookie 失败时", "错误提示文案"),
-    ("digital_life_host/qzone_client.py", "_NO_CONNECTION"): (
-        "缺少可用 OneBot 连接且无手动 Cookie 的错误提示", "QZone 客户端获取凭据无可用连接时", "错误提示文案"),
-    ("digital_life_host/qzone_client.py", "_RUNTIME_MISSING"): (
-        "OneBot 未返回有效 QZone 凭据的错误提示模板", "QZone 客户端从 OneBot 取回凭据缺失字段时", "错误提示文案"),
 }
 
 
@@ -692,8 +686,6 @@ def main() -> None:
          "日程规划任务补充", "安装/角色/窗口", "agenda/planning.py:34", "calendar.plan 任务"),
         ("model.content.authoring.draft.prompt", "（见 content/authoring_tasks.py 的 PROMPTS）",
          "创作任务补充", "安装/角色/窗口", "conversation/content/authoring_tasks.py:11", "每次创作调用"),
-        ("qzone.topic_prompt_guidance", "（空）", "空间主题分类补充指引（未见消费点）", "安装/角色/窗口",
-         "未找到消费点", "无"),
     ]
     field_sheet = workbook.create_sheet("可配置字段")
     about["B6"] = f"{len(field_specs)} 个页面/配置字段（含默认全文，空值显式标注）"

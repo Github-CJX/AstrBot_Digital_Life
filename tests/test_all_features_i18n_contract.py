@@ -68,7 +68,6 @@ def _field_definitions_by_group():
         mgmt.SCREEN_GROUP: mgmt.screen_fields(),
         mgmt.WEB_GROUP: mgmt.web_fields(),
         mgmt.RELAY_GROUP: mgmt.relay_fields(),
-        mgmt.QZONE_GROUP: mgmt.qzone_fields(),
         mgmt.PERSON_GROUP: mgmt.person_fields(),
         mgmt.PRIVATE_ACCESS_GROUP: mgmt.private_access_fields(),
         mgmt.SKILLS_GROUP: mgmt.skill_configuration_fields(),
@@ -285,7 +284,8 @@ class AllFeaturesI18nContractTests(unittest.TestCase):
                         missing_bool_helps.append(f"{sec_name}.{field_name}={help_text!r}")
 
         self.assertGreaterEqual(total_fields, 450)
-        self.assertGreaterEqual(total_booleans, 130)
+        # M2.5b 移除 qzone 实现后布尔总量从 ≥130 降到 120（qzone 曾贡献 10 个布尔）。
+        self.assertGreaterEqual(total_booleans, 120)
         self.assertEqual(missing_labels, [], f"以下 /config 字段缺少中文 label: {missing_labels}")
         self.assertEqual(missing_bool_helps, [], f"以下布尔字段缺少中文 help: {missing_bool_helps}")
 
@@ -346,7 +346,6 @@ class AllFeaturesI18nContractTests(unittest.TestCase):
             "invalid_probability",
             "invalid_weight",
             "busy_gate_settings_invalid",
-            "qzone_scene_list_invalid",
             "life_sleep_variation_invalid",
             "life_sleep_window_invalid",
             "configuration_section_read_failed",

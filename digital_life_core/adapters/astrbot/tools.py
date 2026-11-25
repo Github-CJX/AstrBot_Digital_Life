@@ -18,7 +18,6 @@ from digital_life_core.conversation.tool_failures import retry_disposition_for
 from digital_life_core.foundation.refs import SourceRef, VersionRef
 from digital_life_core.identity_policy.models import _opaque
 from digital_life_core.sources.models import SourceRecord
-from digital_life_core.qzone.capability import COMMENT_ACTION, LIKE_ACTION, PUBLISH_ACTION, READ_ACTION, tool_descriptors
 
 
 @dataclass(frozen=True)
@@ -88,112 +87,6 @@ class CompositeAstrBotToolPort:
             if callable(attach):
                 attach(application)
         return self
-
-
-class QzoneToolPort:
-    """Adapt the included QQ Zone service to the supervised model tool contract."""
-
-    _ACTIONS = frozenset((READ_ACTION, LIKE_ACTION, COMMENT_ACTION, PUBLISH_ACTION))
-
-    def __init__(self, transport):
-        if transport is None:
-            raise ValueError("QQ Zone tool port requires a host transport")
-        self.transport = transport
-        self.application = None
-        self._declarations = tuple(
-            AstrBotToolDeclaration("qzone:" + descriptor.tool.action, descriptor)
-            for descriptor in tool_descriptors()
-        )
-
-    def declarations(self):
-        return self._declarations
-
-    def current_declaration(self, host_tool_id):
-        if self.application is None or getattr(self.application, "qzone", None) is None:
-            return None
-        for declaration in self._declarations:
-            if declaration.host_tool_id == host_tool_id:
-                service = self.application.qzone
-                return declaration if getattr(service, "transport", None) is self.transport else None
-        return None
-
-    def attach(self, application):
-        service = getattr(application, "qzone", None)
-        if service is None or getattr(service, "transport", None) is not self.transport:
-            raise ValueError("QQ Zone service must be assembled from the original host transport")
-        if self.application is not None and self.application is not application:
-            raise ValueError("QQ Zone tool port can attach only once")
-        self.application = application
-        return self
-
-    @staticmethod
-    def _receipt(invocation, code):
-        return "qzone-receipt:" + digest([invocation.invocation_id, code])
-
-    @staticmethod
-    def _source(invocation, result, observed_at):
-        payload = encode(result)
-        reference = SourceRef("qzone:" + invocation.invocation_id, "qzone.feed", invocation.context.scope,
-                              VersionRef(invocation.invocation_id, 1), observed_at)
-        return SourceRecord(reference, invocation.context.audience, digest(payload), payload)
-
-    async def invoke(self, host_tool_id, invocation):
-        declaration = next((item for item in self._declarations if item.host_tool_id == host_tool_id), None)
-        if declaration is None or declaration.descriptor != invocation.descriptor:
-            raise TaskError("qzone_provider_changed", "the original QQ Zone declaration is unavailable")
-        service = getattr(self.application, "qzone", None)
-        if service is None:
-            raise TaskError("qzone_provider_unavailable", "QQ Zone is not assembled for this host")
-        arguments = json.loads(invocation.arguments_json)
-        action = declaration.descriptor.tool.action
-        operation_key = invocation.invocation_id
-        effectful = action in (LIKE_ACTION, COMMENT_ACTION, PUBLISH_ACTION)
-        try:
-            if action == READ_ACTION:
-                result = await service.scan(invocation.context, scope=arguments.get("scope", "friends"),
-                                            limit=arguments.get("limit"), detail=arguments.get("detail", False))
-            elif action == LIKE_ACTION:
-                result = await service.like(invocation.context, post_ref=arguments["post_ref"],
-                                            operation_key=operation_key)
-            elif action == COMMENT_ACTION:
-                result = await service.comment(invocation.context, post_ref=arguments["post_ref"],
-                                               text=arguments["text"], operation_key=operation_key)
-            elif action == PUBLISH_ACTION:
-                # The model proposes the topic; whether that proposal may go out
-                # without a human is decided by the configured gates, so it never
-                # confirms itself here.
-                from digital_life_core.qzone.images import album_images
-                images, _ = album_images(self.application, invocation.context, service.now(),
-                                          arguments.get("image_ids", ()))
-                source_refs = list(arguments.get("source_refs", ()))
-                source_refs.extend(image.source_id for image in images if image.source_id)
-                result = await service.publish(invocation.context, text=arguments["text"],
-                                              topic=arguments["topic"], scene=arguments["scene"],
-                                              confidence=arguments["confidence"], topic_confirmed=False,
-                                              source_refs=source_refs, images=images,
-                                              agenda_proposal=arguments.get("agenda_proposal"),
-                                              operation_key=operation_key)
-            else:
-                raise TaskError("qzone_action_unknown", "unknown QQ Zone action")
-        except TaskError as error:
-            if error.code in ("qzone_delivery_unknown", "qzone_operation_unresolved") and effectful:
-                return ExternalToolResponse(invocation.invocation_id, invocation.context.key,
-                    invocation.arguments_hash, declaration.descriptor.binding, "unknown", effect="unknown",
-                    error_code=error.code, retry_disposition="external_effect_unknown")
-            return ExternalToolResponse(invocation.invocation_id, invocation.context.key,
-                invocation.arguments_hash, declaration.descriptor.binding, "failed",
-                effect="not_committed" if effectful else "none",
-                receipt_ref=self._receipt(invocation, error.code), error_code=error.code,
-                retry_disposition=retry_disposition_for(error.code, "failed"))
-        observed_at = service.now()
-        operation_id = result.get("operation_id") if effectful else None
-        receipt_ref = result.get("receipt_ref") if effectful else None
-        if effectful and (not operation_id or not receipt_ref):
-            raise TaskError("qzone_receipt_missing", "QQ Zone action did not return its committed receipt")
-        return ExternalToolResponse(invocation.invocation_id, invocation.context.key,
-            invocation.arguments_hash, declaration.descriptor.binding, "succeeded",
-            effect="committed" if effectful else "none", source=self._source(invocation, result, observed_at),
-            operation_id=operation_id, receipt_ref=receipt_ref)
 
 
 def _same_declaration(declaration, current):

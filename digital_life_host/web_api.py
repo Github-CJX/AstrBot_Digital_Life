@@ -178,10 +178,6 @@ class StagingWebAPI:
             all_routes += GameAccessWebAPI(self.controller).routes()
             all_routes += AccountSessionWebAPI(self.controller).routes()
             all_routes += ImageMaterialsWebAPI(self.controller).routes()
-            if module_enabled("qzone"):
-                from .qzone_api import QzoneWebAPI
-
-                all_routes += QzoneWebAPI(self.controller).routes()
             all_routes += HostOptionsWebAPI(self.controller).routes()
             all_routes += StorageWebAPI(self.controller).routes()
             for route, handler, methods, description in all_routes:

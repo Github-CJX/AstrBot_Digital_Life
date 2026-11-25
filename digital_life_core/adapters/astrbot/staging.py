@@ -244,7 +244,7 @@ class AstrBotStagingSession:
 
     def __init__(self, runtime, context, *, profile: StagingProfile, native_types: NativeAdapterTypes,
                  native_tool_port=None, now=None, voice=None, voice_policy=None, weather_port=None,
-                 weather_alert_port=None, balance_port=None, news_port=None, solar_term_port=None, qzone_transport=None, additional_providers=(), fallback_provider_id="", replacement_rules="[]",
+                 weather_alert_port=None, balance_port=None, news_port=None, solar_term_port=None, additional_providers=(), fallback_provider_id="", replacement_rules="[]",
                  fallback_on_refusal=False, review_only=False, profile_field_shapes=None,
                  bootstrap_receipt_validated=False, default_provider_resolver=None,
                  relay_tool_port_factory=None, search_port_factory=None):
@@ -382,7 +382,6 @@ class AstrBotStagingSession:
             solar_term_port=solar_term_port,
             news_port=news_port,
             search_port_factory=search_port_factory,
-            qzone_transport=qzone_transport,
             presence_port=OneBotPresencePort(self.bridge, reverse_api_type=native_types.reverse_api,
                 authorize=self.require_delivery_authorization, now=lambda: self.application.now())
                 if not self._uses_local_sender else None)

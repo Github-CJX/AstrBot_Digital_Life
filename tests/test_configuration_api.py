@@ -66,22 +66,6 @@ class ConfigurationWebAPITests(MultiFixture, unittest.IsolatedAsyncioTestCase):
                     and "/targets/" + target_id + "/" in route][0]
         return handlers, editor("first"), editor("second")
 
-    async def test_scoped_qzone_config_accepts_matching_page_selection(self):
-        handlers, first, _ = await self.routes()
-        selection = {"target_id": "first", "role_id": handlers[first].__self__.controller.role_id}
-        try:
-            response = await call(handlers[first], query={"sections": "qzone", **selection})
-            self.assertEqual(response["status"], "ok", response)
-            section = response["data"]["sections"]["qzone"]
-            saved = await call(handlers[first + "/configure"], {
-                "section": "qzone", "operation_key": "qzone-selected-private",
-                "edit_token": section["edit_token"], "changes": {"like_enabled": False},
-                **selection,
-            })
-            self.assertEqual(saved["status"], "ok", saved)
-        finally:
-            self.controller.unregister_routes()
-
     async def test_phone_connection_probes_and_enables_only_a_ready_device(self):
         handlers, first, _ = await self.routes()
         connect = handlers[first + "/phone-connection"]
@@ -125,7 +109,7 @@ class ConfigurationWebAPITests(MultiFixture, unittest.IsolatedAsyncioTestCase):
         try:
             for selection in ({"target_id": "second", "role_id": role_id},
                               {"target_id": "first", "role_id": "another-role"}):
-                response = await call(handlers[first], query={"sections": "qzone", **selection})
+                response = await call(handlers[first], query={"sections": "recall", **selection})
                 self.assertEqual(response["status"], "error", response)
                 self.assertEqual(response["message"], "configuration_target_changed", response)
         finally:
@@ -179,11 +163,6 @@ class ConfigurationWebAPITests(MultiFixture, unittest.IsolatedAsyncioTestCase):
                                  "private_access", "private_access_installation", "quota", "reaction", "recall",
                                  "content.authoring",
                                  "expression.learning", "role.growth.skills",
-                                 # qzone 是真实配置分区（digital_life_core/qzone/configuration.py:18
-                                 # 的 GROUP = "qzone"）。它加入注册表时这份硬编码清单没跟上，
-                                 # 于是 assertEqual 把"多了一个真分区"报成失败——这正是本会话
-                                 # 反复出现的模式：新增能力却不更新按字面枚举的名单。
-                                 "qzone",
                                  "relay",
                                  "relationship_profile",
                                  "role_profile", "screen", "wardrobe", "web_understanding", "proactive.contact",
@@ -251,16 +230,13 @@ class ConfigurationWebAPITests(MultiFixture, unittest.IsolatedAsyncioTestCase):
                 # conversation.group_participation / photo.reference 等；
                 # private_access（私聊用户权限的默认值与拒绝文案）本身就是一个小域，
                 # 不带厂商前缀，字段是按人权限的默认值而不是某个能力的实现细节。
-                # qzone（QQ 空间拓展的角色级开关与节流）同样是自己的一个小域。
                 # 这份白名单是**按字面枚举**的，所以每加一个不带前缀的域都要跟上——
-                # 今天 qzone 就因此判红过一次，而失败信息只说"qzone"，看不出是
-                # "多了一个真域"还是"组名写错了"。加域时两处都要改：
-                # 这里的前缀白名单，以及下面 expected_sections 的组清单。
+                # 加域时两处都要改：这里的前缀白名单，以及 expected_sections 的组清单。
                 self.assertTrue(section["group_id"].split(".")[0] in
                                 ("conversation", "expression", "model", "screen", "person",
                                  "role", "knowledge", "library", "photo", "wardrobe",
                                  "proactive", "private_access", "relationship", "content",
-                                 "qzone", "system",
+                                 "system",
                                  # device.phone 的组名是 device.phone（digital_life_core/
                                  # device/configuration.py:27 GROUP），前缀就是 device。
                                  "device"), name)

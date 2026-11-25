@@ -136,7 +136,7 @@ test("app.js 已彻底移除 6.7.0 死表并禁止裸英文简介兜底", () => 
   assert.doesNotMatch(APP_SRC, /row\.help\|\|row\.field/);
 });
 
-test("复合键索引保留全部 10 个 enabled 与 2 个 group_enabled 且零三遍英文", () => {
+test("复合键索引保留全部 9 个 enabled 与 2 个 group_enabled 且零三遍英文", () => {
   const {api} = loadAllFeaturesSandbox();
   const sections = {
     "content.authoring": {group_id: "content.authoring", scope: "role", edit_token: "t1",
@@ -146,9 +146,6 @@ test("复合键索引保留全部 10 个 enabled 与 2 个 group_enabled 且零�
     relay: {group_id: "conversation.relay", scope: "window", edit_token: "t3",
       settings: {enabled: true, member_relay_enabled: true, prefer_relationship_names: true, require_confirm: true},
       fields: {enabled: {kind: "boolean"}, member_relay_enabled: {kind: "boolean"}, prefer_relationship_names: {kind: "boolean"}, require_confirm: {kind: "boolean"}}},
-    qzone: {group_id: "qzone", scope: "role", edit_token: "t4",
-      settings: {enabled: true, like_enabled: true, comment_enabled: true, publish_enabled: true},
-      fields: {enabled: {kind: "boolean"}, like_enabled: {kind: "boolean"}, comment_enabled: {kind: "boolean"}, publish_enabled: {kind: "boolean"}}},
     "role.growth.skills": {group_id: "role.growth.skills", scope: "role", edit_token: "t5",
       settings: {enabled: true}, fields: {enabled: {kind: "boolean"}}},
     life: {group_id: "role.life", scope: "window", edit_token: "t6",
@@ -177,7 +174,7 @@ test("复合键索引保留全部 10 个 enabled 与 2 个 group_enabled 且零�
 
   const index = api.index();
   const enabledKeys = Object.keys(index).filter(k => k.endsWith(".enabled") && !k.startsWith("proactive.contact.affection."));
-  assert.equal(enabledKeys.length, 10, `10 个分区的 enabled 总开关必须全部保留，实际：${enabledKeys.join(", ")}`);
+  assert.equal(enabledKeys.length, 9, `9 个分区的 enabled 总开关必须全部保留，实际：${enabledKeys.join(", ")}`);
   assert.ok(index["image.output.group_enabled"], "image.output.group_enabled 不能被 photo.reference 覆盖");
   assert.ok(index["photo.reference.group_enabled"], "photo.reference.group_enabled 必须存在");
 
@@ -190,9 +187,6 @@ test("复合键索引保留全部 10 个 enabled 与 2 个 group_enabled 且零�
     assert.ok(HAS_CJK.test(row.help), `${row.key} 缺少中文简介: ${row.help}`);
     assert.notEqual(row.help, row.field, `${row.key} 简介不能退化为字段键`);
   }
-  const qzoneComment = allRows.find(r => r.key === "qzone.comment_enabled");
-  assert.equal(qzoneComment.label, "允许回复空间评论");
-  assert.match(qzoneComment.help, /不影响私聊或群聊/);
 });
 
 test("多目标模式并行拉取角色级与安装级分区并按各自 endpoint 分流保存", async () => {
@@ -252,7 +246,6 @@ test("详情弹窗使用 data-wb-field 滚定位、自动切到子分段且错�
   assert.deepEqual(dialogMounts[0].selectedSections, ["sleep"]);
 
   assert.match(api.errorText({code: "life_sleep_window_invalid"}), /0 到 360 分钟/);
-  assert.match(api.errorText({code: "qzone_scene_list_invalid"}), /半角逗号/);
   assert.match(api.errorText({code: "configuration_section_read_failed"}), /配置分区读取失败/);
   assert.equal(api.errorText(new Error("当前角色没有配置入口")), "当前角色没有配置入口");
   assert.doesNotMatch(api.errorText({code: "unknown_internal_machine_code"}), /unknown_internal_machine_code/);
@@ -548,7 +541,7 @@ test("配置导入导出展示中文分区名与统一中文错误信息", async
         return {
           schema: "companion.config-export.v1",
           sections: {quota: {settings: {}}},
-          unavailable: {busy_gate: "configuration_port_window_required", qzone: "qzone_scene_list_invalid"},
+          unavailable: {busy_gate: "configuration_port_window_required", web_understanding: "web_understanding_configuration_invalid"},
         };
       }
       return {
@@ -562,8 +555,8 @@ test("配置导入导出展示中文分区名与统一中文错误信息", async
   root.listeners.click({target: {closest: () => ({hasAttribute: a => a === "data-config-port-export", disabled: false})}});
   await new Promise(resolve => setTimeout(resolve, 10));
   assert.match(root.innerHTML, /忙碌时的回复与联系（需要明确选择窗口）/);
-  assert.match(root.innerHTML, /QQ 空间设置（QQ 空间主题的场景清单/);
-  assert.doesNotMatch(root.innerHTML, /busy_gate|qzone_scene_list_invalid/);
+  assert.match(root.innerHTML, /网页理解（请核对网页理解开关、条数、字数与超时范围/);
+  assert.doesNotMatch(root.innerHTML, /busy_gate|web_understanding_configuration_invalid/);
 
   root.listeners.change({target: {matches: () => true, value: "x", files: [{size: 64,
     async text() { return JSON.stringify({schema: "companion.config-export.v1", sections: {group_participation: {settings: {}}}}); }}]}});

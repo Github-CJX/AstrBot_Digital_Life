@@ -10,7 +10,7 @@ from unittest.mock import AsyncMock
 
 from digital_life_host.native_extensions import NativeExtensionRegistry
 from digital_life_host.native_extensions.discovery import discover
-from digital_life_core.adapters.astrbot.tools import CompositeAstrBotToolPort, QzoneToolPort, map_tools
+from digital_life_core.adapters.astrbot.tools import CompositeAstrBotToolPort, map_tools
 from digital_life_core.capabilities.native import MAX_DOCUMENT_BYTES, parse_manifest
 from digital_life_core.conversation.external_tools import ExternalToolExecutor
 from digital_life_core.model_gateway.models import MAX_TOOL_CATALOG
@@ -106,14 +106,16 @@ class NativeToolCatalogTests(unittest.IsolatedAsyncioTestCase):
             finally:
                 runtime.close()
 
-    async def test_composition_preserves_qzone_and_dispatches_tail_tool_to_its_original_port(self):
+    async def test_composition_preserves_second_port_and_dispatches_tail_tool_to_its_original_port(self):
         entries, issues = discover(SimpleNamespace(get_all_stars=lambda: (star(MAX_TOOL_CATALOG + 1),)))
         self.assertEqual(issues, ())
         native = DeclaredPort(tuple(item[0] for item in entries.values()))
         native.invoke = AsyncMock(return_value="original-port-result")
-        qzone = QzoneToolPort(object())
-        composite = CompositeAstrBotToolPort(native, qzone)
-        self.assertEqual(composite.declarations(), native.declarations() + qzone.declarations())
+        native = DeclaredPort(tuple(item[0] for item in entries.values()))
+        native.invoke = AsyncMock(return_value="original-port-result")
+        tail_port = DeclaredPort(())
+        composite = CompositeAstrBotToolPort(native, tail_port)
+        self.assertEqual(composite.declarations(), native.declarations() + tail_port.declarations())
         tail = native.declarations()[-1]
         self.assertEqual(composite.current_declaration(tail.host_tool_id), tail)
         invocation = object()

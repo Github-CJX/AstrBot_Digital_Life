@@ -40,7 +40,6 @@ GAPS = {
     "expression.learning": "role_defaults_with_group_exceptions",
     "knowledge": "installation_and_role_defaults",
     "memory": "installation_and_role_defaults",
-    "qzone": "role_preferences",
     "role.growth.skills": "role_preferences",
     "role.life": "role_policy_with_scoped_execution_grants",
     "role.state": "role_policy_with_scoped_platform_grants",
@@ -284,7 +283,6 @@ def behavior_probes():
     from digital_life_core.conversation.reply_settings import (GROUP, configuration_fields,
         ReplyConfigurationOwner)
     from digital_life_core.foundation.refs import ScopeKind, ScopeRef, SubjectKind, SubjectRef
-    from digital_life_core.qzone.configuration import configuration_fields as qzone_fields, QzoneConfigurationOwner
     from digital_life_core.role_work.state.configuration import configuration_fields as state_fields, StateConfigurationOwner
     from digital_life_core.role_work.growth.configuration import SKILL_FIELDS, SkillConfigurationOwner
     from digital_life_core.storage.runtime import StorageRuntime
@@ -325,8 +323,6 @@ def behavior_probes():
                 "other_group": owner.read(other_group, definitions).fields[key].value}
             second_private = window(ScopeKind.PRIVATE, "private-second")
             for name, factory, owner_type, key in (
-                ("qzone_role_inheritance_and_window_override", qzone_fields, QzoneConfigurationOwner,
-                 "qzone.enabled"),
                 ("state_role_inheritance_and_window_override", state_fields, StateConfigurationOwner,
                  "role.state.hunger_enabled"),
             ):
@@ -337,7 +333,7 @@ def behavior_probes():
                 result[name] = {"saved_role_value": False,
                                 "inherited_window_value": owner.read(second_private, definitions).fields[key].value,
                                 "explicit_window_override": owner.read(private, definitions).fields[key].value}
-            inherited = QzoneConfigurationOwner(runtime).read(group, qzone_fields()).fields["qzone.enabled"]
+            inherited = StateConfigurationOwner(runtime).read(group, state_fields()).fields["role.state.hunger_enabled"]
             result["role_provenance_marks_window_as_explicit"] = {
                 "source_layer": inherited.source.layer.value,
                 "edited_layer": group.layer.value, "reported_explicit": inherited.explicit}

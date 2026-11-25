@@ -29,19 +29,15 @@ from digital_life_host.core_reply_tools import (CoreReplyToolSession, close_core
 from digital_life_host.core_reply_telemetry import observe_core_agent_begin, prepare_core_reply_telemetry
 from digital_life_host.core_reply_tool_dispatch import observe_core_tool_dispatch_begin, restore_core_tool_dispatch
 from digital_life_core.agenda.service import AgendaService
-from digital_life_core.adapters.astrbot.tools import QzoneToolPort, map_tools
 from digital_life_core.capabilities.models import CapabilityAuthorizationState
 from digital_life_core.execution.models import TaskError, require
 from digital_life_core.foundation.outcome import Outcome
 from digital_life_core.foundation.refs import ScopeKind
 from digital_life_core.model_gateway.models import MAX_TOOL_CATALOG, ToolCall as ExternalToolCall
-from digital_life_core.qzone.capability import CAPABILITIES, EXTENSION, PUBLISH_ACTION, package_descriptor
-from digital_life_core.qzone.service import QzoneService
 from tests.test_astrbot_core_reply import FakeEvent
 from tests.test_external_tools import ExternalFixture, tool_call as external_tool_call
 from tests.test_management_access import SCOPE
 from tests.test_semantic_integration import picture
-from tests.test_qzone_extension import FakeSettings, FakeTransport
 from tests.test_role_tool_loop import answered, requested
 
 
@@ -458,116 +454,6 @@ class WideCoreReplyToolCatalogTests(ExternalFixture, unittest.IsolatedAsyncioTes
         self.assertEqual(self.extension_calls[0].context, self.context)
         self.assertEqual(self.runtime.read_one("SELECT COUNT(*) n FROM conversation_batches", ())["n"], 0)
         self.assertEqual(self.runtime.read_one("SELECT COUNT(*) n FROM model_calls", ())["n"], 0)
-
-
-class QzoneCoreReplyToolsTests(CoreReplyToolFixture, unittest.IsolatedAsyncioTestCase):
-    def setUp(self):
-        self.transport = FakeTransport()
-        self.qzone_port = QzoneToolPort(self.transport)
-        super().setUp()
-        self.settings = FakeSettings()
-        self.app.qzone = QzoneService(self.runtime, self.settings, self.transport, now=self.clock.now,
-                                      verify_delays=(0.0,), publish_verify_delays=(0.0,))
-        self.qzone_port.attach(self.app)
-        at = self.clock.now()
-        package = package_descriptor()
-        self.capabilities.register_descriptor(package, registered_at=at).unwrap()
-        self.capabilities.acquire(extension_id=EXTENSION, package_id=package.package_id,
-            package_version=package.package_version, expected_revision=0, observed_at=at).unwrap()
-        self.capabilities.set_role_enabled(extension_id=EXTENSION, role=self.context.role_binding.role,
-            bot_id=self.context.scope.bot_id, enabled=True, expected_revision=0, observed_at=at).unwrap()
-        for capability in CAPABILITIES:
-            self.capabilities.set_authorization(extension_id=EXTENSION, capability_id=capability,
-                subject=self.context.actor.subject, scope=self.context.scope,
-                state=CapabilityAuthorizationState.ACTIVE, expected_revision=0, observed_at=at).unwrap()
-        self.native_event, self.request = self.prepare("qzone-native-event")
-
-    def make_extension(self, runtime):
-        return map_tools(runtime, self.qzone_port)
-
-    @staticmethod
-    def publish_arguments(text="今天把窗台擦干净了"):
-        return {"text": text, "topic": "life_documentary", "scene": "role_activity", "confidence": 0.9}
-
-    async def test_confirmation_stops_before_credentials_or_transport_and_cannot_be_self_supplied(self):
-        arguments = self.publish_arguments()
-        with patch.object(self.app.qzone, "publish", wraps=self.app.qzone.publish) as publish:
-            original = await self.call_native(PUBLISH_ACTION, arguments)
-            self.assertEqual((original["state"], original["effect"], original["code"], original["retry_disposition"]),
-                             ("failed", "not_committed", "qzone_topic_confirmation_required", "human_confirmation_required"))
-            self.assertTrue(original["receipt_ref"])
-            self.assertIn("陪伴小屋 → QQ 空间", original["next_step"])
-            replay = await self.call_native(PUBLISH_ACTION, self.publish_arguments("换一段正文"), "changed-call")
-            self.assertEqual(replay, {**original, "replayed": True})
-            publish.assert_awaited_once()
-            for flag in ("confirmed", "topic_confirmed"):
-                result = await self.call_native(PUBLISH_ACTION, {**arguments, flag: True}, flag)
-                self.assertEqual((result["state"], result["code"]), ("failed", "invalid_tool_arguments"))
-            event, request = self.prepare("later-confirmation-turn")
-            later = await self.call_native(PUBLISH_ACTION, self.publish_arguments("下一轮换正文"), "later-call",
-                                           request=request, event=event)
-            self.assertEqual(later["code"], original["code"])
-            self.assertNotEqual(later["invocation_id"], original["invocation_id"])
-            self.assertEqual(publish.await_count, 2)
-        self.assertEqual((self.transport.acquired, self.transport.sent), (0, []))
-        self.assertEqual(self.runtime.read_one("SELECT COUNT(*) n FROM operations WHERE owner = ?", ("qzone.actions",))["n"], 0)
-        task = require(self.app._core_reply_tool_executor.tasks.read(self.context, original["invocation_id"]))
-        self.assertEqual((task.state, task.effect), ("failed", "not_committed"))
-
-    async def test_auto_publish_keeps_the_committed_receipt_and_exact_replay(self):
-        self.settings.values.update(topic_auto_enabled=True, topic_require_confirmation=False)
-        arguments = self.publish_arguments()
-        original = await self.call_native(PUBLISH_ACTION, arguments)
-        self.assertEqual((original["state"], original["effect"]), ("succeeded", "committed"))
-        self.assertEqual(original["receipt_ref"], original["operation_id"])
-        self.assertTrue(json.loads(original["payload"])["verified"])
-        replay = await self.call_native(PUBLISH_ACTION, arguments)
-        self.assertEqual(replay, original)
-        self.assertEqual(sum(request.effectful for request in self.transport.sent), 1)
-        self.assertEqual(self.transport.acquired, 1)
-        task = require(self.app._core_reply_tool_executor.tasks.read(self.context, original["invocation_id"]))
-        self.assertEqual((task.state, task.effect, task.operation_id), ("succeeded", "committed", original["operation_id"]))
-
-    async def test_unknown_publish_blocks_changed_body_across_turns_and_execution_paths(self):
-        self.settings.values.update(topic_auto_enabled=True, topic_require_confirmation=False)
-        self.transport.delivery_unknown = True
-        original = await self.call_native(PUBLISH_ACTION, self.publish_arguments())
-        self.assertEqual((original["state"], original["effect"], original["code"], original["retry_disposition"]),
-                         ("unknown", "unknown", "qzone_delivery_unknown", "external_effect_unknown"))
-        event, request = self.prepare("later-unknown-turn")
-        replay = await self.call_native(PUBLISH_ACTION, self.publish_arguments("不同正文"), "different-call",
-                                        request=request, event=event)
-        self.assertEqual(replay, {**original, "replayed": True})
-        call = ExternalToolCall("other-path", PUBLISH_ACTION, json.dumps(self.publish_arguments("另一条正文")))
-        _, run, completion = await self.stage(call)
-        exchange = await self.tools.execute_async(run, completion.call_id, completion.tool_calls[0])
-        self.assertEqual(json.loads(exchange.result_json), {**original, "replayed": True})
-        self.assertEqual((self.transport.acquired, len(self.transport.sent)), (1, 1))
-        row = self.runtime.read_one("SELECT state FROM operations WHERE owner = ?", ("qzone.actions",))
-        self.assertEqual(row["state"], "unknown")
-        self.assertNotIn("SECRET", json.dumps(original))
-        self.assertNotIn("TOKEN", json.dumps(original))
-
-    async def test_reply_generator_receives_confirmation_receipt_and_stops_repeated_dispatch(self):
-        async def respond(envelope):
-            index = len(envelope.tool_history)
-            if index < 2:
-                call = ExternalToolCall("call-" + str(index), PUBLISH_ACTION,
-                                        json.dumps(self.publish_arguments("正文" + str(index))))
-                return requested(call)
-            return answered("请到陪伴小屋的 QQ 空间发布区确认正文、主题和场景。")
-        self.responses["primary"] = respond
-        with patch.object(self.app.qzone, "publish", wraps=self.app.qzone.publish) as publish:
-            await self.generate()
-            publish.assert_awaited_once()
-        history = self.called[-1][1].tool_history
-        original, replay = (json.loads(item.result_json) for item in history)
-        self.assertEqual(replay, {**original, "replayed": True})
-        self.assertEqual(original["code"], "qzone_topic_confirmation_required")
-        self.assertEqual(original["retry_disposition"], "human_confirmation_required")
-        self.assertTrue(original["receipt_ref"])
-        self.assertEqual(len(self.rows()), 1)
-        self.assertEqual((self.transport.acquired, self.transport.sent), (0, []))
 
 
 class PrivateCatalogProviderSchemaTests(ExternalFixture, unittest.IsolatedAsyncioTestCase):
