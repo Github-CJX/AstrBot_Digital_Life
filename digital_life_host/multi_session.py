@@ -52,20 +52,6 @@ from digital_life_core.reality.model_profile import reality_text_profile
 from .settings import HostControlError
 from .display_names import event_person_names
 from .group_standing import group_sender_standing
-from .module_gates import module_enabled
-
-
-def _huawei_health_service(runtime):
-    """Build the health service only when the module is switched on.
-
-    华为健康是待移除的独立数据源；关着的时候连模块都不导入，手机控制与
-    生理周期这些保留能力不依赖它。
-    """
-    if not module_enabled("huawei_health"):
-        return None
-    from .huawei_health.service import get_huawei_health_service_for_root
-
-    return get_huawei_health_service_for_root(runtime.data_root, logger=logger)
 
 from digital_life_core.conversation.voice_reply import VoiceReplyDelivery
 from digital_life_core.execution.models import Lane, ProviderBinding, TaskContext, TaskError, digest, require, stamp
@@ -526,7 +512,6 @@ class MultiHostSession:
         self.runtime, self.settings, self.authority, self.types, self.now = runtime, settings, authority, native_types, now
         self.native_tool_port = native_tool_port
         self.search_port_factory = search_port_factory
-        self.huawei_health = _huawei_health_service(runtime)
         common = settings.common
         weather_port, weather_alert_port = weather_ports or configured_weather_ports(None)
         self.voice = NativeVoiceReply(native_context).render
@@ -670,8 +655,6 @@ class MultiHostSession:
         from digital_life_core.relationships.account_link_delivery import PrivateAccountDelivery
         self.application.outbound.private_account_router = PrivateAccountDelivery(
             self.application, self._linked_private_context, available=self._linked_private_available)
-        if hasattr(self.application, "contact_schedule"):
-            self.application.contact_schedule.bind_health_source(self.huawei_health)
         self.application.image_fallback.attach_port(ReviewFallbackRoutes(self))
         # 私聊权限的**默认值**要在签发那一刻就读到：新用户一开始有没有对话/主动权限，
         # 由 `private_access` 那一组决定（见 digital_life_core/relationships/private_access.py）。
@@ -1222,32 +1205,6 @@ class MultiHostSession:
             return Outcome.failed("host_core_reply_prepare_failed",
                                   "core reply admission could not be prepared")
 
-    async def _huawei_health_material(self, context, at):
-        if context.scope.kind is not ScopeKind.PRIVATE:
-            return None
-        try:
-            settings = self.application.perception_settings.capture(context, at)["settings"]
-            if settings.get("health_enabled") is not True:
-                return None
-            if not module_enabled("huawei_health"):
-                return None
-            service = self.huawei_health
-            if service is None:
-                return None
-            await service.initialize()
-            if not service.is_bound():
-                return None
-            if not service.allowed_for(context.actor.subject.subject_id,
-                                       context.role_binding.role.subject_id):
-                return None
-            cached = service.cached_context(max_age_seconds=3600)
-            if cached is None:
-                service.schedule_refresh()
-            return cached
-        except Exception as error:
-            logger.warning("[CompanionV2] 华为健康感知读取降级 error_type=%s", type(error).__name__)
-            return None
-
     async def prepare_core_reply(self, event, target, *, group_admission=None, plan=None):
         """Prepare only V2 identity and prompt data for AstrBot's normal reply pipeline."""
         async with self._intake[target.target_id]:
@@ -1407,7 +1364,6 @@ class MultiHostSession:
                             except Exception as error:
                                 logger.warning("[CompanionV2] 关键词材料未注入 error_type=%s",
                                                type(error).__name__)
-                        health_material = await self._huawei_health_material(context, self.now())
                         from .external_memory import prepare_external_memory
                         external_memory = await prepare_external_memory(
                             self.bridge.context, self.application, context, captured)
@@ -1422,7 +1378,6 @@ class MultiHostSession:
                         prompt = await asyncio.to_thread(
                             build_core_reply_prompt, self.application, context, captured, at=prompt_at,
                             keyword_materials=keyword_entries,
-                            health_material=health_material,
                             external_memory=external_memory,
                             group_trigger=group_trigger,
                             private_group_context=private_group_context,

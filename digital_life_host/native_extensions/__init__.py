@@ -539,7 +539,7 @@ class NativeExtensionRegistry(AstrBotToolPort):
                         from digital_life_core.capabilities.native_catalog import register_native_replacement
                         predecessors = {"content": "astrbot_plugin_content_companion", "image": "astrbot_plugin_image_companion",
                             "reality": "astrbot_plugin_reality_companion", "together": "astrbot_plugin_together_companion",
-                            "game": "astrbot_plugin_game_companion", "live": "astrbot_plugin_live_stream_companion",
+                            "game": "astrbot_plugin_game_companion",
                             "companion.screen.native": package.package_id}
                         previous = predecessors.get(package.extension_id)
                         if previous is not None:

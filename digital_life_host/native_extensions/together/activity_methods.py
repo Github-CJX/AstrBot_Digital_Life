@@ -132,10 +132,6 @@ class TogetherActivityMethods:
         self._start_room_task(room, self._generate_work_progress_check(room))
         return True
 
-    def _live_native_api(self) -> Any | None:
-        registry = self.controller.native_extensions
-        return registry.api('live') if registry.active_service('live') is not None else None
-
     @staticmethod
     async def _invoke_extension(api: Any, method_name: str, *args: Any, timeout: float=5.0, **kwargs: Any) -> Any:
         method = getattr(api, method_name, None) if api is not None else None

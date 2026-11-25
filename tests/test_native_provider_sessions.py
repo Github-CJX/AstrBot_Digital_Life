@@ -57,16 +57,16 @@ class NativeSingleSessionTests(unittest.IsolatedAsyncioTestCase):
         self.assertIsNotNone(refreshed)
         self.assertEqual(refreshed.descriptor.package, declaration.descriptor.package)
 
-    async def test_no_optional_provider_starts_with_all_seven_bundled_providers(self):
+    async def test_no_optional_provider_starts_with_all_six_bundled_providers(self):
         self.native.get_all_stars = lambda: ()
         (await self.controller.initialize_profile()).unwrap()
         (await self.controller.start()).unwrap()
         declarations = self.controller.native_extensions.declarations()
         self.assertEqual({item.descriptor.package.extension_id for item in declarations},
-                         {"content", "image", "companion.screen.native", "reality", "together", "game", "live"})
+                         {"content", "image", "companion.screen.native", "reality", "together", "game"})
         self.assertTrue(all(CapabilityRepository(self.controller.runtime).installation(
             extension_id=extension_id).failure is not None for extension_id in
-            ("content", "image", "companion.screen.native", "reality", "together", "game", "live")))
+            ("content", "companion.screen.native", "reality", "together", "game")))
         self.assertIsNotNone(self.controller.session.application.external)
 
     async def test_optional_provider_cannot_replace_a_managed_image_provider(self):
@@ -160,15 +160,15 @@ class NativeMultiSessionTests(MultiFixture, unittest.IsolatedAsyncioTestCase):
         self.assertIsNotNone(refreshed)
         self.assertEqual(refreshed.descriptor.package, declaration.descriptor.package)
 
-    async def test_no_optional_provider_starts_with_all_seven_bundled_providers(self):
+    async def test_no_optional_provider_starts_with_all_six_bundled_providers(self):
         self.native.get_all_stars = lambda: ()
         app = await self.start_host()
         declarations = self.controller.native_extensions.declarations()
         self.assertEqual({item.descriptor.package.extension_id for item in declarations},
-                         {"content", "image", "companion.screen.native", "reality", "together", "game", "live"})
+                         {"content", "image", "companion.screen.native", "reality", "together", "game"})
         self.assertTrue(all(CapabilityRepository(self.controller.runtime).installation(
             extension_id=extension_id).failure is not None for extension_id in
-            ("content", "image", "companion.screen.native", "reality", "together", "game", "live")))
+            ("content", "companion.screen.native", "reality", "together", "game")))
         self.assertIsNotNone(app.external)
 
 

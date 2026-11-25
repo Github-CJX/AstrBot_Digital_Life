@@ -20,10 +20,6 @@ _FULL_FEATURED = (
     "multi_role",
     "phone",
     "screen",
-    "live",
-    "qzone",
-    "mihome",
-    "huawei_health",
 )
 
 

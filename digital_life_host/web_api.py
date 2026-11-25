@@ -161,10 +161,6 @@ class StagingWebAPI:
             all_routes += PerceptionWebAPI(self.controller).routes()
             all_routes += NativeExtensionWebAPI(self.controller).routes()
             all_routes += NativePerceptionWebAPI(self.controller).routes()
-            if module_enabled("huawei_health"):
-                from .huawei_health.api import HuaweiHealthWebAPI
-
-                all_routes += HuaweiHealthWebAPI(self.controller).routes()
             all_routes += ConfigurationWebAPI(self.controller).routes()
             if self.setup is None:
                 self.setup = SetupWebAPI(self.controller)

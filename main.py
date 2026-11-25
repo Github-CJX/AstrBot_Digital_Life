@@ -2593,11 +2593,6 @@ class PrivateCompanionV2StagingPlugin(Star):
                             else "[CompanionV2] 共享宿主正在收尾")
             finally:
                 try:
-                    from .digital_life_host.huawei_health.service import close_all_huawei_health_services
-                    await close_all_huawei_health_services()
-                except Exception as error:
-                    logger.warning("[CompanionV2] 华为健康服务停机清理失败 error_type=%s", type(error).__name__)
-                try:
                     from .digital_life_host.laya_client import shutdown_laya_resources
                     await shutdown_laya_resources()
                 except Exception as error:

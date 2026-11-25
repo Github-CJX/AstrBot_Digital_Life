@@ -24,9 +24,6 @@ class NativeExtensionWebAPI(PerceptionWebAPI):
                 "revision": service.config.revision(), "runtime": registry.status(name)}
         if name == "reality":
             data["management"] = service.extension_api.page_snapshot()
-        elif name == "live":
-            from .native_extensions.live.management import snapshot
-            data["management"] = snapshot(service)
         elif name == "game":
             from .native_extensions.game.management import snapshot
             data["management"] = snapshot(service)
@@ -40,7 +37,7 @@ class NativeExtensionWebAPI(PerceptionWebAPI):
                 self._authorize()
                 registry = getattr(self.controller, "native_extensions", None)
                 extensions = {}
-                for name in ("reality", "together", "game", "live"):
+                for name in ("reality", "together", "game"):
                     service = registry.service(name) if registry is not None else None
                     if service is not None:
                         extensions[name] = self._snapshot(registry, name, service)
@@ -62,7 +59,7 @@ class NativeExtensionWebAPI(PerceptionWebAPI):
                 return values
             data = json.loads(raw, object_pairs_hook=unique)
             if (type(data) is not dict or set(data) != {"extension_id", "updates", "revision"}
-                    or data["extension_id"] not in {"reality", "together", "game", "live"}
+                    or data["extension_id"] not in {"reality", "together", "game"}
                     or type(data["updates"]) is not dict or type(data["revision"]) is not str):
                 raise ValueError("invalid native settings command")
             async with self.controller._control_lock:
@@ -84,7 +81,7 @@ class NativeExtensionWebAPI(PerceptionWebAPI):
                 raise ValueError("bounded action body required")
             data = json.loads(raw)
             if (type(data) is not dict or set(data) != {"extension_id", "action", "payload"}
-                    or data['extension_id'] not in {'reality', 'live', 'game'}
+                    or data['extension_id'] not in {'reality', 'game'}
                     or type(data['action']) is not str or type(data['payload']) is not dict):
                 raise ValueError("invalid native management action")
             name = data['extension_id']
@@ -102,10 +99,7 @@ class NativeExtensionWebAPI(PerceptionWebAPI):
                     raise TaskError('native_service_changed', '模块已停止或重新配置，请刷新状态')
 
             # Device I/O must not hold the host's conversation control lock.
-            if name == 'live':
-                from .native_extensions.live.management import action
-                result = await action(service, data['action'], data['payload'], current)
-            elif name == 'game':
+            if name == 'game':
                 from .native_extensions.game.management import action
                 result = await action(service, data['action'], data['payload'], current)
             else:

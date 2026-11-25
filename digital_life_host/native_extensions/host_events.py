@@ -22,9 +22,7 @@ def _events(controller, name):
         return None
     owner = getattr(runtime, "_host_event_owner", None)
     if owner is None:
-        if name == "live":
-            from .live.host_events import LiveHostEvents as EventOwner
-        elif name == "game":
+        if name == "game":
             from .game.host_events import GameHostEvents as EventOwner
         else:
             from .reality.host_events import RealityHostEvents as EventOwner
@@ -34,7 +32,7 @@ def _events(controller, name):
 
 
 def _dispatch(controller, method, *args):
-    for name in ("game", "reality", "live"):
+    for name in ("game", "reality"):
         try:
             owner = _events(controller, name)
             callback = getattr(owner, method, None)
@@ -47,9 +45,8 @@ def _dispatch(controller, method, *args):
 
 def prepare_native_host_request(controller, event, req):
     clear_turn_contexts(req)
-    if _active(controller, "live") is None:
-        set_system_instruction(req, "soullink")
-        set_system_instruction(req, "live2d")
+    set_system_instruction(req, "soullink")
+    set_system_instruction(req, "live2d")
     _dispatch(controller, "request", event, req)
 
 

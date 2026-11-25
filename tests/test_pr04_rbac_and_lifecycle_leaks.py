@@ -27,11 +27,6 @@ from digital_life_core.storage.runtime import StorageRuntime
 from digital_life_host.account_session_api import AccountSessionWebAPI
 from digital_life_host.backup_api import BackupWebAPI
 from digital_life_host.host_options_api import HostOptionsWebAPI
-from digital_life_host.huawei_health import service as huawei_service
-from digital_life_host.huawei_health.service import (
-    HuaweiHealthService,
-    close_all_huawei_health_services,
-)
 from digital_life_host import laya_client
 from digital_life_host.log_api import LogWebAPI
 from digital_life_host.management_identity import (
@@ -41,13 +36,6 @@ from digital_life_host.management_identity import (
 )
 from digital_life_host.multi_api import MultiHostWebAPI
 from digital_life_host.multi_controller import AstrBotMultiController
-from digital_life_host.native_extensions.live.bilibili_live import (
-    BilibiliBlivedmClient,
-    BilibiliOpenLiveClient,
-)
-from digital_life_host.native_extensions.live.model_methods import LiveModelMethods
-from digital_life_host.native_extensions.live.runtime import LiveRuntime
-from digital_life_host.native_extensions.live.subtitle_server import SubtitleServer
 from digital_life_host.private_debounce import PrivateDebounce
 from digital_life_host import service_balance_script
 from digital_life_host.setup_api import SetupWebAPI
@@ -356,53 +344,6 @@ class ManagementAPIsRBACTests(unittest.IsolatedAsyncioTestCase):
 
 
 class LifecycleAndLeakFixTests(unittest.IsolatedAsyncioTestCase):
-    async def test_huawei_health_aclose_and_close_all_cancel_tasks_and_stop_login(self):
-        with TemporaryDirectory(prefix="hw-close-") as tmpdir:
-            svc1 = huawei_service.get_huawei_health_service_for_root(
-                Path(tmpdir) / "a", logger=logging.getLogger("test.hw"),
-            )
-            svc2 = huawei_service.get_huawei_health_service_for_root(
-                Path(tmpdir) / "b", logger=logging.getLogger("test.hw"),
-            )
-            cancelled = asyncio.Event()
-
-            async def slow_refresh(*, force=True):
-                try:
-                    await asyncio.sleep(60)
-                except asyncio.CancelledError:
-                    cancelled.set()
-                    raise
-
-            svc1.refresh_summary = slow_refresh
-            svc1.schedule_refresh()
-            await asyncio.sleep(0)
-            self.assertIsNotNone(svc1._refresh_task)
-
-            inflight = asyncio.create_task(asyncio.sleep(60))
-            svc1._cache_inflight["hr:7"] = inflight
-
-            stopped_login = []
-            closed_browser = []
-            fake_session = NS(
-                _proc=object(),
-                _ws=object(),
-                _close_browser=lambda sweep_profile=True: closed_browser.append(sweep_profile),
-            )
-            svc1.login_manager.stop = lambda: stopped_login.append(True)
-            svc1.login_manager.current_session = lambda: fake_session
-            svc2.aclose = AsyncMock(side_effect=RuntimeError("boom"))
-
-            await close_all_huawei_health_services()
-
-            self.assertTrue(cancelled.is_set())
-            self.assertTrue(inflight.cancelled())
-            self.assertEqual(stopped_login, [True])
-            self.assertEqual(closed_browser, [True])
-            self.assertEqual(huawei_service._SERVICES, {})
-            # Closed service refuses new background refresh tasks.
-            svc1.schedule_refresh()
-            self.assertIsNone(svc1._refresh_task)
-
     async def test_laya_and_balance_executors_shutdown_and_lazy_recreate(self):
         # Laya resources shutdown: cancels warmup, clears routers, shuts down pool, empties CUDA cache.
         warmup_cancelled = asyncio.Event()
@@ -445,170 +386,6 @@ class LifecycleAndLeakFixTests(unittest.IsolatedAsyncioTestCase):
         second_balance_pool = service_balance_script._get_script_workers()
         self.assertIsNot(second_balance_pool, first_balance_pool)
         service_balance_script.shutdown_balance_script_workers()
-
-    async def test_live_runtime_terminate_isolates_failures_and_cancels_all_tasks(self):
-        with TemporaryDirectory(prefix="live-term-") as tmpdir:
-            runtime = LiveRuntime(NS(), {"auto_connect": False}, Path(tmpdir), controller=None)
-            ext_task = asyncio.create_task(asyncio.sleep(60))
-            bg_task = asyncio.create_task(asyncio.sleep(60))
-            runtime._external_mouth_sync_tasks["together"] = {ext_task}
-            runtime._background_tasks.add(bg_task)
-
-            called = []
-            runtime._stop_bili_live = AsyncMock(side_effect=RuntimeError("bili boom"))
-            runtime._stop_subtitle_server = AsyncMock(side_effect=RuntimeError("subtitle boom"))
-            runtime._stop_soullink_runtime = AsyncMock(side_effect=lambda: called.append("soullink"))
-            runtime._vts_parameter_scheduler.stop = AsyncMock(side_effect=lambda: called.append("scheduler"))
-            runtime.vts.disconnect = AsyncMock(side_effect=lambda: called.append("vts"))
-            runtime._parameter_vts.disconnect = AsyncMock(side_effect=lambda: called.append("param_vts"))
-
-            await runtime.terminate()
-
-            self.assertEqual(called, ["soullink", "scheduler", "vts", "param_vts"])
-            self.assertTrue(ext_task.cancelled())
-            self.assertTrue(bg_task.cancelled())
-            self.assertEqual(runtime._external_mouth_sync_tasks, {})
-            self.assertEqual(runtime._background_tasks, set())
-
-    async def test_subtitle_server_start_failure_stop_cleanup_and_non_dict_show(self):
-        server = SubtitleServer("127.0.0.1", 0, {})
-        cleanup_calls = []
-
-        class FakeRunner:
-            def __init__(self, _app):
-                pass
-
-            async def setup(self):
-                pass
-
-            async def cleanup(self):
-                cleanup_calls.append(True)
-
-        class FailingSite:
-            def __init__(self, _runner, _host, _port):
-                pass
-
-            async def start(self):
-                raise OSError("address in use")
-
-        with patch("digital_life_host.native_extensions.live.subtitle_server.web.AppRunner", FakeRunner), \
-             patch("digital_life_host.native_extensions.live.subtitle_server.web.TCPSite", FailingSite):
-            with self.assertRaises(OSError):
-                await server.start()
-        self.assertEqual(cleanup_calls, [True])
-        self.assertIsNone(server._runner)
-        self.assertIsNone(server._app)
-        self.assertIsNone(server._site)
-
-        # stop() cleans up runner even if ws.close() fails.
-        stop_cleanup = []
-
-        class BadWS:
-            async def close(self):
-                raise RuntimeError("ws close failed")
-
-        server._clients.add(BadWS())
-        server._runner = NS(cleanup=AsyncMock(side_effect=lambda: stop_cleanup.append(True)))
-        await server.stop()
-        self.assertEqual(stop_cleanup, [True])
-        self.assertIsNone(server._runner)
-        self.assertEqual(server._clients, set())
-
-        # _handle_show tolerates non-dict JSON without AttributeError 500.
-        for payload in ([1, 2, 3], "plain-string", 42, None):
-            req = NS(method="POST", json=AsyncMock(return_value=payload), query={})
-            resp = await server._handle_show(req)
-            body = json.loads(resp.text)
-            self.assertTrue(body["ok"])
-            self.assertEqual(body["text"], "")
-
-    async def test_bilibili_clients_close_session_and_message_task_on_error_or_cancel(self):
-        # BilibiliOpenLiveClient.stop() closes session even if _close_ws raises.
-        open_client = BilibiliOpenLiveClient("k", "s", 1, "code", AsyncMock())
-        session_closed = []
-        open_client._session = NS(closed=False, close=AsyncMock(side_effect=lambda: session_closed.append(True)))
-        open_client._close_ws = AsyncMock(side_effect=RuntimeError("ws boom"))
-        await open_client.stop()
-        self.assertEqual(session_closed, [True])
-        self.assertIsNone(open_client._session)
-
-        # BilibiliBlivedmClient.run_forever() cancels message_task cleanly when cancelled.
-        message_cancelled = asyncio.Event()
-
-        class FakeBlivedmWebClient:
-            def __init__(self, _room_id, cookie_str=""):
-                self._network_future = None
-                self.stopped = False
-
-            def start(self):
-                pass
-
-            async def get_message(self):
-                try:
-                    await asyncio.sleep(60)
-                except asyncio.CancelledError:
-                    message_cancelled.set()
-                    raise
-
-            async def stop_and_close(self):
-                self.stopped = True
-
-        with patch("digital_life_host.native_extensions.live.bilibili_live.BlivedmWebClient", FakeBlivedmWebClient), \
-             patch("digital_life_host.native_extensions.live.bilibili_live.blivedm_message", object()):
-            client = BilibiliBlivedmClient(12345, AsyncMock())
-            task = asyncio.create_task(client.run_forever())
-            await asyncio.sleep(0.02)
-            task.cancel()
-            with self.assertRaises(asyncio.CancelledError):
-                await task
-        self.assertTrue(message_cancelled.is_set())
-
-    async def test_live_model_and_activity_background_tasks_are_tracked(self):
-        with TemporaryDirectory(prefix="live-bg-") as tmpdir:
-            runtime = LiveRuntime(NS(send_message=AsyncMock()), {
-                "auto_connect": False,
-                "bili_live_auto_reply_force_full_tts": True,
-                "bili_live_auto_reply_sync_tts_subtitle": False,
-            }, Path(tmpdir), controller=None)
-            started = asyncio.Event()
-            release = asyncio.Event()
-
-            async def followup(*_args, **_kwargs):
-                started.set()
-                await release.wait()
-
-            runtime._decorate_bili_live_reply_chain = AsyncMock(return_value=[])
-            runtime._strip_tts_blocks_from_plain_chain = lambda c: c
-            runtime._ensure_visible_text_after_voice = lambda c, _t: c
-            runtime._bili_live_auto_reply_sync_tts_subtitle = lambda: False
-            runtime._push_subtitle = AsyncMock()
-            runtime._send_bili_live_tts_followup = followup
-
-            await LiveModelMethods._send_bili_live_prebuilt_reply(runtime, "sess", [], "hello")
-            await asyncio.wait_for(started.wait(), timeout=2)
-            self.assertEqual(len(runtime._background_tasks), 1)
-
-            # _on_bili_live_task_done tracks live summary task too.
-            summary_started = asyncio.Event()
-            summary_calls = 0
-
-            async def write_summary():
-                nonlocal summary_calls
-                summary_calls += 1
-                if summary_calls == 1:
-                    summary_started.set()
-                    await release.wait()
-
-            runtime._write_private_companion_live_summary = write_summary
-            runtime._bili_session_events.append(NS())
-            done_task = asyncio.create_task(asyncio.sleep(0))
-            await done_task
-            runtime._on_bili_live_task_done(done_task)
-            await asyncio.wait_for(summary_started.wait(), timeout=2)
-            self.assertEqual(len(runtime._background_tasks), 2)
-
-            await runtime.terminate()
-            self.assertEqual(runtime._background_tasks, set())
 
     async def test_multi_controller_terminate_closes_extensions_early_and_bounds_drain(self):
         controller = AstrBotMultiController.__new__(AstrBotMultiController)
@@ -844,15 +621,13 @@ class LifecycleAndLeakFixTests(unittest.IsolatedAsyncioTestCase):
 
         pkg = ENTRY.__package__
         prefix = f"{pkg}.digital_life_host" if pkg else "digital_life_host"
-        with patch(f"{prefix}.huawei_health.service.close_all_huawei_health_services",
-                   AsyncMock(side_effect=lambda: calls.append("huawei"))), \
-             patch(f"{prefix}.laya_client.shutdown_laya_resources",
+        with patch(f"{prefix}.laya_client.shutdown_laya_resources",
                    AsyncMock(side_effect=lambda: calls.append("laya"))), \
              patch(f"{prefix}.service_balance_script.shutdown_balance_script_workers",
                    side_effect=lambda: calls.append("balance")):
             await plugin.terminate()
 
-        self.assertEqual(calls, ["setup", "staging", "huawei", "laya", "balance"])
+        self.assertEqual(calls, ["setup", "staging", "laya", "balance"])
 
 
 if __name__ == "__main__":

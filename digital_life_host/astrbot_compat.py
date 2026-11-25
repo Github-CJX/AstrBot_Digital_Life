@@ -41,13 +41,13 @@ def _main_agent_api():
 try:
     MainAgentBuildConfig, build_main_agent = _main_agent_api()
 except ImportError:
-    # Keep the rest of the plugin loadable.  Only the Bilibili live "auto reply
-    # through a full main agent" path depends on this builder; it will report a
-    # clear runtime warning instead of taking the whole plugin down at import.
+    # Keep the rest of the plugin loadable.  Only the full main-agent build path
+    # depends on this builder; callers report a clear runtime warning instead of
+    # taking the whole plugin down at import.
     MainAgentBuildConfig = None
     build_main_agent = None
     logger.warning(
-        "[CompanionV2] 当前 AstrBot 没有兼容的主 Agent 构建入口；B站直播自动回复将不可用。"
+        "[CompanionV2] 当前 AstrBot 没有兼容的主 Agent 构建入口；依赖主 Agent 的扩展将不可用。"
     )
 
 

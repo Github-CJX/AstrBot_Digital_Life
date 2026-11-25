@@ -87,12 +87,10 @@ class DisabledModuleHistorySafetyTests(unittest.TestCase):
             connection.close()
             before = hashlib.sha256(db_path.read_bytes()).hexdigest()
 
-            self.assertIsNone(multi_session._huawei_health_service(runtime))
+            # M2.5 之后华为健康实现整体移除：宿主不再持有任何服务构造入口，
+            # 既有历史库只是躺在磁盘上，没人打开它。
+            self.assertFalse(hasattr(multi_session, "_huawei_health_service"))
             self.assertEqual(hashlib.sha256(db_path.read_bytes()).hexdigest(), before)
-            # 关闭态连服务目录都不该被补建：不存在的目录保持不存在。
-            empty = runtime / "elsewhere"
-            self.assertIsNone(multi_session._huawei_health_service(empty))
-            self.assertFalse(empty.exists())
 
     def test_disabled_module_gates_do_not_create_runtime_files(self):
         with tempfile.TemporaryDirectory() as directory:

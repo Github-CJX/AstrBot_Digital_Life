@@ -57,11 +57,6 @@ BUNDLED_EXTENSIONS: tuple[dict[str, Any], ...] = (
         "description": "V2 本体内置的棋类、派对和多人游戏房间拓展。",
         "furniture": {"id": "game", "name": "游戏棋桌", "panel_id": "game"},
     },
-    {
-        "extension_id": "live", "capability_id": "live", "label": "直播与表演",
-        "description": "V2 本体内置的直播事件、Live2D、SoulLink 和角色呈现拓展。",
-        "furniture": {"id": "live", "name": "直播与表演", "panel_id": "live"},
-    },
 )
 
 # Compatibility import for older callers. Runtime discovery uses the explicit

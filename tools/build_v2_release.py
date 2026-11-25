@@ -57,16 +57,6 @@ NATIVE_EXTENSION_FILES = {
              "digital_life_host/native_extensions/game/web/native-gomoku-input.js",
              "digital_life_host/native_extensions/game/web/native.css",
              "digital_life_host/native_extensions/game/web/lucide.min.js"),
-    "live": ("digital_life_core/live/provider.py",
-             "digital_life_host/native_extensions/live/runtime.py",
-             "digital_life_host/native_extensions/live/soullink_bridge.mjs",
-             "digital_life_host/native_extensions/live/settings-schema.json",
-             "digital_life_host/native_extensions/live/settings-defaults.json",
-             "digital_life_host/native_extensions/live/blivedm/__init__.py",
-             "digital_life_host/native_extensions/live/blivedm/LICENSE",
-             "digital_life_host/native_extensions/live/vendor/soullink_emotion_engine/index.mjs",
-             "digital_life_host/native_extensions/live/vendor/soullink_emotion_engine/chunk-WF7NFOHV.mjs",
-             "digital_life_host/native_extensions/live/vendor/soullink_emotion_engine/LICENSE"),
 }
 NATIVE_ASSEMBLY_FILES = ("digital_life_host/native_extensions/__init__.py",
                          "digital_life_host/native_extensions/builtins.py",
@@ -90,10 +80,9 @@ NATIVE_HASH_FILES = {
         "digital_life_core/games/turtle_soup.py", "digital_life_core/games/draw_guess.py",
         "digital_life_core/games/native/context.py",
     ),
-    "live": ("digital_life_core/live/provider.py",),
 }
 LEGACY_PROVIDER_IDS = frozenset("astrbot_plugin_" + name + "_companion" for name in
-    ("content", "image", "reality", "screen", "together", "game", "live_stream"))
+    ("content", "image", "reality", "screen", "together", "game"))
 CORE_DIRS = ("digital_life_core", "digital_life_host", "pages", "docs", "fixtures", "tools", "skills")
 ROOT_FILES = {
     "metadata.yaml", "_conf_schema.json", "README.md", "CHANGELOG.md", "CONTRIBUTING.md",

@@ -106,7 +106,7 @@ class RegistryTests(unittest.IsolatedAsyncioTestCase):
         self.assertTrue(value["status_connected"])
         self.assertEqual(value["pages"], [])
 
-    async def test_seven_bundled_providers_report_owned_metadata_without_starting_services(self):
+    async def test_six_bundled_providers_report_owned_metadata_without_starting_services(self):
         with TemporaryDirectory(prefix="companion-integration-bundled-") as temporary:
             context = NS(get_all_stars=Mock(return_value=()))
             leases, issues = create_bundled_extensions(Path(temporary), context=context,
@@ -115,32 +115,36 @@ class RegistryTests(unittest.IsolatedAsyncioTestCase):
             registry = NativeExtensionRegistry(context, bundled_extensions=leases,
                 managed_extensions=MANAGED_EXTENSIONS)
             self.addAsyncCleanup(registry.aclose)
-            self.assertEqual(len(leases), 7)
+            self.assertEqual(len(leases), 6)
             self.assertTrue(all(lease.star is None for lease in leases))
             declarations = registry.declarations()
             self.assertEqual({item.descriptor.package.extension_id for item in declarations},
-                {"content", "image", "companion.screen.native", "reality", "together", "game", "live"})
+                {"content", "image", "companion.screen.native", "reality", "together", "game"})
             for item in declarations:
                 package = item.descriptor.package
                 base, separator, build = package.package_version.partition("+")
                 self.assertEqual(base, PRODUCT_VERSION, package.extension_id)
                 if separator:
-                    # Image transports are rebuilt within one release; their package
-                    # version carries a content hash, while the release base must match.
-                    self.assertEqual(package.extension_id, "image", package.package_version)
-                    self.assertRegex(build, r"^image\.[0-9a-f]{64}$")
+                    # Image and screen transports are rebuilt within one release;
+                    # their package version carries a content hash (image keeps the
+                    # full digest, screen a 12-char short hash), while the release
+                    # base must match.
+                    self.assertIn(package.extension_id, ("image", "companion.screen.native"),
+                                  package.package_version)
+                    self.assertRegex(build,
+                                     r"^(image|screen)\.[0-9a-f]{12,64}$")
             value = IntegrationRegistry(context).snapshot(native_extensions=registry)
             bundled = value["extensions"]
             self.assertEqual({item["capability_id"] for item in bundled},
-                {"content", "image", "screen", "reality", "together", "game", "live"})
+                {"content", "image", "screen", "reality", "together", "game"})
             for item in bundled:
                 self.assertEqual(item["kind"], "native_extension")
                 self.assertEqual(item["owner"], "digital_life_core")
                 base, separator, build = item["version"].partition("+")
                 self.assertEqual(base, PRODUCT_VERSION, item["capability_id"])
                 if separator:
-                    self.assertEqual(item["capability_id"], "image", item["version"])
-                    self.assertRegex(build, r"^image\.[0-9a-f]{64}$")
+                    self.assertIn(item["capability_id"], ("image", "screen"), item["version"])
+                    self.assertRegex(build, r"^(image|screen)\.[0-9a-f]{12,64}$")
                 self.assertTrue(item["status_connected"])
                 self.assertFalse(item["assembled"])
                 self.assertFalse(item["runtime_ready"])
@@ -174,7 +178,7 @@ class ExternalProviderCatalogTests(unittest.TestCase):
                             for value in entry["furniture"].values()))
 
     def test_video_vision_stays_out_of_the_bundled_catalog(self):
-        self.assertEqual(len(BUNDLED_EXTENSIONS), 7)
+        self.assertEqual(len(BUNDLED_EXTENSIONS), 6)
         self.assertNotIn("video_vision", {item["capability_id"] for item in BUNDLED_EXTENSIONS})
 
     def test_snapshot_lists_installed_provider_without_inventing_status(self):

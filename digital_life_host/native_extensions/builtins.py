@@ -20,7 +20,7 @@ from .settings import ExtensionSettings
 IMAGE_EXTENSION_ID = "image"
 SCREEN_EXTENSION_ID = "companion.screen.native"
 LEGACY_SCREEN_EXTENSION_ID = "companion.screen"
-MANAGED_EXTENSIONS = frozenset({"content", "reality", "together", "game", "live",
+MANAGED_EXTENSIONS = frozenset({"content", "reality", "together", "game",
     IMAGE_EXTENSION_ID, SCREEN_EXTENSION_ID, LEGACY_SCREEN_EXTENSION_ID})
 
 
@@ -147,7 +147,7 @@ def create_bundled_extension(data_root, name, *, now=None, context=None, control
         return BundledNativeLease(SCREEN_PACKAGE_ID, port, factory=factory, package_version=version,
             furniture=FurnitureDescriptor(name, SCREEN_EXTENSION_ID, "屏幕台", name))
     from importlib import import_module
-    labels = {"reality": "现实设备台", "together": "共处电话", "game": "游戏棋桌", "live": "直播与表演"}
+    labels = {"reality": "现实设备台", "together": "共处电话", "game": "游戏棋桌"}
     config = ExtensionSettings(root, name)
     module = import_module("." + name + ".runtime", __package__)
     runtime = getattr(module, name.title() + "Runtime")(context, config, config.root, controller)
@@ -161,7 +161,7 @@ def create_bundled_extensions(data_root: Path, *, now=None, context=None, contro
     leases, issues = [], []
     names = ["content", "image", "screen"]
     if context is not None and controller is not None:
-        names.extend(("reality", "together", "game", "live"))
+        names.extend(("reality", "together", "game"))
     # M2 模块开关：可选模块默认关闭、移除项先停注册，实现保留可回退。
     names = list(enabled_modules(names))
     for name in names:
