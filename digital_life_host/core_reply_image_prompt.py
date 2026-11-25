@@ -35,7 +35,7 @@ def _record_turn_note(session, text):
 
 logger = logging.getLogger(__name__)
 _PURPOSES = {
-    "image.generate": "仅在没有底图和参考图、需要从零生成全新图片时使用（包括全新角色、普通场景与无身份锚点的自拍）；修改本轮附图、引用图或刚发出的图片时不要使用此工具",
+    "image.generate": "仅在没有底图和参考图、需要从零生成全新图片时才需要使用此工具（全新角色、普通场景、与本角色无关的物件）；画角色本人（自拍、画像、你长什么样、你穿什么）一律不要使用此工具，改用 image.edit 并填 identity 参考；修改本轮附图、引用图或刚发出的图片时也不要使用此工具",
     "image.edit": "修改已有图片或保持人物/参考一致时优先使用（依据本轮附图、引用图、当前会话最近生成的图、已保存产物或角色参考素材改图；改表情、换装、换背景或微调细节时，针对本轮附图或刚生成的图只需传 prompt 即可自动选图）",
     "image.mask_edit": "使用明确底图和蒙版做局部编辑",
 }
@@ -325,4 +325,23 @@ def inject_core_image_prompt(session, request, offered, values):
                 else:
                     logger.warning("[CompanionV2] 核心生图参考资料暂不可用 error_type=%s code=%s",
                                    type(error).__name__, code)
+                    fallback_ids = []
+                    try:
+                        from digital_life_core.references.models import ReferenceRole
+                        fallback_assets = owner.assets.list(owner.owner(session.context),
+                                                           role=ReferenceRole.IDENTITY)
+                        fallback_ids = [item.asset_id for item in fallback_assets]
+                    except Exception:
+                        fallback_ids = []
+                    if fallback_ids and has_edit:
+                        session.state["_image_reference_material"] = {"references": tuple(
+                            {"id": identifier, "label": "", "roles": ["identity"], "usage": {}}
+                            for identifier in fallback_ids)}
+                        anchor = ("本轮身份锚点：reference_ids=" + str(fallback_ids)
+                                  + "，reference_indices=[]，reference_roles=[\"identity\"]。"
+                                  "画角色本人必须带这个 identity 参考。")
+                        notes = session.state.get("_turn_notes")
+                        previous = notes.get("image") if isinstance(notes, dict) else ""
+                        _record_turn_note(session, "\n".join(
+                            part for part in (str(previous or ""), anchor) if part))
     set_system_instruction(request, "image_output", instruction)

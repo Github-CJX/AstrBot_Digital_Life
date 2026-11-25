@@ -11,7 +11,8 @@ _INPUT_CODES = frozenset({
     "native_reference_index_unavailable", "native_reference_id_unavailable",
     "native_reference_roles_mismatch", "native_reference_role_required",
     "native_reference_role_unavailable", "image_artifact_not_found",
-    "reference_ids_invalid", "backend_request_invalid", "native_reference_limit",
+    "reference_ids_invalid", "identity_reference_required",
+    "backend_request_invalid", "native_reference_limit",
     "edit_reference_limit", "mask_edit_requires_source_and_mask",
     "edit_mask_invalid", "mask_dimension_mismatch", "edit_mask_empty",
 })
@@ -91,6 +92,14 @@ def failure_guidance(error_code, state, *, action):
             return {
                 "reason": "生图后端拒绝了本次请求，未生成图片。",
                 "next_step": "请结合当前参数调整后再试，必要时在陪伴小屋检查生图端点配置与回执诊断。",
+            }
+        if error_code == "identity_reference_required":
+            return {
+                "reason": "画角色本人不能用纯文生图，本次未发起远端生图。",
+                "next_step": ("请立刻改用 image.edit，reference_ids 填本轮身份锚点里给出的那个 identity 素材 id，"
+                              "reference_indices 留空，reference_roles 填 [\"identity\"]；"
+                              "prompt 只写动作、镜头、场景、光线和情绪，不要重复描述发色/瞳色/服装，更不要把她画成鱼或其它物种。"
+                              "修正参数后可以直接再调一次。"),
             }
         if disposition == "input_invalid":
             return {

@@ -43,6 +43,7 @@ _IMAGE_PREFLIGHT_LEASE_CODES = frozenset({
     "reference_image_limit", "reference_image_invalid", "reference_fingerprint_mismatch",
     "reference_not_found", "reference_role_disabled", "reference_group_disabled",
     "photo_reference_disabled", "photo_reference_group_disabled",
+    "identity_reference_required",
 })
 
 
@@ -610,6 +611,33 @@ class NativeExtensionRegistry(AstrBotToolPort):
         run.begin_effect()
         return await self.invoke(declaration.host_tool_id, invocation, role_references_only=True)
 
+    def _require_identity_reference(self, invocation):
+        """画角色本人必须走 image.edit 的 identity 参考，不用纯文生图。"""
+        try:
+            arguments = json.loads(invocation.arguments_json)
+        except Exception:
+            return
+        if isinstance(arguments, dict) and arguments.get("reference_ids"):
+            return
+        application = self.application
+        references = getattr(application, "references", None) if application is not None else None
+        if references is None:
+            return
+        try:
+            from digital_life_core.references.models import ReferenceRole
+            assets = references.list_assets(invocation.context, role=ReferenceRole.IDENTITY,
+                                            allow_disabled=True)
+        except Exception:
+            return
+        if not assets:
+            return
+        identity = assets[0].asset_id
+        raise TaskError(
+            "identity_reference_required",
+            '画角色本人必须保持身份一致：请改用 image.edit，参数 reference_ids=["' + identity
+            + '"], reference_indices=[], reference_roles=["identity"]，prompt 只写动作、镜头、场景、光线，'
+            '不要重复发色眼睛等固定外貌；image.generate 只用于与本角色无关的全新画面。')
+
     async def invoke(self, host_tool_id, invocation, *, role_references_only=False):
         entry = self._entries.get(host_tool_id)
         if entry is None or entry[0].descriptor != invocation.descriptor:
@@ -624,6 +652,13 @@ class NativeExtensionRegistry(AstrBotToolPort):
         await self._role(host_tool_id, invocation)
         guard()
         action = invocation.descriptor.tool.action
+        if action == "image.generate" and not role_references_only:
+            try:
+                self._require_identity_reference(invocation)
+            except TaskError as error:
+                if error.code in _IMAGE_PREFLIGHT_LEASE_CODES:
+                    return self._preflight_failure(invocation, error.code)
+                raise
         reference_lease = None
         if action == "image.mask_edit" or (action == "image.edit"
                 and json.loads(invocation.arguments_json).get("artifact_id", "") == ""):
