@@ -151,8 +151,17 @@ def create_bundled_extension(data_root, name, *, now=None, context=None, control
     config = ExtensionSettings(root, name)
     module = import_module("." + name + ".runtime", __package__)
     runtime = getattr(module, name.title() + "Runtime")(context, config, config.root, controller)
+    # reality 的能力目录描述随 digital_life_core/reality 源码变化（M2.5b 起米家
+    # 观察来源已移除）。与 image/screen 相同的理由：同一发布版内的正常重建不应
+    # 触发 capability_descriptor_conflict，把包哈希并入版本串生成新版本行，
+    # 保留既有授权与状态（identity 不变则 peer 校验照常通过）。
+    version = PRODUCT_VERSION
+    if name == "reality":
+        from digital_life_core.reality.provider import _package_hash as reality_package_hash
+        version = PRODUCT_VERSION + "+reality." + reality_package_hash()[:12]
     return BundledNativeLease("astrbot_plugin_digital_life." + name,
-        runtime.build_native(PRODUCT_VERSION), api=runtime, factory=factory,
+        runtime.build_native(version), api=runtime, factory=factory,
+        package_version=version,
         furniture=FurnitureDescriptor(name, name, labels[name], name))
 
 
