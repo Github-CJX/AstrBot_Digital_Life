@@ -11,6 +11,13 @@ class RealityActivityMethods:
 
     def _init_embedded_mihome(self) -> None:
         """Initialize the embedded MiHome runtime without loading the old plugin."""
+        from ...module_gates import module_enabled
+        if not module_enabled("mihome"):
+            # M2：米家已确认移除，先停注册与调度；实现保留，开关打开即可回退。
+            self.mihome_data_manager = None
+            self.mihome_client = None
+            self.mihome_web_api = None
+            return
         if MiHomeDataManager is None or MiHomeClient is None or MiHomeWebAPI is None:
             logger.warning('[RealityCompanion] 米家内置运行时不可用: %s', _single_line(_MIHOME_IMPORT_ERROR, 180))
             return

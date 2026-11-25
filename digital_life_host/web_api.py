@@ -47,6 +47,7 @@ from .storage_api import StorageWebAPI
 from .log_api import LogWebAPI
 from .display_names import display_names
 from .huawei_health.api import HuaweiHealthWebAPI
+from .module_gates import module_enabled
 
 if TYPE_CHECKING:
     from .controller import AstrBotStagingController
@@ -162,7 +163,8 @@ class StagingWebAPI:
             all_routes += PerceptionWebAPI(self.controller).routes()
             all_routes += NativeExtensionWebAPI(self.controller).routes()
             all_routes += NativePerceptionWebAPI(self.controller).routes()
-            all_routes += HuaweiHealthWebAPI(self.controller).routes()
+            if module_enabled("huawei_health"):
+                all_routes += HuaweiHealthWebAPI(self.controller).routes()
             all_routes += ConfigurationWebAPI(self.controller).routes()
             if self.setup is None:
                 self.setup = SetupWebAPI(self.controller)

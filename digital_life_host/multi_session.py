@@ -53,6 +53,7 @@ from .settings import HostControlError
 from .display_names import event_person_names
 from .group_standing import group_sender_standing
 from .huawei_health.service import get_huawei_health_service_for_root
+from .module_gates import module_enabled
 from digital_life_core.conversation.voice_reply import VoiceReplyDelivery
 from digital_life_core.execution.models import Lane, ProviderBinding, TaskContext, TaskError, digest, require, stamp
 from digital_life_core.foundation.outcome import Failure, Outcome
@@ -1215,7 +1216,11 @@ class MultiHostSession:
             settings = self.application.perception_settings.capture(context, at)["settings"]
             if settings.get("health_enabled") is not True:
                 return None
+            if not module_enabled("huawei_health"):
+                return None
             service = self.huawei_health
+            if service is None:
+                return None
             await service.initialize()
             if not service.is_bound():
                 return None

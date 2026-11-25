@@ -12,6 +12,7 @@ from digital_life_core.capabilities.models import FurnitureDescriptor
 from digital_life_core.capabilities.native import parse_manifest
 from digital_life_core.product import PRODUCT_VERSION
 
+from ..module_gates import enabled_modules
 from .discovery import declarations_for_manifest
 from .image_native.adapter import PLUGIN_ID as IMAGE_PACKAGE_ID
 from .image_native.extension import ImageExtensionAPI
@@ -160,6 +161,8 @@ def create_bundled_extensions(data_root: Path, *, now=None, context=None, contro
     names = ["content", "image", "screen"]
     if context is not None and controller is not None:
         names.extend(("reality", "together", "game", "live"))
+    # M2 模块开关：可选模块默认关闭、移除项先停注册，实现保留可回退。
+    names = list(enabled_modules(names))
     for name in names:
         try:
             leases.append(create_bundled_extension(root, name, now=now, context=context, controller=controller))

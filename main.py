@@ -109,6 +109,11 @@ from .digital_life_host.phone_command import receive_phone_confirmation
 from digital_life_core.conversation.group_llm_block import GroupLLMBlock
 from digital_life_core.conversation.group_timing import SELF_MENTION
 from digital_life_core.conversation import debounce_log
+from .digital_life_host.module_gates import (
+    configure_modules as configure_module_gates,
+    describe as describe_module_gates,
+    module_enabled,
+)
 from .digital_life_host.private_debounce import PrivateDebounce, PrivateDeliveryDedup
 from .digital_life_host.group_debounce import GroupDebounce, group_plain_text, replace_group_plain_text
 from digital_life_core.adapters.astrbot.group import group_event_route
@@ -311,6 +316,8 @@ class PrivateCompanionV2StagingPlugin(Star):
             default_data_root = resolve_data_root(validate_default_data_root(raw_data_root))
             data_root = prepare_storage_root(default_data_root, self.config)
             data_root.mkdir(parents=True, exist_ok=True)
+            configure_module_gates(data_root)
+            logger.info("[CompanionV2][modules] %s", describe_module_gates())
             migrated, changed = migrate_single_target_config(self.config)
             if changed:
                 self.config.clear()
@@ -724,7 +731,7 @@ class PrivateCompanionV2StagingPlugin(Star):
         if getattr(self, "_automatic_backup", None) is None:
             from .digital_life_host.automatic_backup import AutomaticBackup
             self._automatic_backup = AutomaticBackup(self.staging).start()
-        if self._qzone_life_publisher is None:
+        if self._qzone_life_publisher is None and module_enabled("qzone"):
             from .digital_life_host.qzone_life_publish import QzoneLifePublisher
             self._qzone_life_publisher = QzoneLifePublisher(self.staging).start()
         if self.staging.settings is None or not self.staging.settings.enabled:
