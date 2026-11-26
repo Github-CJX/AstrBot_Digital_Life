@@ -171,23 +171,42 @@ class BiliSee:
             import base64
             content.append({"type": "image_url",
                             "image_url": {"url": "data:image/jpeg;base64," + base64.b64encode(blob).decode()}})
+        body = None
+        try:
+            body = await self._vision_call(port, content, max_tokens=2400)
+            message = self._choice_message(body)
+        except BiliError as empty:
+            # 该网关会先烧 reasoning 再给 content：多帧预算不够时 content 为空
+            # 且 finish_reason=length → 降帧数重试一次。
+            finish = (body.get("choices") or [{}])[0].get("finish_reason") if isinstance(body, dict) else None
+            if finish != "length":
+                raise
+            trimmed = [content[0]] + content[1:4]
+            body = await self._vision_call(port, trimmed, max_tokens=1600)
+            message = self._choice_message(body)
+        text = str(message.get("content") or "").strip()
+        if not text.strip():
+            raise BiliError("视觉网关返回了空描述")
+        return text.strip()
+
+    async def _vision_call(self, port, content, *, max_tokens: int) -> dict[str, Any]:
         payload = {
             "model": self.model,
             "messages": [{"role": "user", "content": content}],
-            "max_tokens": 1200,
+            "max_tokens": max_tokens,
         }
-        body = await port.post_json(self.api_base + "/chat/completions", payload,
+        return await port.post_json(self.api_base + "/chat/completions", payload,
                                     headers={"User-Agent": "astrbot-digital-life/0.1",
                                              "Authorization": f"Bearer {self.key}",
                                              "x-opencode-session": self.session_id})
+
+    @staticmethod
+    def _choice_message(body) -> dict[str, Any]:
         try:
             message = body["choices"][0]["message"]
         except (KeyError, IndexError, TypeError) as exc:
             raise BiliError(f"视觉网关响应异常：{json.dumps(body, ensure_ascii=False)[:200]}") from exc
-        text = str(message.get("content") or "")
-        if not text.strip():
-            raise BiliError("视觉网关返回了空描述")
-        return text.strip()
+        return message
 
 
 def _run_ffmpeg(cmd, timeout: float) -> None:
