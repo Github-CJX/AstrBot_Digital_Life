@@ -347,7 +347,7 @@ class BiliSee:
             results = await asyncio.gather(*[
                 loop.run_in_executor(None, lambda offset=offset, output=output, cmd=cmd:
                                      self._one_frame(runner, cmd, output, offset))
-                for _, offset, output, cmd in jobs
+                for offset, output, cmd in jobs
             ])
         pairs = [item for item in results if item is not None]
         blob_by_offset = {offset: blob for offset, blob in pairs}
@@ -375,7 +375,7 @@ class BiliSee:
             results = await asyncio.gather(*[
                 loop.run_in_executor(None, lambda offset=offset, output=output, cmd=cmd:
                                      self._one_frame(runner, cmd, output, offset))
-                for _, offset, output, cmd in jobs
+                for offset, output, cmd in jobs
             ])
         return [item for item in results if item is not None]
 
