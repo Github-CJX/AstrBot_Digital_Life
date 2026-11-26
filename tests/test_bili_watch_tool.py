@@ -169,6 +169,69 @@ class BiliWatchToolTests(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(calls[0], ("start", None))
         self.assertEqual(calls[-1], ("close", None))
 
+    async def test_see_true_attaches_a_sight_description(self):
+        calls = []
+
+        class Seer:
+            def __init__(self):
+                self.ports = []
+
+            async def describe(self, port, bvid):
+                self.ports.append((port, bvid))
+                return {"present": True, "frames": 6, "offsets": [0.5, 53.6],
+                        "description": "画面里有一条鲸鱼在跳舞。"}
+
+        seer = Seer()
+        tool = BiliWatchTools(lambda context: self.Port(calls), seer)
+        result = await tool.execute(self.fake_run(), self.context(),
+                                    {"target": "BV1bW4y1P7Kf", "see": True},
+                                    observed_at=NOW)
+        self.assertEqual(result["state"], "succeeded")
+        sight = result["payload"]["sight"]
+        self.assertTrue(sight["present"])
+        self.assertEqual((sight["frames"], sight["description"][:9]), (6, "画面里有一条鲸鱼在"))
+        self.assertEqual(seer.ports[-1][1], "BV1bW4y1P7Kf")
+        validated, _ = tool.validate({}, self.context(), result, NOW)
+        self.assertEqual(validated, result)
+
+    async def test_see_true_degrades_gracefully_without_a_seer_or_on_failure(self):
+        calls = []
+        tool = BiliWatchTools(lambda context: self.Port(calls))
+        result = await tool.execute(self.fake_run(), self.context(),
+                                    {"target": "BV1bW4y1P7Kf", "see": True},
+                                    observed_at=NOW)
+        self.assertEqual(result["state"], "succeeded")
+        self.assertEqual(result["payload"]["sight"],
+                         {"present": False, "reason": "seer_unavailable"})
+        validated, _ = tool.validate({}, self.context(), result, NOW)
+
+        class BrokenSeer:
+            async def describe(self, port, bvid):
+                raise RuntimeError("ffmpeg 缺失")
+
+        calls.clear()
+        tool = BiliWatchTools(lambda context: self.Port(calls), BrokenSeer())
+        result = await tool.execute(self.fake_run(), self.context(),
+                                    {"target": "BV1bW4y1P7Kf", "see": True},
+                                    observed_at=NOW)
+        self.assertEqual(result["state"], "succeeded")
+        sight = result["payload"]["sight"]
+        self.assertEqual((sight["present"], sight["reason"]), (False, "ffmpeg 缺失"))
+        validated, _ = tool.validate({}, self.context(), result, NOW)
+        self.assertEqual(validated, result)
+
+    async def test_see_true_skips_candidates_mode_and_bad_arguments_fail(self):
+        calls = []
+        tool = BiliWatchTools(lambda context: self.Port(calls))
+        result = await tool.execute(self.fake_run(), self.context(),
+                                    {"target": "鲸鱼", "see": True}, observed_at=NOW)
+        self.assertEqual(result["state"], "succeeded")
+        self.assertNotIn("sight", result["payload"])
+        for bad in ({"target": "BV1bW4y1P7Kf", "see": "yes"},
+                    {"target": "BV1bW4y1P7Kf", "extra": 1}):
+            with self.assertRaises(TaskError):
+                BiliWatchTools._arguments(bad)
+
 
 if __name__ == "__main__":
     unittest.main()

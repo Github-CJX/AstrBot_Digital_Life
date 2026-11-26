@@ -23,6 +23,7 @@ ACTION = "bili.watch"
 INSTRUCTION = (
     "你的工具列表里有看B站视频的工具：digital_life_core_bili_watch（动作 bili.watch），"
     "它可以读取B站视频的标题、简介、字幕、热评、弹幕热点，也可以按关键词搜索候选视频；"
+    "用户想让你看视频画面（不只是文字）时传 see=true，会抽关键帧让视觉模型描述画面内容。"
     "被问到能不能看视频/刷B站时，直接用它，不要说自己没有这个能力。"
     "只在用户明确让你看某个B站视频、发来B站链接或BV号，或想聊B站上的具体内容时使用；"
     "只读不写：不要用其他工具往B站发评论、弹幕或私信。没有BV号时先用关键词搜索拿候选，"
@@ -36,6 +37,7 @@ MAX_DANMAKU = 8
 MAX_SUBTITLE_CHARS = 9000
 MAX_FETCH_SECONDS = 60
 MAX_WATCHES_PER_TURN = 3
+MAX_SIGHT_CHARS = 3000
 _BV_RE = re.compile(r"BV[0-9A-Za-z]{10}")
 
 
@@ -48,14 +50,17 @@ def extract_bvid(target: str):
 class BiliWatchTools:
     actions = frozenset({ACTION})
 
-    def __init__(self, factory=None):
+    def __init__(self, factory=None, seer=None):
         self.factory = factory if callable(factory) else None
+        self.seer = seer
         self._calls = {}
-        self.catalog = (ToolSpec(ACTION, "读取一个B站视频的文字材料（标题、简介、字幕、热评、弹幕热点）或按关键词搜候选。", encode({
+        self.catalog = (ToolSpec(ACTION, "读取一个B站视频的文字材料（标题、简介、字幕、热评、弹幕热点）或按关键词搜候选；传 see=true 还会抽关键帧看画面。", encode({
             "type": "object",
             "properties": {
                 "target": {"type": "string",
                            "description": "BV号、B站视频链接，或没有BV号时的搜索关键词，最多 120 字"},
+                "see": {"type": "boolean",
+                        "description": "可选：true 时抽取关键帧用视觉模型描述画面（视频内容）"},
             },
             "required": ["target"],
             "additionalProperties": False,
@@ -67,7 +72,7 @@ class BiliWatchTools:
         return self.catalog
 
     async def execute(self, run, context, arguments, *, observed_at):
-        target = self._arguments(arguments)
+        target, see = self._arguments(arguments)
         if self.factory is None:
             return {"state": "failed", "code": "bili_watch_unavailable", "effect": "none"}
         task_id = getattr(getattr(run, "task", None), "task_id", "")
@@ -88,7 +93,8 @@ class BiliWatchTools:
         try:
             try:
                 payload = await asyncio.wait_for(
-                    self._material(port, target), timeout=MAX_FETCH_SECONDS)
+                    self._material(port, target, see=see),
+                    timeout=MAX_FETCH_SECONDS)
             except asyncio.TimeoutError:
                 return {"state": "failed", "code": "bili_watch_timeout", "effect": "none"}
             except TaskError:
@@ -122,7 +128,7 @@ class BiliWatchTools:
             return "bili_watch_budget"
         return "bili_watch_failed"
 
-    async def _material(self, port, target):
+    async def _material(self, port, target, *, see=False):
         start = getattr(port, "start", None)
         if start is not None:
             await start()
@@ -151,19 +157,42 @@ class BiliWatchTools:
                                               int(getattr(video, "duration", 0) or 0),
                                               buckets=MAX_DANMAKU)
         subtitle_text = (subtitle.text if subtitle is not None else "")[:MAX_SUBTITLE_CHARS]
-        return {"mode": "video",
-                "video": {"bvid": str(video.bvid)[:20], "title": str(video.title)[:200],
-                          "author": str(video.author)[:60], "duration": int(video.duration or 0),
-                          "play": int(video.play or 0), "desc": str(video.desc)[:500],
-                          "link": str(video.link)[:120]},
-                "subtitle": {"present": bool(subtitle_text), "lang": str(getattr(subtitle, "lang", "") or "") if subtitle_text else "",
-                             "text": subtitle_text},
-                "comments": [{"user": str(c.user)[:40], "text": str(c.text)[:160],
-                              "like": int(c.like or 0)} for c in comments[:MAX_COMMENTS]],
-                "danmaku": [{"label": str(getattr(s, "label", ""))[:12],
-                             "count": int(getattr(s, "count", 0) or 0),
-                             "samples": [str(x)[:80] for x in tuple(getattr(s, "samples", ()) or ())[:3]]}
-                            for s in danmaku[:MAX_DANMAKU]]}
+        payload = {"mode": "video",
+                   "video": {"bvid": str(video.bvid)[:20], "title": str(video.title)[:200],
+                             "author": str(video.author)[:60], "duration": int(video.duration or 0),
+                             "play": int(video.play or 0), "desc": str(video.desc)[:500],
+                             "link": str(video.link)[:120]},
+                   "subtitle": {"present": bool(subtitle_text), "lang": str(getattr(subtitle, "lang", "") or "") if subtitle_text else "",
+                                "text": subtitle_text},
+                   "comments": [{"user": str(c.user)[:40], "text": str(c.text)[:160],
+                                 "like": int(c.like or 0)} for c in comments[:MAX_COMMENTS]],
+                   "danmaku": [{"label": str(getattr(s, "label", ""))[:12],
+                                "count": int(getattr(s, "count", 0) or 0),
+                                "samples": [str(x)[:80] for x in tuple(getattr(s, "samples", ()) or ())[:3]]}
+                               for s in danmaku[:MAX_DANMAKU]]}
+        if see:
+            payload["sight"] = await self._sight(port, bvid, video)
+        return payload
+
+    async def _sight(self, port, bvid, video):
+        """关键帧 + 视觉描述；任何失败降级为 present=False 的 sight 记录。"""
+        seer = self.seer
+        if seer is None:
+            return {"present": False, "reason": "seer_unavailable"}
+        describe = getattr(seer, "describe", None)
+        if not callable(describe):
+            return {"present": False, "reason": "seer_unavailable"}
+        try:
+            sight = await describe(port, bvid)
+        except Exception as error:
+            reason = str(error)[:120] or type(error).__name__
+            return {"present": False, "reason": reason}
+        if type(sight) is not dict or not sight.get("present"):
+            return {"present": False, "reason": "sight_empty"}
+        return {"present": True,
+                "frames": max(1, min(16, int(sight.get("frames") or 1))),
+                "offsets": [float(x) for x in tuple(sight.get("offsets") or ())[:16]],
+                "description": str(sight.get("description") or "")[:MAX_SIGHT_CHARS]}
 
     def validate(self, row, context, result, observed_at):
         if result.get("state") != "succeeded" or result.get("effect") != "none":
@@ -188,8 +217,28 @@ class BiliWatchTools:
                         or not _BV_RE.fullmatch(item["bvid"] or "")):
                     raise TaskError("bili_watch_result_invalid", "the original bili watch candidate is invalid")
         elif payload.get("mode") == "video":
-            if set(rest) != {"mode", "video", "subtitle", "comments", "danmaku"}:
+            base_keys = {"mode", "video", "subtitle", "comments", "danmaku"}
+            rest_keys = set(rest)
+            if rest_keys != base_keys and rest_keys != base_keys | {"sight"}:
                 raise TaskError("bili_watch_result_invalid", "the original bili watch payload is invalid")
+            if "sight" in rest_keys:
+                sight = rest["sight"]
+                if type(sight) is not dict or set(sight) not in (
+                        {"present", "reason"}, {"present", "frames", "offsets", "description"}):
+                    raise TaskError("bili_watch_result_invalid", "the original bili watch sight is invalid")
+                if type(sight["present"]) is not bool:
+                    raise TaskError("bili_watch_result_invalid", "the original bili watch sight is invalid")
+                if sight["present"]:
+                    if (type(sight["frames"]) is not int or not 1 <= sight["frames"] <= 16
+                            or type(sight["offsets"]) is not list
+                            or any(type(x) is not float for x in sight["offsets"])
+                            or len(sight["offsets"]) > 16
+                            or type(sight["description"]) is not str
+                            or len(sight["description"]) > MAX_SIGHT_CHARS):
+                        raise TaskError("bili_watch_result_invalid",
+                                        "the original bili watch sight is invalid")
+                elif not str(sight.get("reason") or ""):
+                    raise TaskError("bili_watch_result_invalid", "the original bili watch sight is invalid")
             video = rest["video"]
             subtitle = rest["subtitle"]
             if (type(video) is not dict
@@ -228,13 +277,17 @@ class BiliWatchTools:
 
     @staticmethod
     def _arguments(arguments):
-        if type(arguments) is not dict or set(arguments) - {"target"} or "target" not in arguments:
+        if type(arguments) is not dict or set(arguments) - {"target", "see"} \
+                or "target" not in arguments:
             raise TaskError("invalid_tool_arguments", "bili.watch requires one bounded target")
         target = arguments["target"]
         if (type(target) is not str or not 1 <= len(target.strip()) <= MAX_TARGET_CHARS
                 or "\x00" in target):
             raise TaskError("invalid_tool_arguments", "bili.watch requires a bounded target")
-        return target.strip()
+        see = arguments.get("see")
+        if see is not None and type(see) is not bool:
+            raise TaskError("invalid_tool_arguments", "bili.watch see must be boolean")
+        return target.strip(), bool(see)
 
 
 def bili_watch_action(action):

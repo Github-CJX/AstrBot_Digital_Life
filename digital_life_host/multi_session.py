@@ -508,12 +508,13 @@ class MultiHostSession:
                  provider_fingerprint, runtime_instance_id, now, native_tool_port=None, news_port=None,
                  solar_term_port=None, balance_port=None, weather_ports=None,
                  persona_window_snapshot_lookup=None, persona_window_snapshot_update=None, private_session_lookup=None,
-                 search_port_factory=None, bili_factory=None, bili_settings=None, bili_state_path=None,
-                 connection_manager=None):
+                 search_port_factory=None, bili_factory=None, bili_seer=None, bili_settings=None,
+                 bili_state_path=None, connection_manager=None):
         self.runtime, self.settings, self.authority, self.types, self.now = runtime, settings, authority, native_types, now
         self.native_tool_port = native_tool_port
         self.search_port_factory = search_port_factory
         self.bili_factory = bili_factory
+        self.bili_seer = bili_seer
         self.bili_settings = bili_settings
         self.bili_state_path = bili_state_path
         common = settings.common
@@ -639,6 +640,7 @@ class MultiHostSession:
             news_port=news_port,
             search_port_factory=search_port_factory,
             bili_factory=self.bili_factory,
+            bili_seer=self.bili_seer,
             bili_settings=self.bili_settings,
             bili_state_path=self.bili_state_path,
             solar_term_port=solar_term_port,

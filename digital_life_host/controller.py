@@ -47,6 +47,7 @@ from .service_balance import configured_balance_port
 from .news import configured_news_port, configured_search_port
 from .solar_terms import configured_solar_term_port
 from .bili_watch import configured_bili_factory, configured_bili_settings
+from .bili_see import configured_bili_seer
 from .web_api import StagingWebAPI
 from .recalls import is_notice_event, receive_notice
 from .pokes import is_poke_notice, receive_poke
@@ -473,6 +474,7 @@ class AstrBotStagingController:
                                          search_priority_resolver=search_settings.source_priority),
                                      search_port_factory=search_port_factory,
                                      bili_factory=configured_bili_factory(self.config, self.data_root),
+                                    bili_seer=configured_bili_seer(self.config, self.data_root),
                                      bili_settings=configured_bili_settings(self.config),
                                      bili_state_path=Path(self.data_root).joinpath("bilibili", "curiosity.json"),
                                      solar_term_port=configured_solar_term_port(

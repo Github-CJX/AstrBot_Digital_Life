@@ -49,6 +49,7 @@ from .weather_settings import configured_weather_ports
 from .files.parsing import parser_availability
 from .solar_terms import configured_solar_term_port
 from .bili_watch import configured_bili_factory, configured_bili_settings
+from .bili_see import configured_bili_seer
 from .session_topology import SessionTopology
 from .shared_host_migration import recover_repeated_single_target
 
@@ -976,6 +977,7 @@ class AstrBotMultiController:
                 search_priority_resolver=search_settings.source_priority),
             search_port_factory=search_port_factory,
             bili_factory=configured_bili_factory(self.config, self.data_root),
+            bili_seer=configured_bili_seer(self.config, self.data_root),
             bili_settings=configured_bili_settings(self.config),
             bili_state_path=Path(self.data_root).joinpath("bilibili", "curiosity.json"),
             balance_port=configured_balance_port(self.config, context=self.context),

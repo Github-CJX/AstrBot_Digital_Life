@@ -249,8 +249,8 @@ class CompanionApplication:
                  solar_term_port=None, budget_soft=None, capability_owners=(),
                  default_provider_resolver=None, provider_lookup=None,
                  knowledge=None, memory_owner=DEFAULT_MEMORY_OWNER, memory_push=DEFAULT_MEMORY_PUSH, wake_port=None,
-                 search_port_factory=None, bili_factory=None, bili_settings=None, bili_state_path=None,
-                 configuration_store=None, reference_owner_resolver=None):
+                 search_port_factory=None, bili_factory=None, bili_seer=None, bili_settings=None,
+                 bili_state_path=None, configuration_store=None, reference_owner_resolver=None):
         if type(owns_runtime) is not bool or not any(p.kind == REPLY_KIND and p.lane is Lane.FOREGROUND for p in profiles):
             raise ValueError("assembly requires a foreground reply profile and explicit runtime ownership")
         if external is not None and (external.runtime is not runtime or external.messages is not None):
@@ -566,7 +566,7 @@ class CompanionApplication:
                                    relationships=self.relationship_memories, weather_port=weather_port,
                                    role_state=self.role_state, authoring=self.authoring,
                                    web_search_factory=search_port_factory,
-                                   bili_factory=bili_factory)
+                                   bili_factory=bili_factory, bili_seer=bili_seer)
         self.messages.reply_settings = self.reply_settings
         self.messages.perception_settings = self.perception_settings
         self.acquaintance_settings = AcquaintanceSettings(self.configuration)

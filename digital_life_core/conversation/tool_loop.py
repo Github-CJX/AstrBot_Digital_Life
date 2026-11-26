@@ -153,7 +153,8 @@ def specification(action, required, optional=(), description="Use the original r
 
 class LocalRoleTools:
     def __init__(self, messages, *, diagnostics=None, agenda=True, external=None, memory=None, growth=None, timeline=None, calendar=None,
-                 relationships=None, weather_port=None, role_state=None, authoring=None, web_search_factory=None, bili_factory=None):
+                 relationships=None, weather_port=None, role_state=None, authoring=None, web_search_factory=None,
+                 bili_factory=None, bili_seer=None):
         if messages.tools is not None:
             raise ValueError("a message owner may have only one local tool owner registry")
         if type(agenda) is not bool or (diagnostics is not None and diagnostics.runtime is not messages.runtime):
@@ -185,7 +186,7 @@ class LocalRoleTools:
         self.calendar = CalendarTools(calendar, messages) if calendar is not None else None
         self.weather = WeatherTools(weather_port, role_state)
         self.web = WebSearchTools(web_search_factory)
-        self.bili = BiliWatchTools(bili_factory)
+        self.bili = BiliWatchTools(bili_factory, bili_seer)
         if external is not None and external.messages is not messages:
             raise ValueError("external tools must attach to the original message owner")
         self.external = external

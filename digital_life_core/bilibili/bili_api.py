@@ -246,6 +246,48 @@ class BiliAPI:
             self._json_cache[cache_key] = (now, payload)
         return payload
 
+    async def play_url(self, video, *, quality: int = 32) -> dict[str, Any]:
+        """匿名低清视频流地址（platform=html5 只读）。返回 {"url", "size"}。"""
+        bvid = str(getattr(video, "bvid", "") or "")
+        cid = int(getattr(video, "cid", 0) or 0)
+        if not bvid or cid <= 0:
+            raise BiliError("缺少 bvid 或 cid，取不到视频流")
+        payload = await self._get_json(
+            "/x/player/wbi/playurl",
+            params={"bvid": bvid, "cid": cid, "qn": quality,
+                    "platform": "html5", "high_quality": 0},
+        )
+        data = payload.get("data") if isinstance(payload.get("data"), dict) else {}
+        durl = data.get("durl") or []
+        first = durl[0] if isinstance(durl, list) and durl and isinstance(durl[0], dict) else {}
+        url = str(first.get("url") or "")
+        if not url:
+            raise BiliError("视频流地址为空（B 站没给 durl）")
+        return {"url": url, "size": int(first.get("size") or 0)}
+
+    async def post_json(self, url: str, payload: Mapping[str, Any], *, timeout: float = 120.0,
+                        headers: Mapping[str, str] | None = None) -> dict[str, Any]:
+        """普通 JSON POST（不记配额、不走风控码——调用方是自家网关）。"""
+        self._ensure()
+        try:
+            async with self._session.post(url, json=payload, headers=dict(headers or {}),
+                                          timeout=timeout) as resp:
+                status = resp.status
+                text = await resp.text(errors="replace")
+        except BiliRisk:
+            raise
+        except Exception as exc:
+            raise BiliError(f"请求失败（网络异常）：{type(exc).__name__}") from exc
+        if status >= 400:
+            raise BiliError(f"网关返回 HTTP {status}：{text[:200]}")
+        try:
+            body = json.loads(text)
+        except ValueError as exc:
+            raise BiliError(f"网关返回的不是 JSON（HTTP {status}）") from exc
+        if not isinstance(body, dict):
+            raise BiliError("网关返回结构异常")
+        return body
+
     async def _get_text(self, url: str, referer: str = REFERER) -> str:
         self._ensure()
         await self.guard.before_read()
