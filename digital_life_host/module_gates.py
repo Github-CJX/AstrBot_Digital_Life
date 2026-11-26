@@ -39,6 +39,7 @@ OPTIONAL_MODULES = frozenset({
     "multi_role",   # F14 多角色管理入口
     "phone",        # F15 手机控制
     "screen",       # F18 远程屏幕捕获
+    "bilibili",     # F09 拆出的 B 站浏览（纯读：看懂与分享，不做直播/写操作）
 })
 #: 移除项：默认关闭，先停注册与调度。
 REMOVED_MODULES = frozenset({

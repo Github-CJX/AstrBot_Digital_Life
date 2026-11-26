@@ -25,6 +25,7 @@ from .weather_events import SOURCE_OWNER as WEATHER_SOURCE_OWNER
 from .weather_change_events import SOURCE_OWNER as WEATHER_CHANGE_SOURCE_OWNER
 from .official_alert_events import SOURCE_OWNER as OFFICIAL_ALERT_SOURCE_OWNER
 from .balance_events import SOURCE_OWNER as BALANCE_SOURCE_OWNER
+from .bili_events import SOURCE_OWNER as BILI_SOURCE_OWNER
 from .news_events import SOURCE_OWNER as NEWS_SOURCE_OWNER
 from .prompt_templates import (EXPRESSION_INSTRUCTION, LENGTH_INSTRUCTION, NEWS_LENGTH_INSTRUCTION,
                                NEWS_SHARING_INSTRUCTION, effective_template)
@@ -164,7 +165,8 @@ def evidence_materials(records):
         payload = record.payload
         if record.reference.owner in (SOURCE_OWNER, GROWTH_SOURCE_OWNER, JOURNAL_SOURCE_OWNER, CALENDAR_SOURCE_OWNER,
                                       REMINISCENCE_SOURCE_OWNER, WEATHER_SOURCE_OWNER, WEATHER_CHANGE_SOURCE_OWNER,
-                                      OFFICIAL_ALERT_SOURCE_OWNER, BALANCE_SOURCE_OWNER, NEWS_SOURCE_OWNER):
+                                      OFFICIAL_ALERT_SOURCE_OWNER, BALANCE_SOURCE_OWNER, BILI_SOURCE_OWNER,
+                                      NEWS_SOURCE_OWNER):
             body = json.loads(payload)
             body.pop("_receipt")
             payload = json.dumps(body, ensure_ascii=False, sort_keys=True, separators=(",", ":"))

@@ -247,7 +247,7 @@ class AstrBotStagingSession:
                  weather_alert_port=None, balance_port=None, news_port=None, solar_term_port=None, additional_providers=(), fallback_provider_id="", replacement_rules="[]",
                  fallback_on_refusal=False, review_only=False, profile_field_shapes=None,
                  bootstrap_receipt_validated=False, default_provider_resolver=None,
-                 relay_tool_port_factory=None, search_port_factory=None):
+                 relay_tool_port_factory=None, search_port_factory=None, bili_factory=None):
         if runtime.installation_id != profile.target.scope.installation_id:
             raise ValueError("staging storage and target must have the same installation")
         self.runtime, self.profile, self.native_types = runtime, profile, native_types
@@ -382,6 +382,7 @@ class AstrBotStagingSession:
             solar_term_port=solar_term_port,
             news_port=news_port,
             search_port_factory=search_port_factory,
+            bili_factory=bili_factory,
             presence_port=OneBotPresencePort(self.bridge, reverse_api_type=native_types.reverse_api,
                 authorize=self.require_delivery_authorization, now=lambda: self.application.now())
                 if not self._uses_local_sender else None)

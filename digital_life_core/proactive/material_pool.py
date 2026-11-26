@@ -8,6 +8,7 @@ from digital_life_core.foundation.refs import ScopeKind
 
 from .configuration import GROUP as CONTACT_OWNER, PURPOSES
 from .balance_events import SOURCE_OWNER as BALANCE_OWNER
+from .bili_events import SOURCE_OWNER as BILI_OWNER
 from .calendar_events import SOURCE_OWNER as CALENDAR_OWNER
 from .events import SOURCE_OWNER as ACTIVITY_OWNER
 from .growth_events import SOURCE_OWNER as GROWTH_OWNER
@@ -30,6 +31,7 @@ SOURCE_CATEGORIES = {
     WEATHER_CHANGE_OWNER: ("环境与状态", "环境与状态变化"),
     ALERT_OWNER: ("环境与状态", "环境与状态变化"),
     BALANCE_OWNER: ("环境与状态", "环境与状态变化"),
+    BILI_OWNER: ("资讯", "外部资讯"),
     "reality.location": ("环境与状态", "环境与状态变化"),
     NEWS_OWNER: ("资讯", "外部资讯"),
     SCREEN_OWNER: ("屏幕观察", "已授权屏幕观察"),
@@ -44,6 +46,7 @@ SOURCE_LABELS = {
     WEATHER_CHANGE_OWNER: "天气变化",
     ALERT_OWNER: "官方气象预警",
     BALANCE_OWNER: "服务余额",
+    BILI_OWNER: "B 站好奇心",
     "reality.location": "手机位置",
     NEWS_OWNER: "资讯源",
     SCREEN_OWNER: "授权屏幕回执",
@@ -71,6 +74,7 @@ THOUGHT_ORIGINS = {
     "official_alert_event": "天气预警",
     "weather_event": "当前天气",
     "balance_event": "服务余额",
+    "bili_event": "B 站好奇心",
     "reality_location_event": "手机位置变化",
     "news_event": "资讯分享",
 }
@@ -183,6 +187,12 @@ def _record_projection(record, settings, at):
         title = _text(body.get("title"), 180) or "外部资讯"
         detail = _text(body.get("summary"), 360)
         note = _text(body.get("source"), 100)
+    elif owner == BILI_OWNER:
+        candidates = body.get("candidates") if isinstance(body.get("candidates"), list) else ()
+        titles = " · ".join(_text(item.get("title"), 60) for item in candidates[:3] if isinstance(item, dict))
+        title = "B 站好奇心候选"
+        detail = _text(body.get("meaning"), 360)
+        note = titles
     else:
         title = "已授权屏幕观察"
         detail = _text(body.get("interpretation"), 360)

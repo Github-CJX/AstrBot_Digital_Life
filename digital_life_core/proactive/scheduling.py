@@ -39,6 +39,7 @@ from .weather_events import WeatherContactEvents
 from .weather_change_events import WeatherChangeContactEvents
 from .official_alert_events import NO_CURRENT_ALERT, OfficialAlertContactEvents
 from .balance_events import BalanceContactEvents
+from .bili_events import BiliWatchContactEvents
 from .news_events import NewsContactEvents
 from .screen_events import ScreenContactEvents
 from .relationship_events import RelationshipContactEvents
@@ -88,7 +89,8 @@ class ContactSchedule:
     def __init__(self, contacts, messages, *, notify, role_life=None, role_growth=None, role_journal=None,
                  calendar=None, relationships=None, role_state=None, weather_port=None,
                  weather_alert_port=None, balance_port=None, news_port=None, screen_peek=None,
-                 wake_port=None, health_source=None, health_settings=None):
+                 wake_port=None, health_source=None, health_settings=None,
+                 bili_factory=None, bili_settings=None, bili_state_path=None):
         self.contacts, self.messages, self.notify = contacts, messages, notify
         self.tasks, self.runtime = contacts.tasks, contacts.runtime
         self.screen_peek = screen_peek
@@ -118,6 +120,8 @@ class ContactSchedule:
         self.official_alert_events = OfficialAlertContactEvents(
             contacts, role_state, weather_alert_port) if role_state is not None else None
         self.balance_events = BalanceContactEvents(contacts, balance_port)
+        self.bili_events = (BiliWatchContactEvents(contacts, bili_factory, bili_settings, bili_state_path)
+                            if bili_factory is not None else None)
         self.news_events = NewsContactEvents(contacts, news_port)
         self.exploration = (ExplorationEvents(contacts, self.date_events, news_port)
                             if news_port is not None else None)
@@ -429,9 +433,9 @@ class ContactSchedule:
         event_markers = {"activity_event", "growth_event", "journal_event", "calendar_event",
                          "reminiscence_event", "date_event",
                          "meal_event", "weather_event", "weather_change_event", "official_alert_event",
-                         "balance_event", "news_event", "screen_event", "greeting_event", "burst_event",
-                         "relationship_event", "followup_event", "open_loop_event", "morning_event",
-                         "health_event", "reality_location_event"}
+                         "balance_event", "news_event", "bili_event", "screen_event", "greeting_event",
+                         "burst_event", "relationship_event", "followup_event", "open_loop_event",
+                         "morning_event", "health_event", "reality_location_event"}
         rhythm_event_markers = event_markers - {"relationship_event"}
         if current.get("reanchored"):
             # The latest completed conversation took over. Keep the original
@@ -502,6 +506,10 @@ class ContactSchedule:
             self.health_events.validate(context, origin["health_event"], at)
         if "balance_event" in origin:
             self.balance_events.validate(context, origin["balance_event"], at)
+        if "bili_event" in origin:
+            if self.bili_events is None:
+                raise TaskError("contact_bili_unavailable", "automatic bilibili curiosity needs its original producer")
+            self.bili_events.validate(context, origin["bili_event"], at)
         if "news_event" in origin:
             self.news_events.validate(context, origin["news_event"], at)
         if "screen_event" in origin:
@@ -699,6 +707,11 @@ class ContactSchedule:
         if candidate is not None:
             opportunity, marker = candidate
             return context, opportunity, (), batch["role_instruction"], {**origin, "news_pending": marker}
+        if self.bili_events is not None:
+            candidate = self.bili_events.select(context, preferences, at) if hour_allowed else None
+            if candidate is not None:
+                opportunity, marker = candidate
+                return context, opportunity, (), batch["role_instruction"], {**origin, "bili_pending": marker}
         if hour_allowed and self.weather_events is not None:
             candidate = self.weather_events.select(context, preferences, at)
             if candidate is not None:
@@ -1490,6 +1503,24 @@ class ContactSchedule:
                     for intent in intents)
                 origin = {key: value for key, value in origin.items() if key != "news_pending"}
                 origin["news_event"] = marker
+            if "bili_pending" in origin:
+                if self.bili_events is None:
+                    return self._record_worker_result(context, origin,
+                        Outcome.failed("contact_bili_unavailable", "bilibili curiosity needs its original producer"),
+                        purpose=purpose, failure_stage="source_preparation")
+                prepared = await self.bili_events.prepare(context, origin["bili_pending"])
+                if prepared is None:
+                    return self._record_worker_result(context, origin,
+                        Outcome.failed("contact_bili_unavailable", "bilibili candidates were not verified"),
+                        purpose=purpose, failure_stage="source_preparation")
+                opportunity, intents, marker = prepared
+                purpose = intents[0].purpose if intents else purpose
+                _, _, event = self._origin(context, origin["batch_id"], self.tasks.now())
+                intents = tuple(replace(intent, thought=replace(intent.thought, evidence=EvidenceSnapshot(
+                    context.scope, self.tasks.now(), (event.source, *intent.thought.evidence.sources))))
+                    for intent in intents)
+                origin = {key: value for key, value in origin.items() if key != "bili_pending"}
+                origin["bili_event"] = marker
             purpose = intents[0].purpose if intents else purpose
             result = await self.contacts.contact(context, opportunity, intents, role_instruction=instruction,
                 selection_seed=opportunity.opportunity_id, automatic_origin=origin)
@@ -1786,6 +1817,8 @@ class ContactSchedule:
             self.health_events.close()
         self.balance_events.close()
         self.news_events.close()
+        if getattr(self, "bili_events", None) is not None:
+            self.bili_events.close()
         if getattr(self, "exploration", None) is not None:
             self.exploration.close()
         self.screen_events.close()

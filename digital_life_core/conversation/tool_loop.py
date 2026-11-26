@@ -13,6 +13,7 @@ import json
 from digital_life_core.agenda.models import AgendaTarget
 from digital_life_core.agenda.weather_tools import INSTRUCTION as WEATHER_INSTRUCTION, WeatherTools
 from digital_life_core.conversation.web_tools import INSTRUCTION as WEB_SEARCH_INSTRUCTION, WebSearchTools
+from digital_life_core.conversation.bili_tools import INSTRUCTION as BILI_WATCH_INSTRUCTION, BiliWatchTools
 from digital_life_core.execution.models import TaskError, digest, encode, require, stamp
 from digital_life_core.execution.service import outcome
 from digital_life_core.foundation.refs import ScopeKind, SourceRef
@@ -152,7 +153,7 @@ def specification(action, required, optional=(), description="Use the original r
 
 class LocalRoleTools:
     def __init__(self, messages, *, diagnostics=None, agenda=True, external=None, memory=None, growth=None, timeline=None, calendar=None,
-                 relationships=None, weather_port=None, role_state=None, authoring=None, web_search_factory=None):
+                 relationships=None, weather_port=None, role_state=None, authoring=None, web_search_factory=None, bili_factory=None):
         if messages.tools is not None:
             raise ValueError("a message owner may have only one local tool owner registry")
         if type(agenda) is not bool or (diagnostics is not None and diagnostics.runtime is not messages.runtime):
@@ -184,6 +185,7 @@ class LocalRoleTools:
         self.calendar = CalendarTools(calendar, messages) if calendar is not None else None
         self.weather = WeatherTools(weather_port, role_state)
         self.web = WebSearchTools(web_search_factory)
+        self.bili = BiliWatchTools(bili_factory)
         if external is not None and external.messages is not messages:
             raise ValueError("external tools must attach to the original message owner")
         self.external = external
@@ -226,6 +228,7 @@ class LocalRoleTools:
         self.actions = frozenset(tool.action for tool in self.catalog)
         self.actions |= self.weather.actions
         self.actions |= self.web.actions
+        self.actions |= self.bili.actions
         self.actions |= self.group_memory.actions
         self.actions |= self.acquaintance.actions
         self.actions |= self.group_participation.actions
@@ -342,7 +345,8 @@ class LocalRoleTools:
                     if external_filter_reasons is not None:
                         external_filter_reasons.update({action: denial[0] for action in image_actions})
             return semantic + self.acquaintance.catalog_for(context) + self.group_participation.catalog_for(context) \
-                + self.group_memory.catalog_for(context) + self.web.catalog_for(context) + tuple(
+                + self.group_memory.catalog_for(context) + self.web.catalog_for(context) \
+                + self.bili.catalog_for(context) + tuple(
                 tool for tool in external if tool.action in allowed_external_actions)
         # 唯一决定「模型这一轮看到哪些工具」的地方，所以记忆让位的门也设在这里：
         # 让位时 ``memory.*`` 既不进 filtered、也不进 catalog_for 的结果，模型那边
@@ -359,6 +363,7 @@ class LocalRoleTools:
                     | set(self.calendar.actions if self.calendar else ())
                     | set(self.weather.actions)
                     | set(self.web.actions)
+                    | set(self.bili.actions)
                     | set(self.relationships.actions if self.relationships else ()))
         policy = ObjectAccessPolicy(self.runtime)
         at = self.tasks.now()
@@ -381,6 +386,7 @@ class LocalRoleTools:
                 + (self.calendar.catalog_for(context) if self.calendar else ())
                 + self.weather.catalog_for(context)
                 + self.web.catalog_for(context)
+                + self.bili.catalog_for(context)
                 + (self.relationships.catalog_for(context) if self.relationships else ())
                 + external + authoring)
 
@@ -536,6 +542,8 @@ class LocalRoleTools:
                 return self.group_memory.validate(row, context, self._visible(row))
             if row["action"] in self.web.actions:
                 return self.web.validate(row, context, self._visible(row), at)
+            if row["action"] in self.bili.actions:
+                return self.bili.validate(row, context, self._visible(row), at)
             if row["action"] not in GROUP_EXTERNAL_ACTIONS:
                 raise TaskError("group_action_unavailable", "a group cannot adopt private tool results")
         invocation = self.runtime.read_one("SELECT 1 FROM extension_tool_invocations WHERE parent_task_id = ? AND tool_call_id = ?",
@@ -567,6 +575,8 @@ class LocalRoleTools:
             return self.weather.validate(row, context, result, at)
         if action in self.web.actions:
             return self.web.validate(row, context, result, at)
+        if action in self.bili.actions:
+            return self.bili.validate(row, context, result, at)
         if action in self.acquaintance.actions:
             return self.acquaintance.validate(row, context, result)
         if self.authoring is not None and action in self.authoring.actions:
@@ -661,6 +671,8 @@ class LocalRoleTools:
             instructions += "\n" + WEATHER_INSTRUCTION
         if self.web.catalog_for(context):
             instructions += "\n" + WEB_SEARCH_INSTRUCTION
+        if self.bili.catalog_for(context):
+            instructions += "\n" + BILI_WATCH_INSTRUCTION
         if self.diagnostics is not None:
             from .diagnostic_tools import DIAGNOSTIC_INSTRUCTION
             instructions += DIAGNOSTIC_INSTRUCTION
@@ -797,6 +809,8 @@ class LocalRoleTools:
             raise TaskError("tool_requires_async", "weather reads require the supervised asynchronous executor")
         if call.action in self.web.actions:
             raise TaskError("tool_requires_async", "web search requires the supervised asynchronous executor")
+        if call.action in self.bili.actions:
+            raise TaskError("tool_requires_async", "bili watch requires the supervised asynchronous executor")
         if self.external is not None and call.action in self.external.actions:
             raise TaskError("tool_requires_async", "external tools require their supervised asynchronous executor")
         request, old, rows = self._prepare(run, model_call_id, call)
@@ -882,6 +896,8 @@ class LocalRoleTools:
             return await self._execute_weather(run, model_call_id, call)
         if call.action in self.web.actions:
             return await self._execute_web_search(run, model_call_id, call)
+        if call.action in self.bili.actions:
+            return await self._execute_bili_watch(run, model_call_id, call)
         if self.semantic is not None:
             if call.action in self.semantic.actions:
                 return await self._execute_semantic(run, model_call_id, call)
@@ -1009,6 +1025,36 @@ class LocalRoleTools:
             if (len(encoded.encode("utf-8")) > MAX_RESULT_BYTES
                     or previous + len(encoded.encode("utf-8")) > MAX_TURN_RESULT_BYTES):
                 raise TaskError("tool_result_too_large", "web search result exceeds the local material budget")
+            with self.runtime.transaction() as connection:
+                run.validate()
+                connection.execute("""UPDATE conversation_tool_calls SET state=?,effect=?,result_json=?,finished_at=?
+                    WHERE task_id=? AND tool_call_id=? AND state='started'""",
+                    (result["state"], result["effect"], encoded, stamp(self.tasks.now()),
+                     run.task.task_id, call.call_id))
+            return ToolExchange(call, encoded)
+        except BaseException:
+            with self.runtime.transaction() as connection:
+                connection.execute("""UPDATE conversation_tool_calls SET state='unknown',finished_at=?
+                    WHERE task_id=? AND tool_call_id=? AND state='started'""",
+                    (stamp(self.tasks.now()), run.task.task_id, call.call_id))
+            raise
+
+    async def _execute_bili_watch(self, run, model_call_id, call):
+        request, old, rows = self._prepare(run, model_call_id, call)
+        if old is not None:
+            result, _ = self._validate_result(old, request, run.task.spec.context, self.tasks.now())
+            return ToolExchange(call, encode(result))
+        try:
+            result = await self.bili.execute(run, run.task.spec.context,
+                json.loads(call.arguments_json), observed_at=self.tasks.now())
+            run.validate()
+            encoded = encode(result)
+            previous = sum(len(row["result_json"].encode("utf-8")) for row in rows if row["result_json"])
+            if self.external is not None:
+                previous += self.external.material_bytes(run.task.spec.request_ref)
+            if (len(encoded.encode("utf-8")) > MAX_RESULT_BYTES
+                    or previous + len(encoded.encode("utf-8")) > MAX_TURN_RESULT_BYTES):
+                raise TaskError("tool_result_too_large", "bili watch result exceeds the local material budget")
             with self.runtime.transaction() as connection:
                 run.validate()
                 connection.execute("""UPDATE conversation_tool_calls SET state=?,effect=?,result_json=?,finished_at=?

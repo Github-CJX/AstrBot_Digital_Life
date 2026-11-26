@@ -509,7 +509,7 @@ class AstrBotStagingBootstrap:
              voice_policy=None, weather_port=None, weather_alert_port=None, balance_port=None, news_port=None, solar_term_port=None,
              additional_providers=(), fallback_provider_id="", replacement_rules="[]",
              fallback_on_refusal=False, review_only=False, default_provider_resolver=None,
-             relay_tool_port_factory=None, search_port_factory=None) -> Outcome[AstrBotStagingSession]:
+             relay_tool_port_factory=None, search_port_factory=None, bili_factory=None) -> Outcome[AstrBotStagingSession]:
         """Read current authority and assemble; never initialize, grant or start work."""
         try:
             with self.runtime.read_snapshot():
@@ -517,7 +517,7 @@ class AstrBotStagingBootstrap:
                                                   weather_port, weather_alert_port, balance_port, news_port, solar_term_port, additional_providers,
                                                   fallback_provider_id, replacement_rules, fallback_on_refusal, review_only,
                                                   default_provider_resolver, relay_tool_port_factory,
-                                                  search_port_factory))
+                                                  search_port_factory, bili_factory))
         except TaskError as error:
             return Outcome.failed(error.code, str(error))
         except Exception:
@@ -528,7 +528,7 @@ class AstrBotStagingBootstrap:
               additional_providers=(), fallback_provider_id="", replacement_rules="[]",
               fallback_on_refusal=False, review_only=False,
               default_provider_resolver=None, relay_tool_port_factory=None,
-              search_port_factory=None) -> AstrBotStagingSession:
+              search_port_factory=None, bili_factory=None) -> AstrBotStagingSession:
         if self._marker() is None:
             raise TaskError("staging_not_initialized", "use explicit initialization on a fresh staging store first")
         target = self._target(self._time())
@@ -555,6 +555,7 @@ class AstrBotStagingBootstrap:
             fallback_on_refusal=fallback_on_refusal, review_only=review_only,
             relay_tool_port_factory=relay_tool_port_factory,
             search_port_factory=search_port_factory,
+            bili_factory=bili_factory,
             profile_field_shapes={name: tuple(config._fingerprint_document().get(name, {}))
                                   for name in ("policy", "segmentation")},
             bootstrap_receipt_validated=True)
