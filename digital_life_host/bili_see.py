@@ -178,6 +178,7 @@ class BiliSee:
         }
         body = await port.post_json(self.api_base + "/chat/completions", payload,
                                     headers={"User-Agent": "astrbot-digital-life/0.1",
+                                             "Authorization": f"Bearer {self.key}",
                                              "x-opencode-session": self.session_id})
         try:
             message = body["choices"][0]["message"]
