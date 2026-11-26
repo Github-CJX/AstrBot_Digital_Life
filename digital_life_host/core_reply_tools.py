@@ -8,6 +8,7 @@ import asyncio
 import json
 import logging
 import re
+from types import SimpleNamespace
 from typing import Any
 
 from jsonschema.exceptions import ValidationError
@@ -79,7 +80,7 @@ def private_tool_group(owner: str, action: str) -> str:
         return "memory"
     if owner in ("source", "growth", "relationships", "timeline", "acquaintance"):
         return "records"
-    if owner in ("interaction", "semantic", "weather", "news"):
+    if owner in ("interaction", "semantic", "weather", "news", "bili"):
         return "interaction"
     if owner == "diagnostics":
         return "diagnostics"
@@ -395,6 +396,9 @@ class CoreReplyToolSession:
             group = getattr(tools, "group_memory", None)
             if group is not None:
                 offered.extend(_OfferedTool(spec, "group") for spec in group.catalog_for(context))
+        bili = getattr(tools, "bili", None)
+        if bili is not None:
+            offered.extend(_OfferedTool(spec, "bili") for spec in bili.catalog_for(context))
         acquaintance = getattr(tools, "acquaintance", None)
         if acquaintance is not None:
             offered.extend(_OfferedTool(spec, "acquaintance") for spec in acquaintance.catalog_for(context))
@@ -798,6 +802,22 @@ class CoreReplyToolSession:
                 result = await executor_for(self.application).local_async(self, call_id, action, arguments,
                     lambda: news.lookup_native(self.context, self.turn_id, call_id, arguments["query"]))
                 result = news.validate_native(self.context, result)
+            elif offered.owner == "bili":
+                call_id = native_call_id(wrapper, action, arguments)
+                session = self
+
+                class BiliRun:
+                    def __init__(self):
+                        self.task = SimpleNamespace(task_id="core-reply:" + session.turn_id)
+
+                    def validate(self):
+                        session.assert_current()
+                        require(session.application.tasks.check_context_access(session.context,
+                            action="conversation.reply", observed_at=session.application.tasks.now()))
+
+                result = await executor_for(self.application).local_async(self, call_id, action, arguments,
+                    lambda: self.application.tools.bili.execute(BiliRun(), self.context, arguments,
+                        observed_at=self.application.tasks.now()))
             elif offered.owner == "semantic":
                 call_id = native_call_id(wrapper, action, arguments)
                 if action == "slang.learn":
@@ -1006,6 +1026,10 @@ def inject_core_reply_tools(event, req, *, application):
             from digital_life_core.conversation.content.authoring_workflow import INSTRUCTION as AUTHORING_INSTRUCTION
             if AUTHORING_INSTRUCTION not in req.system_prompt:
                 req.system_prompt += "\n\n" + AUTHORING_INSTRUCTION
+        if any(item.owner == "bili" for item in offered):
+            from digital_life_core.conversation.bili_tools import INSTRUCTION as BILI_INSTRUCTION
+            if BILI_INSTRUCTION not in req.system_prompt:
+                req.system_prompt += "\n\n" + BILI_INSTRUCTION
         if any(item.owner == "diagnostics" for item in offered):
             from digital_life_core.conversation.diagnostic_tools import DIAGNOSTIC_INSTRUCTION
             if DIAGNOSTIC_INSTRUCTION not in req.system_prompt:
