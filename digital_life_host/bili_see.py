@@ -14,6 +14,7 @@ import asyncio
 import json
 import os
 import tempfile
+import uuid
 from pathlib import Path
 from typing import Any, Callable, Mapping
 
@@ -48,6 +49,7 @@ class BiliSee:
                 self.key = self.key or gateway["key"]
                 self.model = self.model or gateway["model"]
         self._runner = runner
+        self.session_id = uuid.uuid4().hex
 
     @staticmethod
     def _gateway_from_runtime(data_root):
@@ -175,7 +177,8 @@ class BiliSee:
             "max_tokens": 1200,
         }
         body = await port.post_json(self.api_base + "/chat/completions", payload,
-                                    headers={"User-Agent": "astrbot-digital-life/0.1"})
+                                    headers={"User-Agent": "astrbot-digital-life/0.1",
+                                             "x-opencode-session": self.session_id})
         try:
             message = body["choices"][0]["message"]
         except (KeyError, IndexError, TypeError) as exc:
