@@ -161,7 +161,7 @@ class BiliSee:
         # 该网关的模型会先烧 reasoning 再给 content：多帧时 reasoning 长度波动，
         # 预算可能被烧尽（finish=length、content 空）。逐级降帧兜底——
         # 单帧请求被证明稳定出内容。[(帧数上限, max_tokens), ...]
-        ladder = [(len(frames), 3000), (3, 2000), (1, 1600)]
+        ladder = [(len(frames), 4000), (3, 2600), (1, 1800)]
         last_finish = "unknown"
         for keep, budget in ladder:
             subset = frames[:keep]
