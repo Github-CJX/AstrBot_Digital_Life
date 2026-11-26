@@ -51,17 +51,29 @@ class BiliSee:
 
     @staticmethod
     def _gateway_from_runtime(data_root):
-        """默认沿用 AstrBot 主配置的第一个 chat provider source（视觉用同一网关）。"""
+        """默认沿用 AstrBot 主配置第一个已启用的 chat provider（视觉走同一网关）。
+
+        model 名在顶层 ``provider[].model``（按 ``provider_source_id`` 关联 source），
+        source 本身只存 api_base/key。
+        """
         try:
             path = Path(data_root).parents[1].joinpath("cmd_config.json")
             with open(path, encoding="utf-8-sig") as handle:
                 conf = json.load(handle)
-            for source in conf.get("provider_sources") or []:
+            sources = {str(s.get("id")): s for s in (conf.get("provider_sources") or [])}
+            models = {}
+            for entry in conf.get("provider") or []:
+                if not isinstance(entry, Mapping):
+                    continue
+                model = str(entry.get("model") or "")
+                if model:
+                    models.setdefault(str(entry.get("provider_source_id")), model)
+            for source in (conf.get("provider_sources") or []):
                 keys = source.get("key") or []
                 api_base = str(source.get("api_base") or "").rstrip("/")
                 if keys and api_base:
                     return {"api_base": api_base, "key": str(keys[0]),
-                            "model": str(source.get("model") or "")}
+                            "model": models.get(str(source.get("id")), "")}
         except Exception:
             return {}
         return {}

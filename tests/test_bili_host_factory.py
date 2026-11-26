@@ -1,5 +1,6 @@
 """The host builds the bili port factory only when the module is enabled."""
 
+import json
 import tempfile
 import unittest
 from pathlib import Path
@@ -80,6 +81,23 @@ class BiliFactoryTests(unittest.TestCase):
         config = {"bilibili": {"see": {"enabled": False, "api_base": "https://gw.example",
                                        "key": "k", "model": "m"}}}
         self.assertIsNone(configured_bili_seer(config, self.root))
+
+    def test_seer_falls_back_to_runtime_gateway_with_provider_level_model(self):
+        """cmd_config.json 的 model 存在顶层 provider[].model，source 只存 api_base/key。"""
+        self._module_on()
+        nested = self.root / "level-one" / "level-two"
+        nested.mkdir(parents=True, exist_ok=True)
+        (self.root / "cmd_config.json").write_text(json.dumps({
+            "provider_sources": [{"id": "go_source", "api_base": "https://gw.example/",
+                                  "key": ["k1"], "model": None}],
+            "provider": [{"id": "go", "enable": True, "model": "vision-flash",
+                          "provider_source_id": "go_source"}],
+        }), encoding="utf-8")
+        seer = configured_bili_seer({"bilibili": {}}, nested)
+        self.assertIsInstance(seer, BiliSee)
+        self.assertEqual((seer.api_base, seer.key, seer.model),
+                         ("https://gw.example", "k1", "vision-flash"))
+        self.assertTrue(seer.settings()["available"])
 
 
 if __name__ == "__main__":
