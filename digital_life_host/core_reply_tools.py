@@ -397,7 +397,7 @@ class CoreReplyToolSession:
             if group is not None:
                 offered.extend(_OfferedTool(spec, "group") for spec in group.catalog_for(context))
         bili = getattr(tools, "bili", None)
-        if bili is not None:
+        if bili is not None and type(getattr(bili, "catalog", None)) is tuple:
             offered.extend(_OfferedTool(spec, "bili") for spec in bili.catalog_for(context))
         acquaintance = getattr(tools, "acquaintance", None)
         if acquaintance is not None:
