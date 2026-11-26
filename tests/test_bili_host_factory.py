@@ -64,11 +64,12 @@ class BiliFactoryTests(unittest.TestCase):
     def test_seer_builds_from_config_with_clamped_settings(self):
         self._module_on()
         config = {"bilibili": {"see": {"api_base": "https://gw.example/", "key": "k",
-                                       "model": "m", "frames": 99, "scale": 10,
+                                       "model": "m", "frames": 99, "probe": 999,
+                                       "sheet_tokens": 99_999,
                                        "max_chars": 9_999_999}}}
         seer = configured_bili_seer(config, self.root)
         self.assertIsInstance(seer, BiliSee)
-        self.assertEqual((seer.frames, seer.scale), (8, 240))
+        self.assertEqual((seer.frames, seer.probe, seer.sheet_tokens), (8, 24, 1000))
         self.assertEqual(seer.api_base, "https://gw.example")
         self.assertTrue(seer.settings()["available"])
 
