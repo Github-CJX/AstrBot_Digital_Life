@@ -232,6 +232,85 @@ class BiliWatchToolTests(unittest.IsolatedAsyncioTestCase):
             with self.assertRaises(TaskError):
                 BiliWatchTools._arguments(bad)
 
+    async def test_look_at_returns_a_focused_sight(self):
+        calls = []
+
+        class Seer:
+            def __init__(self):
+                self.moments = []
+
+            async def describe(self, port, bvid, *, at=None):
+                self.moments.append(at)
+                return {"present": True, "frames": 5, "offsets": [22.0, 24.5, 27.0],
+                        "changes": [{"at": 24.5, "score": 18.2}],
+                        "description": "第24秒左右画面切到了特写。"}
+
+        seer = Seer()
+        tool = BiliWatchTools(lambda context: self.Port(calls), seer)
+        result = await tool.execute(self.fake_run(), self.context(),
+                                    {"target": "BV1bW4y1P7Kf", "at": 25},
+                                    observed_at=NOW)
+        self.assertEqual(result["state"], "succeeded")
+        payload = result["payload"]
+        self.assertEqual((payload["mode"], payload["at"]), ("look", 25.0))
+        self.assertEqual(set(payload["video"]), {"bvid", "title", "author", "duration"})
+        sight = payload["sight"]
+        self.assertTrue(sight["present"])
+        self.assertEqual(sight["changes"], [{"at": 24.5, "score": 18.2}])
+        self.assertEqual(seer.moments, [25.0])
+        # 回看不拉全量材料：没有字幕/热评/弹幕调用。
+        self.assertNotIn(("subtitles", "BV1bW4y1P7Kf"), calls)
+        validated, _ = tool.validate({}, self.context(), result, NOW)
+        self.assertEqual(validated, result)
+
+    async def test_look_at_sight_failure_still_validates(self):
+        calls = []
+
+        class Seer:
+            async def describe(self, port, bvid, *, at=None):
+                raise RuntimeError("视频流不可用")
+
+        tool = BiliWatchTools(lambda context: self.Port(calls), Seer())
+        result = await tool.execute(self.fake_run(), self.context(),
+                                    {"target": "BV1bW4y1P7Kf", "at": 0},
+                                    observed_at=NOW)
+        self.assertEqual(result["state"], "succeeded")
+        self.assertEqual((result["payload"]["mode"], result["payload"]["at"]), ("look", 0.0))
+        self.assertEqual(result["payload"]["sight"],
+                         {"present": False, "reason": "视频流不可用"})
+        validated, _ = tool.validate({}, self.context(), result, NOW)
+        self.assertEqual(validated, result)
+
+    async def test_bad_at_arguments_are_rejected(self):
+        for bad in ({"target": "BV1bW4y1P7Kf", "at": "25"},
+                    {"target": "BV1bW4y1P7Kf", "at": -1},
+                    {"target": "BV1bW4y1P7Kf", "at": 86401},
+                    {"target": "BV1bW4y1P7Kf", "at": True}):
+            with self.assertRaises(TaskError):
+                BiliWatchTools._arguments(bad)
+
+    def test_video_sight_validation_accepts_changes_and_rejects_malformed_rows(self):
+        tool = BiliWatchTools()
+        good = {"state": "succeeded", "effect": "none", "payload": {
+            "mode": "look", "at": 25.0,
+            "video": {"bvid": "BV1bW4y1P7Kf", "title": "标题", "author": "UP 主", "duration": 321},
+            "sight": {"present": True, "frames": 5, "offsets": [22.0, 27.0],
+                      "changes": [{"at": 24.5, "score": 18.2}],
+                      "description": "特写。"},
+            "observed_at": NOW.isoformat()}}
+        validated, _ = tool.validate({}, self.context(), good, NOW)
+        self.assertEqual(validated, good)
+        bad = {"state": "succeeded", "effect": "none", "payload": {
+            "mode": "look", "at": 25.0,
+            "video": {"bvid": "BV1bW4y1P7Kf", "title": "标题", "author": "UP 主", "duration": 321},
+            "sight": {"present": True, "frames": 5, "offsets": [22.0],
+                      "changes": [{"at": 24.5, "score": "high"}],
+                      "description": "特写。"},
+            "observed_at": NOW.isoformat()}}
+        from digital_life_core.execution.models import TaskError as _TE
+        with self.assertRaises(_TE):
+            tool.validate({}, self.context(), bad, NOW)
+
 
 if __name__ == "__main__":
     unittest.main()

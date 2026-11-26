@@ -281,8 +281,12 @@ class BiliSee:
             pass
 
     # ── 主流程 ───────────────────────────────────────────────────────────
-    async def describe(self, port, bvid: str) -> dict[str, Any]:
-        """返回 {"present", "frames", "offsets", "description"}；失败抛原异常。"""
+    async def describe(self, port, bvid: str, *, at=None) -> dict[str, Any]:
+        """返回 {"present", "frames", "offsets", "changes", "description"}；失败抛原异常。
+
+        ``at``（秒）非空时做「追问回看」：候选帧集中在该时刻附近的小窗口里，
+        其余流程（探针→变化选帧→拼图→视觉）与全片模式相同。
+        """
         from digital_life_core.bilibili.errors import BiliError
 
         if not self.available:
@@ -293,7 +297,7 @@ class BiliSee:
         url = str(play.get("url") or "")
         if not url:
             raise BiliError("视频流地址不可用（视频可能不可匿名播放）")
-        candidates = self._probe_offsets(duration)
+        candidates = self._probe_offsets(duration, at=at)
         if not candidates:
             raise BiliError("视频时长不可用（视频流可能不可用）")
         probes = await self._probe_frames(url, candidates)
@@ -314,12 +318,50 @@ class BiliSee:
         if not picked:
             picked = offsets[:self.frames]
         picked_blobs = [blobs[offsets.index(offset)] for offset in picked]
-        description = await self._vision(port, url, video, picked, picked_blobs)
+        changes = self._change_peaks(offsets, grids, at=at)
+        description = await self._vision(port, url, video, picked, picked_blobs, at=at)
         return {"present": True, "frames": len(picked),
                 "offsets": [round(offset, 1) for offset in picked],
+                "changes": changes,
                 "description": description[:self.max_chars]}
 
-    def _probe_offsets(self, duration: int):
+    @staticmethod
+    def _change_peaks(offsets, grids, *, at=None, keep: int = 3):
+        """相邻候选帧的变化分 → 前 keep 个画面突变点 [{"at", "score"}]；无分返回 []。
+
+        时刻取相邻两帧的中点；回看模式（at 非空）只保留窗口内的突变点。
+        """
+        if not grids or all(grid is None for grid in grids):
+            return []
+        scored = []
+        for index in range(1, len(offsets)):
+            score = frame_diff(grids[index - 1], grids[index])
+            if score <= 0:
+                continue
+            scored.append((score, (offsets[index - 1] + offsets[index]) / 2.0))
+        scored.sort(key=lambda item: (-item[0], item[1]))
+        peaks = []
+        for score, moment in scored:
+            if at is not None and abs(moment - at) > max(15.0, abs(at) * 0.2):
+                continue
+            peaks.append({"at": round(float(moment), 1), "score": round(float(score), 1)})
+            if len(peaks) >= keep:
+                break
+        peaks.sort(key=lambda item: item["at"])
+        return peaks
+
+    def _probe_offsets(self, duration: int, at=None):
+        if at is not None:
+            # 回看窗口：以 at 为中心、宽度 ≤24s 的探针带，按时长收边。
+            moment = max(0.0, float(at))
+            span = min(24.0, max(2.0, duration if duration > 0 else 24.0))
+            start = max(0.5, moment - span / 2.0)
+            end = min(max(1.0, (duration or moment) - 1.0), moment + span / 2.0)
+            if end <= start:
+                end = start + 0.5
+            count = max(4, min(self.probe, 8))
+            step = (end - start) / max(1, count - 1)
+            return [round(start + index * step, 2) for index in range(count)]
         if duration <= 0:
             duration = 60
         if duration <= 6:
@@ -446,7 +488,7 @@ class BiliSee:
         return None
 
     # ── 视觉请求 ─────────────────────────────────────────────────────────
-    async def _vision(self, port, url: str, video, picked, picked_blobs) -> str:
+    async def _vision(self, port, url: str, video, picked, picked_blobs, *, at=None) -> str:
         from digital_life_core.bilibili.errors import BiliError
 
         title = str(getattr(video, "title", ""))[:160]
@@ -462,11 +504,17 @@ class BiliSee:
                 "不要编造帧之间没有发生的剧情。"
             )
 
+        if at is not None:
+            extra = f"（回看：第 {at:.0f} 秒附近的连续画面）"
+        else:
+            extra = ""
+
         timeline = "、".join(f"{offset:.0f}s" for offset in picked)
-        self._log().info("[CompanionV2][bili][see] picked=%d at %s", len(picked), timeline[:120])
+        self._log().info("[CompanionV2][bili][see] picked=%d at %s%s",
+                         len(picked), timeline[:120], "" if at is None else f" (look@{at:.0f}s)")
 
         # ① 首选：单张拼图（token 成本最低，reasoning 空间最大）。
-        description = await self._describe_sheet(port, url, video, picked, timeline, prompt_for)
+        description = await self._describe_sheet(port, url, video, picked, timeline, prompt_for, extra=extra)
         if description:
             return description
 
@@ -499,7 +547,7 @@ class BiliSee:
                                 keep, finish, json.dumps(body.get("usage") or {}, ensure_ascii=False)[:200])
         raise BiliError(f"视觉网关返回了空描述（finish={last_finish}）")
 
-    async def _describe_sheet(self, port, url: str, video, picked, timeline, prompt_for):
+    async def _describe_sheet(self, port, url: str, video, picked, timeline, prompt_for, extra: str = ""):
         """拼图路径：按 token 预算反推画布 → 重抽格子帧 → ffmpeg 拼图 → 单图视觉请求。"""
         cols = max(1, int(math.ceil(math.sqrt(len(picked)))))
         rows = max(1, int(math.ceil(len(picked) / cols)))
@@ -521,7 +569,7 @@ class BiliSee:
             return None
         actual = [offset for offset, _ in sheet_frames]
         actual_timeline = "、".join(f"{offset:.0f}s" for offset in actual)
-        content = [{"type": "text", "text": prompt_for(actual_timeline)},
+        content = [{"type": "text", "text": prompt_for(actual_timeline, extra)},
                    {"type": "image_url",
                     "image_url": {"url": "data:image/jpeg;base64,"
                                           + base64.b64encode(sheet_blob).decode()}}]

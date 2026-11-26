@@ -111,7 +111,7 @@ class DescribeWiringTests(unittest.TestCase):
         async def fake_probe(url, offs):
             return grids, blobs
 
-        async def fake_vision(port, url, video, picked, picked_blobs):
+        async def fake_vision(port, url, video, picked, picked_blobs, at=None):
             fake_vision.picked = picked
             return "描述文本"
 
@@ -134,6 +134,57 @@ class DescribeWiringTests(unittest.TestCase):
         from digital_life_core.bilibili.errors import BiliError
         with self.assertRaises(BiliError):
             asyncio.run(seer.describe(port, "BVxxx"))
+
+    def test_probe_offsets_at_mode_centers_a_clamped_window(self):
+        seer = self._seer()
+        offsets = seer._probe_offsets(300, at=150)
+        self.assertEqual(len(offsets), 8)
+        self.assertAlmostEqual(offsets[3], 150.0, delta=6.0)
+        self.assertTrue(all(0.5 <= x <= 299 for x in offsets))
+        # 边界时刻：窗口被夹进时长内，不越过末尾。
+        tail = seer._probe_offsets(40, at=39)
+        self.assertTrue(all(x <= 39 for x in tail))
+        # 0 秒附近不出现负时刻。
+        head = seer._probe_offsets(300, at=0)
+        self.assertTrue(all(x >= 0.0 for x in head))
+
+    def test_change_peaks_rank_by_score_and_keep_at_window(self):
+        offsets = [0.0, 10.0, 20.0, 30.0, 40.0]
+        grids = [grid_of(10), grid_of(10), grid_of(200), grid_of(200), grid_of(30)]
+        peaks = BiliSee._change_peaks(offsets, grids)
+        # 10→20（色相差最大）与 30→40 各成一个突变点，按时刻排序。
+        self.assertEqual([p["at"] for p in peaks], [15.0, 35.0])
+        # 回看模式只保留窗口内的突变点。
+        windowed = BiliSee._change_peaks(offsets, grids, at=35.0)
+        self.assertEqual([p["at"] for p in windowed], [35.0])
+
+    def test_describe_at_mode_returns_changes(self):
+        seer = self._seer()
+        offsets = seer._probe_offsets(120, at=60)
+        grids = [grid_of(10)] * len(offsets)
+        grids[2] = grid_of(250)
+        blobs = [b"x" * 10] * len(offsets)
+
+        async def fake_probe(url, offs):
+            return grids, blobs
+
+        async def fake_vision(port, url, video, picked, picked_blobs, at=None):
+            fake_vision.at = at
+            return "回看描述"
+
+        seer._probe_frames = fake_probe
+        seer._vision = fake_vision
+        port = SimpleNamespace(
+            video_info=lambda bvid: _async(SimpleNamespace(duration=120, title="t", author="a", desc="d")),
+            play_url=lambda video: _async({"url": "https://cdn.example/video.m4s"}),
+        )
+        result = asyncio.run(seer.describe(port, "BVxxx", at=60.0))
+        self.assertTrue(result["present"])
+        self.assertEqual(fake_vision.at, 60.0)
+        self.assertTrue(all(30.0 <= x <= 90.0 for x in result["offsets"]))
+        self.assertEqual([c["at"] for c in result["changes"]],
+                         sorted(c["at"] for c in result["changes"]))
+        self.assertTrue(result["changes"])
 
 
 class ComposeSheetSmokeTests(unittest.TestCase):

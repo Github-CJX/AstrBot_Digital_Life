@@ -23,7 +23,9 @@ ACTION = "bili.watch"
 INSTRUCTION = (
     "你的工具列表里有看B站视频的工具：digital_life_core_bili_watch（动作 bili.watch），"
     "它可以读取B站视频的标题、简介、字幕、热评、弹幕热点，也可以按关键词搜索候选视频；"
-    "用户想让你看视频画面（不只是文字）时传 see=true，会抽关键帧让视觉模型描述画面内容。"
+    "用户想让你看视频画面（不只是文字）时传 see=true，会抽关键帧让视觉模型描述画面内容；"
+    "看完后用户追问某个时间点/某一段的画面时，用同一个BV号传 at=秒数（例如 at=30 就是第30秒附近），"
+    "会回看那一小段的画面。"
     "被问到能不能看视频/刷B站时，直接用它，不要说自己没有这个能力。"
     "只在用户明确让你看某个B站视频、发来B站链接或BV号，或想聊B站上的具体内容时使用；"
     "只读不写：不要用其他工具往B站发评论、弹幕或私信。没有BV号时先用关键词搜索拿候选，"
@@ -38,7 +40,55 @@ MAX_SUBTITLE_CHARS = 9000
 MAX_FETCH_SECONDS = 60
 MAX_WATCHES_PER_TURN = 3
 MAX_SIGHT_CHARS = 3000
+MAX_LOOK_SECONDS = 86400.0
 _BV_RE = re.compile(r"BV[0-9A-Za-z]{10}")
+
+
+def _clamp_changes(raw):
+    """seer 的画面突变点 [{"at","score"}] → 受界列表；畸形项丢弃（最多 6 条）。"""
+    if type(raw) is not list:
+        return []
+    rows = []
+    for item in tuple(raw)[:6]:
+        if type(item) is not dict:
+            continue
+        at, score = item.get("at"), item.get("score")
+        if type(at) not in (int, float) or type(score) not in (int, float):
+            continue
+        if not 0 <= float(at) <= MAX_LOOK_SECONDS:
+            continue
+        rows.append({"at": round(float(at), 1), "score": round(float(score), 1)})
+    return rows
+
+
+def _validate_sight(sight):
+    """sight 记录的统一校验（video/look 两种模式共用）。"""
+    if type(sight) is not dict or set(sight) not in (
+            {"present", "reason"},
+            {"present", "frames", "offsets", "changes", "description"}):
+        raise TaskError("bili_watch_result_invalid", "the original bili watch sight is invalid")
+    if type(sight["present"]) is not bool:
+        raise TaskError("bili_watch_result_invalid", "the original bili watch sight is invalid")
+    if not sight["present"]:
+        if not str(sight.get("reason") or ""):
+            raise TaskError("bili_watch_result_invalid", "the original bili watch sight is invalid")
+        return
+    if (type(sight["frames"]) is not int or not 1 <= sight["frames"] <= 16
+            or type(sight["offsets"]) is not list
+            or any(type(x) is not float for x in sight["offsets"])
+            or len(sight["offsets"]) > 16
+            or type(sight["description"]) is not str
+            or len(sight["description"]) > MAX_SIGHT_CHARS):
+        raise TaskError("bili_watch_result_invalid", "the original bili watch sight is invalid")
+    changes = sight["changes"]
+    if type(changes) is not list or len(changes) > 6:
+        raise TaskError("bili_watch_result_invalid", "the original bili watch sight is invalid")
+    for row in changes:
+        if (type(row) is not dict or set(row) != {"at", "score"}
+                or type(row["at"]) not in (int, float)
+                or type(row["score"]) not in (int, float)
+                or not 0 <= float(row["at"]) <= MAX_LOOK_SECONDS):
+            raise TaskError("bili_watch_result_invalid", "the original bili watch sight is invalid")
 
 
 def extract_bvid(target: str):
@@ -54,13 +104,15 @@ class BiliWatchTools:
         self.factory = factory if callable(factory) else None
         self.seer = seer
         self._calls = {}
-        self.catalog = (ToolSpec(ACTION, "读取一个B站视频的文字材料（标题、简介、字幕、热评、弹幕热点）或按关键词搜候选；传 see=true 还会抽关键帧看画面。", encode({
+        self.catalog = (ToolSpec(ACTION, "读取一个B站视频的文字材料（标题、简介、字幕、热评、弹幕热点）或按关键词搜候选；传 see=true 抽关键帧看画面；看完后追问某段画面传 at=秒回看。", encode({
             "type": "object",
             "properties": {
                 "target": {"type": "string",
                            "description": "BV号、B站视频链接，或没有BV号时的搜索关键词，最多 120 字"},
                 "see": {"type": "boolean",
                         "description": "可选：true 时抽取关键帧用视觉模型描述画面（视频内容）"},
+                "at": {"type": "number",
+                       "description": "可选：秒数。追问视频某一时刻的画面时传（配合BV号，如 at=30 表示第30秒附近），只回看那一小段"},
             },
             "required": ["target"],
             "additionalProperties": False,
@@ -72,7 +124,7 @@ class BiliWatchTools:
         return self.catalog
 
     async def execute(self, run, context, arguments, *, observed_at):
-        target, see = self._arguments(arguments)
+        target, see, at = self._arguments(arguments)
         if self.factory is None:
             return {"state": "failed", "code": "bili_watch_unavailable", "effect": "none"}
         task_id = getattr(getattr(run, "task", None), "task_id", "")
@@ -93,7 +145,7 @@ class BiliWatchTools:
         try:
             try:
                 payload = await asyncio.wait_for(
-                    self._material(port, target, see=see),
+                    self._material(port, target, see=see, at=at),
                     timeout=MAX_FETCH_SECONDS)
             except asyncio.TimeoutError:
                 return {"state": "failed", "code": "bili_watch_timeout", "effect": "none"}
@@ -128,7 +180,7 @@ class BiliWatchTools:
             return "bili_watch_budget"
         return "bili_watch_failed"
 
-    async def _material(self, port, target, *, see=False):
+    async def _material(self, port, target, *, see=False, at=None):
         start = getattr(port, "start", None)
         if start is not None:
             await start()
@@ -151,6 +203,13 @@ class BiliWatchTools:
             return {"mode": "candidates", "query": keyword[:MAX_TARGET_CHARS],
                     "candidates": candidates}
         video = await port.video_info(bvid)
+        if at is not None:
+            # 追问回看：只取该时刻附近的画面，不拉字幕/热评/弹幕（轻量材料）。
+            look_video = {"bvid": str(video.bvid)[:20], "title": str(video.title)[:200],
+                          "author": str(video.author)[:60], "duration": int(video.duration or 0)}
+            return {"mode": "look", "at": round(float(at), 1),
+                    "video": look_video,
+                    "sight": await self._sight(port, bvid, video, at=at)}
         subtitle = await port.subtitles(video)
         comments = await port.hot_comments(video, limit=MAX_COMMENTS)
         danmaku = await port.danmaku_hotspots(int(getattr(video, "cid", 0) or 0),
@@ -174,7 +233,7 @@ class BiliWatchTools:
             payload["sight"] = await self._sight(port, bvid, video)
         return payload
 
-    async def _sight(self, port, bvid, video):
+    async def _sight(self, port, bvid, video, *, at=None):
         """关键帧 + 视觉描述；任何失败降级为 present=False 的 sight 记录。"""
         seer = self.seer
         if seer is None:
@@ -183,7 +242,10 @@ class BiliWatchTools:
         if not callable(describe):
             return {"present": False, "reason": "seer_unavailable"}
         try:
-            sight = await describe(port, bvid)
+            if at is not None:
+                sight = await describe(port, bvid, at=at)
+            else:
+                sight = await describe(port, bvid)
         except Exception as error:
             reason = str(error)[:120] or type(error).__name__
             return {"present": False, "reason": reason}
@@ -192,6 +254,7 @@ class BiliWatchTools:
         return {"present": True,
                 "frames": max(1, min(16, int(sight.get("frames") or 1))),
                 "offsets": [float(x) for x in tuple(sight.get("offsets") or ())[:16]],
+                "changes": _clamp_changes(sight.get("changes")),
                 "description": str(sight.get("description") or "")[:MAX_SIGHT_CHARS]}
 
     def validate(self, row, context, result, observed_at):
@@ -216,29 +279,26 @@ class BiliWatchTools:
                         or type(item["duration"]) is not int or type(item["play"]) is not int
                         or not _BV_RE.fullmatch(item["bvid"] or "")):
                     raise TaskError("bili_watch_result_invalid", "the original bili watch candidate is invalid")
+        elif payload.get("mode") == "look":
+            if set(rest) != {"mode", "at", "video", "sight"}:
+                raise TaskError("bili_watch_result_invalid", "the original bili watch payload is invalid")
+            at = rest["at"]
+            if type(at) not in (int, float) or not 0 <= float(at) <= MAX_LOOK_SECONDS:
+                raise TaskError("bili_watch_result_invalid", "the original bili watch look moment is invalid")
+            video = rest["video"]
+            if (type(video) is not dict or set(video) != {"bvid", "title", "author", "duration"}
+                    or any(type(video[key]) is not str for key in ("bvid", "title", "author"))
+                    or type(video["duration"]) is not int
+                    or not _BV_RE.fullmatch(video["bvid"] or "")):
+                raise TaskError("bili_watch_result_invalid", "the original bili watch look video is invalid")
+            _validate_sight(rest["sight"])
         elif payload.get("mode") == "video":
             base_keys = {"mode", "video", "subtitle", "comments", "danmaku"}
             rest_keys = set(rest)
             if rest_keys != base_keys and rest_keys != base_keys | {"sight"}:
                 raise TaskError("bili_watch_result_invalid", "the original bili watch payload is invalid")
             if "sight" in rest_keys:
-                sight = rest["sight"]
-                if type(sight) is not dict or set(sight) not in (
-                        {"present", "reason"}, {"present", "frames", "offsets", "description"}):
-                    raise TaskError("bili_watch_result_invalid", "the original bili watch sight is invalid")
-                if type(sight["present"]) is not bool:
-                    raise TaskError("bili_watch_result_invalid", "the original bili watch sight is invalid")
-                if sight["present"]:
-                    if (type(sight["frames"]) is not int or not 1 <= sight["frames"] <= 16
-                            or type(sight["offsets"]) is not list
-                            or any(type(x) is not float for x in sight["offsets"])
-                            or len(sight["offsets"]) > 16
-                            or type(sight["description"]) is not str
-                            or len(sight["description"]) > MAX_SIGHT_CHARS):
-                        raise TaskError("bili_watch_result_invalid",
-                                        "the original bili watch sight is invalid")
-                elif not str(sight.get("reason") or ""):
-                    raise TaskError("bili_watch_result_invalid", "the original bili watch sight is invalid")
+                _validate_sight(rest["sight"])
             video = rest["video"]
             subtitle = rest["subtitle"]
             if (type(video) is not dict
@@ -277,7 +337,7 @@ class BiliWatchTools:
 
     @staticmethod
     def _arguments(arguments):
-        if type(arguments) is not dict or set(arguments) - {"target", "see"} \
+        if type(arguments) is not dict or set(arguments) - {"target", "see", "at"} \
                 or "target" not in arguments:
             raise TaskError("invalid_tool_arguments", "bili.watch requires one bounded target")
         target = arguments["target"]
@@ -287,7 +347,10 @@ class BiliWatchTools:
         see = arguments.get("see")
         if see is not None and type(see) is not bool:
             raise TaskError("invalid_tool_arguments", "bili.watch see must be boolean")
-        return target.strip(), bool(see)
+        at = arguments.get("at")
+        if at is not None and (type(at) not in (int, float) or not 0 <= float(at) <= MAX_LOOK_SECONDS):
+            raise TaskError("invalid_tool_arguments", "bili.watch at must be seconds in [0, 86400]")
+        return target.strip(), bool(see), None if at is None else float(at)
 
 
 def bili_watch_action(action):
