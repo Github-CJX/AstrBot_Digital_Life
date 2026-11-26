@@ -481,6 +481,12 @@ class StorageRuntime:
         self._lock = RLock()
         self._tuning_profile: SqliteTuningProfile = tuning_profile()
         self._reader_pool_size: int = self._tuning_profile.reader_pool_size
+        # Total budget a caller may wait for a pooled reader before degrading
+        # to an unpooled read connection. The pool must never become a way to
+        # deadlock the event loop thread: if every reader is checked out and
+        # none comes back, waiting forever freezes the whole process. The
+        # budget is an instance seam so tests can shorten it deterministically.
+        self._reader_pool_wait_seconds: float = 10.0
         self._read_snapshot_diagnostics = local()
         self._read_connections = local()
         self._reader_condition = Condition()
@@ -1071,7 +1077,9 @@ class StorageRuntime:
 
         connection: sqlite3.Connection | None = None
         need_create = False
+        temporary = False
         with self._reader_condition:
+            deadline = time.monotonic() + self._reader_pool_wait_seconds
             while True:
                 if self._reader_closing or self._connection is None:
                     raise StorageOpenError("V2 storage runtime is closed")
@@ -1084,9 +1092,20 @@ class StorageRuntime:
                     self._active_readers += 1
                     need_create = True
                     break
-                self._reader_condition.wait()
+                remaining = deadline - time.monotonic()
+                if remaining <= 0.0:
+                    # Every pooled reader is checked out and none came back
+                    # within the budget. Blocking forever here would freeze
+                    # the event loop (observed in production: six threads
+                    # parked on this wait). Degrade to a short-lived unpooled
+                    # query-only connection instead, and say so loudly so the
+                    # pool leak is diagnosable from the log.
+                    self._report_reader_pool_starvation()
+                    temporary = True
+                    break
+                self._reader_condition.wait(timeout=min(remaining, 1.0))
 
-        if need_create:
+        if need_create or temporary:
             created: sqlite3.Connection | None = None
             try:
                 created = sqlite3.connect(
@@ -1109,18 +1128,24 @@ class StorageRuntime:
                         created.close()
                     except Exception:
                         pass
-                with self._reader_condition:
-                    self._creating_readers -= 1
-                    self._active_readers -= 1
-                    self._reader_condition.notify_all()
+                if not temporary:
+                    with self._reader_condition:
+                        self._creating_readers -= 1
+                        self._active_readers -= 1
+                        self._reader_condition.notify_all()
                 if isinstance(error, sqlite3.Error):
                     raise StorageOpenError("unable to read V2 SQLite store") from error
                 raise
             connection = created
-            with self._reader_condition:
-                self._all_readers.append(connection)
-                self._creating_readers -= 1
-                self._reader_condition.notify_all()
+            if temporary:
+                # Unpooled fallback: never enters _all_readers or the counters,
+                # closed outright on release so it cannot disturb the pool.
+                pass
+            else:
+                with self._reader_condition:
+                    self._all_readers.append(connection)
+                    self._creating_readers -= 1
+                    self._reader_condition.notify_all()
 
         assert connection is not None
         self._read_connections.connection = connection
@@ -1135,10 +1160,32 @@ class StorageRuntime:
                     connection.execute("ROLLBACK")
             except sqlite3.Error:
                 pass
-            with self._reader_condition:
-                self._idle_readers.append(connection)
-                self._active_readers -= 1
-                self._reader_condition.notify_all()
+            if temporary:
+                try:
+                    connection.close()
+                except Exception:
+                    pass
+            else:
+                with self._reader_condition:
+                    self._idle_readers.append(connection)
+                    self._active_readers -= 1
+                    self._reader_condition.notify_all()
+
+    def _report_reader_pool_starvation(self) -> None:
+        """One warning line per starvation event, carrying the full pool state.
+
+        Production hit this as a silent event-loop freeze; the pool state in
+        the log is the evidence needed to attribute which path leaked its
+        reader (all_readers vs active vs idle vs creating tells the story).
+        """
+        logger.warning(
+            "V2 SQLite reader pool exhausted after %.1fs "
+            "(pool_size=%d all_readers=%d active=%d idle=%d creating=%d); "
+            "degrading to an unpooled read connection",
+            self._reader_pool_wait_seconds, self._reader_pool_size,
+            len(self._all_readers), self._active_readers, len(self._idle_readers),
+            self._creating_readers,
+        )
 
     @contextmanager
     def _snapshot_on(self, connection: sqlite3.Connection) -> Iterator[sqlite3.Connection]:
