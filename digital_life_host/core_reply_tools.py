@@ -1009,6 +1009,9 @@ def inject_core_reply_tools(event, req, *, application):
     names = {tool.name for tool in existing}
     appended = [CoreReplyFunctionTool(session, item) for item in offered
                 if native_tool_name(item.spec.action) not in names]
+    logger.info("[CompanionV2][tools] 核心工具目录 offered=%d appended=%d owners=%s bili=%s",
+                len(offered), len(appended), sorted({item.owner for item in offered}),
+                any(item.owner == "bili" for item in offered))
     if appended:
         # AstrBot only canonicalises the OpenAI schema; the Gemini and Anthropic
         # serialisers keep insertion order.  Sort here so every provider sees the

@@ -108,6 +108,40 @@ class BiliAPI:
             raise BiliError("缺少 aiohttp：请在插件目录执行 pip install -r requirements.txt") from exc
         timeout = aiohttp.ClientTimeout(total=25, connect=10)
         self._session = aiohttp.ClientSession(timeout=timeout, headers=self._base_headers())
+        if not self.cookie.get("buvid3"):
+            await self._provision_buvid()
+
+    async def _provision_buvid(self) -> None:
+        """匿名游客身份：机房 IP 不带 buvid3 访问 view 等接口会被 412 挡掉。
+
+        官方 finger 接口（``x/frontend/finger/spi``）匿名就能领 ``b_3``/``b_4``，
+        只读不写；失败不阻塞启动——下一轮请求照旧裸奔，撞了 412 走正常熔断。
+        """
+        if self.cookie.get("buvid3"):
+            return
+        try:
+            import aiohttp
+        except ImportError:  # pragma: no cover - start() 已确保可用
+            return
+        try:
+            async with self._session.get(
+                f"{API}/x/frontend/finger/spi",
+                headers=self._base_headers(use_cookie=False),
+                timeout=aiohttp.ClientTimeout(total=10),
+            ) as resp:
+                payload = json.loads(await resp.text(errors="replace"))
+        except Exception as exc:
+            if self.logger is not None:
+                self.logger.warning("[bili] 游客身份领取失败，继续无 cookie 访问: %s", type(exc).__name__)
+            return
+        data = payload.get("data") if isinstance(payload, dict) else None
+        if isinstance(data, dict):
+            b3 = str(data.get("b_3") or "").strip()
+            b4 = str(data.get("b_4") or "").strip()
+            if b3:
+                self.cookie["buvid3"] = b3
+            if b4:
+                self.cookie["buvid4"] = b4
 
     async def close(self) -> None:
         if self._session is not None:
@@ -134,7 +168,7 @@ class BiliAPI:
 
     def _cookie_header(self, use_cookie: bool = True) -> str:
         bits = []
-        for key in ("SESSDATA", "bili_jct", "buvid3"):
+        for key in ("SESSDATA", "bili_jct", "buvid3", "buvid4"):
             if not use_cookie and key != "buvid3":
                 continue
             value = self.cookie.get(key.lower()) or self.cookie.get(key) or ""
