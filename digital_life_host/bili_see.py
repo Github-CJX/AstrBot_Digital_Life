@@ -158,36 +158,51 @@ class BiliSee:
         title = str(getattr(video, "title", ""))[:160]
         author = str(getattr(video, "author", ""))[:60]
         desc = str(getattr(video, "desc", ""))[:300]
-        timeline = "、".join(f"{offset:.0f}s" for offset, _ in frames)
-        prompt = (
-            f"这是一个B站视频在 {timeline} 处抽出的 {len(frames)} 张关键帧。"
-            f"标题：《{title}》，UP 主：{author}。简介：{desc}\n"
-            "请以旁观者视角描述画面里发生了什么：场景、人物/动物、动作、镜头变化，"
-            "画面里出现的字幕或花字也读出来。按时间顺序讲，简洁自然，"
-            "不要编造帧之间没有发生的剧情。"
-        )
-        content: list[dict[str, Any]] = [{"type": "text", "text": prompt}]
-        for _, blob in frames:
-            import base64
-            content.append({"type": "image_url",
-                            "image_url": {"url": "data:image/jpeg;base64," + base64.b64encode(blob).decode()}})
-        body = None
+        # 该网关的模型会先烧 reasoning 再给 content：多帧时 reasoning 长度波动，
+        # 预算可能被烧尽（finish=length、content 空）。逐级降帧兜底——
+        # 单帧请求被证明稳定出内容。[(帧数上限, max_tokens), ...]
+        ladder = [(len(frames), 3000), (3, 2000), (1, 1600)]
+        last_finish = "unknown"
+        for keep, budget in ladder:
+            subset = frames[:keep]
+            timeline = "、".join(f"{offset:.0f}s" for offset, _ in subset)
+            prompt = (
+                f"这是一个B站视频在 {timeline} 处抽出的 {len(subset)} 张关键帧。"
+                f"标题：《{title}》，UP 主：{author}。简介：{desc}\n"
+                "请以旁观者视角描述画面里发生了什么：场景、人物/动物、动作、镜头变化，"
+                "画面里出现的字幕或花字也读出来。按时间顺序讲，简洁自然，"
+                "不要编造帧之间没有发生的剧情。"
+            )
+            content: list[dict[str, Any]] = [{"type": "text", "text": prompt}]
+            for _, blob in subset:
+                import base64
+                content.append({"type": "image_url",
+                                "image_url": {"url": "data:image/jpeg;base64," + base64.b64encode(blob).decode()}})
+            body = await self._vision_call(port, content, max_tokens=budget)
+            message = self._choice_message(body)
+            finish = self._finish_reason(body)
+            text = str(message.get("content") or "").strip()
+            if text:
+                if keep != len(frames):
+                    self._log().info("[CompanionV2][bili][see] 降帧成功 keep=%d finish=%s", keep, finish)
+                return text
+            last_finish = str(finish)
+            self._log().warning("[CompanionV2][bili][see] 视觉空描述 keep=%d finish=%s tokens=%s",
+                                keep, finish, json.dumps(body.get("usage") or {}, ensure_ascii=False)[:200])
+        raise BiliError(f"视觉网关返回了空描述（finish={last_finish}）")
+
+    @staticmethod
+    def _finish_reason(body) -> Any:
         try:
-            body = await self._vision_call(port, content, max_tokens=2400)
-            message = self._choice_message(body)
-        except BiliError as empty:
-            # 该网关会先烧 reasoning 再给 content：多帧预算不够时 content 为空
-            # 且 finish_reason=length → 降帧数重试一次。
-            finish = (body.get("choices") or [{}])[0].get("finish_reason") if isinstance(body, dict) else None
-            if finish != "length":
-                raise
-            trimmed = [content[0]] + content[1:4]
-            body = await self._vision_call(port, trimmed, max_tokens=1600)
-            message = self._choice_message(body)
-        text = str(message.get("content") or "").strip()
-        if not text.strip():
-            raise BiliError("视觉网关返回了空描述")
-        return text.strip()
+            return body["choices"][0].get("finish_reason")
+        except (KeyError, IndexError, TypeError):
+            return None
+
+    @staticmethod
+    def _log():
+        import logging
+
+        return logging.getLogger(__name__)
 
     async def _vision_call(self, port, content, *, max_tokens: int) -> dict[str, Any]:
         payload = {
